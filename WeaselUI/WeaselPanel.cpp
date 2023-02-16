@@ -196,8 +196,26 @@ bool WeaselPanel::_DrawCandidates(CDCHandle dc)
 				dc.SetTextColor(m_style.hilited_comment_text_color);
 			else
 				dc.SetTextColor(m_style.comment_text_color);
+			std::wstring::difference_type newLineCount = max(std::count(comment.begin(), comment.end(), '\n'), 1);
 			rect = m_layout->GetCandidateCommentRect(i);
-			_TextOut(dc, rect.left, rect.top, rect, comment.c_str(), comment.length());
+			const auto textHeight = ((long long)rect.bottom - (long long)rect.top) / newLineCount;
+			size_t lastNewLinePos = 0;
+			auto rectTop = rect.top;
+			for (auto i = 0; i < newLineCount; ++i)
+			{
+				auto tNewLinePos = comment.find(L"\n", lastNewLinePos);
+				if (tNewLinePos == std::wstring::npos) {
+					tNewLinePos = comment.length();
+				}
+				_TextOut(dc, rect.left, rect.top, rect, comment.c_str() + lastNewLinePos, tNewLinePos - lastNewLinePos);
+				rect.top += textHeight;
+				if (tNewLinePos == comment.length())
+				{
+					break;
+				}
+				lastNewLinePos = tNewLinePos + 1;
+			}
+			
 		}
 		drawn = true;
 	}

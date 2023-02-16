@@ -71,7 +71,7 @@ void VerticalLayout::DoLayout(CDCHandle dc)
 			comment_shift_width = max(comment_shift_width, w - _style.margin_x);
 
 			const std::wstring& comment = comments.at(i).str;
-			dc.GetTextExtent(comment.c_str(), comment.length(), &size);
+			size = GetTextWithNewLineSize(dc, comment);
 			_candidateCommentRects[i].SetRect(0, height, size.cx, height + size.cy);
 			w += size.cx, h = max(h, size.cy);
 			comment_width += size.cx;
@@ -79,6 +79,11 @@ void VerticalLayout::DoLayout(CDCHandle dc)
 		}
 		//w += margin;
 		//width = max(width, w);
+		auto& candidateRect = _candidateTextRects[i];
+		if (h > candidateRect.Height())
+		{
+			candidateRect.bottom = candidateRect.top + h;
+		}
 		height += h;
 	}
 	/* comments are left-aligned to the right of the longest candidate who has a comment */
