@@ -245,6 +245,7 @@
     <ClCompile Include="FullScreenLayout.cpp" />
     <ClCompile Include="HorizontalLayout.cpp" />
     <ClCompile Include="Layout.cpp" />
+    <ClCompile Include="MultiHintPanel.cpp" />
     <ClCompile Include="StandardLayout.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
@@ -264,6 +265,7 @@
     <ClInclude Include="FullScreenLayout.h" />
     <ClInclude Include="HorizontalLayout.h" />
     <ClInclude Include="Layout.h" />
+    <ClInclude Include="MultiHintPanel.h" />
     <ClInclude Include="StandardLayout.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
