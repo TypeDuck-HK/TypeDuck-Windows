@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include <WeaselUI.h>
 #include "WeaselPanel.h"
+#include "MultiHintPanel.h"
 
 using namespace weasel;
 
@@ -193,6 +194,12 @@ void UI::UpdateInputPosition(RECT const& rc)
 void UI::Update(const Context &ctx, const Status &status)
 {
 	ctx_ = ctx;
+	MultiHintPanel multiHintPanel;
+	for (size_t i = 0; i < ctx.cinfo.comments.size(); ++i)
+	{
+		auto& comment = ctx_.cinfo.comments[i];
+		multiHintPanel.applyMultiHint(comment);
+	}
 	status_ = status;
 	Refresh();
 }

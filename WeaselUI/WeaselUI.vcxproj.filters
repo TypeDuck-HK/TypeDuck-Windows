@@ -45,6 +45,7 @@
     <ClCompile Include="FullScreenLayout.cpp">
       <Filter>Source Files\Layouts</Filter>
     </ClCompile>
+    <ClCompile Include="MultiHintPanel.cpp">
     <ClCompile Include="GdiplusBlur.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -85,7 +86,8 @@
     </ClInclude>
     <ClInclude Include="FullScreenLayout.h">
       <Filter>Header Files\Layouts</Filter>
-    </ClInclude>
+	</ClInclude>
+    <ClInclude Include="MultiHintPanel.h">
     <ClInclude Include="GdiplusBlur.h">
       <Filter>Header Files</Filter>
     </ClInclude>
