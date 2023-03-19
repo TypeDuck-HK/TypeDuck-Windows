@@ -45,24 +45,6 @@ CSize StandardLayout::GetPreeditSize(CDCHandle dc) const
 	return size;
 }
 
-CSize StandardLayout::GetTextWithNewLineSize(CDCHandle dc, const std::wstring& text) const{
-	CSize size(0, 0), tempSize;
-	const wchar_t* str = text.c_str();
-	const size_t endOfPos = std::wstring::npos;
-	const size_t strLen = text.length();
-	for (size_t i = 0; i < strLen; ) {
-		size_t newLinePos = text.find('\n', i);
-		if (newLinePos == endOfPos) {
-			newLinePos = strLen;
-		}
-		dc.GetTextExtent(str + i, newLinePos, &tempSize);
-		size.cy += tempSize.cy;
-		size.cx = max(size.cx, tempSize.cx);
-		i = newLinePos + 1;
-	}
-	return size;
-}
-
 void StandardLayout::UpdateStatusIconLayout(int* width, int* height)
 {
 	// rule 1. status icon is middle-aligned with preedit text or auxiliary text, whichever comes first

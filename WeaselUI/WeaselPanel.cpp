@@ -4,8 +4,7 @@
 #include <Usp10.h>
 
 #include "VerticalLayout.h"
-#include "HorizontalLayout.h"
-#include "FullScreenLayout.h"
+#include "utils.h"
 
 // for IDI_ZH, IDI_EN
 #include <resource.h>
@@ -29,13 +28,18 @@ WeaselPanel::~WeaselPanel()
 		delete m_layout;
 }
 
+void WeaselPanel::_SetFont(CDCHandle dc) {
+	const long otherFontHeight = -MulDiv(m_style.font_point, dc.GetDeviceCaps(LOGPIXELSY), 72);
+	const long romanFontHeight = MulDiv(m_style.font_point, 4, 5);
+	const wchar_t* fontFace = m_style.font_face.c_str();
+	m_romanFont.CreateFontW(romanFontHeight, 0, 0, 0, 0, 0, 0, 0, DEFAULT_CHARSET, 0, 0, 0, 0, fontFace);
+	m_otherFont.CreateFontW(otherFontHeight, 0, 0, 0, 0, 0, 0, 0, DEFAULT_CHARSET, 0, 0, 0, 0, fontFace);
+}
+
 void WeaselPanel::_ResizeWindow()
 {
 	CDCHandle dc = GetDC();
-	long fontHeight = -MulDiv(m_style.font_point, dc.GetDeviceCaps(LOGPIXELSY), 72);
-	CFont font;
-	font.CreateFontW(fontHeight, 0, 0, 0, 0, 0, 0, 0, DEFAULT_CHARSET, 0, 0, 0, 0, m_style.font_face.c_str());
-	dc.SelectFont(font);
+	_SetFont(dc);
 
 	CSize size = m_layout->GetContentSize();
 	SetWindowPos(NULL, 0, 0, size.cx, size.cy, SWP_NOACTIVATE | SWP_NOMOVE | SWP_NOZORDER);
@@ -47,23 +51,7 @@ void WeaselPanel::_CreateLayout()
 	if (m_layout != NULL)
 		delete m_layout;
 
-	Layout* layout = NULL;
-	if (m_style.layout_type == UIStyle::LAYOUT_VERTICAL ||
-		m_style.layout_type == UIStyle::LAYOUT_VERTICAL_FULLSCREEN)
-	{
-		layout = new VerticalLayout(m_style, m_ctx, m_status);
-	}
-	else if (m_style.layout_type == UIStyle::LAYOUT_HORIZONTAL ||
-		m_style.layout_type == UIStyle::LAYOUT_HORIZONTAL_FULLSCREEN)
-	{
-		layout = new HorizontalLayout(m_style, m_ctx, m_status);
-	}
-	if (m_style.layout_type == UIStyle::LAYOUT_VERTICAL_FULLSCREEN ||
-		m_style.layout_type == UIStyle::LAYOUT_HORIZONTAL_FULLSCREEN)
-	{
-		layout = new FullScreenLayout(m_style, m_ctx, m_status, m_inputPos, layout);
-	}
-	m_layout = layout;
+	m_layout = new VerticalLayout(m_style, m_ctx, m_status);
 }
 
 //更新界面
@@ -72,11 +60,8 @@ void WeaselPanel::Refresh()
 	_CreateLayout();
 
 	CDCHandle dc = GetDC();
-	long fontHeight = -MulDiv(m_style.font_point, dc.GetDeviceCaps(LOGPIXELSY), 72);
-	CFont font;
-	font.CreateFontW(fontHeight, 0, 0, 0, 0, 0, 0, 0, DEFAULT_CHARSET, 0, 0, 0, 0, m_style.font_face.c_str());
-	dc.SelectFont(font);
-	m_layout->DoLayout(dc);
+	_SetFont(dc);
+	m_layout->DoLayout(dc, m_romanFont, m_otherFont);
 	ReleaseDC(dc);
 
 	_ResizeWindow();
@@ -159,13 +144,21 @@ bool WeaselPanel::_DrawPreedit(Text const& text, CDCHandle dc, CRect const& rc)
 bool WeaselPanel::_DrawCandidates(CDCHandle dc)
 {
 	bool drawn = false;
+	CSize size, romanSize, charSize;
+	CPoint point, romanPoint, charPoint;
+
 	const std::vector<Text> &candidates(m_ctx.cinfo.candies);
 	const std::vector<Text> &comments(m_ctx.cinfo.comments);
 	const std::vector<Text> &labels(m_ctx.cinfo.labels);
 
+	const int space = m_style.hilite_spacing;
+	const int CHAR_MARGIN = m_style.hilite_spacing / 2;
+	const int RUBY_MARGIN = CHAR_MARGIN;
+
+	int y = m_style.margin_y;
+
 	for (size_t i = 0; i < candidates.size() && i < MAX_CANDIDATES_COUNT; ++i)
 	{
-		CRect rect;
 		if (i == m_ctx.cinfo.highlighted)
 		{
 			_HighlightText(dc, m_layout->GetHighlightRect(), m_style.hilited_candidate_back_color);
@@ -174,48 +167,76 @@ bool WeaselPanel::_DrawCandidates(CDCHandle dc)
 		else
 			dc.SetTextColor(m_style.label_text_color);
 
-		// Draw label
 		std::wstring label = m_layout->GetLabelText(labels, i, m_style.label_text_format.c_str());
-		rect = m_layout->GetCandidateLabelRect(i);
-		_TextOut(dc, rect.left, rect.top, rect, label.c_str(), label.length());
+		std::u32string text = conv16to32(candidates.at(i).str);
 
-		// Draw text
-		std::wstring text = candidates.at(i).str;
-		if (i == m_ctx.cinfo.highlighted)
-			dc.SetTextColor(m_style.hilited_candidate_text_color);
-		else
-			dc.SetTextColor(m_style.candidate_text_color);
-		rect = m_layout->GetCandidateTextRect(i);
-		_TextOut(dc, rect.left, rect.top, rect, text.c_str(), text.length());
+		const std::unordered_set<char32_t>& charWithTwoSyllables = text.length() == 1 ? charWithTwoSyllablesIndividual : charWithTwoSyllablesInPhrase;
 		
-		// Draw comment
-		std::wstring comment = comments.at(i).str;
-		if (!comment.empty())
-		{
-			if (i == m_ctx.cinfo.highlighted)
-				dc.SetTextColor(m_style.hilited_comment_text_color);
-			else
-				dc.SetTextColor(m_style.comment_text_color);
-			std::wstring::difference_type newLineCount = max(std::count(comment.begin(), comment.end(), '\n'), 1);
-			rect = m_layout->GetCandidateCommentRect(i);
-			const auto textHeight = ((long long)rect.bottom - (long long)rect.top) / newLineCount;
-			size_t lastNewLinePos = 0;
-			auto rectTop = rect.top;
-			for (auto i = 0; i < newLineCount; ++i)
-			{
-				auto tNewLinePos = comment.find(L"\n", lastNewLinePos);
-				if (tNewLinePos == std::wstring::npos) {
-					tNewLinePos = comment.length();
-				}
-				_TextOut(dc, rect.left, rect.top, rect, comment.c_str() + lastNewLinePos, tNewLinePos - lastNewLinePos);
-				rect.top += textHeight;
-				if (tNewLinePos == comment.length())
-				{
-					break;
-				}
-				lastNewLinePos = tNewLinePos + 1;
+		bool firstComment = true;
+		columns lines(conv16to32(comments.at(i).str), lineSep);
+		for (const std::u32string& comment : lines) {
+			columns tokens(comment, tabSep);
+			auto tokens_it = tokens.begin();
+
+			std::u32string roman = *tokens_it++;
+			columns romans(roman, spaceSep);
+			auto romans_it = romans.begin();
+
+			std::wstring roman16 = conv32to16(roman);
+			dc.SelectFont(m_romanFont);
+			dc.GetTextExtent(roman16.c_str(), roman16.length(), &size);
+			const long romanHeight = size.cy;
+
+			std::wstring other = label + conv32to16(U'\t' + text + U'\t' + comment.substr(comment.find(U'\t')));
+			dc.SelectFont(m_otherFont);
+			dc.GetTextExtent(other.c_str(), other.length(), &size);
+			const long otherHeight = size.cy;
+
+			int x = m_style.margin_x;
+			if (firstComment) {
+				dc.GetTextExtent(label.c_str(), label.length(), &size);
+				point.SetPoint(x, y + romanHeight);
+				_TextOut(dc, point.x, point.y, CRect(point, size), label.c_str(), label.length());
+				firstComment = false;
 			}
-			
+			x += m_layout->labelWidth + space;
+
+			int textX = x;
+			for (const char32_t& ch : text) {
+				std::wstring ch16 = conv32to16(std::u32string(&ch));
+				std::u32string roman = charWithZeroSyllables.count(ch) || romans_it == romans.end() ? U"" : (*romans_it++ + (charWithTwoSyllables.count(ch) && romans_it != romans.end() ? U" " + *romans_it++ : U""));
+				std::wstring roman16 = conv32to16(roman);
+
+				dc.SelectFont(m_romanFont);
+				dc.GetTextExtent(roman16.c_str(), roman16.length(), &romanSize);
+				const long romanWidth = romanSize.cx;
+				dc.SelectFont(m_otherFont);
+				dc.GetTextExtent(ch16.c_str(), ch16.length(), &charSize);
+				const long charWidth = charSize.cx;
+				const long width = max(romanWidth, charWidth);
+
+				dc.SelectFont(m_romanFont);
+				romanPoint.SetPoint(textX + (width - romanWidth) / 2, y);
+				_TextOut(dc, romanPoint.x, romanPoint.y, CRect(romanPoint, romanSize), roman16.c_str(), roman16.length());
+
+				dc.SelectFont(m_otherFont);
+				charPoint.SetPoint(textX + (width - charWidth) / 2, y + romanHeight);
+				_TextOut(dc, charPoint.x, charPoint.y, CRect(charPoint, charSize), ch16.c_str(), ch16.length());
+
+				textX += width + CHAR_MARGIN;
+			}
+			x += m_layout->textWidth + space;
+
+			dc.SelectFont(m_otherFont);
+			for (size_t j = 0; tokens_it != tokens.end(); tokens_it++, j++) {
+				std::wstring token16 = conv32to16(*tokens_it);
+				dc.GetTextExtent(token16.c_str(), token16.length(), &size);
+				point.SetPoint(x, y + romanHeight);
+				_TextOut(dc, point.x, point.y, CRect(point, size), token16.c_str(), token16.length());
+				x += m_layout->restColumnWidths[j] + space;
+			}
+
+			y += romanHeight + RUBY_MARGIN + otherHeight + m_style.candidate_spacing;
 		}
 		drawn = true;
 	}
@@ -246,11 +267,8 @@ void WeaselPanel::DoPaint(CDCHandle dc)
 		dc.SelectBrush(oldBrush);
 	}
 
-	long height = -MulDiv(m_style.font_point, dc.GetDeviceCaps(LOGPIXELSY), 72);
-
-	CFont font;
-	font.CreateFontW(height, 0, 0, 0, 0, 0, 0, 0, DEFAULT_CHARSET, 0, 0, 0, 0, m_style.font_face.c_str());
-	CFontHandle oldFont = dc.SelectFont(font);
+	_SetFont(dc);
+	CFontHandle oldFont = dc.SelectFont(m_otherFont);
 
 	dc.SetTextColor(m_style.text_color);
 	dc.SetBkColor(m_style.back_color);

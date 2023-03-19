@@ -17,10 +17,10 @@ void MultiHintPanel::applyMultiHint(weasel::Text& comment)
 
 	std::string& eng = info_.Definition.English;
 	std::string hint =
-		info_.Jyutping + "\n" +
-		(info_.Definition.Pos.empty() ? "" : "(" + info_.Definition.Pos + ")") + "\n" +
-		(info_.Definition.Label.empty() ? "" : "[" + info_.Definition.Label + "]") + "\n" +
-		(eng.length() > 25 ? eng.substr(0, eng.find_last_not_of(" ", 20) + 1) : eng) + "\n" +
+		info_.Jyutping + "\t" +
+		(info_.Definition.Pos.empty() ? "" : "(" + info_.Definition.Pos + ")") + "\t" +
+		(info_.Definition.Label.empty() ? "" : "[" + info_.Definition.Label + "]") + "\t" +
+		(eng.length() > 25 ? eng.substr(0, eng.find_last_not_of(" ", 20) + 1) : eng) + "\t" +
 		info_.Definition.Language.Urd;
 
 	//use converter (.to_bytes: wstr->str, .from_bytes: str->wstr)
