@@ -1,6 +1,7 @@
 #pragma once
 #include <WeaselCommon.h>
 #include <WeaselUI.h>
+#include <boost/tokenizer.hpp>
 #include "Layout.h"
 
 typedef CWinTraits<WS_POPUP|WS_CLIPSIBLINGS|WS_DISABLED, WS_EX_TOOLWINDOW|WS_EX_TOPMOST> CWeaselPanelTraits;
@@ -31,6 +32,7 @@ public:
 
 private:
 	void _CreateLayout();
+	void _SetFont(CDCHandle dc);
 	void _ResizeWindow();
 	void _RepositionWindow();
 	bool _DrawPreedit(weasel::Text const& text, CDCHandle dc, CRect const& rc);
@@ -47,4 +49,5 @@ private:
 	CIcon m_iconDisabled;
 	CIcon m_iconEnabled;
 	CIcon m_iconAlpha;
+	CFont m_romanFont, m_otherFont;
 };

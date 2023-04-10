@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "VerticalLayout.h"
+#include "utils.h"
 
 using namespace weasel;
 
@@ -8,16 +9,13 @@ VerticalLayout::VerticalLayout(const UIStyle &style, const Context &context, con
 {
 }
 
-void VerticalLayout::DoLayout(CDCHandle dc)
+void VerticalLayout::DoLayout(CDCHandle dc, CFont romanFont, CFont otherFont)
 {
 	const std::vector<Text> &candidates(_context.cinfo.candies);
 	const std::vector<Text> &comments(_context.cinfo.comments);
 	const std::vector<Text> &labels(_context.cinfo.labels);
 
 	CSize size;
-	//dc.GetTextExtent(L"\x4e2d", 1, &size);
-	//const int space = size.cx / 4;
-	const int space = _style.hilite_spacing;
 	int width = 0, height = _style.margin_y;
 
 	/* Preedit */
@@ -38,64 +36,85 @@ void VerticalLayout::DoLayout(CDCHandle dc)
 		height += size.cy + _style.spacing;
 	}
 
-	/* Candidates */
-	int comment_shift_width = 0;  /* distance to the left of the candidate text */
-	int max_candidate_width = 0;  /* label + text */
-	int max_comment_width = 0;    /* comment, or none */
-	for (size_t i = 0; i < candidates.size() && i < MAX_CANDIDATES_COUNT; ++i)
-	{
-		if (i > 0 )
-			height += _style.candidate_spacing;
+	labelWidth = 0;
+	textWidth = 0;
+	restColumnWidths.clear();
 
-		int w = _style.margin_x, h = 0;
-		int candidate_width = 0, comment_width = 0;
-		/* Label */
-		std::wstring label = GetLabelText(labels, i, _style.label_text_format.c_str());
-		dc.GetTextExtent(label.c_str(), label.length(), &size);
-		_candidateLabelRects[i].SetRect(w, height, w + size.cx, height + size.cy);
-		w += size.cx + space, h = max(h, size.cy);
-		candidate_width += size.cx + space;
+	const int space = _style.hilite_spacing;
+	const int CHAR_MARGIN = _style.hilite_spacing / 2;
+	const int RUBY_MARGIN = CHAR_MARGIN;
 
-		/* Text */
-		const std::wstring& text = candidates.at(i).str;
-		dc.GetTextExtent(text.c_str(), text.length(), &size);
-		_candidateTextRects[i].SetRect(w, height, w + size.cx, height + size.cy);
-		w += size.cx, h = max(h, size.cy);
-		candidate_width += size.cx;
-		max_candidate_width = max(max_candidate_width, candidate_width);
+	long highlightTop = 0, highlightBottom = 0;
+	for (size_t i = 0; i < candidates.size() && i < MAX_CANDIDATES_COUNT; ++i) {
+		if (i == _context.cinfo.highlighted) highlightTop = height;
 
-		/* Comment */
-		if (!comments.at(i).str.empty())
-		{
-			w += space;
-			comment_shift_width = max(comment_shift_width, w - _style.margin_x);
+		const std::wstring label = GetLabelText(labels, i, _style.label_text_format.c_str());
+		const std::u32string text = conv16to32(candidates.at(i).str);
 
-			const std::wstring& comment = comments.at(i).str;
-			size = GetTextWithNewLineSize(dc, comment);
-			_candidateCommentRects[i].SetRect(0, height, size.cx, height + size.cy);
-			w += size.cx, h = max(h, size.cy);
-			comment_width += size.cx;
-			max_comment_width = max(max_comment_width, comment_width);
+		dc.SelectFont(otherFont);
+		dc.GetTextExtent(label.c_str(), label.size(), &size);
+		labelWidth = max(labelWidth, size.cx);
+
+		const std::unordered_set<char32_t>& charWithTwoSyllables = text.size() == 1 ? charWithTwoSyllablesIndividual : charWithTwoSyllablesInPhrase;
+
+		columns lines(conv16to32(comments.at(i).str), lineSep);
+		for (const std::u32string& comment : lines) {
+			columns tokens(comment, tabSep);
+			auto tokens_it = tokens.begin();
+
+			std::u32string roman = *tokens_it++;
+			columns romans(roman, spaceSep);
+			auto romans_it = romans.begin();
+
+			std::wstring roman16 = conv32to16(roman);
+			dc.SelectFont(romanFont);
+			dc.GetTextExtent(roman16.c_str(), roman16.length(), &size);
+			const long romanHeight = size.cy;
+
+			std::wstring other = label + conv32to16(U'\t' + text + U'\t' + comment.substr(comment.find(U'\t')));
+			dc.SelectFont(otherFont);
+			dc.GetTextExtent(other.c_str(), other.length(), &size);
+			const long otherHeight = size.cy;
+
+			long textX = 0;
+			for (const char32_t& ch : text) {
+				std::wstring ch16 = conv32to16(std::u32string(&ch));
+				std::u32string roman = charWithZeroSyllables.count(ch) || romans_it == romans.end() ? U"" : (*romans_it++ + (charWithTwoSyllables.count(ch) && romans_it != romans.end() ? U" " + *romans_it++ : U""));
+				std::wstring roman16 = conv32to16(roman);
+
+				dc.SelectFont(romanFont);
+				dc.GetTextExtent(roman16.c_str(), roman16.length(), &size);
+				const long romanWidth = size.cx;
+				dc.SelectFont(otherFont);
+				dc.GetTextExtent(ch16.c_str(), ch16.length(), &size);
+				const long charWidth = size.cx;
+				const long width = max(romanWidth, charWidth);
+
+				textX += width + CHAR_MARGIN;
+			}
+			textWidth = max(textWidth, textX - CHAR_MARGIN);
+
+			dc.SelectFont(otherFont);
+			for (size_t j = 0; tokens_it != tokens.end(); tokens_it++, j++) {
+				std::wstring token16 = conv32to16(*tokens_it);
+				dc.GetTextExtent(token16.c_str(), token16.length(), &size);
+				if (restColumnWidths.size() < j) restColumnWidths.push_back(size.cx);
+				else restColumnWidths[j] = max(restColumnWidths[j], size.cx);
+			}
+
+			height += romanHeight + RUBY_MARGIN + otherHeight + _style.candidate_spacing;
 		}
-		//w += margin;
-		//width = max(width, w);
-		auto& candidateRect = _candidateTextRects[i];
-		if (h > candidateRect.Height())
-		{
-			candidateRect.bottom = candidateRect.top + h;
-		}
-		height += h;
+
+		if (i == _context.cinfo.highlighted) highlightBottom = height - _style.candidate_spacing;
 	}
-	/* comments are left-aligned to the right of the longest candidate who has a comment */
-	int max_content_width = max(max_candidate_width, comment_shift_width + max_comment_width);
+
+	long commentWidth = 0;
+	for (const long& restColumnWidth : restColumnWidths) commentWidth += restColumnWidth + space;
+	long max_content_width = labelWidth + textWidth + commentWidth + space;
 	width = max(width, max_content_width + 2 * _style.margin_x);
 
-	/* Align comments */
-	for (size_t i = 0; i < candidates.size() && i < MAX_CANDIDATES_COUNT; ++i)
-		_candidateCommentRects[i].OffsetRect(_style.margin_x + comment_shift_width, 0);
-
 	if (candidates.size())
-		height += _style.spacing;
+		height += _style.spacing - _style.candidate_spacing;
 
 	/* Trim the last spacing */
 	if (height > 0)
@@ -110,11 +129,5 @@ void VerticalLayout::DoLayout(CDCHandle dc)
 	UpdateStatusIconLayout(&width, &height);
 	_contentSize.SetSize(width, height);
 
-	/* Highlighted Candidate */
-	int id = _context.cinfo.highlighted;
-	_highlightRect.SetRect(
-		_style.margin_x,
-		_candidateTextRects[id].top,
-		width - _style.margin_x,
-		_candidateTextRects[id].bottom);
+	_highlightRect.SetRect(_style.margin_x, highlightTop, width - _style.margin_x, highlightBottom);
 }

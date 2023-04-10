@@ -9,6 +9,6 @@ namespace weasel
 	public:
 		VerticalLayout(const UIStyle &style, const Context &context, const Status &status);
 
-		virtual void DoLayout(CDCHandle dc);
+		virtual void DoLayout(CDCHandle dc, CFont romanFont, CFont otherFont);
 	};
 };

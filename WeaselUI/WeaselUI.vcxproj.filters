@@ -39,12 +39,6 @@
     <ClCompile Include="VerticalLayout.cpp">
       <Filter>Source Files\Layouts</Filter>
     </ClCompile>
-    <ClCompile Include="HorizontalLayout.cpp">
-      <Filter>Source Files\Layouts</Filter>
-    </ClCompile>
-    <ClCompile Include="FullScreenLayout.cpp">
-      <Filter>Source Files\Layouts</Filter>
-    </ClCompile>
     <ClCompile Include="MultiHintPanel.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -74,13 +68,10 @@
     <ClInclude Include="VerticalLayout.h">
       <Filter>Header Files\Layouts</Filter>
     </ClInclude>
-    <ClInclude Include="HorizontalLayout.h">
-      <Filter>Header Files\Layouts</Filter>
-    </ClInclude>
-    <ClInclude Include="FullScreenLayout.h">
-      <Filter>Header Files\Layouts</Filter>
-    </ClInclude>
     <ClInclude Include="MultiHintPanel.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="utils.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
