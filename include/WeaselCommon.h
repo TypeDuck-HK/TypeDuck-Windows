@@ -341,6 +341,7 @@ namespace weasel
 #endif /*  USE_PAGER_MARK */
 		// per client
 		int client_caps;
+		std::wstring hint_settings;
 
 		UIStyle() : font_face(),
 			label_font_face(),
@@ -403,6 +404,7 @@ namespace weasel
 #endif
 			hilited_label_text_color(0),
 			hilited_comment_text_color(0),
+			int_settings() {},
 #ifdef USE_HILITE_MARK
 			hilited_mark_color(0),
 #endif
@@ -560,6 +562,8 @@ namespace boost {
 #endif
 			// per client
 			ar & s.client_caps;
+			// hint settings
+			ar & s.hint_settings;
 		}
 
 		template <typename Archive>

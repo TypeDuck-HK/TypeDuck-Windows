@@ -164,6 +164,8 @@
   <ItemGroup>
     <ClInclude Include="Configurator.h" />
     <ClInclude Include="DictManagementDialog.h" />
+    <ClInclude Include="HintSettings.h" />
+    <ClInclude Include="HintSettingsDialog.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="SwitcherSettingsDialog.h" />
@@ -176,6 +178,8 @@
     <ClCompile Include="..\RimeWithWeasel\WeaselUtility.cpp" />
     <ClCompile Include="Configurator.cpp" />
     <ClCompile Include="DictManagementDialog.cpp" />
+    <ClCompile Include="HintSettings.cpp" />
+    <ClCompile Include="HintSettingsDialog.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
@@ -197,7 +201,11 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\output\WeaselDeployer.exe" />
     <None Include="..\resource\weasel.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="..\resource\bitmap1.bmp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -5,6 +5,7 @@
 #include "UIStyleSettings.h"
 #include "UIStyleSettingsDialog.h"
 #include "DictManagementDialog.h"
+#include "HintSettingsDialog.h"
 #include <WeaselCommon.h>
 #include <WeaselIPC.h>
 #include <WeaselUtility.h>
@@ -64,6 +65,21 @@ static bool configure_ui(RimeLeversApi* api, UIStyleSettings* ui_style_settings,
 	return false;
 }
 
+static bool configure_multiHint(RimeLeversApi* api, HintSettings* hintSettings, bool* reconfigured) {
+	RimeCustomSettings* settings = hintSettings->settings();
+	HintSettingsDialog dialog(hintSettings);
+	if (!api->load_settings(settings)) {
+		return false;
+	}
+	if (dialog.DoModal() == IDOK) {
+		if (api->save_settings(settings)) {
+			*reconfigured = true;
+			return true;
+		}
+	}
+	return false;
+}
+
 int Configurator::Run(bool installing)
 {
 	RimeModule* levers = rime_get_api()->find_module("levers");
@@ -75,12 +91,15 @@ int Configurator::Run(bool installing)
 
 	RimeSwitcherSettings* switcher_settings = api->switcher_settings_init();
 	UIStyleSettings ui_style_settings;
+	HintSettings hint_settings;
 
 	bool skip_switcher_settings = installing && !api->is_first_run((RimeCustomSettings*)switcher_settings);
 	bool skip_ui_style_settings = installing && !api->is_first_run(ui_style_settings.settings());
+	bool skip_multiHint_settings = installing && !api->is_first_run(hint_settings.settings());
 
 	(skip_switcher_settings || configure_switcher(api, switcher_settings, &reconfigured)) &&
-		(skip_ui_style_settings || configure_ui(api, &ui_style_settings, &reconfigured));
+		(skip_ui_style_settings || configure_ui(api, &ui_style_settings, &reconfigured)) &&
+		(skip_multiHint_settings || configure_multiHint(api, &hint_settings, &reconfigured));
 
 	api->custom_settings_destroy((RimeCustomSettings*)switcher_settings);
 
