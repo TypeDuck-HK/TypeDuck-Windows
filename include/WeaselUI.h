@@ -53,13 +53,13 @@ namespace weasel
 		Context& ctx() { return ctx_; } 
 		Status& status() { return status_; } 
 		UIStyle& style() { return style_; }
-
 	private:
 		UIImpl* pimpl_;
 
 		Context ctx_;
 		Status status_;
 		UIStyle style_;
+
 	};
 
 }

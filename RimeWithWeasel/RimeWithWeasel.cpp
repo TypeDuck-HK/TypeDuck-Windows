@@ -664,7 +664,13 @@ static void _UpdateUIStyle(RimeConfig* config, weasel::UI* ui, bool initialize)
 		}
 		RimeConfigGetInt(config, (prefix + "/hilited_comment_text_color").c_str(), &style.hilited_comment_text_color);
 	}
-}
+	char hint_settings[128] = { 0 };
+	RimeConfigGetString(config, "style/language_list", hint_settings, sizeof(hint_settings) - 1);
+	if (strlen(hint_settings) > 0) {
+		// don't know why sometime it is empty even though settings is correct
+		style.hint_settings = utf8towcs(hint_settings);
+	}
+} 
 
 static void _LoadAppOptions(RimeConfig* config, AppOptionsByAppName& app_options)
 {
