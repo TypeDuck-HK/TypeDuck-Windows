@@ -42,6 +42,12 @@
     <ClInclude Include="DictManagementDialog.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="HintSettingsDialog.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="HintSettings.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -68,6 +74,12 @@
     <ClCompile Include="..\RimeWithWeasel\WeaselUtility.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="HintSettingsDialog.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="HintSettings.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="WeaselDeployer.rc">
@@ -78,5 +90,11 @@
     <None Include="..\resource\weasel.ico">
       <Filter>Resource Files</Filter>
     </None>
+    <None Include="..\output\WeaselDeployer.exe" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="..\resource\bitmap1.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
   </ItemGroup>
 </Project>

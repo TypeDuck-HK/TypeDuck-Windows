@@ -179,6 +179,7 @@ namespace weasel
 		int hilited_comment_text_color;
 		// per client
 		int client_caps;
+		std::wstring hint_settings;
 
 		UIStyle() : font_face(),
 			font_point(0),
@@ -209,7 +210,8 @@ namespace weasel
 			hilited_candidate_back_color(0),
 			hilited_label_text_color(0),
 			hilited_comment_text_color(0),
-			client_caps(0) {}
+			client_caps(0),
+			hint_settings() {}
 	};
 }
 namespace boost {
@@ -250,6 +252,8 @@ namespace boost {
 			ar & s.hilited_comment_text_color;
 			// per client
 			ar & s.client_caps;
+			// hint settings
+			ar & s.hint_settings;
 		}
 
 		template <typename Archive>
