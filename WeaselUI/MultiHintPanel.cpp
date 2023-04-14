@@ -10,44 +10,45 @@ void MultiHintPanel::applyMultiHint(weasel::Text& comment)
 	std::wstring_convert<convert_type, wchar_t> converter;
 
 	std::wstring& str = comment.str;
-	if (str.find(',') == std::wstring::npos) { // std::count(str.begin(), str.end(), ',') < 16
+	if (str.size() < 2) {
+		return;
+	}
+	if (str.at(0) != '{' || str.at(str.size() - 1) != '}') {
 		return;
 	}
 	InfoMultiHint info_(converter.to_bytes(str));
-
-	std::string& eng = info_.Definition.English;
-	std::string hint =
-		info_.Jyutping + "\t" +
-		(info_.Definition.Pos.empty() ? "" : "(" + info_.Definition.Pos + ")") + "\t" +
-		(info_.Definition.Label.empty() ? "" : "[" + info_.Definition.Label + "]") + "\t" +
-		(eng.length() > 25 ? eng.substr(0, eng.find_last_not_of(" ", 20) + 1) : eng) + "\t" +
-		info_.Definition.Language.Urd;
+	
+	std::string hint = boost::algorithm::join(std::vector<std::string>{
+		info_.Jyutping, 
+		info_.Eng, 
+		info_.Pos, 
+		info_.Label
+		}, "\n");
 
 	//use converter (.to_bytes: wstr->str, .from_bytes: str->wstr)
 	str = converter.from_bytes(hint);
 }
 
-InfoMultiHint::InfoMultiHint(const std::string& input) {
-	boost::tokenizer<boost::escaped_list_separator<char>> columns(input);
-	auto column = columns.begin();
-	/*  0 */ Honzi = *column++;
-	/*  1 */ Jyutping = *column++;
-	/*  2 */ PronOrder = *column++;
-	/*  3 */ Sandhi = *column++;
-	/*  4 */ LitColReading = *column++;
-	/*  5 */ Freq = *column++;
-	/*  6 */ Freq2 = *column++;
-	Definition = InfoDefinition();
-	/*  7 */ Definition.English = *column++;
-	/*  8 */ Definition.Disambiguation = *column++;
-	/*  9 */ Definition.Pos = *column++;
-	/* 10 */ Definition.Register = *column++;
-	/* 11 */ Definition.Label = *column++;
-	/* 12 */ Definition.Written = *column++;
-	/* 13 */ Definition.Colloquial = *column++;
-	Definition.Language = InfoLanguage();
-	/* 14 */ Definition.Language.Urd = *column++;
-	/* 15 */ Definition.Language.Nep = *column++;
-	/* 16 */ Definition.Language.Hin = *column++;
-	/* 17 */ Definition.Language.Ind = *column++;
+InfoMultiHint::InfoMultiHint(const std::string& json)
+{
+	parseJSON(json);
+}
+
+void InfoMultiHint::parseJSON(std::string input)
+{
+	std::string inputStr(input.begin(), input.end());
+	std::stringstream ss(inputStr);
+	boost::property_tree::ptree pt;
+	boost::property_tree::read_json(ss, pt);
+  std::vector<std::string> engs;
+	std::vector<std::string> poss;
+	std::vector<std::string> lbls;
+	for (const auto& def : pt.get_child("defs")) {
+		engs.push_back(def.second.get("eng",""));
+		poss.push_back(def.second.get("pos", ""));
+		lbls.push_back(def.second.get("lbl", ""));
+	}
+	Eng = boost::algorithm::join(engs, ";");
+	Pos = boost::algorithm::join(poss, ";");
+	Label = boost::algorithm::join(lbls, ";");
 }
