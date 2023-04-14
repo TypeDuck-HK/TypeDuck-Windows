@@ -95,6 +95,7 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="VHorizontalLayout.h">
+    <ClInclude Include="MultiHintPanel.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
