@@ -29,7 +29,7 @@ namespace weasel
 	protected:
 		/* Utility functions */
 		CSize GetPreeditSize(CDCHandle dc) const;
-		CSize GetTextWithNewLineSize(CDCHandle dc,const std::wstring& text) const;
+		CSize GetTextWithNewLineSize(CDCHandle dc, const std::wstring& text) const;
 		void UpdateStatusIconLayout(int* width, int* height);
 
 		CSize _contentSize;
