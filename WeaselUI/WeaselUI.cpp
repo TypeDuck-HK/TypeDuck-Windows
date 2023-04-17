@@ -3,6 +3,8 @@
 #include "WeaselPanel.h"
 #include "MultiHintPanel.h"
 
+static MultiHintPanel multiHintPanel;
+
 using namespace weasel;
 
 class weasel::UIImpl {
@@ -108,7 +110,8 @@ bool UI::Create(HWND parent)
 	if (!pimpl_)
 		return false;
 
-	pimpl_->panel.Create(parent, 0, 0, WS_POPUP, WS_EX_TOOLWINDOW | WS_EX_TOPMOST | WS_EX_NOACTIVATE | WS_EX_LAYERED | WS_EX_TRANSPARENT, 0U, 0);
+	multiHintPanel.setMultiHintOptions(style_.hint_settings);
+	pimpl_->panel.Create(parent, 0, 0, WS_POPUP, WS_EX_TOOLWINDOW | WS_EX_TOPMOST, 0U, 0);
 	return true;
 }
 
@@ -194,7 +197,6 @@ void UI::UpdateInputPosition(RECT const& rc)
 void UI::Update(const Context &ctx, const Status &status)
 {
 	ctx_ = ctx;
-	MultiHintPanel multiHintPanel;
 	for (size_t i = 0; i < ctx.cinfo.comments.size(); ++i)
 	{
 		auto& comment = ctx_.cinfo.comments[i];

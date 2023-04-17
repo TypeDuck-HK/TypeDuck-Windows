@@ -2,6 +2,8 @@
 
 #include <WeaselCommon.h>
 #include <boost/tokenizer.hpp>
+#include <locale>
+#include <codecvt>
 
 struct InfoLanguage {
 	std::string Urd;
@@ -33,8 +35,31 @@ struct InfoMultiHint {
 	InfoDefinition Definition; // std::vector<std::string> if necessary
 };
 
+enum class StatusHintColumn {
+	None						= 0,
+	JyutPing				= 1<<0,
+	English					= 1<<1,
+	Disambiguation	= 1<<2,
+	PartOfSpeech		= 1<<3,
+	Register				= 1<<4,
+	Label						= 1<<5,
+	Written					= 1<<6,
+	Colloquial			= 1<<7,
+	Urd							= 1<<8,
+	Nep							= 1<<9,
+	Hin							= 1<<10,
+	Ind							= 1<<11
+};
+
+using StatusHintSetting = int;
+
 class MultiHintPanel
 {
 public:
 	void applyMultiHint(weasel::Text& comment);
+	void setMultiHintOptions(const std::wstring& settings);
+private:
+	using convert_type = std::codecvt_utf8<wchar_t>;
+	std::wstring_convert<convert_type, wchar_t> converter_;
+	StatusHintSetting settingsStatus_;
 };
