@@ -6,14 +6,11 @@
 void MultiHintPanel::applyMultiHint(weasel::Text& comment)
 {
 	//setup converter
-	using convert_type = std::codecvt_utf8<wchar_t>;
-	std::wstring_convert<convert_type, wchar_t> converter;
-
 	std::wstring& str = comment.str;
 	if (str.find(',') == std::wstring::npos) { // std::count(str.begin(), str.end(), ',') < 16
 		return;
 	}
-	InfoMultiHint info_(converter.to_bytes(str));
+	InfoMultiHint info_(converter_.to_bytes(str));
 
 	std::string& eng = info_.Definition.English;
 	std::string hint =
@@ -24,7 +21,33 @@ void MultiHintPanel::applyMultiHint(weasel::Text& comment)
 		info_.Definition.Language.Urd;
 
 	//use converter (.to_bytes: wstr->str, .from_bytes: str->wstr)
-	str = converter.from_bytes(hint);
+	str = converter_.from_bytes(hint);
+}
+
+const std::pair<std::wstring, int> columns[] = {
+	{L"Jyutping", (int)StatusHintColumn::JyutPing},
+	{L"English", (int)StatusHintColumn::English},
+	{L"Disambiguatory Information", (int)StatusHintColumn::Disambiguation},
+	{L"Part of Speech", (int)StatusHintColumn::PartOfSpeech},
+	{L"Register", (int)StatusHintColumn::Register},
+	{L"Label", (int)StatusHintColumn::Label},
+	{L"Written", (int)StatusHintColumn::Written},
+	{L"Colloquial", (int)StatusHintColumn::Colloquial},
+	{L"Urd", (int)StatusHintColumn::Urd},
+	{L"Nep", (int)StatusHintColumn::Nep},
+	{L"Hin", (int)StatusHintColumn::Hin},
+	{L"Ind", (int)StatusHintColumn::Ind}
+};
+
+void MultiHintPanel::setMultiHintOptions(const std::wstring& settings)
+{
+	StatusHintSetting status = (int)StatusHintColumn::None;
+	for (auto& column : columns) {
+		if (settings.find(column.first) != std::wstring::npos) {
+			status = status | column.second;
+		}
+	}
+	if (status) { settingsStatus_ = status; }
 }
 
 InfoMultiHint::InfoMultiHint(const std::string& input) {
