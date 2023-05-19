@@ -56,8 +56,10 @@ using StatusHintSetting = int;
 class MultiHintPanel
 {
 public:
+	MultiHintPanel() : settingsStatus_(0) {}
 	void applyMultiHint(weasel::Text& comment);
 	void setMultiHintOptions(const std::wstring& settings);
+	std::string getHint(const InfoMultiHint& info);
 private:
 	using convert_type = std::codecvt_utf8<wchar_t>;
 	std::wstring_convert<convert_type, wchar_t> converter_;

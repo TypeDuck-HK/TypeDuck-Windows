@@ -2,23 +2,23 @@
 #include "MultiHintPanel.h"
 #include <locale>
 #include <codecvt>
+#include <boost/container/vector.hpp>
+#include <boost/algorithm/string.hpp>
 
 void MultiHintPanel::applyMultiHint(weasel::Text& comment)
 {
 	//setup converter
 	std::wstring& str = comment.str;
+	// if Jyutping set to empty don't print the default comment whatever it is.
+	auto status = settingsStatus_;
+	if (!(status & (int)StatusHintColumn::JyutPing)) {
+		comment.str = L"";
+	}
 	if (str.find(',') == std::wstring::npos) { // std::count(str.begin(), str.end(), ',') < 16
 		return;
 	}
-	InfoMultiHint info_(converter_.to_bytes(str));
-
-	std::string& eng = info_.Definition.English;
-	std::string hint =
-		info_.Jyutping + "\n" +
-		(info_.Definition.Pos.empty() ? "" : "(" + info_.Definition.Pos + ")") + "\n" +
-		(info_.Definition.Label.empty() ? "" : "[" + info_.Definition.Label + "]") + "\n" +
-		(eng.length() > 25 ? eng.substr(0, eng.find_last_not_of(" ", 20) + 1) : eng) + "\n" +
-		info_.Definition.Language.Urd;
+	InfoMultiHint info(converter_.to_bytes(str));
+	std::string hint = getHint(info);
 
 	//use converter (.to_bytes: wstr->str, .from_bytes: str->wstr)
 	str = converter_.from_bytes(hint);
@@ -47,7 +47,60 @@ void MultiHintPanel::setMultiHintOptions(const std::wstring& settings)
 			status = status | column.second;
 		}
 	}
-	if (status) { settingsStatus_ = status; }
+	settingsStatus_ = status;
+}
+
+std::string MultiHintPanel::getHint(const InfoMultiHint& info)
+{
+	using namespace boost::container;
+	vector<std::string> textContainer;
+	auto status = settingsStatus_;
+	if(status & (int)StatusHintColumn::JyutPing)
+	{ textContainer.push_back(info.Jyutping); }
+
+	if(status & (int)StatusHintColumn::English)
+	{ textContainer.push_back(info.Definition.English); }
+
+	if(status & (int)StatusHintColumn::Disambiguation)
+	{ textContainer.push_back(info.Definition.Disambiguation); }
+
+	if(status & (int)StatusHintColumn::PartOfSpeech 
+			&& info.Definition.Pos.size() > 0)
+	{ 
+		const auto& pos = info.Definition.Pos;
+		textContainer.push_back("(" + pos + ")");
+	}
+
+	if(status & (int)StatusHintColumn::Register 
+			&& info.Definition.Register.size() > 0)
+	{ 
+		const auto& reg = info.Definition.Register;
+		textContainer.push_back("[" + reg + "]"); 
+	}
+
+	if(status & (int)StatusHintColumn::Label) 
+	{ textContainer.push_back(info.Definition.Label); }
+
+	if(status & (int)StatusHintColumn::Written) 
+	{ textContainer.push_back(info.Definition.Written); }
+
+	if(status & (int)StatusHintColumn::Colloquial) 
+	{ textContainer.push_back(info.Definition.Colloquial); }
+
+	if(status & (int)StatusHintColumn::Urd) 
+	{ textContainer.push_back(info.Definition.Language.Urd); }
+
+	if(status & (int)StatusHintColumn::Nep) 
+	{ textContainer.push_back(info.Definition.Language.Nep); }
+
+	if(status & (int)StatusHintColumn::Hin) 
+	{ textContainer.push_back(info.Definition.Language.Hin); }
+
+	if(status & (int)StatusHintColumn::Ind) 
+	{ textContainer.push_back(info.Definition.Language.Ind); }
+
+	return boost::algorithm::join_if(textContainer, " \t ", 
+											[](const std::string& s) { return s.size() > 0; });
 }
 
 InfoMultiHint::InfoMultiHint(const std::string& input) {
