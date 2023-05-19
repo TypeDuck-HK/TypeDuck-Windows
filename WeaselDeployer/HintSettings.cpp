@@ -63,7 +63,7 @@ bool HintSettings::GetActiveLanguages(std::vector<HintSettingsInfo> *result)
 
 bool HintSettings::SetLanguageList(const std::vector<HintSettingsInfo> &result)
 {
-	std::string settingStr = "";
+	std::string settingStr = " ";
 	for (auto& info : result) {
 		// concat settingStr and info.column_name
 		settingStr += info.column_name;
