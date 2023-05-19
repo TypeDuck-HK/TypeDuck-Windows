@@ -54,8 +54,7 @@ static bool configure_switcher(RimeLeversApi* api, RimeSwitcherSettings* switchc
 
 static bool configure_ui(RimeLeversApi* api, UIStyleSettings* ui_style_settings, bool* reconfigured) {
 	RimeCustomSettings* settings = ui_style_settings->settings();
-    if (!api->load_settings(settings))
-        return false;
+  api->load_settings(settings);
 	UIStyleSettingsDialog dialog(ui_style_settings);
 	if (dialog.DoModal() == IDOK) {
 		if (api->save_settings(settings))
@@ -68,9 +67,7 @@ static bool configure_ui(RimeLeversApi* api, UIStyleSettings* ui_style_settings,
 static bool configure_multiHint(RimeLeversApi* api, HintSettings* hintSettings, bool* reconfigured) {
 	RimeCustomSettings* settings = hintSettings->settings();
 	HintSettingsDialog dialog(hintSettings);
-	if (!api->load_settings(settings)) {
-		return false;
-	}
+	api->load_settings(settings);
 	if (dialog.DoModal() == IDOK) {
 		if (api->save_settings(settings)) {
 			*reconfigured = true;
@@ -96,7 +93,7 @@ int Configurator::Run(bool installing)
 	bool skip_switcher_settings = installing && !api->is_first_run((RimeCustomSettings*)switcher_settings);
 	bool skip_ui_style_settings = installing && !api->is_first_run(ui_style_settings.settings());
 	bool skip_multiHint_settings = installing && !api->is_first_run(hint_settings.settings());
-
+	
 	(skip_switcher_settings || configure_switcher(api, switcher_settings, &reconfigured)) &&
 		(skip_ui_style_settings || configure_ui(api, &ui_style_settings, &reconfigured)) &&
 		(skip_multiHint_settings || configure_multiHint(api, &hint_settings, &reconfigured));
@@ -122,7 +119,7 @@ int Configurator::UpdateWorkspace(bool report_errors) {
 		CloseHandle(hMutex);
 		if (report_errors)
 		{
-			MessageBox(NULL, L"正在執行另一項部署任務，方纔所做的修改將在輸入法再次啓動後生效。", L"【小狼毫】", MB_OK | MB_ICONINFORMATION);
+			MessageBox(NULL, L"Another Task Deploying, The modification would be Enable after restart.", L"[Weasel]", MB_OK | MB_ICONINFORMATION);
 		}
 		return 1;
 	}
@@ -141,7 +138,7 @@ int Configurator::UpdateWorkspace(bool report_errors) {
 		// initialize weasel config
 		rime->deploy_config_file("weasel.yaml", "config_version");
 	}
-
+	
 	CloseHandle(hMutex);  // should be closed before resuming service.
 
 	if (client.Connect())
@@ -163,7 +160,7 @@ int Configurator::DictManagement() {
 	{
 		LOG(WARNING) << "another deployer process is running; aborting operation.";
 		CloseHandle(hMutex);
-		MessageBox(NULL, L"正在執行另一項部署任務，請稍候再試。", L"【小狼毫】", MB_OK | MB_ICONINFORMATION);
+		MessageBox(NULL, L"Another Running Deployer process, Please Wait.", L"[Weasel]", MB_OK | MB_ICONINFORMATION);
 		return 1;
 	}
 
@@ -205,7 +202,7 @@ int Configurator::SyncUserData() {
 	{
 		LOG(WARNING) << "another deployer process is running; aborting operation.";
 		CloseHandle(hMutex);
-		MessageBox(NULL, L"正在執行另一項部署任務，請稍候再試。", L"【小狼毫】", MB_OK | MB_ICONINFORMATION);
+		MessageBox(NULL, L"Another Running Deployer process, Please Wait.", L"【Weasel】", MB_OK | MB_ICONINFORMATION);
 		return 1;
 	}
 
