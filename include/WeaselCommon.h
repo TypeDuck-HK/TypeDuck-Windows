@@ -404,7 +404,7 @@ namespace weasel
 #endif
 			hilited_label_text_color(0),
 			hilited_comment_text_color(0),
-			int_settings() {},
+			hint_settings(),
 #ifdef USE_HILITE_MARK
 			hilited_mark_color(0),
 #endif

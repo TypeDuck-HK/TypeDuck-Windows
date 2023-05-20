@@ -1127,6 +1127,7 @@ static bool _UpdateUIStyleColor(RimeConfig* config, weasel::UIStyle& style, bool
 		}
 		return true;
 	}
+	return false;
 }
 
 static void _LoadAppOptions(RimeConfig* config, AppOptionsByAppName& app_options)

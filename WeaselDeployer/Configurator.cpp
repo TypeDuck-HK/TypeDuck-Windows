@@ -54,7 +54,8 @@ static bool configure_switcher(RimeLeversApi* api, RimeSwitcherSettings* switchc
 
 static bool configure_ui(RimeLeversApi* api, UIStyleSettings* ui_style_settings, bool* reconfigured) {
 	RimeCustomSettings* settings = ui_style_settings->settings();
-  api->load_settings(settings);
+    if (!api->load_settings(settings))
+        return false;
 	UIStyleSettingsDialog dialog(ui_style_settings);
 	if (dialog.DoModal() == IDOK) {
 		if (api->save_settings(settings))
