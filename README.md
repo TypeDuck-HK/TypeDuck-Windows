@@ -116,3 +116,4 @@ Rime 輸入法（不限於 Windows 平臺）功能、使用方法與配置相關
 其他技術交流請寄 Rime 開發者 <rimeime@gmail.com>
 
 謝謝！
+

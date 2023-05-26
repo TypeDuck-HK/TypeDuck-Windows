@@ -11,15 +11,15 @@ void MultiHintPanel::applyMultiHint(weasel::Text& comment)
 	std::wstring& str = comment.str;
 	// if Jyutping set to empty don't print the default comment whatever it is.
 	auto status = settingsStatus_;
-	if (!(status & (int)StatusHintColumn::JyutPing)) {
-		comment.str = L"";
-	}
+	
 	if (str.find(',') == std::wstring::npos) { // std::count(str.begin(), str.end(), ',') < 16
+		if (!(status & (int)StatusHintColumn::JyutPing)) {
+			comment.str = L"";
+		}
 		return;
 	}
 	InfoMultiHint info(converter_.to_bytes(str));
 	std::string hint = getHint(info);
-
 	//use converter (.to_bytes: wstr->str, .from_bytes: str->wstr)
 	str = converter_.from_bytes(hint);
 }
@@ -99,7 +99,7 @@ std::string MultiHintPanel::getHint(const InfoMultiHint& info)
 	if(status & (int)StatusHintColumn::Ind) 
 	{ textContainer.push_back(info.Definition.Language.Ind); }
 
-	return boost::algorithm::join_if(textContainer, " \t ", 
+	return boost::algorithm::join_if(textContainer, " \t\t ", 
 											[](const std::string& s) { return s.size() > 0; });
 }
 

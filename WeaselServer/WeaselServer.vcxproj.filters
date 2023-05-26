@@ -50,6 +50,9 @@
     <ClInclude Include="WeaselTrayIcon.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="resource.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="WeaselServer.rc">
@@ -74,5 +77,13 @@
     <None Include="..\output\weasel.dll" />
     <None Include="..\output\weaselt.dll" />
     <None Include="..\output\weaseltx64.dll" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="..\resource\full.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="..\resource\half.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
   </ItemGroup>
 </Project>
