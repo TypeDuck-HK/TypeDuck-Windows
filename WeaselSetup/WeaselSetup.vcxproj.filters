@@ -3,28 +3,18 @@
   <ItemGroup>
     <Filter Include="Resource Files">
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
-      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;jpg;jpeg;jpe;manifest</Extensions>
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <None Include="ReadMe.txt" />
-    <None Include="small.ico">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="WeaselSetup.ico">
-      <Filter>Resource Files</Filter>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="InstallOptionsDialog.h" />
+    <ClInclude Include="InstallOptionsDlg.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="stdafx.h" />
-    <ClInclude Include="targetver.h" />
     <ClInclude Include="WeaselSetup.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="imesetup.cpp" />
-    <ClCompile Include="InstallOptionsDialog.cpp" />
+    <ClCompile Include="InstallOptionsDlg.cpp" />
     <ClCompile Include="stdafx.cpp" />
     <ClCompile Include="WeaselSetup.cpp" />
   </ItemGroup>

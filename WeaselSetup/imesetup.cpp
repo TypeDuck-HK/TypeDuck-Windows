@@ -65,8 +65,6 @@ BOOL is_wow64()
 		return TRUE;
 }
 
-typedef BOOL (WINAPI *PW64DW64FR)(PVOID *);
-typedef BOOL (WINAPI *PW64RW64FR)(PVOID);
 typedef int (*ime_register_func)(const std::wstring& ime_path, bool register_ime, bool is_wow64, bool hant, bool silent);
 
 int install_ime_file(std::wstring& srcPath, const std::wstring& ext, bool hant, bool silent, ime_register_func func)
@@ -96,9 +94,9 @@ int install_ime_file(std::wstring& srcPath, const std::wstring& ext, bool hant, 
 	{
 		ireplace_last(srcPath, ext, L"x64" + ext);
 		PVOID OldValue = NULL;
-		PW64DW64FR fnWow64DisableWow64FsRedirection = (PW64DW64FR)GetProcAddress(GetModuleHandle(_T("kernel32.dll")), "Wow64DisableWow64FsRedirection");
-		PW64RW64FR fnWow64RevertWow64FsRedirection = (PW64RW64FR)GetProcAddress(GetModuleHandle(_T("kernel32.dll")), "Wow64RevertWow64FsRedirection");
-		if (fnWow64DisableWow64FsRedirection == NULL || fnWow64DisableWow64FsRedirection(&OldValue) == FALSE)
+		// PW64DW64FR fnWow64DisableWow64FsRedirection = (PW64DW64FR)GetProcAddress(GetModuleHandle(_T("kernel32.dll")), "Wow64DisableWow64FsRedirection");
+		// PW64RW64FR fnWow64RevertWow64FsRedirection = (PW64RW64FR)GetProcAddress(GetModuleHandle(_T("kernel32.dll")), "Wow64RevertWow64FsRedirection");
+		if (Wow64DisableWow64FsRedirection(&OldValue) == FALSE)
 		{
 			if (!silent) MessageBoxW(NULL, L"Unable to disable file system redirection.", L"Installation Failed", MB_ICONERROR | MB_OK);
 			return 1;
@@ -109,7 +107,7 @@ int install_ime_file(std::wstring& srcPath, const std::wstring& ext, bool hant, 
 			return 1;
 		}
 		retval += func(destPath, true, true, hant, silent);
-		if (fnWow64RevertWow64FsRedirection == NULL || fnWow64RevertWow64FsRedirection(OldValue) == FALSE)
+		if (Wow64RevertWow64FsRedirection(OldValue) == FALSE)
 		{
 			if (!silent) MessageBoxW(NULL, L"Unable to revert file system redirection.", L"Installation Failed", MB_ICONERROR | MB_OK);
 			return 1;
@@ -135,9 +133,9 @@ int uninstall_ime_file(const std::wstring& ext, bool silent, ime_register_func f
 	{
 		retval += func(imePath, false, true, false, silent);
 		PVOID OldValue = NULL;
-		PW64DW64FR fnWow64DisableWow64FsRedirection = (PW64DW64FR)GetProcAddress(GetModuleHandle(_T("kernel32.dll")), "Wow64DisableWow64FsRedirection");
-		PW64RW64FR fnWow64RevertWow64FsRedirection = (PW64RW64FR)GetProcAddress(GetModuleHandle(_T("kernel32.dll")), "Wow64RevertWow64FsRedirection");
-		if (fnWow64DisableWow64FsRedirection == NULL || fnWow64DisableWow64FsRedirection(&OldValue) == FALSE)
+		// PW64DW64FR fnWow64DisableWow64FsRedirection = (PW64DW64FR)GetProcAddress(GetModuleHandle(_T("kernel32.dll")), "Wow64DisableWow64FsRedirection");
+		// PW64RW64FR fnWow64RevertWow64FsRedirection = (PW64RW64FR)GetProcAddress(GetModuleHandle(_T("kernel32.dll")), "Wow64RevertWow64FsRedirection");
+		if (Wow64DisableWow64FsRedirection(&OldValue) == FALSE)
 		{
 			if (!silent) MessageBoxW(NULL, L"Unable to disable file system redirection.", L"Uninstall Failed", MB_ICONERROR | MB_OK);
 			return 1;
@@ -147,7 +145,7 @@ int uninstall_ime_file(const std::wstring& ext, bool silent, ime_register_func f
 			if (!silent) MessageBoxW(NULL, imePath.c_str(), L"Uninstall Failed", MB_ICONERROR | MB_OK);
 			retval += 1;
 		}
-		if (fnWow64RevertWow64FsRedirection == NULL || fnWow64RevertWow64FsRedirection(OldValue) == FALSE)
+		if (Wow64RevertWow64FsRedirection(OldValue) == FALSE)
 		{
 			if (!silent) MessageBoxW(NULL, L"Unable to revert file system redirection.", L"Uninstall Failed", MB_ICONERROR | MB_OK);
 			return 1;
@@ -173,7 +171,7 @@ int register_ime(const std::wstring& ime_path, bool register_ime, bool is_wow64,
 		if (!hKL)
 		{
 			// manually register ime
-			WCHAR hkl_str[16] = {0};
+			WCHAR hkl_str[16] = { 0 };
 			HKEY hKey;
 			LSTATUS ret = RegOpenKey(HKEY_LOCAL_MACHINE, KEYBOARD_LAYOUTS_KEY, &hKey);
 			if (ret == ERROR_SUCCESS)
@@ -185,7 +183,7 @@ int register_ime(const std::wstring& ime_path, bool register_ime, bool is_wow64,
 					ret = RegOpenKey(hKey, hkl_str, &hSubKey);
 					if (ret == ERROR_SUCCESS)
 					{
-						WCHAR imeFile[32] = {0};
+						WCHAR imeFile[32] = { 0 };
 						DWORD len = sizeof(imeFile);
 						DWORD type = 0;
 						ret = RegQueryValueEx(hSubKey, L"Ime File", NULL, &type, (LPBYTE)imeFile, &len);
@@ -311,8 +309,8 @@ int register_ime(const std::wstring& ime_path, bool register_ime, bool is_wow64,
 				{
 					number = std::to_wstring(i + 1);
 					RegSetValueEx(hPreloadKey, number.c_str(), 0, REG_SZ,
-						          (const BYTE*)preloads[i].c_str(),
-								  (preloads[i].length() + 1) * sizeof(WCHAR));
+						(const BYTE*)preloads[i].c_str(),
+						(preloads[i].length() + 1) * sizeof(WCHAR));
 				}
 				RegCloseKey(hPreloadKey);
 				break;
@@ -326,15 +324,15 @@ int register_ime(const std::wstring& ime_path, bool register_ime, bool is_wow64,
 
 void enable_profile(BOOL fEnable, bool hant) {
 	HRESULT hr;
-	ITfInputProcessorProfiles *pProfiles = NULL;
+	ITfInputProcessorProfiles* pProfiles = NULL;
 
-	hr = CoCreateInstance(  CLSID_TF_InputProcessorProfiles, 
-							NULL, 
-							CLSCTX_INPROC_SERVER, 
-							IID_ITfInputProcessorProfiles, 
-							(LPVOID*)&pProfiles);
+	hr = CoCreateInstance(CLSID_TF_InputProcessorProfiles,
+		NULL,
+		CLSCTX_INPROC_SERVER,
+		IID_ITfInputProcessorProfiles,
+		(LPVOID*)&pProfiles);
 
-	if(SUCCEEDED(hr))
+	if (SUCCEEDED(hr))
 	{
 		LANGID lang_id = hant ? 0x0C04 : 0x0804;
 		if (fEnable) {
@@ -352,7 +350,7 @@ void enable_profile(BOOL fEnable, bool hant) {
 // 注册TSF输入法
 int register_text_service(const std::wstring& tsf_path, bool register_ime, bool is_wow64, bool hant, bool silent)
 {
-	using RegisterServerFunction = HRESULT (STDAPICALLTYPE *)();
+	using RegisterServerFunction = HRESULT(STDAPICALLTYPE*)();
 
 	if (!register_ime)
 		enable_profile(FALSE, hant);
@@ -405,7 +403,7 @@ int install(bool hant, bool silent)
 	// 写注册表
 	HKEY hKey;
 	LSTATUS ret = RegCreateKeyEx(HKEY_LOCAL_MACHINE, WEASEL_REG_KEY,
-		                         0, NULL, 0, KEY_ALL_ACCESS, 0, &hKey, NULL);
+		0, NULL, 0, KEY_ALL_ACCESS, 0, &hKey, NULL);
 	if (FAILED(HRESULT_FROM_WIN32(ret)))
 	{
 		if (!silent) MessageBox(NULL, WEASEL_REG_KEY, L"Installation Failed", MB_ICONERROR | MB_OK);
@@ -428,8 +426,8 @@ int install(bool hant, bool silent)
 
 	const std::wstring executable = L"TypeDuckServer.exe";
 	ret = RegSetValueEx(hKey, L"ServerExecutable", 0, REG_SZ,
-		                (const BYTE*)executable.c_str(),
-						(executable.length() + 1) * sizeof(WCHAR));
+		(const BYTE*)executable.c_str(),
+		(executable.length() + 1) * sizeof(WCHAR));
 	if (FAILED(HRESULT_FROM_WIN32(ret)))
 	{
 		if (!silent) MessageBox(NULL, L"Unable to write to the “ServerExecutable” Registry key.", L"Installation Failed", MB_ICONERROR | MB_OK);

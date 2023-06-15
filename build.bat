@@ -112,8 +112,8 @@ if %build_rime% == 1 (
   if not exist env.bat (
     copy %WEASEL_ROOT%\env.bat env.bat
   )
-  if not exist thirdparty\lib\opencc.lib (
-    call build.bat thirdparty %rime_build_variant%
+  if not exist lib\opencc.lib (
+    call build.bat deps %rime_build_variant%
     if errorlevel 1 goto error
   )
   call build.bat %rime_build_variant%
@@ -172,27 +172,20 @@ goto end
 
 :build_boost
 
-set BOOST_COMPILED_LIBS=--with-date_time^
- --with-filesystem^
- --with-locale^
- --with-regex^
- --with-system^
- --with-thread^
- --with-serialization
-
-set BJAM_OPTIONS_COMMON=toolset=%BJAM_TOOLSET%^
- variant=%boost_build_variant%^
+set BJAM_OPTIONS_COMMON=-j%NUMBER_OF_PROCESSORS%^
+ --without-mpi^
+ define=BOOST_USE_WINAPI_VERSION=0x0603^
+ toolset=%BJAM_TOOLSET%^
  link=static^
- threading=multi^
  runtime-link=static^
- cxxflags="/Zc:threadSafeInit- "
+ --build-type=complete
 
 set BJAM_OPTIONS_X86=%BJAM_OPTIONS_COMMON%^
- define=BOOST_USE_WINAPI_VERSION=0x0501^
+ architecture=x86^
  address-model=32
 
 set BJAM_OPTIONS_X64=%BJAM_OPTIONS_COMMON%^
- define=BOOST_USE_WINAPI_VERSION=0x0502^
+ architecture=x86^
  address-model=64^
  --stagedir=stage_x64
 
@@ -218,14 +211,14 @@ if errorlevel 1 goto error
 exit /b
 
 :build_opencc_data
-if not exist %WEASEL_ROOT%\librime\thirdparty\share\opencc\TSCharacters.ocd (
+if not exist %WEASEL_ROOT%\librime\share\opencc\TSCharacters.ocd2 (
   cd %WEASEL_ROOT%\librime
-  call build.bat thirdparty %rime_build_variant%
+  call build.bat deps %rime_build_variant%
   if errorlevel 1 goto error
 )
 cd %WEASEL_ROOT%
 if not exist output\data\opencc mkdir output\data\opencc
-copy %WEASEL_ROOT%\librime\thirdparty\share\opencc\*.* output\data\opencc\
+copy %WEASEL_ROOT%\librime\share\opencc\*.* output\data\opencc\
 if errorlevel 1 goto error
 exit /b
 
