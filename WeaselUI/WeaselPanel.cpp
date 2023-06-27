@@ -8,6 +8,7 @@
 #include "FullScreenLayout.h"
 #include "VHorizontalLayout.h"
 
+
 // for IDI_ZH, IDI_EN
 #include <resource.h>
 #define COLORTRANSPARENT(color)		((color & 0xff000000) == 0)
@@ -54,6 +55,9 @@ WeaselPanel::WeaselPanel(weasel::UI& ui)
 
 	_InitFontRes();
 	m_ostyle = m_style;
+
+	m_hintPanel = MultiHintPanel::GetInstance();
+	m_hintPanel->setMultiHintOptions(m_style.hint_settings);
 }
 
 WeaselPanel::~WeaselPanel()
@@ -663,7 +667,7 @@ bool WeaselPanel::_DrawCandidates(CDCHandle &dc, bool back)
 				candidate_text_color = m_style.candidate_text_color;
 				comment_text_color = m_style.comment_text_color;
 			}
-#ifdef USE_HILITE_MARK
+#ifdef USE_HILITE_MAR
 			// draw highlight mark
 			if (!m_style.mark_text.empty() && COLORNOTTRANSPARENT(m_style.hilited_mark_color))
 			{
@@ -681,6 +685,18 @@ bool WeaselPanel::_DrawCandidates(CDCHandle &dc, bool back)
 				_TextOut(hlRc, m_style.mark_text.c_str(), m_style.mark_text.length(), m_style.hilited_mark_color, pDWR->pTextFormat);
 			}
 #endif
+			// Draw Hint
+			// zenam todo: add hint
+			const std::wstring& comment = comments.at(i).str;
+			rect = m_layout->GetCandidateTextHintRect((int)i);
+			if(!comment.empty() && m_hintPanel->isEnable()) {
+				if (m_hintPanel->containsCsv(comment)) {
+					auto& jp = m_hintPanel->getJyutping(comment);
+					_TextOut(rect, jp.c_str(), jp.length(), label_text_color, pDWR->pTextHintFormat);
+				} else {
+					_TextOut(rect, comment.c_str(), comment.length(), label_text_color, pDWR->pTextHintFormat);
+				}
+			}
 			// Draw label
 			std::wstring label = m_layout->GetLabelText(labels, (int)i, m_style.label_text_format.c_str());
 			if (!label.empty()) {
@@ -694,10 +710,14 @@ bool WeaselPanel::_DrawCandidates(CDCHandle &dc, bool back)
 				_TextOut(rect, text.c_str(), text.length(), candidate_text_color, txtFormat);
 			}
 			// Draw comment
-			std::wstring comment = comments.at(i).str;
+			
 			if (!comment.empty()) {
 				rect = m_layout->GetCandidateCommentRect((int)i);
-				_TextOut(rect, comment.c_str(), comment.length(), comment_text_color, commenttxtFormat);
+				if(m_hintPanel->isEnable() && m_hintPanel->containsCsv(comment)) {
+					auto& hint = m_hintPanel->getMultiHint(comment);
+					_TextOut(rect, hint.c_str(), hint.length(), comment_text_color, commenttxtFormat);
+				} else
+					_TextOut(rect, comment.c_str(), comment.length(), comment_text_color, commenttxtFormat);
 			}
 			drawn = true;
 		}
@@ -902,7 +922,7 @@ void WeaselPanel::_TextOut(CRect const& rc, std::wstring psz, size_t cch, int in
 	pBrush->SetColor(D2D1::ColorF(r, g, b, alpha));
 
 	if (NULL != pBrush && NULL != pTextFormat) {
-		pDWR->pDWFactory->CreateTextLayout( psz.c_str(), (UINT32)psz.size(), pTextFormat, (float)rc.Width(), (float)rc.Height(), reinterpret_cast<IDWriteTextLayout**>(&pDWR->pTextLayout));
+		volatile auto err = pDWR->pDWFactory->CreateTextLayout( psz.c_str(), (UINT32)psz.size(), pTextFormat, (float)rc.Width(), (float)rc.Height(), reinterpret_cast<IDWriteTextLayout**>(&pDWR->pTextLayout));
 		if (m_style.layout_type == UIStyle::LAYOUT_VERTICAL_TEXT) {
 			DWRITE_FLOW_DIRECTION flow = m_style.vertical_text_left_to_right ? DWRITE_FLOW_DIRECTION_LEFT_TO_RIGHT : DWRITE_FLOW_DIRECTION_RIGHT_TO_LEFT;
 			pDWR->pTextLayout->SetReadingDirection(DWRITE_READING_DIRECTION_TOP_TO_BOTTOM);

@@ -3,6 +3,7 @@
 #include <WeaselUI.h>
 #include "Layout.h"
 #include "GdiplusBlur.h"
+#include "MultiHintPanel.h"
 
 #pragma comment(lib, "d2d1.lib")
 #pragma comment(lib, "dwrite.lib")
@@ -178,6 +179,8 @@ private:
 	GdiplusBlur* m_blurer;
 	DirectWriteResources* pDWR;
 	ID2D1SolidColorBrush* pBrush;
+
+	MultiHintPanel* m_hintPanel;
 #ifdef USE_BLUR_UNDER_WINDOWS10
 	// for blur window
 	HMODULE& hUser;

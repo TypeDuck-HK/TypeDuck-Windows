@@ -39,7 +39,8 @@ DirectWriteResources::DirectWriteResources(weasel::UIStyle& style, UINT dpi = 0)
 	pTextFormat(NULL),
 	pPreeditTextFormat(NULL),
 	pLabelTextFormat(NULL),
-	pCommentTextFormat(NULL)
+	pCommentTextFormat(NULL),
+	pTextHintFormat(NULL)
 {
 	// prepare d2d1 resources
 	HRESULT hResult = S_OK;
@@ -93,6 +94,7 @@ HRESULT DirectWriteResources::InitResources(std::wstring label_font_face, int la
 	// prepare d2d1 resources
 	SafeRelease(&pPreeditTextFormat);
 	SafeRelease(&pTextFormat);
+	SafeRelease(&pTextHintFormat);
 	SafeRelease(&pLabelTextFormat);
 	SafeRelease(&pCommentTextFormat);
 	DWRITE_WORD_WRAPPING wrapping = ((_style.max_width == 0 && _style.layout_type != UIStyle::LAYOUT_VERTICAL_TEXT) 
@@ -115,6 +117,14 @@ HRESULT DirectWriteResources::InitResources(std::wstring label_font_face, int la
 	hResult = pDWFactory->CreateTextFormat(_mainFontFace.c_str(), NULL,
 			fontWeight, fontStyle, DWRITE_FONT_STRETCH_NORMAL,
 			font_point * dpiScaleX_, L"", reinterpret_cast<IDWriteTextFormat**>(&pTextFormat));
+	pDWFactory->CreateTextFormat(_mainFontFace.c_str(), NULL,
+			fontWeight, fontStyle, DWRITE_FONT_STRETCH_NORMAL,
+			(font_point * 0.8) * dpiScaleX_, L"", reinterpret_cast<IDWriteTextFormat**>(&pTextHintFormat));
+	if( pTextHintFormat != NULL) {
+		pTextHintFormat->SetParagraphAlignment(DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
+		pTextHintFormat->SetWordWrapping(wrapping);
+		_SetFontFallback(pTextHintFormat, fontFaceStrVector);
+	}
 	if( pTextFormat != NULL)
 	{
 		if (vertical_text)
@@ -123,8 +133,9 @@ HRESULT DirectWriteResources::InitResources(std::wstring label_font_face, int la
 			pTextFormat->SetReadingDirection(DWRITE_READING_DIRECTION_TOP_TO_BOTTOM);
 			pTextFormat->SetTextAlignment(DWRITE_TEXT_ALIGNMENT_LEADING);
 		}
-		else
+		else {
 			pTextFormat->SetTextAlignment(DWRITE_TEXT_ALIGNMENT_LEADING);
+		}
 
 		pTextFormat->SetParagraphAlignment(DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
 		pTextFormat->SetWordWrapping(wrapping);

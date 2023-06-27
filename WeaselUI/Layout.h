@@ -60,6 +60,7 @@ namespace weasel
 		virtual CRect GetCandidateTextRect(int id) const = 0;
 		virtual CRect GetCandidateRect(int id) const = 0;
 		virtual CRect GetCandidateCommentRect(int id) const = 0;
+		virtual CRect GetCandidateTextHintRect(int id) const = 0;
 		virtual CRect GetStatusIconRect() const = 0;
 		virtual IsToRoundStruct GetRoundInfo(int id) = 0;
 		virtual IsToRoundStruct GetTextRoundInfo() = 0;

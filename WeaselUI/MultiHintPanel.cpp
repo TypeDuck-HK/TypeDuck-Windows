@@ -4,8 +4,30 @@
 #include <codecvt>
 #include <boost/container/vector.hpp>
 #include <boost/algorithm/string.hpp>
+MultiHintPanel* volatile MultiHintPanel::instance = nullptr;
+MultiHintPanel* MultiHintPanel::GetInstance()
+{
+  	if (instance == NULL)
+	{
+		if (instance == NULL)
+		{
+			instance = new MultiHintPanel();
+		}
+	}
+	return instance;
+}
 
-void MultiHintPanel::applyMultiHint(weasel::Text& comment)
+bool MultiHintPanel::containsCsv(weasel::Text &comment)
+{
+	return containsCsv(comment.str);
+}
+
+bool MultiHintPanel::containsCsv(const std::wstring &comment)
+{
+  return comment.find(',') != std::wstring::npos;
+}
+
+void MultiHintPanel::applyMultiHint(weasel::Text &comment)
 {
 	//setup converter
 	std::wstring& str = comment.str;
@@ -13,15 +35,28 @@ void MultiHintPanel::applyMultiHint(weasel::Text& comment)
 	auto status = settingsStatus_;
 	
 	if (str.find(',') == std::wstring::npos) { // std::count(str.begin(), str.end(), ',') < 16
-		if (!(status & (int)StatusHintColumn::JyutPing)) {
-			comment.str = L"";
-		}
 		return;
 	}
+	comment = getMultiHint(str);
+}
+
+std::wstring MultiHintPanel::getMultiHint(const std::wstring &comment)
+{
+	std::wstring str = comment;
+	auto status = settingsStatus_;
 	InfoMultiHint info(converter_.to_bytes(str));
-	std::string hint = getHint(info);
+	// Disable Jyutping
+	status = status & ~(int)StatusHintColumn::JyutPing;
+	std::string hint = getHint(info, status);
 	//use converter (.to_bytes: wstr->str, .from_bytes: str->wstr)
 	str = converter_.from_bytes(hint);
+	return str;
+}
+
+std::wstring MultiHintPanel::getJyutping(const std::wstring &comment)
+{
+  InfoMultiHint info(converter_.to_bytes(comment));
+	return converter_.from_bytes(info.Jyutping);
 }
 
 const std::pair<std::wstring, int> columns[] = {
@@ -50,57 +85,66 @@ void MultiHintPanel::setMultiHintOptions(const std::wstring& settings)
 	settingsStatus_ = status;
 }
 
-std::string MultiHintPanel::getHint(const InfoMultiHint& info)
+std::string MultiHintPanel::getHint(const InfoMultiHint& info, const StatusHintSetting status) const
 {
 	using namespace boost::container;
 	vector<std::string> textContainer;
-	auto status = settingsStatus_;
+	auto pushText = [&textContainer](const std::string& text){
+		if (text.size() > 0) {
+			textContainer.push_back(text);
+		}
+	};
 	if(status & (int)StatusHintColumn::JyutPing)
-	{ textContainer.push_back(info.Jyutping); }
+	{ pushText(info.Jyutping); }
 
 	if(status & (int)StatusHintColumn::English)
-	{ textContainer.push_back(info.Definition.English); }
+	{ pushText(info.Definition.English); }
 
 	if(status & (int)StatusHintColumn::Disambiguation)
-	{ textContainer.push_back(info.Definition.Disambiguation); }
+	{ pushText(info.Definition.Disambiguation); }
 
 	if(status & (int)StatusHintColumn::PartOfSpeech 
 			&& info.Definition.Pos.size() > 0)
 	{ 
 		const auto& pos = info.Definition.Pos;
-		textContainer.push_back("(" + pos + ")");
+		pushText("(" + pos + ")");
 	}
 
 	if(status & (int)StatusHintColumn::Register 
 			&& info.Definition.Register.size() > 0)
 	{ 
 		const auto& reg = info.Definition.Register;
-		textContainer.push_back("[" + reg + "]"); 
+		pushText("[" + reg + "]"); 
 	}
 
 	if(status & (int)StatusHintColumn::Label) 
-	{ textContainer.push_back(info.Definition.Label); }
+	{ pushText(info.Definition.Label); }
 
 	if(status & (int)StatusHintColumn::Written) 
-	{ textContainer.push_back(info.Definition.Written); }
+	{ pushText(info.Definition.Written); }
 
 	if(status & (int)StatusHintColumn::Colloquial) 
-	{ textContainer.push_back(info.Definition.Colloquial); }
+	{ pushText(info.Definition.Colloquial); }
 
 	if(status & (int)StatusHintColumn::Urd) 
-	{ textContainer.push_back(info.Definition.Language.Urd); }
+	{ pushText(info.Definition.Language.Urd); }
 
 	if(status & (int)StatusHintColumn::Nep) 
-	{ textContainer.push_back(info.Definition.Language.Nep); }
+	{ pushText(info.Definition.Language.Nep); }
 
 	if(status & (int)StatusHintColumn::Hin) 
-	{ textContainer.push_back(info.Definition.Language.Hin); }
+	{ pushText(info.Definition.Language.Hin); }
 
 	if(status & (int)StatusHintColumn::Ind) 
-	{ textContainer.push_back(info.Definition.Language.Ind); }
+	{ pushText(info.Definition.Language.Ind); }
 
-	return boost::algorithm::join_if(textContainer, " \t\t ", 
+	return boost::algorithm::join_if(textContainer, "\t ", 
 											[](const std::string& s) { return s.size() > 0; });
+}
+
+bool MultiHintPanel::isHintEnabled(StatusHintColumn column) const
+{
+  return (settingsStatus_ & (int)column) != 0;
 }
 
 InfoMultiHint::InfoMultiHint(const std::string& input) {

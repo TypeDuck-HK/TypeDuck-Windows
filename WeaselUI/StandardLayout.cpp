@@ -299,18 +299,6 @@ void weasel::StandardLayout::_PrepareRoundInfo(CDCHandle& dc)
 	}
 }
 
-const std::wstring weasel::StandardLayout::_GetComments(const weasel::Text comment, bool highlighted, bool hide, unsigned int hideSize)
-{
-	if(!hide || highlighted)
-		return comment.str;
-	std::wstring ret = comment.str;
-	if (ret.size() > hideSize) {
-		ret.resize(hideSize - 3);
-		ret.resize(hideSize, '.');
-	}
-	return ret;
-}
-
 void StandardLayout::UpdateStatusIconLayout(int* width, int* height)
 {
 	// rule 1. status icon is middle-aligned with preedit text or auxiliary text, whichever comes first

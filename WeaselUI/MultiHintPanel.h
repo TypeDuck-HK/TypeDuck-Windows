@@ -56,12 +56,23 @@ using StatusHintSetting = int;
 class MultiHintPanel
 {
 public:
-	MultiHintPanel() : settingsStatus_(0) {}
+ 	static MultiHintPanel* GetInstance();
+	bool containsCsv(weasel::Text& comment);
+	bool containsCsv(const std::wstring& comment);
 	void applyMultiHint(weasel::Text& comment);
+	// without safety check
+	std::wstring getMultiHint(const std::wstring& comment);
+	std::wstring getJyutping(const std::wstring& comment);
 	void setMultiHintOptions(const std::wstring& settings);
-	std::string getHint(const InfoMultiHint& info);
+	std::string getHint(const InfoMultiHint& info,const StatusHintSetting status) const;
+	bool isHintEnabled(StatusHintColumn column) const ;
+	bool isEnable() const { return settingsStatus_ != 0; }
 private:
+	MultiHintPanel() : settingsStatus_(0) {}
+	~MultiHintPanel() {}
 	using convert_type = std::codecvt_utf8<wchar_t>;
 	std::wstring_convert<convert_type, wchar_t> converter_;
 	StatusHintSetting settingsStatus_;
+	// Private static pointer
+	static MultiHintPanel* volatile instance;
 };

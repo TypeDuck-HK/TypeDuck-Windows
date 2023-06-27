@@ -5,7 +5,7 @@
 #include <dwrite.h>
 #pragma comment(lib, "d2d1.lib")
 #pragma comment(lib, "dwrite.lib")
-
+#include "MultiHintPanel.h"
 namespace weasel
 {
 	const int MAX_CANDIDATES_COUNT = 10;
@@ -14,7 +14,7 @@ namespace weasel
 	class StandardLayout: public Layout
 	{
 	public:
-		StandardLayout(const UIStyle &style, const Context &context, const Status &status) : Layout(style, context, status){}
+		StandardLayout(const UIStyle &style, const Context &context, const Status &status) : Layout(style, context, status),_multiHintPanel(MultiHintPanel::GetInstance()) {}
 
 		/* Layout */
 
@@ -26,6 +26,7 @@ namespace weasel
 		virtual CRect GetCandidateLabelRect(int id) const { return _candidateLabelRects[id]; }
 		virtual CRect GetCandidateTextRect(int id) const { return _candidateTextRects[id]; }
 		virtual CRect GetCandidateCommentRect(int id) const { return _candidateCommentRects[id]; }
+		virtual CRect GetCandidateTextHintRect(int id) const { return _candidateTextHintRects[id]; }
 		virtual CRect GetCandidateRect(int id) const { return _candidateRects[id]; }
 		virtual CRect GetStatusIconRect() const { return _statusIconRect; }
 		virtual std::wstring GetLabelText(const std::vector<Text> &labels, int id, const wchar_t *format) const;
@@ -47,8 +48,6 @@ namespace weasel
 		bool _IsHighlightOverCandidateWindow(CRect& rc, CDCHandle& dc);
 		void _PrepareRoundInfo(CDCHandle& dc);
 
-		const std::wstring _GetComments(const weasel::Text comment,bool highlighted, bool hide = true, unsigned int hideSize = 25);
-
 		void UpdateStatusIconLayout(int* width, int* height);
 
 		CSize _contentSize;
@@ -57,11 +56,13 @@ namespace weasel
 		CRect _candidateLabelRects[MAX_CANDIDATES_COUNT];
 		CRect _candidateTextRects[MAX_CANDIDATES_COUNT];
 		CRect _candidateCommentRects[MAX_CANDIDATES_COUNT];
+		CRect _candidateTextHintRects[MAX_CANDIDATES_COUNT];
 		CRect _statusIconRect;
 		CRect _bgRect;
 		CRect _contentRect;
 		IsToRoundStruct _roundInfo[MAX_CANDIDATES_COUNT];
 		IsToRoundStruct _textRoundInfo;
+		MultiHintPanel* _multiHintPanel;
 #ifdef USE_PAGER_MARK
 		CRect _prePageRect;
 		CRect _nextPageRect;

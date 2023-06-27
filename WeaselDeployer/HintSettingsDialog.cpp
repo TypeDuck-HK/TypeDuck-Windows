@@ -33,14 +33,15 @@ void HintSettingsDialog::Populate()
   for (auto& language : languages)
   {
     auto currentLine = language_available_list_.GetItemCount();
-    int index = language_available_list_.AddItem(currentLine, 0, utf8towcs(language.column_name.c_str()));
+    int index = language_available_list_.AddItem(currentLine, 0, language.column_name.c_str());
     // check if the language is in active_languages
     auto it = std::find_if(active_languages.begin(), active_languages.end(), 
                           [&language](const HintSettingsInfo& info) {
-      return info.column_name == language.column_name;
+      return info.settingIndex == language.settingIndex;
     });
     bool isActive = it != active_languages.end();
     language_available_list_.SetCheckState(index, isActive);
+
   }
 
 }
@@ -66,7 +67,8 @@ LRESULT HintSettingsDialog::OnOK(WORD, WORD code, HWND, BOOL&)
     // ATL::CString to std::string
     std::string language_str = CW2A(language.GetString());
     HintSettingsInfo info;
-    info.column_name = language_str;
+    info.column_name = language.GetString();
+    info.settingIndex = index;
     selected_languages.push_back(info);
   }
   settings_->SetLanguageList(selected_languages);

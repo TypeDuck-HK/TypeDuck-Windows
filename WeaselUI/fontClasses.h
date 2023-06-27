@@ -39,6 +39,7 @@ namespace weasel
 		IDWriteTextFormat1* pTextFormat;
 		IDWriteTextFormat1* pLabelTextFormat;
 		IDWriteTextFormat1* pCommentTextFormat;
+		IDWriteTextFormat1* pTextHintFormat;
 		IDWriteTextLayout2* pTextLayout;
 	private:
 		UIStyle& _style;

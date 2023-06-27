@@ -31,7 +31,7 @@ void weasel::VerticalLayout::DoLayout(CDCHandle dc, DirectWriteResources* pDWR)
 	int pgh = max(pgszl.cy, pgszr.cy);
 #endif /* USE_PAGER_MARK */
 
-	/*  preedit and auxiliary rectangle calc start */
+	/*  preedit and auxiliary rectangle calc start */ 
 	CSize size;
 	/* Preedit */
 	if (!IsInlinePreedit() && !_context.preedit.str.empty())
@@ -75,8 +75,33 @@ void weasel::VerticalLayout::DoLayout(CDCHandle dc, DirectWriteResources* pDWR)
 
 		int w = real_margin_x + base_offset, max_height_curren_candidate = 0;
 		int candidate_width = w, comment_width = 0;
+
+		const std::wstring& label = GetLabelText(labels, i, _style.label_text_format.c_str());
+		/* Hints */
+		// jyutping for hint
+		if(_multiHintPanel->isEnable() && !comments.at(i).str.empty())
+		{
+			std::wstring comment = comments.at(i).str;
+			CSize labelSize;
+			GetTextSizeDW(label, label.length(), pDWR->pLabelTextFormat, pDWR, &labelSize);
+		 	const int leftPadding = space + labelSize.cx;
+			if(_multiHintPanel->containsCsv(comment)) 
+			{
+				auto& jp = _multiHintPanel->getJyutping(comment);
+				GetTextSizeDW(jp, jp.length(), pDWR->pTextHintFormat, pDWR, &size);				
+				_candidateTextHintRects[i].SetRect(w + leftPadding, height, w + size.cx * labelFontValid, height + size.cy);
+				_candidateTextHintRects[i].OffsetRect(offsetX, offsetY);
+				height += size.cy;
+			}
+			else {
+				GetTextSizeDW(comment, comment.length(), pDWR->pTextHintFormat, pDWR, &size);
+				_candidateTextHintRects[i].SetRect(w + leftPadding, height, w + size.cx * labelFontValid, height + size.cy);
+				_candidateTextHintRects[i].OffsetRect(offsetX, offsetY);
+				height += size.cy;
+			}
+		}
+		// same height with label Ignoring the width 
 		/* Label */
-		std::wstring label = GetLabelText(labels, i, _style.label_text_format.c_str());
 		GetTextSizeDW(label, label.length(), pDWR->pLabelTextFormat, pDWR, &size);
 		_candidateLabelRects[i].SetRect(w, height, w + size.cx * labelFontValid, height + size.cy);
 		_candidateLabelRects[i].OffsetRect(offsetX, offsetY);
@@ -93,13 +118,17 @@ void weasel::VerticalLayout::DoLayout(CDCHandle dc, DirectWriteResources* pDWR)
 		max_height_curren_candidate = max(max_height_curren_candidate, size.cy);
 		candidate_width += size.cx * textFontValid;
 		max_candidate_width = max(max_candidate_width, candidate_width);
-
+		
 		/* Comment */
 		if (!comments.at(i).str.empty() && cmtFontValid)
 		{
 			w += space;
 			comment_shift_width = max(comment_shift_width, w);
-			const std::wstring& comment = _GetComments(comments.at(i), i == _context.cinfo.highlighted);
+			std::wstring comment = comments.at(i).str;
+			if(_multiHintPanel->isEnable() && !comments.at(i).str.empty() && _multiHintPanel->containsCsv(comment))
+			{
+					comment = _multiHintPanel->getMultiHint(comment);
+			}
 			GetTextSizeDW(comment, comment.length(), pDWR->pCommentTextFormat, pDWR, &size);
 			_candidateCommentRects[i].SetRect(0, height, size.cx * cmtFontValid, height + size.cy);
 			_candidateCommentRects[i].OffsetRect(offsetX, offsetY);

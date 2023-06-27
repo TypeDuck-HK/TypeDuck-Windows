@@ -93,7 +93,7 @@ void HorizontalLayout::DoLayout(CDCHandle dc, DirectWriteResources* pDWR )
 			/* Comment */
 			if (!comments.at(i).str.empty() && cmtFontValid )
 			{
-				const std::wstring& comment = _GetComments(comments.at(i), i == _context.cinfo.highlighted);
+				const std::wstring& comment = comments.at(i).str;
 				GetTextSizeDW(comment, comment.length(), pDWR->pCommentTextFormat, pDWR, &size);
 				w += _style.hilite_spacing;
 				_candidateCommentRects[i].SetRect(w, height, w + size.cx * cmtFontValid, height + size.cy);
