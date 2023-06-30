@@ -116,8 +116,8 @@ void WeaselPanel::Refresh()
 	// check if to hide candidates window
 	// show tips status, two kind of situation: 1) only aux strings, don't care icon status; 2)only icon(ascii mode switching)
 	bool show_tips = (!m_ctx.aux.empty() && m_ctx.cinfo.empty() && m_ctx.preedit.empty()) || (m_ctx.empty() && should_show_icon);
-	// show schema menu status: always preedit start with "[Schema Menu]"
-	bool show_schema_menu = m_ctx.preedit.str.rfind(L"[Schema Menu]", 1) != std::wstring::npos;
+	// show schema menu status: schema_id == L".default"
+	bool show_schema_menu = m_status.schema_id == L".default";
 	bool margin_negative = (m_style.margin_x < 0 || m_style.margin_y < 0);
 	bool inline_no_candidates = m_style.inline_preedit && (m_ctx.cinfo.candies.size() == 0) && (!show_tips);
 	// when to hide_cadidates?
