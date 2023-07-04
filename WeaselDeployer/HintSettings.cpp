@@ -3,7 +3,7 @@
 #include <WeaselUtility.h>
 
 static std::wstring LanguageList[] {
-		L"JyutPing ¸f«÷", L"English", L"Disambiguatory Information",
+		L"Jyutping ç²µæ‹¼", L"English", L"Disambiguatory Information",
 		L"Part Of Speech", L"Register", L"Label",
 		L"Written", L"Colloquial", L"Urdu",
 		L"Nepel", L"Hindi", L"Indian"
