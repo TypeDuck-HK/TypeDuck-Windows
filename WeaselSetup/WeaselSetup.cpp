@@ -95,7 +95,7 @@ static int CustomInstall(bool installing)
 		                 0, NULL, 0, KEY_ALL_ACCESS, 0, &hKey, NULL);
 	if (FAILED(HRESULT_FROM_WIN32(ret)))
 	{
-		MessageBox(NULL, KEY, L"Failed To Install", MB_ICONERROR | MB_OK);
+		MessageBox(NULL, KEY, L"Failed to Install", MB_ICONERROR | MB_OK);
 		return 1;
 	}
 
@@ -104,7 +104,7 @@ static int CustomInstall(bool installing)
 						(user_dir.length() + 1) * sizeof(WCHAR));
 	if (FAILED(HRESULT_FROM_WIN32(ret)))
 	{
-		MessageBox(NULL, L"無法寫入 RimeUserDir", L"Failed To Install", MB_ICONERROR | MB_OK);
+		MessageBox(NULL, L"Unable to write to “RimeUserDir” folder.", L"Failed to Install", MB_ICONERROR | MB_OK);
 		return 1;
 	}
 
@@ -112,7 +112,7 @@ static int CustomInstall(bool installing)
 	ret = RegSetValueEx(hKey, L"Hant", 0, REG_DWORD, (const BYTE*)&data, sizeof(DWORD));
 	if (FAILED(HRESULT_FROM_WIN32(ret)))
 	{
-		MessageBox(NULL, L"無法寫入 Hant", L"Failed To Install", MB_ICONERROR | MB_OK);
+		MessageBox(NULL, L"Unable to write to “Hant” folder.", L"Failed to Install", MB_ICONERROR | MB_OK);
 		return 1;
 	}
 
