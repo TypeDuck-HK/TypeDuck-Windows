@@ -31,7 +31,7 @@ void weasel::VerticalLayout::DoLayout(CDCHandle dc, DirectWriteResources* pDWR)
 	int pgh = max(pgszl.cy, pgszr.cy);
 #endif /* USE_PAGER_MARK */
 
-	/*  preedit and auxiliary rectangle calc start */ 
+	/*  preedit and auxiliary rectangle calc start */
 	CSize size;
 	/* Preedit */
 	if (!IsInlinePreedit() && !_context.preedit.str.empty())

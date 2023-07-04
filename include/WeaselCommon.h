@@ -5,7 +5,7 @@
 #include <boost/serialization/vector.hpp>
 #include <boost/serialization/string.hpp>
 
-#define WEASEL_IME_NAME L"小狼毫"
+#define WEASEL_IME_NAME L"Weasel"
 #define WEASEL_REG_KEY L"Software\\Rime\\Weasel"
 #define RIME_REG_KEY L"Software\\Rime"
 
@@ -277,9 +277,19 @@ namespace weasel
 		std::wstring font_face;
 		std::wstring label_font_face;
 		std::wstring comment_font_face;
+		std::wstring eng_font_face;
+		std::wstring hin_font_face;
+		std::wstring urd_font_face;
+		std::wstring nep_font_face;
+		std::wstring ind_font_face;
 		int font_point;
 		int label_font_point;
 		int comment_font_point;
+		int eng_font_point;
+		int hin_font_point;
+		int urd_font_point;
+		int nep_font_point;
+		int ind_font_point;
 		bool inline_preedit;
 #ifdef USE_BLUR_UNDER_WINDOWS10
 		bool blur_window;
@@ -346,9 +356,19 @@ namespace weasel
 		UIStyle() : font_face(),
 			label_font_face(),
 			comment_font_face(),
+			eng_font_face(),
+			hin_font_face(),
+			urd_font_face(),
+			nep_font_face(),
+			ind_font_face(),
 			font_point(0),
 			label_font_point(0),
 			comment_font_point(0),
+			eng_font_point(0),
+			hin_font_point(0),
+			urd_font_point(0),
+			nep_font_point(0),
+			ind_font_point(0),
 			inline_preedit(false),
 			align_type(ALIGN_BOTTOM),
 			preedit_type(COMPOSITION),
@@ -425,9 +445,19 @@ namespace weasel
 					|| font_face != st.font_face
 					|| label_font_face != st.label_font_face
 					|| comment_font_face != st.comment_font_face
+					|| eng_font_face != st.eng_font_face
+					|| hin_font_face != st.hin_font_face
+					|| urd_font_face != st.urd_font_face
+					|| nep_font_face != st.nep_font_face
+					|| ind_font_face != st.ind_font_face
 					|| font_point != st.font_point
 					|| label_font_point != st.label_font_point
 					|| comment_font_point != st.comment_font_point
+					|| eng_font_point != st.eng_font_point
+					|| hin_font_point != st.hin_font_point
+					|| urd_font_point != st.urd_font_point
+					|| nep_font_point != st.nep_font_point
+					|| ind_font_point != st.ind_font_point
 					|| inline_preedit != st.inline_preedit
 #ifdef USE_BLUR_UNDER_WINDOWS10
 					|| blur_window != st.blur_window
@@ -475,6 +505,7 @@ namespace weasel
 					|| hilited_candidate_shadow_color != st.hilited_candidate_shadow_color
 					|| hilited_label_text_color != st.hilited_label_text_color
 					|| hilited_comment_text_color != st.hilited_comment_text_color
+					|| hint_settings != st.hint_settings
 #ifdef USE_HILITE_MARK
 					|| hilited_mark_color != st.hilited_mark_color
 #endif
@@ -494,9 +525,19 @@ namespace boost {
 			ar & s.font_face;
 			ar & s.label_font_face;
 			ar & s.comment_font_face;
+			ar & s.eng_font_face;
+			ar & s.hin_font_face;
+			ar & s.urd_font_face;
+			ar & s.nep_font_face;
+			ar & s.ind_font_face;
 			ar & s.font_point;
 			ar & s.label_font_point;
 			ar & s.comment_font_point;
+			ar & s.eng_font_point;
+			ar & s.hin_font_point;
+			ar & s.urd_font_point;
+			ar & s.nep_font_point;
+			ar & s.ind_font_point;
 			ar & s.inline_preedit;
 			ar & s.align_type;
 #ifdef USE_BLUR_UNDER_WINDOWS10

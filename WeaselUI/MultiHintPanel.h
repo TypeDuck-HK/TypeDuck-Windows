@@ -5,50 +5,42 @@
 #include <locale>
 #include <codecvt>
 
-struct InfoLanguage {
+struct InfoDefinition {
+	std::string Eng;
 	std::string Urd;
 	std::string Nep;
 	std::string Hin;
 	std::string Ind;
 };
 
-struct InfoDefinition {
-	std::string English;
-	std::string Disambiguation;
-	std::string Pos;
+struct InfoProperties {
+	std::string PartOfSpeech;
 	std::string Register;
 	std::string Label;
+	std::string Normalized;
 	std::string Written;
 	std::string Colloquial;
-	InfoLanguage Language;
+	std::string Collocation;
+	InfoDefinition Definition;
 };
 
 struct InfoMultiHint {
 	InfoMultiHint(const std::string& input);
 	std::string Honzi;
 	std::string Jyutping;
-	std::string PronOrder;
 	std::string Sandhi;
 	std::string LitColReading;
-	std::string Freq;
-	std::string Freq2;
-	InfoDefinition Definition; // std::vector<std::string> if necessary
+	InfoProperties Properties;
 };
 
 enum class StatusHintColumn {
-	None            = 0,
-	Jyutping        = 1 << 0,
-	English         = 1 << 1,
-	Disambiguation  = 1 << 2,
-	PartOfSpeech    = 1 << 3,
-	Register        = 1 << 4,
-	Label           = 1 << 5,
-	Written         = 1 << 6,
-	Colloquial      = 1 << 7,
-	Urd             = 1 << 8,
-	Nep             = 1 << 9,
-	Hin             = 1 << 10,
-	Ind             = 1 << 11
+	None     = 0,
+	Jyutping = 1 << 1,
+	Eng      = 1 << 2,
+	Urd      = 1 << 3,
+	Nep      = 1 << 4,
+	Hin      = 1 << 5,
+	Ind      = 1 << 6,
 };
 
 using StatusHintSetting = int;

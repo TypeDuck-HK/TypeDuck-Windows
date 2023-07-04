@@ -9,7 +9,7 @@ struct HintSettingsInfo {
 	std::wstring column_name;
 	bool disable;
 	unsigned int settingIndex;
-	HintSettingsInfo() : disable(false),settingIndex(0) {}
+	HintSettingsInfo() : disable(false), settingIndex(0) {}
 };
 
 class HintSettings
@@ -23,8 +23,7 @@ public:
 	bool SetLanguageList(const std::vector<HintSettingsInfo>& result);
 
 private:
-  void dumpLanguageList(std::vector<HintSettingsInfo>* result);
+	void dumpLanguageList(std::vector<HintSettingsInfo>* result);
 	RimeLeversApi* api_;
 	RimeCustomSettings* settings_;
 };
-

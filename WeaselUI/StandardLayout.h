@@ -6,6 +6,7 @@
 #pragma comment(lib, "d2d1.lib")
 #pragma comment(lib, "dwrite.lib")
 #include "MultiHintPanel.h"
+
 namespace weasel
 {
 	const int MAX_CANDIDATES_COUNT = 10;
@@ -14,7 +15,7 @@ namespace weasel
 	class StandardLayout: public Layout
 	{
 	public:
-		StandardLayout(const UIStyle &style, const Context &context, const Status &status) : Layout(style, context, status),_multiHintPanel(MultiHintPanel::GetInstance()) {}
+		StandardLayout(const UIStyle &style, const Context &context, const Status &status) : Layout(style, context, status), _multiHintPanel(MultiHintPanel::GetInstance()) {}
 
 		/* Layout */
 

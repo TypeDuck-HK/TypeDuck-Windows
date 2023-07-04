@@ -11,7 +11,7 @@ LRESULT HintSettingsDialog::OnInitDiaLog(UINT, WPARAM, LPARAM, BOOL &)
 {
   language_available_list_.Attach(GetDlgItem(IDC_HINT_LIST));
   language_available_list_.SetExtendedListViewStyle(LVS_EX_FULLROWSELECT | LVS_EX_CHECKBOXES, LVS_EX_FULLROWSELECT | LVS_EX_CHECKBOXES);
-	language_available_list_.AddColumn(L"Available Language", 0);
+	language_available_list_.AddColumn(L"Available Languages", 0);
   WTL::CRect rc;
 	language_available_list_.GetClientRect(&rc);
 	language_available_list_.SetColumnWidth(0, rc.Width() - 20);

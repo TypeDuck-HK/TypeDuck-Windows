@@ -2,8 +2,9 @@
 #include "MultiHintPanel.h"
 #include <locale>
 #include <codecvt>
-#include <boost/container/vector.hpp>
 #include <boost/algorithm/string.hpp>
+#include <StringAlgorithm.hpp>
+
 MultiHintPanel* volatile MultiHintPanel::instance = nullptr;
 MultiHintPanel* MultiHintPanel::GetInstance()
 {
@@ -55,19 +56,13 @@ std::wstring MultiHintPanel::getMultiHint(const std::wstring &comment)
 
 std::wstring MultiHintPanel::getJyutping(const std::wstring &comment)
 {
-  InfoMultiHint info(converter_.to_bytes(comment));
+	InfoMultiHint info(converter_.to_bytes(comment));
 	return converter_.from_bytes(info.Jyutping);
 }
 
 const std::pair<std::wstring, int> columns[] = {
 	{ L"Jyutping", (int)StatusHintColumn::Jyutping },
-	{ L"English", (int)StatusHintColumn::English },
-	{ L"Disambiguatory Information", (int)StatusHintColumn::Disambiguation },
-	{ L"Part of Speech", (int)StatusHintColumn::PartOfSpeech },
-	{ L"Register", (int)StatusHintColumn::Register },
-	{ L"Label", (int)StatusHintColumn::Label },
-	{ L"Written", (int)StatusHintColumn::Written },
-	{ L"Colloquial", (int)StatusHintColumn::Colloquial },
+	{ L"Eng", (int)StatusHintColumn::Eng },
 	{ L"Urd", (int)StatusHintColumn::Urd },
 	{ L"Nep", (int)StatusHintColumn::Nep },
 	{ L"Hin", (int)StatusHintColumn::Hin },
@@ -77,9 +72,11 @@ const std::pair<std::wstring, int> columns[] = {
 void MultiHintPanel::setMultiHintOptions(const std::wstring& settings)
 {
 	StatusHintSetting status = (int)StatusHintColumn::None;
+	std::vector<std::wstring> options;
+	boost::split(options, settings, boost::is_any_of(","));
 	for (auto& column : columns) {
-		if (settings.find(column.first) != std::wstring::npos) {
-			status = status | column.second;
+		if (std::find(options.begin(), options.end(), column.first) != options.end()) {
+			status |= column.second;
 		}
 	}
 	settingsStatus_ = status;
@@ -87,51 +84,14 @@ void MultiHintPanel::setMultiHintOptions(const std::wstring& settings)
 
 std::string MultiHintPanel::getHint(const InfoMultiHint& info, const StatusHintSetting status) const
 {
-	using namespace boost::container;
-	vector<std::string> textContainer;
-	auto pushText = [&textContainer](const std::string& text){
-		if (text.size() > 0) {
-			textContainer.push_back(text);
-		}
-	};
-	if (status & (int)StatusHintColumn::Jyutping) pushText(info.Jyutping);
-
-	if (status & (int)StatusHintColumn::English) pushText(info.Definition.English);
-
-	if (status & (int)StatusHintColumn::Disambiguation) pushText(info.Definition.Disambiguation);
-
-	if (status & (int)StatusHintColumn::PartOfSpeech 
-			&& info.Definition.Pos.size() > 0) { 
-		const auto& pos = info.Definition.Pos;
-		pushText("(" + pos + ")");
-	}
-
-	if(status & (int)StatusHintColumn::Register 
-			&& info.Definition.Register.size() > 0) { 
-		const auto& reg = info.Definition.Register;
-		pushText("[" + reg + "]"); 
-	}
-
-	if(status & (int)StatusHintColumn::Label
-			&& info.Definition.Label.size() > 0) {
-		const auto& label = info.Definition.Label;
-		pushText("[" + label + "]");
-	}
-
-	if(status & (int)StatusHintColumn::Written) pushText(info.Definition.Written);
-
-	if(status & (int)StatusHintColumn::Colloquial) pushText(info.Definition.Colloquial);
-
-	if(status & (int)StatusHintColumn::Urd) pushText(info.Definition.Language.Urd);
-
-	if(status & (int)StatusHintColumn::Nep) pushText(info.Definition.Language.Nep);
-
-	if(status & (int)StatusHintColumn::Hin) pushText(info.Definition.Language.Hin);
-
-	if(status & (int)StatusHintColumn::Ind) pushText(info.Definition.Language.Ind);
-
-	return boost::algorithm::join_if(textContainer, "\t ", 
-											[](const std::string& s) { return s.size() > 0; });
+	std::vector<std::string> hints;
+	if (status & (int)StatusHintColumn::Jyutping) hints.push_back(info.Jyutping);
+	if (status & (int)StatusHintColumn::Eng) hints.push_back(info.Properties.Definition.Eng);
+	if(status & (int)StatusHintColumn::Urd) hints.push_back(info.Properties.Definition.Urd);
+	if(status & (int)StatusHintColumn::Nep) hints.push_back(info.Properties.Definition.Nep);
+	if(status & (int)StatusHintColumn::Hin) hints.push_back(info.Properties.Definition.Hin);
+	if(status & (int)StatusHintColumn::Ind) hints.push_back(info.Properties.Definition.Ind);
+	return join(hints, "\t");
 }
 
 bool MultiHintPanel::isHintEnabled(StatusHintColumn column) const
@@ -144,22 +104,20 @@ InfoMultiHint::InfoMultiHint(const std::string& input) {
 	auto column = columns.begin();
 	/*  0 */ Honzi = *column++;
 	/*  1 */ Jyutping = *column++;
-	/*  2 */ PronOrder = *column++;
-	/*  3 */ Sandhi = *column++;
-	/*  4 */ LitColReading = *column++;
-	/*  5 */ Freq = *column++;
-	/*  6 */ Freq2 = *column++;
-	Definition = InfoDefinition();
-	/*  7 */ Definition.English = *column++;
-	/*  8 */ Definition.Disambiguation = *column++;
-	/*  9 */ Definition.Pos = *column++;
-	/* 10 */ Definition.Register = *column++;
-	/* 11 */ Definition.Label = *column++;
-	/* 12 */ Definition.Written = *column++;
-	/* 13 */ Definition.Colloquial = *column++;
-	Definition.Language = InfoLanguage();
-	/* 14 */ Definition.Language.Urd = *column++;
-	/* 15 */ Definition.Language.Nep = *column++;
-	/* 16 */ Definition.Language.Hin = *column++;
-	/* 17 */ Definition.Language.Ind = *column++;
+	/*  2 */ Sandhi = *column++;
+	/*  3 */ LitColReading = *column++;
+	Properties = InfoProperties();
+	/*  4 */ Properties.PartOfSpeech = *column++;
+	/*  5 */ Properties.Register = *column++;
+	/*  6 */ Properties.Label = *column++;
+	/*  7 */ Properties.Normalized = *column++;
+	/*  8 */ Properties.Written = *column++;
+	/*  9 */ Properties.Colloquial = *column++;
+	/* 10 */ Properties.Collocation = *column++;
+	Properties.Definition = InfoDefinition();
+	/* 11 */ Properties.Definition.Eng = *column++;
+	/* 12 */ Properties.Definition.Urd = *column++;
+	/* 13 */ Properties.Definition.Nep = *column++;
+	/* 14 */ Properties.Definition.Hin = *column++;
+	/* 15 */ Properties.Definition.Ind = *column++;
 }

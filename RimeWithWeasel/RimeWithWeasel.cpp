@@ -767,41 +767,39 @@ static void _UpdateUIStyle(RimeConfig* config, weasel::UI* ui, bool initialize)
 
 	const int BUF_SIZE = 2047;
 	char buffer[BUF_SIZE + 1];
-	memset(buffer, '\0', sizeof(buffer));
-	if (RimeConfigGetString(config, "style/font_face", buffer, BUF_SIZE))
-	{
-		std::wstring tmp = utf8towcs(buffer);
-		// remove spaces around seperators  : , 
-		_RemoveSpaceAroundSep(tmp);
-		style.font_face = tmp;
-	}
-	memset(buffer, '\0', sizeof(buffer));
-	if (RimeConfigGetString(config, "style/label_font_face", buffer, BUF_SIZE))
-	{
-		std::wstring tmp = utf8towcs(buffer);
-		// remove spaces around seperators  : , 
-		_RemoveSpaceAroundSep(tmp);
-		style.label_font_face = tmp;
-	}
-	memset(buffer, '\0', sizeof(buffer));
-	if (RimeConfigGetString(config, "style/comment_font_face", buffer, BUF_SIZE))
-	{
-		std::wstring tmp = utf8towcs(buffer);
-		// remove spaces around seperators  : , 
-		_RemoveSpaceAroundSep(tmp);
-		style.comment_font_face = tmp;
-	}
+	const auto processFontFaceConfig = [&config, &style, &buffer](const char* key, std::wstring& value) {
+		memset(buffer, '\0', sizeof(buffer));
+		if (RimeConfigGetString(config, key, buffer, BUF_SIZE)) {
+			std::wstring tmp = utf8towcs(buffer);
+			// remove spaces around seperators  : , 
+			_RemoveSpaceAroundSep(tmp);
+			value = tmp;
+		}
+	};
+	processFontFaceConfig("style/font_face", style.font_face);
+	processFontFaceConfig("style/label_font_face", style.label_font_face);
+	processFontFaceConfig("style/comment_font_face", style.comment_font_face);
+	processFontFaceConfig("style/eng_font_face", style.eng_font_face);
+	processFontFaceConfig("style/hin_font_face", style.hin_font_face);
+	processFontFaceConfig("style/urd_font_face", style.urd_font_face);
+	processFontFaceConfig("style/nep_font_face", style.nep_font_face);
+	processFontFaceConfig("style/ind_font_face", style.ind_font_face);
+
 	RimeConfigGetInt(config, "style/font_point", &style.font_point);
 	if (style.font_point <= 0)
 		style.font_point = 12;
-	if (!RimeConfigGetInt(config, "style/label_font_point", &style.label_font_point))
-	{
-		RimeConfigGetInt(config, "style/font_point", &style.label_font_point);
-	}
-	if (!RimeConfigGetInt(config, "style/comment_font_point", &style.comment_font_point))
-	{
-		RimeConfigGetInt(config, "style/font_point", &style.comment_font_point);
-	}
+	const auto processFontPointConfig = [&config](const char* key, int* value) {
+		if (!RimeConfigGetInt(config, key, value)) {
+			RimeConfigGetInt(config, "style/font_point", value);
+		}
+	};
+	processFontPointConfig("style/label_font_point", &style.label_font_point);
+	processFontPointConfig("style/comment_font_point", &style.comment_font_point);
+	processFontPointConfig("style/eng_font_point", &style.eng_font_point);
+	processFontPointConfig("style/hin_font_point", &style.hin_font_point);
+	processFontPointConfig("style/urd_font_point", &style.urd_font_point);
+	processFontPointConfig("style/nep_font_point", &style.nep_font_point);
+	processFontPointConfig("style/ind_font_point", &style.ind_font_point);
 	Bool inline_preedit = False;
 	if (RimeConfigGetBool(config, "style/inline_preedit", &inline_preedit) || initialize)
 	{

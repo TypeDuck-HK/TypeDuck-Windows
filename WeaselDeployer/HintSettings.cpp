@@ -3,17 +3,21 @@
 #include <WeaselUtility.h>
 
 static std::wstring LanguageList[] {
-		L"Jyutping 粵拼", L"English", L"Disambiguatory Information",
-		L"Part Of Speech", L"Register", L"Label",
-		L"Written", L"Colloquial", L"Urdu",
-		L"Nepel", L"Hindi", L"Indian"
+	L"Jyutping",
+	L"English",
+	L"Hindi",
+	L"Indonesian",
+	L"Urdu",
+	L"Nepali",
 };
 
 static std::string LanguageConfigNameList[] = {
-	"Jyutping", "English", "Disambiguatory Information",
-	"Part of Speech","Register","Label",
-	"Written", "Colloquial","Urd",
-	"Nep","Hin","Ind"
+	"Jyutping",
+	"Eng",
+	"Hin",
+	"Ind",
+	"Urd",
+	"Nep",
 };
 int LanguageConfigSize = sizeof(LanguageConfigNameList) / sizeof(std::string);
 HintSettings::HintSettings()
@@ -87,7 +91,6 @@ bool HintSettings::SetLanguageList(const std::vector<HintSettingsInfo>& result)
 
 void HintSettings::dumpLanguageList(std::vector<HintSettingsInfo>* result)
 {
-	//language_list: ["Jyutping","English","Disambiguatory Information","Part of Speech","Register","Label","Written","Colloquial","Urd","Nep","Hin","Ind"]
 	if (!result)
 	{
 		return;

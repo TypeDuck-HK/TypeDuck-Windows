@@ -8,7 +8,6 @@
 #include "FullScreenLayout.h"
 #include "VHorizontalLayout.h"
 
-
 // for IDI_ZH, IDI_EN
 #include <resource.h>
 #define COLORTRANSPARENT(color)		((color & 0xff000000) == 0)

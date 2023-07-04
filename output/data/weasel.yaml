@@ -11,12 +11,22 @@ app_options:
 
 style:
   color_scheme: aqua
-  font_face: Microsoft YaHei
-  label_font_face: Microsoft YaHei
-  comment_font_face: Microsoft YaHei
-  font_point: 14
+  font_face: Microsoft JhengHei
+  label_font_face: Century Gothic
+  comment_font_face: Segoe UI
+  eng_font_face: Segoe UI
+  hin_font_face: Nirmala UI
+  urd_font_face: Urdu Typesetting
+  nep_font_face: Nirmala UI
+  ind_font_face: Times New Roman
+  font_point: 16
   label_font_point: 14
-  comment_font_point: 14
+  comment_font_point: 13
+  eng_font_point: 14
+  hin_font_point: 15
+  urd_font_point: 16
+  nep_font_point: 15
+  ind_font_point: 14
   horizontal: false
   fullscreen: false
   inline_preedit: false

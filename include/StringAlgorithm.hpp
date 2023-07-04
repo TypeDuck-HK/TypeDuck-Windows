@@ -30,7 +30,8 @@ inline void ireplace_last(std::wstring& input, const std::wstring& search, const
 		input.replace(pos, search.length(), sub);
 }
 
-inline std::string join(const std::set<std::string>& list, const std::string& delim)
+template<typename T>
+inline std::string join(const T& list, const std::string& delim)
 {
 	return std::accumulate(list.begin(), list.end(), std::string(), [&delim](std::string& str1, const std::string& str2)
 	{
