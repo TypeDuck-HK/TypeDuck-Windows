@@ -36,19 +36,19 @@ struct InfoMultiHint {
 };
 
 enum class StatusHintColumn {
-	None						= 0,
-	JyutPing				= 1<<0,
-	English					= 1<<1,
-	Disambiguation	= 1<<2,
-	PartOfSpeech		= 1<<3,
-	Register				= 1<<4,
-	Label						= 1<<5,
-	Written					= 1<<6,
-	Colloquial			= 1<<7,
-	Urd							= 1<<8,
-	Nep							= 1<<9,
-	Hin							= 1<<10,
-	Ind							= 1<<11
+	None            = 0,
+	Jyutping        = 1 << 0,
+	English         = 1 << 1,
+	Disambiguation  = 1 << 2,
+	PartOfSpeech    = 1 << 3,
+	Register        = 1 << 4,
+	Label           = 1 << 5,
+	Written         = 1 << 6,
+	Colloquial      = 1 << 7,
+	Urd             = 1 << 8,
+	Nep             = 1 << 9,
+	Hin             = 1 << 10,
+	Ind             = 1 << 11
 };
 
 using StatusHintSetting = int;
@@ -64,7 +64,7 @@ public:
 	std::wstring getMultiHint(const std::wstring& comment);
 	std::wstring getJyutping(const std::wstring& comment);
 	void setMultiHintOptions(const std::wstring& settings);
-	std::string getHint(const InfoMultiHint& info,const StatusHintSetting status) const;
+	std::string getHint(const InfoMultiHint& info, const StatusHintSetting status) const;
 	bool isHintEnabled(StatusHintColumn column) const ;
 	bool isEnable() const { return settingsStatus_ != 0; }
 private:

@@ -46,7 +46,7 @@ std::wstring MultiHintPanel::getMultiHint(const std::wstring &comment)
 	auto status = settingsStatus_;
 	InfoMultiHint info(converter_.to_bytes(str));
 	// Disable Jyutping
-	status = status & ~(int)StatusHintColumn::JyutPing;
+	status = status & ~(int)StatusHintColumn::Jyutping;
 	std::string hint = getHint(info, status);
 	//use converter (.to_bytes: wstr->str, .from_bytes: str->wstr)
 	str = converter_.from_bytes(hint);
@@ -60,18 +60,18 @@ std::wstring MultiHintPanel::getJyutping(const std::wstring &comment)
 }
 
 const std::pair<std::wstring, int> columns[] = {
-	{L"Jyutping", (int)StatusHintColumn::JyutPing},
-	{L"English", (int)StatusHintColumn::English},
-	{L"Disambiguatory Information", (int)StatusHintColumn::Disambiguation},
-	{L"Part of Speech", (int)StatusHintColumn::PartOfSpeech},
-	{L"Register", (int)StatusHintColumn::Register},
-	{L"Label", (int)StatusHintColumn::Label},
-	{L"Written", (int)StatusHintColumn::Written},
-	{L"Colloquial", (int)StatusHintColumn::Colloquial},
-	{L"Urd", (int)StatusHintColumn::Urd},
-	{L"Nep", (int)StatusHintColumn::Nep},
-	{L"Hin", (int)StatusHintColumn::Hin},
-	{L"Ind", (int)StatusHintColumn::Ind}
+	{ L"Jyutping", (int)StatusHintColumn::Jyutping },
+	{ L"English", (int)StatusHintColumn::English },
+	{ L"Disambiguatory Information", (int)StatusHintColumn::Disambiguation },
+	{ L"Part of Speech", (int)StatusHintColumn::PartOfSpeech },
+	{ L"Register", (int)StatusHintColumn::Register },
+	{ L"Label", (int)StatusHintColumn::Label },
+	{ L"Written", (int)StatusHintColumn::Written },
+	{ L"Colloquial", (int)StatusHintColumn::Colloquial },
+	{ L"Urd", (int)StatusHintColumn::Urd },
+	{ L"Nep", (int)StatusHintColumn::Nep },
+	{ L"Hin", (int)StatusHintColumn::Hin },
+	{ L"Ind", (int)StatusHintColumn::Ind }
 };
 
 void MultiHintPanel::setMultiHintOptions(const std::wstring& settings)
@@ -94,7 +94,7 @@ std::string MultiHintPanel::getHint(const InfoMultiHint& info, const StatusHintS
 			textContainer.push_back(text);
 		}
 	};
-	if(status & (int)StatusHintColumn::JyutPing)
+	if(status & (int)StatusHintColumn::Jyutping)
 	{ pushText(info.Jyutping); }
 
 	if(status & (int)StatusHintColumn::English)
