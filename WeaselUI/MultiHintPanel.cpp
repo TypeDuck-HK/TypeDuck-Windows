@@ -94,49 +94,41 @@ std::string MultiHintPanel::getHint(const InfoMultiHint& info, const StatusHintS
 			textContainer.push_back(text);
 		}
 	};
-	if(status & (int)StatusHintColumn::Jyutping)
-	{ pushText(info.Jyutping); }
+	if (status & (int)StatusHintColumn::Jyutping) pushText(info.Jyutping);
 
-	if(status & (int)StatusHintColumn::English)
-	{ pushText(info.Definition.English); }
+	if (status & (int)StatusHintColumn::English) pushText(info.Definition.English);
 
-	if(status & (int)StatusHintColumn::Disambiguation)
-	{ pushText(info.Definition.Disambiguation); }
+	if (status & (int)StatusHintColumn::Disambiguation) pushText(info.Definition.Disambiguation);
 
-	if(status & (int)StatusHintColumn::PartOfSpeech 
-			&& info.Definition.Pos.size() > 0)
-	{ 
+	if (status & (int)StatusHintColumn::PartOfSpeech 
+			&& info.Definition.Pos.size() > 0) { 
 		const auto& pos = info.Definition.Pos;
 		pushText("(" + pos + ")");
 	}
 
 	if(status & (int)StatusHintColumn::Register 
-			&& info.Definition.Register.size() > 0)
-	{ 
+			&& info.Definition.Register.size() > 0) { 
 		const auto& reg = info.Definition.Register;
 		pushText("[" + reg + "]"); 
 	}
 
-	if(status & (int)StatusHintColumn::Label) 
-	{ pushText(info.Definition.Label); }
+	if(status & (int)StatusHintColumn::Label
+			&& info.Definition.Label.size() > 0) {
+		const auto& label = info.Definition.Label;
+		pushText("[" + label + "]");
+	}
 
-	if(status & (int)StatusHintColumn::Written) 
-	{ pushText(info.Definition.Written); }
+	if(status & (int)StatusHintColumn::Written) pushText(info.Definition.Written);
 
-	if(status & (int)StatusHintColumn::Colloquial) 
-	{ pushText(info.Definition.Colloquial); }
+	if(status & (int)StatusHintColumn::Colloquial) pushText(info.Definition.Colloquial);
 
-	if(status & (int)StatusHintColumn::Urd) 
-	{ pushText(info.Definition.Language.Urd); }
+	if(status & (int)StatusHintColumn::Urd) pushText(info.Definition.Language.Urd);
 
-	if(status & (int)StatusHintColumn::Nep) 
-	{ pushText(info.Definition.Language.Nep); }
+	if(status & (int)StatusHintColumn::Nep) pushText(info.Definition.Language.Nep);
 
-	if(status & (int)StatusHintColumn::Hin) 
-	{ pushText(info.Definition.Language.Hin); }
+	if(status & (int)StatusHintColumn::Hin) pushText(info.Definition.Language.Hin);
 
-	if(status & (int)StatusHintColumn::Ind) 
-	{ pushText(info.Definition.Language.Ind); }
+	if(status & (int)StatusHintColumn::Ind) pushText(info.Definition.Language.Ind);
 
 	return boost::algorithm::join_if(textContainer, "\t ", 
 											[](const std::string& s) { return s.size() > 0; });
