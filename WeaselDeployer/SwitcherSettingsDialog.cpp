@@ -75,7 +75,7 @@ void SwitcherSettingsDialog::ShowDetails(RimeSchemaInfo* info) {
 LRESULT SwitcherSettingsDialog::OnInitDialog(UINT, WPARAM, LPARAM, BOOL&) {
 	schema_list_.SubclassWindow(GetDlgItem(IDC_SCHEMA_LIST));
 	schema_list_.SetExtendedListViewStyle(LVS_EX_FULLROWSELECT, LVS_EX_FULLROWSELECT);
-	schema_list_.AddColumn(L"方案名稱", 0);
+	schema_list_.AddColumn(L"Schema Name", 0);
 	WTL::CRect rc;
 	schema_list_.GetClientRect(&rc);
 	schema_list_.SetColumnWidth(0, rc.Width() - 20);
@@ -147,7 +147,7 @@ LRESULT SwitcherSettingsDialog::OnOK(WORD, WORD code, HWND, BOOL&) {
 			}
 		}
 		if (count == 0) {
-			MessageBox(_T("至少要選用一項吧。"), _T("小狼毫不是這般用法"), MB_OK | MB_ICONEXCLAMATION);
+			MessageBox(_T("You must select at least one schema from the schema list."), _T("Empty Selection"), MB_OK | MB_ICONEXCLAMATION);
 			delete selection;
 			return 0;
 		}

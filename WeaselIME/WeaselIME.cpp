@@ -38,7 +38,7 @@ static bool launch_server()
 	LSTATUS ret = RegOpenKeyEx(HKEY_LOCAL_MACHINE, WEASEL_REG_KEY, 0, KEY_READ | KEY_WOW64_32KEY, &hKey);
 	if (ret != ERROR_SUCCESS)
 	{
-		error_message(L"註冊表信息無影了");
+		error_message(L"Unable to write to the Registry.");
 		return false;
 	}
 
@@ -48,7 +48,7 @@ static bool launch_server()
 	ret = RegQueryValueEx(hKey, L"WeaselRoot", NULL, &type, (LPBYTE)value, &len);
 	if (ret != ERROR_SUCCESS)
 	{
-		error_message(L"未設置 WeaselRoot");
+		error_message(L"The “WeaselRoot” Registry key is not set.");
 		RegCloseKey(hKey);
 		return false;
 	}
@@ -59,7 +59,7 @@ static bool launch_server()
 	ret = RegQueryValueEx(hKey, L"ServerExecutable", NULL, &type, (LPBYTE)value, &len);
 	if (ret != ERROR_SUCCESS)
 	{
-		error_message(L"未設置 ServerExecutable");
+		error_message(L"The “ServerExecutable” Registry key is not set.");
 		RegCloseKey(hKey);
 		return false;
 	}
@@ -78,7 +78,7 @@ static bool launch_server()
 	if (!CreateProcess(exe.c_str(), NULL, NULL, NULL, FALSE, 0, NULL, dir.c_str(), &startup_info, &process_info))
 	{
 		EZDBGONLYLOGGERPRINT("ERROR: failed to launch weasel server.");
-		error_message(L"服務進程啓動不起來 :(");
+		error_message(L"Unable to start process.");
 		return false;
 	}
 

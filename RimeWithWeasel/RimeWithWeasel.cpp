@@ -488,14 +488,14 @@ bool RimeWithWeaselHandler::_ShowMessage(weasel::Context& ctx, weasel::Status& s
 	bool show_icon = false;
 	if (m_message_type == "deploy") {
 		if (m_message_value == "start")
-			tips = L"正在部署 RIME";
+			tips = L"Deploying RIME…";
 		else if (m_message_value == "success")
-			tips = L"部署完成";
+			tips = L"Deployment completed. TypeDuck is now available for use.";
 		else if (m_message_value == "failure")
-			tips = L"有錯誤，請查看日誌 %TEMP%\\rime.weasel.*.INFO";
+			tips = L"An error has occurred. See the log file %TEMP%\\rime.weasel.*.INFO for more information.";
 	}
 	else if (m_message_type == "schema") {
-		tips = /*L"【" + */status.schema_name/* + L"】"*/;
+		tips = /*L"[" + */status.schema_name/* + L"]"*/;
 	}
 	else if (m_message_type == "option") {
 		if (m_message_value == "!ascii_mode")
@@ -507,17 +507,23 @@ bool RimeWithWeaselHandler::_ShowMessage(weasel::Context& ctx, weasel::Status& s
 			show_icon = true;  
 		}
 		else if (m_message_value == "!full_shape")
-			tips = L"半角";
+			tips = L"半形";
 		else if (m_message_value == "full_shape")
-			tips = L"全角";
+			tips = L"全形";
 		else if (m_message_value == "!ascii_punct")
 			tips = L"，。";
 		else if (m_message_value == "ascii_punct")
 			tips = L"，．";
 		else if (m_message_value == "!simplification")
 			tips = L"漢字";
+		else if (m_message_value == "noop")
+			tips = L"傳統漢字";
+		else if (m_message_value == "variants_hk")
+			tips = L"香港傳統漢字";
+		else if (m_message_value == "trad_tw")
+			tips = L"臺灣傳統漢字";
 		else if (m_message_value == "simplification")
-			tips = L"汉字";
+			tips = L"大陆简化汉字";
 	}
 	if (tips.empty() && !show_icon)
 		return m_ui->IsCountingDown();

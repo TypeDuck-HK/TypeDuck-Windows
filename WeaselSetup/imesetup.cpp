@@ -88,7 +88,7 @@ int install_ime_file(std::wstring& srcPath, const std::wstring& ext, bool hant, 
 	// 复制 .dll/.ime 到系统目录
 	if (!copy_file(srcPath, destPath))
 	{
-		if (!silent) MessageBoxW(NULL, destPath.c_str(), L"安裝失敗", MB_ICONERROR | MB_OK);
+		if (!silent) MessageBoxW(NULL, destPath.c_str(), L"Installation Failed", MB_ICONERROR | MB_OK);
 		return 1;
 	}
 	retval += func(destPath, true, false, hant, silent);
@@ -100,18 +100,18 @@ int install_ime_file(std::wstring& srcPath, const std::wstring& ext, bool hant, 
 		PW64RW64FR fnWow64RevertWow64FsRedirection = (PW64RW64FR)GetProcAddress(GetModuleHandle(_T("kernel32.dll")), "Wow64RevertWow64FsRedirection");
 		if (fnWow64DisableWow64FsRedirection == NULL || fnWow64DisableWow64FsRedirection(&OldValue) == FALSE)
 		{
-			if (!silent) MessageBoxW(NULL, L"無法取消文件系統重定向", L"安裝失敗", MB_ICONERROR | MB_OK);
+			if (!silent) MessageBoxW(NULL, L"Unable to disable file system redirection.", L"Installation Failed", MB_ICONERROR | MB_OK);
 			return 1;
 		}
 		if (!copy_file(srcPath, destPath))
 		{
-			if (!silent) MessageBoxW(NULL, destPath.c_str(), L"安裝失敗", MB_ICONERROR | MB_OK);
+			if (!silent) MessageBoxW(NULL, destPath.c_str(), L"Installation Failed", MB_ICONERROR | MB_OK);
 			return 1;
 		}
 		retval += func(destPath, true, true, hant, silent);
 		if (fnWow64RevertWow64FsRedirection == NULL || fnWow64RevertWow64FsRedirection(OldValue) == FALSE)
 		{
-			if (!silent) MessageBoxW(NULL, L"無法恢復文件系統重定向", L"安裝失敗", MB_ICONERROR | MB_OK);
+			if (!silent) MessageBoxW(NULL, L"Unable to revert file system redirection.", L"Installation Failed", MB_ICONERROR | MB_OK);
 			return 1;
 		}
 	}
@@ -128,7 +128,7 @@ int uninstall_ime_file(const std::wstring& ext, bool silent, ime_register_func f
 	retval += func(imePath, false, false, false, silent);
 	if (!delete_file(imePath))
 	{
-		if (!silent) MessageBox(NULL, imePath.c_str(), L"卸載失敗", MB_ICONERROR | MB_OK);
+		if (!silent) MessageBox(NULL, imePath.c_str(), L"Uninstall Failed", MB_ICONERROR | MB_OK);
 		retval += 1;
 	}
 	if (is_wow64())
@@ -139,17 +139,17 @@ int uninstall_ime_file(const std::wstring& ext, bool silent, ime_register_func f
 		PW64RW64FR fnWow64RevertWow64FsRedirection = (PW64RW64FR)GetProcAddress(GetModuleHandle(_T("kernel32.dll")), "Wow64RevertWow64FsRedirection");
 		if (fnWow64DisableWow64FsRedirection == NULL || fnWow64DisableWow64FsRedirection(&OldValue) == FALSE)
 		{
-			if (!silent) MessageBoxW(NULL, L"無法取消文件系統重定向", L"卸載失敗", MB_ICONERROR | MB_OK);
+			if (!silent) MessageBoxW(NULL, L"Unable to disable file system redirection.", L"Uninstall Failed", MB_ICONERROR | MB_OK);
 			return 1;
 		}
 		if (!delete_file(imePath))
 		{
-			if (!silent) MessageBoxW(NULL, imePath.c_str(), L"卸載失敗", MB_ICONERROR | MB_OK);
+			if (!silent) MessageBoxW(NULL, imePath.c_str(), L"Uninstall Failed", MB_ICONERROR | MB_OK);
 			retval += 1;
 		}
 		if (fnWow64RevertWow64FsRedirection == NULL || fnWow64RevertWow64FsRedirection(OldValue) == FALSE)
 		{
-			if (!silent) MessageBoxW(NULL, L"無法恢復文件系統重定向", L"卸載失敗", MB_ICONERROR | MB_OK);
+			if (!silent) MessageBoxW(NULL, L"Unable to revert file system redirection.", L"Uninstall Failed", MB_ICONERROR | MB_OK);
 			return 1;
 		}
 	}
@@ -247,8 +247,8 @@ int register_ime(const std::wstring& ime_path, bool register_ime, bool is_wow64,
 		{
 			DWORD dwErr = GetLastError();
 			WCHAR msg[100];
-			StringCchPrintfW(msg, _countof(msg), L"註冊輸入法錯誤 ImmInstallIME: HKL=%x Err=%x", hKL, dwErr);
-			if (!silent) MessageBox(NULL, msg, L"安裝失敗", MB_ICONERROR | MB_OK);
+			StringCchPrintfW(msg, _countof(msg), L"Error on Registrating IME: ImmInstallIME: HKL=%x Err=%x", hKL, dwErr);
+			if (!silent) MessageBox(NULL, msg, L"Installation Failed", MB_ICONERROR | MB_OK);
 			return 1;
 		}
 		return 0;
@@ -260,7 +260,7 @@ int register_ime(const std::wstring& ime_path, bool register_ime, bool is_wow64,
 	LSTATUS ret = RegOpenKey(HKEY_LOCAL_MACHINE, KEYBOARD_LAYOUTS_KEY, &hKey);
 	if (ret != ERROR_SUCCESS)
 	{
-		if (!silent) MessageBox(NULL, KEYBOARD_LAYOUTS_KEY, L"卸載失敗", MB_ICONERROR | MB_OK);
+		if (!silent) MessageBox(NULL, KEYBOARD_LAYOUTS_KEY, L"Uninstall Failed", MB_ICONERROR | MB_OK);
 		return 1;
 	}
 
@@ -402,8 +402,8 @@ int register_text_service(const std::wstring& tsf_path, bool register_ime, bool 
 	else
 	{
 		WCHAR msg[100];
-		StringCchPrintfW(msg, _countof(msg), L"註冊輸入法錯誤 regsvr32.exe %s", params.c_str());
-		if (!silent) MessageBoxW(NULL, msg, L"安装/卸載失败", MB_ICONERROR | MB_OK);
+		StringCchPrintfW(msg, _countof(msg), L"Error on Registrating IME: regsvr32.exe %s", params.c_str());
+		if (!silent) MessageBoxW(NULL, msg, L"Install/Uninstall Failed", MB_ICONERROR | MB_OK);
 		return 1;
 	}
 
@@ -426,7 +426,7 @@ int install(bool hant, bool silent)
 		                         0, NULL, 0, KEY_ALL_ACCESS, 0, &hKey, NULL);
 	if (FAILED(HRESULT_FROM_WIN32(ret)))
 	{
-		if (!silent) MessageBox(NULL, WEASEL_REG_KEY, L"安裝失敗", MB_ICONERROR | MB_OK);
+		if (!silent) MessageBox(NULL, WEASEL_REG_KEY, L"Installation Failed", MB_ICONERROR | MB_OK);
 		return 1;
 	}
 
@@ -440,7 +440,7 @@ int install(bool hant, bool silent)
 						(rootDir.length() + 1) * sizeof(WCHAR));
 	if (FAILED(HRESULT_FROM_WIN32(ret)))
 	{
-		if (!silent) MessageBox(NULL, L"無法寫入 WeaselRoot", L"安裝失敗", MB_ICONERROR | MB_OK);
+		if (!silent) MessageBox(NULL, L"Unable to write to the “WeaselRoot” Registry key.", L"Installation Failed", MB_ICONERROR | MB_OK);
 		return 1;
 	}
 
@@ -450,7 +450,7 @@ int install(bool hant, bool silent)
 						(executable.length() + 1) * sizeof(WCHAR));
 	if (FAILED(HRESULT_FROM_WIN32(ret)))
 	{
-		if (!silent) MessageBox(NULL, L"無法寫入註冊表鍵值 ServerExecutable", L"安裝失敗", MB_ICONERROR | MB_OK);
+		if (!silent) MessageBox(NULL, L"Unable to write to the “ServerExecutable” Registry key.", L"Installation Failed", MB_ICONERROR | MB_OK);
 		return 1;
 	}
 
@@ -459,7 +459,7 @@ int install(bool hant, bool silent)
 	if (retval)
 		return 1;
 
-	if (!silent) MessageBox(NULL, L"可以使【小狼毫】寫字了 :)", L"安裝完成", MB_ICONINFORMATION | MB_OK);
+	if (!silent) MessageBox(NULL, L"TypeDuck is now available for use.", L"Installation Completed", MB_ICONINFORMATION | MB_OK);
 	return 0;
 }
 
@@ -477,7 +477,7 @@ int uninstall(bool silent)
 	if (retval)
 		return 1;
 
-	if (!silent) MessageBox(NULL, L"小狼毫 :)", L"卸載完成", MB_ICONINFORMATION | MB_OK);
+	if (!silent) MessageBox(NULL, L"Thank you for using TypeDuck.", L"Uninstall Completed", MB_ICONINFORMATION | MB_OK);
 	return 0;
 }
 

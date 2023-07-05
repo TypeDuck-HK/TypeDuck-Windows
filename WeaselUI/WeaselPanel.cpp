@@ -114,8 +114,8 @@ void WeaselPanel::Refresh()
 	// check if to hide candidates window
 	// show tips status, two kind of situation: 1) only aux strings, don't care icon status; 2)only icon(ascii mode switching)
 	bool show_tips = (!m_ctx.aux.empty() && m_ctx.cinfo.empty() && m_ctx.preedit.empty()) || (m_ctx.empty() && should_show_icon);
-	// show schema menu status: always preedit start with "〔方案選單〕"
-	bool show_schema_menu = std::regex_search(m_ctx.preedit.str, std::wsmatch(), std::wregex(L"^〔方案選單〕", std::wregex::icase));
+	// show schema menu status: always preedit start with "[Schema Menu]"
+	bool show_schema_menu = std::regex_search(m_ctx.preedit.str, std::wsmatch(), std::wregex(L"^[Schema Menu]", std::wregex::icase));
 	bool margin_negative = (m_style.margin_x < 0 || m_style.margin_y < 0);
 	bool inline_no_candidates = m_style.inline_preedit && (m_ctx.cinfo.candies.size() == 0) && (!show_tips);
 	// when to hide_cadidates?
@@ -786,7 +786,7 @@ void WeaselPanel::DoPaint(CDCHandle dc)
 			if(IS_FULLSCREENLAYOUT(m_style))
 				iconRect.OffsetRect(-1, -1);
 			CIcon& icon(m_status.disabled ? m_iconDisabled : m_status.ascii_mode ? m_iconAlpha :
-				((m_ctx.aux.str != L"全角" && m_ctx.aux.str != L"半角") ? m_iconEnabled : (m_status.full_shape ? m_iconFull : m_iconHalf)) );
+				((m_ctx.aux.str != L"全形" && m_ctx.aux.str != L"半形") ? m_iconEnabled : (m_status.full_shape ? m_iconFull : m_iconHalf)) );
 			memDC.DrawIconEx(iconRect.left, iconRect.top, icon, 0, 0);
 			drawn = true;
 		}
