@@ -21,7 +21,7 @@ void weasel::StandardLayout::GetTextSizeDW(const std::wstring text, size_t nCoun
 		lpSize->cy = 0;
 		return;
 	}
-	// 创建文本布局 
+	// 鍒涘缓鏂囨湰甯冨眬 
 	if (pTextFormat != NULL){
 		if (_style.layout_type == UIStyle::LAYOUT_VERTICAL_TEXT)
 			hr = pDWR->pDWFactory->CreateTextLayout(text.c_str(), nCount, pTextFormat, 0, _style.max_height, reinterpret_cast<IDWriteTextLayout**>(&pDWR->pTextLayout));
@@ -37,7 +37,7 @@ void weasel::StandardLayout::GetTextSizeDW(const std::wstring text, size_t nCoun
 			pDWR->pTextLayout->SetReadingDirection(DWRITE_READING_DIRECTION_TOP_TO_BOTTOM);
 			pDWR->pTextLayout->SetFlowDirection(flow);
 		}
-		// 获取文本尺寸  
+		// 鑾峰彇鏂囨湰灏哄  
 		DWRITE_TEXT_METRICS textMetrics;
 		hr = pDWR->pTextLayout->GetMetrics(&textMetrics);
 		sz = D2D1::SizeF(ceil(textMetrics.width), ceil(textMetrics.height));

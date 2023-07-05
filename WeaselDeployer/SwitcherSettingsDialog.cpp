@@ -1,4 +1,4 @@
-﻿#include "stdafx.h"
+#include "stdafx.h"
 #include "SwitcherSettingsDialog.h"
 #include "Configurator.h"
 #include <algorithm>

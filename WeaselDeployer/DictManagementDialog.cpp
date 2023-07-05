@@ -1,4 +1,4 @@
-﻿#include "stdafx.h"
+#include "stdafx.h"
 #include "DictManagementDialog.h"
 #include "Configurator.h"
 #include <WeaselUtility.h>

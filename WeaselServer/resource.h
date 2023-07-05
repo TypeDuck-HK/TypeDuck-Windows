@@ -1,6 +1,6 @@
 //{{NO_DEPENDENCIES}}
-// Microsoft Visual C++ 生成的包含文件。
-// 供 WeaselServer.rc 使用
+// Microsoft Visual C++ generated include file.
+// Used by WeaselServer.rc
 //
 #define IDI_WEASEL                      100
 #define IDI_EN                          101

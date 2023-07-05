@@ -1,4 +1,4 @@
-﻿// WeaselServer.cpp : main source file for WeaselServer.exe
+// WeaselServer.cpp : main source file for WeaselServer.exe
 //
 //	WTL MessageLoop 封装了消息循环. 实现了 getmessage/dispatchmessage....
 

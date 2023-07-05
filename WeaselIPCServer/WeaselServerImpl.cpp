@@ -1,4 +1,4 @@
-﻿#include "stdafx.h"
+#include "stdafx.h"
 #include "WeaselServerImpl.h"
 #include <Windows.h>
 #include <resource.h>
