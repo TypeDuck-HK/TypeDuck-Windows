@@ -1,4 +1,4 @@
-#include "stdafx.h"
+﻿#include "stdafx.h"
 #include <logging.h>
 #include <RimeWithWeasel.h>
 #include <StringAlgorithm.hpp>
@@ -601,7 +601,7 @@ bool RimeWithWeaselHandler::_Respond(UINT session_id, EatLine eat)
 				for (auto i = 0; i < ctx.menu.num_candidates; i++)
 				{
 					std::string label = m_ui->style().label_font_point > 0 ? _GetLabelText(cinfo.labels, i, m_ui->style().label_text_format.c_str()) : "";
-					std::string comment = m_ui->style().comment_font_point > 0 ? to_byte_string(cinfo.comments.at(i).str) : "";
+					std::string comment = m_ui->style().hint_font_point > 0 ? to_byte_string(cinfo.comments.at(i).str) : "";
 #ifdef USE_HILITE_MARK
 					std::string mark_text = m_ui->style().mark_text.empty() ? "*" : to_byte_string(m_ui->style().mark_text);
 					std::string prefix = (i != ctx.menu.highlighted_candidate_index) ? "" : mark_text;
@@ -773,7 +773,7 @@ static void _UpdateUIStyle(RimeConfig* config, weasel::UI* ui, bool initialize)
 
 	const int BUF_SIZE = 2047;
 	char buffer[BUF_SIZE + 1];
-	const auto processFontFaceConfig = [&config, &style, &buffer](const char* key, std::wstring& value) {
+	const auto processFontFaceConfig = [&config, &style, &buffer, &BUF_SIZE](const char* key, std::wstring& value) {
 		memset(buffer, '\0', sizeof(buffer));
 		if (RimeConfigGetString(config, key, buffer, BUF_SIZE)) {
 			std::wstring tmp = utf8towcs(buffer);
@@ -784,7 +784,7 @@ static void _UpdateUIStyle(RimeConfig* config, weasel::UI* ui, bool initialize)
 	};
 	processFontFaceConfig("style/font_face", style.font_face);
 	processFontFaceConfig("style/label_font_face", style.label_font_face);
-	processFontFaceConfig("style/comment_font_face", style.comment_font_face);
+	processFontFaceConfig("style/hint_font_face", style.hint_font_face);
 	processFontFaceConfig("style/eng_font_face", style.eng_font_face);
 	processFontFaceConfig("style/hin_font_face", style.hin_font_face);
 	processFontFaceConfig("style/urd_font_face", style.urd_font_face);
@@ -800,7 +800,7 @@ static void _UpdateUIStyle(RimeConfig* config, weasel::UI* ui, bool initialize)
 		}
 	};
 	processFontPointConfig("style/label_font_point", &style.label_font_point);
-	processFontPointConfig("style/comment_font_point", &style.comment_font_point);
+	processFontPointConfig("style/hint_font_point", &style.hint_font_point);
 	processFontPointConfig("style/eng_font_point", &style.eng_font_point);
 	processFontPointConfig("style/hin_font_point", &style.hin_font_point);
 	processFontPointConfig("style/urd_font_point", &style.urd_font_point);
@@ -832,50 +832,15 @@ static void _UpdateUIStyle(RimeConfig* config, weasel::UI* ui, bool initialize)
 			style.preedit_type = weasel::UIStyle::PREVIEW_ALL;
 	}
 
-	char align_type[20] = { 0 };
-	if (RimeConfigGetString(config, "style/layout/align_type", align_type, sizeof(align_type) - 1))
-	{
-		if (!std::strcmp(align_type, "top"))
-			style.align_type = weasel::UIStyle::ALIGN_TOP;
-		else if (!std::strcmp(align_type, "center"))
-			style.align_type = weasel::UIStyle::ALIGN_CENTER;
-		else
-			style.align_type = weasel::UIStyle::ALIGN_BOTTOM;
-	}
+	style.align_type = weasel::UIStyle::ALIGN_BOTTOM;
 	Bool display_tray_icon = False;
 	if (RimeConfigGetBool(config, "style/display_tray_icon", &display_tray_icon) || initialize)
 	{
 		style.display_tray_icon = !!display_tray_icon;
 	}
-	Bool horizontal = False;
-	if (RimeConfigGetBool(config, "style/horizontal", &horizontal) || initialize)
-	{
-		style.layout_type = horizontal ? weasel::UIStyle::LAYOUT_HORIZONTAL : weasel::UIStyle::LAYOUT_VERTICAL;
-	}
-
-	Bool fullscreen = False;
-	if (RimeConfigGetBool(config, "style/fullscreen", &fullscreen) && fullscreen)
-	{
-		style.layout_type = (style.layout_type == weasel::UIStyle::LAYOUT_HORIZONTAL)
-			 ? weasel::UIStyle::LAYOUT_HORIZONTAL_FULLSCREEN : weasel::UIStyle::LAYOUT_VERTICAL_FULLSCREEN;
-	}
-
-	Bool vertical_text = False;
-	if ( RimeConfigGetBool(config, "style/vertical_text", &vertical_text))
-	{
-		if(vertical_text)
-			style.layout_type = weasel::UIStyle::LAYOUT_VERTICAL_TEXT;
-	}
-	Bool vertical_text_left_to_right = False;
-	if ( RimeConfigGetBool(config, "style/vertical_text_left_to_right", &vertical_text_left_to_right))
-	{
-		style.vertical_text_left_to_right = !!vertical_text_left_to_right;
-	}
-	Bool vertical_text_with_wrap = false;
-	if ( RimeConfigGetBool(config, "style/vertical_text_with_wrap", &vertical_text_with_wrap) )
-	{
-		style.vertical_text_with_wrap = !!vertical_text_with_wrap;
-	}
+	style.layout_type = weasel::UIStyle::LAYOUT_VERTICAL;
+	style.vertical_text_left_to_right = False;
+	style.vertical_text_with_wrap = false;
 
 	char label_text_format[128] = { 0 };
 	if (RimeConfigGetString(config, "style/label_format", label_text_format, sizeof(label_text_format) - 1))
@@ -893,45 +858,23 @@ static void _UpdateUIStyle(RimeConfig* config, weasel::UI* ui, bool initialize)
 	RimeConfigGetInt(config, "style/layout/max_width", &style.max_width);
 	RimeConfigGetInt(config, "style/layout/min_height", &style.min_height);
 	RimeConfigGetInt(config, "style/layout/max_height", &style.max_height);
-	// layout (alternative to style/horizontal)
-	char layout_type[256] = {0};
-	if (RimeConfigGetString(config, "style/layout/type", layout_type, sizeof(layout_type) - 1))
-	{
-		if (!std::strcmp(layout_type, "vertical"))
-			style.layout_type = weasel::UIStyle::LAYOUT_VERTICAL;
-		else if (!std::strcmp(layout_type, "horizontal"))
-			style.layout_type = weasel::UIStyle::LAYOUT_HORIZONTAL;
-		else if (!std::strcmp(layout_type, "vertical_text"))
-			style.layout_type = weasel::UIStyle::LAYOUT_VERTICAL_TEXT;
-
-		if (!std::strcmp(layout_type, "vertical+fullscreen"))
-			style.layout_type = weasel::UIStyle::LAYOUT_VERTICAL_FULLSCREEN;
-		else if (!std::strcmp(layout_type, "horizontal+fullscreen"))
-			style.layout_type = weasel::UIStyle::LAYOUT_HORIZONTAL_FULLSCREEN;
-		else
-			LOG(WARNING) << "Invalid style type: " << layout_type;
-	}
 	// disable max_width when full screen
-	if( style.layout_type == weasel::UIStyle::LAYOUT_HORIZONTAL_FULLSCREEN || style.layout_type == weasel::UIStyle::LAYOUT_VERTICAL_FULLSCREEN )
-	{
-		style.max_width = 0;
-		style.inline_preedit = false;
-	}
 	if (!RimeConfigGetInt(config, "style/layout/border", &style.border)) {
 		RimeConfigGetInt(config, "style/layout/border_width", &style.border);
 	}
 	RimeConfigGetInt(config, "style/layout/margin_x", &style.margin_x);
 	RimeConfigGetInt(config, "style/layout/margin_y", &style.margin_y);
 	RimeConfigGetInt(config, "style/layout/spacing", &style.spacing);
+	RimeConfigGetInt(config, "style/layout/text_gap", &style.text_gap);
 	RimeConfigGetInt(config, "style/layout/candidate_spacing", &style.candidate_spacing);
 	RimeConfigGetInt(config, "style/layout/hilite_spacing", &style.hilite_spacing);
 	RimeConfigGetInt(config, "style/layout/hilite_padding", &style.hilite_padding);
+	RimeConfigGetInt(config, "style/layout/character_spacing", &style.character_spacing);
 	style.hilite_padding = abs(style.hilite_padding);
 	RimeConfigGetInt(config, "style/layout/shadow_radius", &style.shadow_radius);
 	// negative shadow radius not allow
 	if(style.shadow_radius < 0)
-		style.shadow_radius = - style.shadow_radius;
-	style.shadow_radius *= (!fullscreen);
+		style.shadow_radius = -style.shadow_radius;
 	RimeConfigGetInt(config, "style/layout/shadow_offset_x", &style.shadow_offset_x);
 	RimeConfigGetInt(config, "style/layout/shadow_offset_y", &style.shadow_offset_y);
 	// round_corner as alias of hilited_corner_radius
@@ -1115,6 +1058,14 @@ static bool _UpdateUIStyleColor(RimeConfig* config, weasel::UIStyle& style, bool
 		style.comment_text_color &= 0xffffffff;
 		RimeConfigGetColor32b(config, (prefix + "/hilited_comment_text_color").c_str(), &style.hilited_comment_text_color, fmt);
 		style.hilited_comment_text_color &= 0xffffffff;
+		style.hint_text_color = style.label_text_color;
+		style.hilited_hint_text_color = style.hilited_label_text_color;
+		if (RimeConfigGetColor32b(config, (prefix + "/hint_text_color").c_str(), &style.hint_text_color, fmt)) {
+			style.hilited_hint_text_color = style.hint_text_color;
+		}
+		style.hint_text_color &= 0xffffffff;
+		RimeConfigGetColor32b(config, (prefix + "/hilited_hint_text_color").c_str(), &style.hilited_hint_text_color, fmt);
+		style.hilited_hint_text_color &= 0xffffffff;
 #ifdef USE_HILITE_MARK
 		if (!RimeConfigGetColor32b(config, (prefix + "/hilited_mark_color").c_str(), &style.hilited_mark_color, fmt))
 		{

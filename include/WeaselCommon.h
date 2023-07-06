@@ -5,8 +5,8 @@
 #include <boost/serialization/vector.hpp>
 #include <boost/serialization/string.hpp>
 
-#define WEASEL_IME_NAME L"Weasel"
-#define WEASEL_REG_KEY L"Software\\Rime\\Weasel"
+#define WEASEL_IME_NAME L"TypeDuck"
+#define WEASEL_REG_KEY L"Software\\Rime\\TypeDuck"
 #define RIME_REG_KEY L"Software\\Rime"
 
 #define USE_BLUR_UNDER_WINDOWS10
@@ -276,7 +276,7 @@ namespace weasel
 		bool vertical_text_with_wrap;
 		std::wstring font_face;
 		std::wstring label_font_face;
-		std::wstring comment_font_face;
+		std::wstring hint_font_face;
 		std::wstring eng_font_face;
 		std::wstring hin_font_face;
 		std::wstring urd_font_face;
@@ -284,7 +284,7 @@ namespace weasel
 		std::wstring ind_font_face;
 		int font_point;
 		int label_font_point;
-		int comment_font_point;
+		int hint_font_point;
 		int eng_font_point;
 		int hin_font_point;
 		int urd_font_point;
@@ -310,9 +310,11 @@ namespace weasel
 		int margin_x;
 		int margin_y;
 		int spacing;
+		int text_gap;
 		int candidate_spacing;
 		int hilite_spacing;
 		int hilite_padding;
+		int character_spacing;
 		int round_corner;
 		int round_corner_ex;
 		int shadow_radius;
@@ -327,6 +329,7 @@ namespace weasel
 		int candidate_border_color;
 #endif
 		int label_text_color;
+		int hint_text_color;
 		int comment_text_color;
 		int back_color;
 		int shadow_color;
@@ -341,6 +344,7 @@ namespace weasel
 		int hilited_candidate_border_color;
 #endif
 		int hilited_label_text_color;
+		int hilited_hint_text_color;
 		int hilited_comment_text_color;
 #ifdef USE_HILITE_MARK
 		int hilited_mark_color;
@@ -355,7 +359,7 @@ namespace weasel
 
 		UIStyle() : font_face(),
 			label_font_face(),
-			comment_font_face(),
+			hint_font_face(),
 			eng_font_face(),
 			hin_font_face(),
 			urd_font_face(),
@@ -363,7 +367,7 @@ namespace weasel
 			ind_font_face(),
 			font_point(0),
 			label_font_point(0),
-			comment_font_point(0),
+			hint_font_point(0),
 			eng_font_point(0),
 			hin_font_point(0),
 			urd_font_point(0),
@@ -393,9 +397,11 @@ namespace weasel
 			margin_x(0),
 			margin_y(0),
 			spacing(0),
+			text_gap(0),
 			candidate_spacing(0),
 			hilite_spacing(0),
 			hilite_padding(0),
+			character_spacing(0),
 			round_corner(0),
 			round_corner_ex(0),
 			shadow_radius(0),
@@ -409,6 +415,7 @@ namespace weasel
 			candidate_border_color(0),
 #endif
 			label_text_color(0),
+			hint_text_color(0),
 			comment_text_color(0),
 			back_color(0),
 			shadow_color(0),
@@ -423,6 +430,7 @@ namespace weasel
 			hilited_candidate_border_color(0),
 #endif
 			hilited_label_text_color(0),
+			hilited_hint_text_color(0),
 			hilited_comment_text_color(0),
 			hint_settings(),
 #ifdef USE_HILITE_MARK
@@ -444,7 +452,7 @@ namespace weasel
 					|| vertical_text_with_wrap != st.vertical_text_with_wrap
 					|| font_face != st.font_face
 					|| label_font_face != st.label_font_face
-					|| comment_font_face != st.comment_font_face
+					|| hint_font_face != st.hint_font_face
 					|| eng_font_face != st.eng_font_face
 					|| hin_font_face != st.hin_font_face
 					|| urd_font_face != st.urd_font_face
@@ -452,7 +460,7 @@ namespace weasel
 					|| ind_font_face != st.ind_font_face
 					|| font_point != st.font_point
 					|| label_font_point != st.label_font_point
-					|| comment_font_point != st.comment_font_point
+					|| hint_font_point != st.hint_font_point
 					|| eng_font_point != st.eng_font_point
 					|| hin_font_point != st.hin_font_point
 					|| urd_font_point != st.urd_font_point
@@ -476,9 +484,11 @@ namespace weasel
 					|| margin_x != st.margin_x
 					|| margin_y != st.margin_y
 					|| spacing != st.spacing
+					|| text_gap != st.text_gap
 					|| candidate_spacing != st.candidate_spacing
 					|| hilite_spacing != st.hilite_spacing
 					|| hilite_padding != st.hilite_padding
+					|| character_spacing != st.character_spacing
 					|| round_corner != st.round_corner
 					|| round_corner_ex != st.round_corner_ex
 					|| shadow_radius != st.shadow_radius
@@ -493,6 +503,7 @@ namespace weasel
 					|| hilited_candidate_border_color != st.hilited_candidate_border_color
 #endif
 					|| label_text_color != st.label_text_color
+					|| hint_text_color != st.hint_text_color
 					|| comment_text_color != st.comment_text_color
 					|| back_color != st.back_color
 					|| shadow_color != st.shadow_color
@@ -504,6 +515,7 @@ namespace weasel
 					|| hilited_candidate_back_color != st.hilited_candidate_back_color
 					|| hilited_candidate_shadow_color != st.hilited_candidate_shadow_color
 					|| hilited_label_text_color != st.hilited_label_text_color
+					|| hilited_hint_text_color != st.hilited_hint_text_color
 					|| hilited_comment_text_color != st.hilited_comment_text_color
 					|| hint_settings != st.hint_settings
 #ifdef USE_HILITE_MARK
@@ -524,7 +536,7 @@ namespace boost {
 		{
 			ar & s.font_face;
 			ar & s.label_font_face;
-			ar & s.comment_font_face;
+			ar & s.hint_font_face;
 			ar & s.eng_font_face;
 			ar & s.hin_font_face;
 			ar & s.urd_font_face;
@@ -532,7 +544,7 @@ namespace boost {
 			ar & s.ind_font_face;
 			ar & s.font_point;
 			ar & s.label_font_point;
-			ar & s.comment_font_point;
+			ar & s.hint_font_point;
 			ar & s.eng_font_point;
 			ar & s.hin_font_point;
 			ar & s.urd_font_point;
@@ -562,9 +574,11 @@ namespace boost {
 			ar & s.margin_x;
 			ar & s.margin_y;
 			ar & s.spacing;
+			ar & s.text_gap;
 			ar & s.candidate_spacing;
 			ar & s.hilite_spacing;
 			ar & s.hilite_padding;
+			ar & s.character_spacing;
 			ar & s.round_corner;
 			ar & s.round_corner_ex;
 			ar & s.shadow_radius;
@@ -579,6 +593,7 @@ namespace boost {
 			ar & s.candidate_border_color;
 #endif
 			ar & s.label_text_color;
+			ar & s.hint_text_color;
 			ar & s.comment_text_color;
 			ar & s.back_color;
 			ar & s.shadow_color;
@@ -593,6 +608,7 @@ namespace boost {
 			ar & s.hilited_candidate_border_color;
 #endif
 			ar & s.hilited_label_text_color;
+			ar & s.hilited_hint_text_color;
 			ar & s.hilited_comment_text_color;
 #ifdef USE_HILITE_MARK
 			ar & s.hilited_mark_color;

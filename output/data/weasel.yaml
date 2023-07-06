@@ -1,7 +1,7 @@
 # Weasel settings
 # encoding: utf-8
 
-config_version: "0.22"
+config_version: "2023.07.06"
 
 app_options:
   cmd.exe:
@@ -11,46 +11,43 @@ app_options:
 
 style:
   color_scheme: aqua
-  font_face: Microsoft JhengHei
-  label_font_face: Century Gothic
-  comment_font_face: Segoe UI
+  font_face: Microsoft JhengHei, MingLiU HKSCS, MingLiU HKSCS ExtB
+  label_font_face: Century Gothic, Segoe UI
+  hint_font_face: Segoe UI, Microsoft JhengHei
   eng_font_face: Segoe UI
-  hin_font_face: Nirmala UI
-  urd_font_face: Urdu Typesetting
-  nep_font_face: Nirmala UI
+  hin_font_face: Nirmala UI, Mangal
+  urd_font_face: Urdu Typesetting, Tahoma, Segoe UI
+  nep_font_face: Nirmala UI, Mangal
   ind_font_face: Times New Roman
-  font_point: 16
+  font_point: 15
   label_font_point: 14
-  comment_font_point: 13
+  hint_font_point: 12
   eng_font_point: 14
-  hin_font_point: 15
-  urd_font_point: 16
-  nep_font_point: 15
+  hin_font_point: 13
+  urd_font_point: 15
+  nep_font_point: 13
   ind_font_point: 14
-  horizontal: false
-  fullscreen: false
+  language_list: Jyutping, Eng
   inline_preedit: false
   preedit_type: composition
   display_tray_icon: false
   label_format: "%s."
   mark_text: ""
-  vertical_text: false
-  vertical_text_left_to_right: false
-  vertical_text_with_wrap: false
   layout:
-    align_type: center
-    max_width: 0	#set 0 to disable max width
+    max_width: 0
     min_width: 160
     min_height: 0
-    max_height: 0	#set 0 to disable max height
+    max_height: 0
     border_width: 3
     margin_x: 12
     margin_y: 12
-    spacing: 10
+    spacing: 3
+    text_gap: 2
     candidate_spacing: 5
-    hilite_spacing: 4
-    hilite_padding: 2
-    round_corner: 4   #别名 hilited_corner_radius
+    hilite_spacing: 10
+    hilite_padding: 5
+    character_spacing: 16
+    round_corner: 4
     corner_radius: 4
     shadow_radius: 0
     shadow_offset_x: 4
@@ -60,19 +57,37 @@ preset_color_schemes:
   aqua:
     name: 碧水／Aqua
     author: 佛振 <chen.sst@gmail.com>
-    text_color: 0x000000                          #默认文字颜色
-    back_color: 0xeceeee                          #候选窗背景色
-    shadow_color: 0x00000000                      #候选窗阴影色，默认全透明（无阴影）
-    border_color: 0xe0e0e0                        #候选窗边框颜色
-    hilited_text_color: 0x000000                  #编码文字颜色
-    hilited_back_color: 0xd4d4d4                  #编码背景颜色
-    hilited_shadow_color: 0x00000000              #编码背景块阴影颜色
-    hilited_candidate_text_color: 0xffffff        #高亮候选文字颜色
-    hilited_candidate_back_color: 0xfa3a0a        #高亮候选背景颜色
-    hilited_candidate_shadow_color: 0x00000000    #高亮候选背景块阴影颜色
-    candidate_text_color: 0x000000                #非高亮候选文字颜色
-    candidate_back_color: 0xeceeee                #非高亮候选背景颜色
-    candidate_shadow_color: 0x00000000            #非高亮候选背景块阴影颜色
+
+    prevpage_color: 0x000000
+    nextpage_color: 0x000000
+    border_color: 0xe0e0e0
+    hilited_mark_color: 0xfa3a0a
+
+    label_color: 0x453a37
+    hint_text_color: 0x453a37
+    candidate_text_color: 0x000000
+    comment_text_color: 0x000000
+
+    hilited_label_color: 0xffede8
+    hilited_hint_text_color: 0xffede8
+    hilited_candidate_text_color: 0xffffff
+    hilited_comment_text_color: 0xffffff
+
+    text_color: 0x000000
+    back_color: 0xeceeee
+    shadow_color: 0x00000000
+
+    hilited_text_color: 0x000000
+    hilited_back_color: 0xd4d4d4
+    hilited_shadow_color: 0x00000000
+
+    candidate_back_color: 0xeceeee
+    candidate_shadow_color: 0x00000000
+    candidate_border_color: 0x00000000
+
+    hilited_candidate_back_color: 0xfa3a0a
+    hilited_candidate_shadow_color: 0x00000000
+    hilited_candidate_border_color: 0x00000000
 
   azure:
     name: 青天／Azure

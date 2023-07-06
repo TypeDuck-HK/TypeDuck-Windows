@@ -463,9 +463,9 @@ bool WeaselPanel::_DrawPreedit(Text const& text, CDCHandle dc, CRect const& rc)
 			std::wstring before_str = t.substr(0, range.start);
 			std::wstring hilited_str = t.substr(range.start, range.end);
 			std::wstring after_str = t.substr(range.end);
-			m_layout->GetTextSizeDW(before_str, before_str.length(), txtFormat, pDWR, &beforeSz);
-			m_layout->GetTextSizeDW(hilited_str, hilited_str.length(), txtFormat, pDWR, &hilitedSz);
-			m_layout->GetTextSizeDW(after_str, after_str.length(), txtFormat, pDWR, &afterSz);
+			m_layout->GetTextSizeDW(before_str, txtFormat, pDWR, &beforeSz);
+			m_layout->GetTextSizeDW(hilited_str, txtFormat, pDWR, &hilitedSz);
+			m_layout->GetTextSizeDW(after_str, txtFormat, pDWR, &afterSz);
 
 			int x = rc.left;
 			int y = rc.top;
@@ -478,7 +478,7 @@ bool WeaselPanel::_DrawPreedit(Text const& text, CDCHandle dc, CRect const& rc)
 					rc_before = CRect(rc.left, y, rc.right, y + beforeSz.cy);
 				else
 					rc_before = CRect(x, rc.top, rc.left + beforeSz.cx, rc.bottom);
-				_TextOut(rc_before, str_before.c_str(), str_before.length(), m_style.text_color, txtFormat);
+				_TextOut(rc_before, str_before, m_style.text_color, txtFormat);
 				if (m_style.layout_type == UIStyle::LAYOUT_VERTICAL_TEXT)
 					y += beforeSz.cy + m_style.hilite_spacing;
 				else
@@ -493,7 +493,7 @@ bool WeaselPanel::_DrawPreedit(Text const& text, CDCHandle dc, CRect const& rc)
 					rc_hi = CRect(rc.left, y, rc.right, y + hilitedSz.cy);
 				else
 					rc_hi = CRect(x, rc.top, x + hilitedSz.cx, rc.bottom);
-				_TextOut(rc_hi, str_highlight.c_str(), str_highlight.length(), m_style.hilited_text_color, txtFormat);
+				_TextOut(rc_hi, str_highlight, m_style.hilited_text_color, txtFormat);
 				if (m_style.layout_type == UIStyle::LAYOUT_VERTICAL_TEXT)
 					y += rc_hi.Height()+m_style.hilite_spacing;
 				else
@@ -507,12 +507,12 @@ bool WeaselPanel::_DrawPreedit(Text const& text, CDCHandle dc, CRect const& rc)
 					rc_after = CRect(rc.left, y, rc.right, y + afterSz.cy);
 				else
 					rc_after = CRect(x, rc.top, x + afterSz.cx, rc.bottom);
-				_TextOut(rc_after, str_after.c_str(), str_after.length(), m_style.text_color, txtFormat);
+				_TextOut(rc_after, str_after, m_style.text_color, txtFormat);
 			}
 		}
 		else {
 			CRect rcText(rc.left, rc.top, rc.right, rc.bottom);
-			_TextOut(rcText, t.c_str(), t.length(), m_style.text_color, txtFormat);
+			_TextOut(rcText, t, m_style.text_color, txtFormat);
 		}
 #ifdef USE_PAGER_MARK
 		if(m_candidateCount && !m_style.inline_preedit && COLORNOTTRANSPARENT(m_style.prevpage_color) && COLORNOTTRANSPARENT(m_style.nextpage_color))
@@ -522,12 +522,12 @@ bool WeaselPanel::_DrawPreedit(Text const& text, CDCHandle dc, CRect const& rc)
 			CRect prc = m_layout->GetPrepageRect();
 			// clickable color / disabled color
 			int color = m_ctx.cinfo.currentPage ? m_style.prevpage_color : m_style.text_color;
-			_TextOut(prc, pre.c_str(), pre.length(), color, txtFormat);
+			_TextOut(prc, pre, color, txtFormat);
 
 			CRect nrc = m_layout->GetNextpageRect();
 			// clickable color / disabled color
 			color = m_ctx.cinfo.is_last_page ? m_style.text_color : m_style.nextpage_color;
-			_TextOut(nrc, next.c_str(), next.length(), color, txtFormat);
+			_TextOut(nrc, next, color, txtFormat);
 		}
 #endif /*  USE_PAGER_MARK */
 		drawn = true;
@@ -553,8 +553,8 @@ bool WeaselPanel::_DrawPreeditBack(Text const& text, CDCHandle dc, CRect const& 
 			CSize beforeSz, hilitedSz;
 			std::wstring before_str = t.substr(0, range.start);
 			std::wstring hilited_str = t.substr(range.start, range.end);
-			m_layout->GetTextSizeDW(before_str, before_str.length(), txtFormat, pDWR, &beforeSz);
-			m_layout->GetTextSizeDW(hilited_str, hilited_str.length(), txtFormat, pDWR, &hilitedSz);
+			m_layout->GetTextSizeDW(before_str, txtFormat, pDWR, &beforeSz);
+			m_layout->GetTextSizeDW(hilited_str, txtFormat, pDWR, &hilitedSz);
 
 			int x = rc.left;
 			int y = rc.top;
@@ -597,9 +597,6 @@ bool WeaselPanel::_DrawCandidates(CDCHandle &dc, bool back)
 	const std::vector<Text> &comments(m_ctx.cinfo.comments);
 	const std::vector<Text> &labels(m_ctx.cinfo.labels);
 
-	IDWriteTextFormat1* txtFormat = pDWR->pTextFormat;
-	IDWriteTextFormat1* labeltxtFormat = pDWR->pLabelTextFormat;
-	IDWriteTextFormat1* commenttxtFormat = pDWR->pCommentTextFormat;
 	BackType bkType = BackType::CAND;
 	CRect rect;	
 	// draw back color and shadow color, with gdi+
@@ -652,17 +649,19 @@ bool WeaselPanel::_DrawCandidates(CDCHandle &dc, bool back)
 	else
 	{
 		// begin draw candidate texts
-		int label_text_color, candidate_text_color, comment_text_color;
+		int label_text_color, hint_text_color, candidate_text_color, comment_text_color;
 		for (size_t i = 0; i < m_candidateCount && i < MAX_CANDIDATES_COUNT; ++i) {
 			if (i == m_ctx.cinfo.highlighted)
 			{
 				label_text_color = m_style.hilited_label_text_color;
+				hint_text_color = m_style.hilited_hint_text_color;
 				candidate_text_color = m_style.hilited_candidate_text_color;
 				comment_text_color = m_style.hilited_comment_text_color;
 			}
 			else
 			{
 				label_text_color = m_style.label_text_color;
+				hint_text_color = m_style.hint_text_color;
 				candidate_text_color = m_style.candidate_text_color;
 				comment_text_color = m_style.comment_text_color;
 			}
@@ -681,42 +680,33 @@ bool WeaselPanel::_DrawCandidates(CDCHandle &dc, bool back)
 				else
 					hlRc = CRect(rc.left + m_style.hilite_padding + (m_layout->MARK_GAP - m_layout->MARK_WIDTH) / 2 + 1, rc.top + vgap,
 					rc.left + m_style.hilite_padding + (m_layout->MARK_GAP - m_layout->MARK_WIDTH) / 2 + 1 + m_layout->MARK_WIDTH, rc.bottom - vgap);
-				_TextOut(hlRc, m_style.mark_text.c_str(), m_style.mark_text.length(), m_style.hilited_mark_color, pDWR->pTextFormat);
+				_TextOut(hlRc, m_style.mark_text, m_style.mark_text.length(), m_style.hilited_mark_color, pDWR->pTextFormat);
 			}
 #endif
-			// Draw Hint
-			// zenam todo: add hint
-			const std::wstring& comment = comments.at(i).str;
-			rect = m_layout->GetCandidateTextHintRect((int)i);
-			if(!comment.empty() && m_hintPanel->isEnable()) {
-				if (m_hintPanel->containsCsv(comment)) {
-					auto& jp = m_hintPanel->getJyutping(comment);
-					_TextOut(rect, jp.c_str(), jp.length(), label_text_color, pDWR->pTextHintFormat);
-				} else {
-					_TextOut(rect, comment.c_str(), comment.length(), label_text_color, pDWR->pTextHintFormat);
-				}
-			}
 			// Draw label
 			std::wstring label = m_layout->GetLabelText(labels, (int)i, m_style.label_text_format.c_str());
 			if (!label.empty()) {
-				rect = m_layout->GetCandidateLabelRect((int)i);
-				_TextOut(rect, label.c_str(), label.length(), label_text_color, labeltxtFormat);
+				_TextOut(m_layout->GetCandidateLabelRect((int)i), label, label_text_color, pDWR->pLabelTextFormat);
 			}
 			// Draw text
 			std::wstring text = candidates.at(i).str;
 			if (!text.empty()) {
-				rect = m_layout->GetCandidateTextRect((int)i);
-				_TextOut(rect, text.c_str(), text.length(), candidate_text_color, txtFormat);
+				_TextOut(m_layout->GetCandidateTextRect((int)i), text, candidate_text_color, pDWR->pTextFormat, m_style.character_spacing);
 			}
-			// Draw comment
-			
-			if (!comment.empty()) {
-				rect = m_layout->GetCandidateCommentRect((int)i);
-				if(m_hintPanel->isEnable() && m_hintPanel->containsCsv(comment)) {
-					auto& hint = m_hintPanel->getMultiHint(comment);
-					_TextOut(rect, hint.c_str(), hint.length(), comment_text_color, commenttxtFormat);
-				} else
-					_TextOut(rect, comment.c_str(), comment.length(), comment_text_color, commenttxtFormat);
+			// Draw hint and comments
+			const std::wstring& comment = comments.at(i).str;
+			if (!comment.empty() && m_hintPanel->isEnabled()) {
+				if (m_hintPanel->containsCSV(comment)) {
+					InfoMultiHint info(comment);
+					if (m_hintPanel->isHintEnabled(StatusHintColumn::Jyutping)) _TextOut(m_layout->GetCandidateHintRect((int)i), info.Jyutping, hint_text_color, pDWR->pHintTextFormat);
+					if (m_hintPanel->isHintEnabled(StatusHintColumn::Eng)) _TextOut(m_layout->GetCandidateEngRect((int)i), info.Properties.Definition.Eng, comment_text_color, pDWR->pEngTextFormat);
+					if (m_hintPanel->isHintEnabled(StatusHintColumn::Hin)) _TextOut(m_layout->GetCandidateHinRect((int)i), info.Properties.Definition.Hin, comment_text_color, pDWR->pHinTextFormat);
+					if (m_hintPanel->isHintEnabled(StatusHintColumn::Urd)) _TextOut(m_layout->GetCandidateUrdRect((int)i), info.Properties.Definition.Urd, comment_text_color, pDWR->pUrdTextFormat);
+					if (m_hintPanel->isHintEnabled(StatusHintColumn::Nep)) _TextOut(m_layout->GetCandidateNepRect((int)i), info.Properties.Definition.Nep, comment_text_color, pDWR->pNepTextFormat);
+					if (m_hintPanel->isHintEnabled(StatusHintColumn::Ind)) _TextOut(m_layout->GetCandidateIndRect((int)i), info.Properties.Definition.Ind, comment_text_color, pDWR->pIndTextFormat);
+				} else if (m_hintPanel->isHintEnabled(StatusHintColumn::Jyutping)) {
+					_TextOut(m_layout->GetCandidateHintRect((int)i), comment, hint_text_color, pDWR->pHintTextFormat);
+				}
 			}
 			drawn = true;
 		}
@@ -911,7 +901,7 @@ void WeaselPanel::_RepositionWindow(bool adj)
 	SetWindowPos(HWND_TOPMOST, x, y, 0, 0, SWP_NOSIZE | SWP_NOACTIVATE);
 }
 
-void WeaselPanel::_TextOut(CRect const& rc, std::wstring psz, size_t cch, int inColor, IDWriteTextFormat* pTextFormat)
+void WeaselPanel::_TextOut(CRect const& rc, const std::wstring text, int inColor, IDWriteTextFormat* pTextFormat, int characterSpacing)
 {
 	if (pTextFormat == NULL) return;
 	float r = (float)(GetRValue(inColor))/255.0f;
@@ -921,11 +911,14 @@ void WeaselPanel::_TextOut(CRect const& rc, std::wstring psz, size_t cch, int in
 	pBrush->SetColor(D2D1::ColorF(r, g, b, alpha));
 
 	if (NULL != pBrush && NULL != pTextFormat) {
-		volatile auto err = pDWR->pDWFactory->CreateTextLayout( psz.c_str(), (UINT32)psz.size(), pTextFormat, (float)rc.Width(), (float)rc.Height(), reinterpret_cast<IDWriteTextLayout**>(&pDWR->pTextLayout));
+		volatile auto err = pDWR->pDWFactory->CreateTextLayout(text.c_str(), text.length(), pTextFormat, (float)rc.Width(), (float)rc.Height(), reinterpret_cast<IDWriteTextLayout**>(&pDWR->pTextLayout));
 		if (m_style.layout_type == UIStyle::LAYOUT_VERTICAL_TEXT) {
 			DWRITE_FLOW_DIRECTION flow = m_style.vertical_text_left_to_right ? DWRITE_FLOW_DIRECTION_LEFT_TO_RIGHT : DWRITE_FLOW_DIRECTION_RIGHT_TO_LEFT;
 			pDWR->pTextLayout->SetReadingDirection(DWRITE_READING_DIRECTION_TOP_TO_BOTTOM);
 			pDWR->pTextLayout->SetFlowDirection(flow);
+		}
+		if (characterSpacing) {
+			pDWR->pTextLayout->SetCharacterSpacing(0, characterSpacing, 0, { 0, (UINT32)text.length() });
 		}
 
 		// offsetx for font glyph over left

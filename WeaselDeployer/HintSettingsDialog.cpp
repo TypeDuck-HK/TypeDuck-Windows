@@ -25,53 +25,23 @@ LRESULT HintSettingsDialog::OnInitDiaLog(UINT, WPARAM, LPARAM, BOOL &)
 
 void HintSettingsDialog::Populate()
 {
-  std::vector<HintSettingsInfo> languages;
-  settings_->GetLanguageList(&languages);
   language_available_list_.DeleteAllItems();
-  std::vector<HintSettingsInfo> active_languages;
-  settings_->GetActiveLanguages(&active_languages);
-  for (auto& language : languages)
+  auto languageConfig = settings_->GetActiveLanguages();
+  for (int i = 0; i < LanguageConfigSize; ++i)
   {
-    auto currentLine = language_available_list_.GetItemCount();
-    int index = language_available_list_.AddItem(currentLine, 0, language.column_name.c_str());
-    // check if the language is in active_languages
-    auto it = std::find_if(active_languages.begin(), active_languages.end(), 
-                          [&language](const HintSettingsInfo& info) {
-      return info.settingIndex == language.settingIndex;
-    });
-    bool isActive = it != active_languages.end();
-    language_available_list_.SetCheckState(index, isActive);
-
+    const int index = language_available_list_.AddItem(i, 0, LanguageList[i].c_str());
+    language_available_list_.SetCheckState(index, languageConfig[i]);
   }
-
 }
 
 LRESULT HintSettingsDialog::OnOK(WORD, WORD code, HWND, BOOL&) 
 {
-  auto itemCount = language_available_list_.GetItemCount();
-  std::vector<int> checkedItemIndices;
-  for (int i = 0; i < itemCount; ++i)
+  std::vector<bool> selectedLanguages;
+  for (int i = 0; i < LanguageConfigSize; ++i)
   {
-    if (language_available_list_.GetCheckState(i))
-    {
-      checkedItemIndices.push_back(i);
-    }
+	  selectedLanguages.push_back(language_available_list_.GetCheckState(i));
   }
-  std::vector<HintSettingsInfo> selected_languages;
-
-  for (auto& index : checkedItemIndices)
-  {
-    // get string from checked item
-    ATL::CString language;
-    language_available_list_.GetItemText(index, 0, language);  
-    // ATL::CString to std::string
-    std::string language_str = CW2A(language.GetString());
-    HintSettingsInfo info;
-    info.column_name = language.GetString();
-    info.settingIndex = index;
-    selected_languages.push_back(info);
-  }
-  settings_->SetLanguageList(selected_languages);
+  settings_->SetLanguageList(selectedLanguages);
   
   EndDialog(code);
   return 0;

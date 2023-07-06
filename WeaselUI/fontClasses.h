@@ -9,7 +9,6 @@
 
 using namespace weasel;
 
-
 namespace weasel
 {
 	template <class T> void SafeRelease(T** ppT)
@@ -26,10 +25,7 @@ namespace weasel
 		DirectWriteResources(weasel::UIStyle& style, UINT dpi);
 		~DirectWriteResources();
 
-		HRESULT InitResources(std::wstring label_font_face, int label_font_point,
-			std::wstring font_face, int font_point,
-			std::wstring comment_font_face, int comment_font_point, bool vertical_text = false);
-		HRESULT InitResources(UIStyle& style, UINT dpi);
+		HRESULT InitResources(UIStyle& style, UINT dpi = 0, bool vertical_text = false);
 		void SetDpi(UINT dpi);
 		float dpiScaleX_, dpiScaleY_;
 		ID2D1Factory* pD2d1Factory;
@@ -38,11 +34,17 @@ namespace weasel
 		IDWriteTextFormat1* pPreeditTextFormat;
 		IDWriteTextFormat1* pTextFormat;
 		IDWriteTextFormat1* pLabelTextFormat;
-		IDWriteTextFormat1* pCommentTextFormat;
-		IDWriteTextFormat1* pTextHintFormat;
+		IDWriteTextFormat1* pHintTextFormat;
+		IDWriteTextFormat1* pEngTextFormat;
+		IDWriteTextFormat1* pHinTextFormat;
+		IDWriteTextFormat1* pUrdTextFormat;
+		IDWriteTextFormat1* pNepTextFormat;
+		IDWriteTextFormat1* pIndTextFormat;
 		IDWriteTextLayout2* pTextLayout;
 	private:
 		UIStyle& _style;
+		HRESULT _SetupTextFormat(std::wstring font_face, int font_point, IDWriteTextFormat1** ppTextFormat,
+								 DWRITE_READING_DIRECTION reading_direction = DWRITE_READING_DIRECTION_LEFT_TO_RIGHT);
 		void _ParseFontFace(const std::wstring fontFaceStr, DWRITE_FONT_WEIGHT& fontWeight, DWRITE_FONT_STYLE& fontStyle);
 		void _SetFontFallback(IDWriteTextFormat1* pTextFormat, std::vector<std::wstring> fontVector);
 	};

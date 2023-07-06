@@ -1,8 +1,9 @@
 #include "stdafx.h"
 #include "HintSettings.h"
 #include <WeaselUtility.h>
+#include <StringAlgorithm.hpp>
 
-static std::wstring LanguageList[] {
+const static std::wstring LanguageList[] {
 	L"Jyutping",
 	L"English",
 	L"Hindi",
@@ -11,7 +12,7 @@ static std::wstring LanguageList[] {
 	L"Nepali",
 };
 
-static std::string LanguageConfigNameList[] = {
+const static std::string LanguageConfigNameList[] = {
 	"Jyutping",
 	"Eng",
 	"Hin",
@@ -19,94 +20,41 @@ static std::string LanguageConfigNameList[] = {
 	"Urd",
 	"Nep",
 };
-int LanguageConfigSize = sizeof(LanguageConfigNameList) / sizeof(std::string);
+
+const int LanguageConfigSize = sizeof(LanguageConfigNameList) / sizeof(std::string);
+
 HintSettings::HintSettings()
 {
 	api_ = (RimeLeversApi*)rime_get_api()->find_module("levers")->get_api();
 	settings_ = api_->custom_settings_init("weasel", "Weasel::HintSettings");
 }
 
-bool HintSettings::GetLanguageList(std::vector<HintSettingsInfo>* result)
+std::vector<bool> HintSettings::GetActiveLanguages()
 {
-	if (!result) return false;
-	result->clear();
-	dumpLanguageList(result);
-	return true;
-}
-
-bool HintSettings::GetActiveLanguages(std::vector<HintSettingsInfo>* result)
-{
-	if (!result) return false;
-	result->clear();
 	RimeConfig config = { 0 };
-	char str[512];
+	char buffer[511];
 	api_->settings_get_config(settings_, &config);
 	RimeApi* rime = rime_get_api();
-	rime->config_get_string(&config, "style/language_list", str, 512);
+	rime->config_get_string(&config, "style/language_list", buffer, 512);
+	std::wstring str = utf8towcs(buffer);
+	str = std::regex_replace(str, std::wregex(L"\\s*,\\s*"), L",");
+	str = std::regex_replace(str, std::wregex(L"^\\s*|\\s*$"), L"");
+	std::unordered_set<std::wstring> columns = ws_split(str, L",");
 
-	// split str by ',' 
-	std::string lList = "";
-	std::string delimiter = ",";
-	// temporarily default Jyutping
-	lList = LanguageConfigNameList[0] + delimiter + str;
-	size_t pos = 0;
-	HintSettingsInfo info;
-	auto updateInfo = [&info](const std::string& column_name) {
-		info.column_name = utf8towcs(column_name.c_str());
-		auto target = std::find(std::begin(LanguageConfigNameList), 
-								 std::end(LanguageConfigNameList), column_name);
-		int index = target == std::end(LanguageConfigNameList) ? 
-								-1 : std::distance(std::begin(LanguageConfigNameList), target);
-		info.settingIndex = index; 
-	};
-	while ((pos = lList.find(delimiter)) != std::string::npos) {
-		updateInfo(lList.substr(0, pos));
-		result->push_back(info);
-		lList.erase(0, pos + delimiter.length());
+	std::vector<bool> languageConfig;
+	for (int i = 0; i < LanguageConfigSize; ++i) {
+		languageConfig.push_back(columns.find(utf8towcs(LanguageConfigNameList[i].c_str())) != columns.end());
 	}
-	if (lList.size() != 0)
-	{
-		updateInfo(lList);
-		result->push_back(info);
-	}
-	return true;
+	return languageConfig;
 }
 
-bool HintSettings::SetLanguageList(const std::vector<HintSettingsInfo>& result)
+bool HintSettings::SetLanguageList(const std::vector<bool> result)
 {
-	std::string settingStr = " ";
-	int sizeOfConfigName = std::size(LanguageConfigNameList);
-	for (auto& info : result) {
-		// concat settingStr and info.column_name
-		if (info.settingIndex < 0 || info.settingIndex > sizeOfConfigName){
-			continue;
-		}
-		settingStr += LanguageConfigNameList[info.settingIndex];
-		settingStr += ",";
+	std::string settingStr = "";
+	for (int i = 0; i < LanguageConfigSize; ++i) {
+		if (result[i]) settingStr += LanguageConfigNameList[i] + ", ";
 	}
 	settingStr.pop_back();
-	bool created = api_->customize_string(settings_, "style/language_list", settingStr.c_str());
-	return true;
-}
-
-void HintSettings::dumpLanguageList(std::vector<HintSettingsInfo>* result)
-{
-	if (!result)
-	{
-		return;
-	}
-	HintSettingsInfo info;
-
-	// Jyutping
-	info.column_name = LanguageList[0];
-	info.disable = true;
-	info.settingIndex = 0;
-	result->push_back(info);
-	int size = std::size(LanguageList);
-	for(int i = 1; i < size; ++i) {
-		info.column_name = LanguageList[i];
-		info.disable = false;
-		info.settingIndex = i;
-		result->push_back(info);
-	}	
+	settingStr.pop_back();
+	return api_->customize_string(settings_, "style/language_list", settingStr.c_str());
 }

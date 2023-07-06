@@ -10,9 +10,14 @@ Layout::Layout(const UIStyle& style, const Context& context, const Status& statu
 	candidates_count(candidates.size()),
 	real_margin_x((abs(_style.margin_x) > _style.hilite_padding) ? abs(_style.margin_x) : _style.hilite_padding),
 	real_margin_y((abs(_style.margin_y) > _style.hilite_padding) ? abs(_style.margin_y) : _style.hilite_padding),
-	labelFontValid(!!(_style.label_font_point > 0)),
 	textFontValid(!!(_style.font_point > 0)),
-	cmtFontValid(!!(_style.comment_font_point > 0))
+	labelFontValid(!!(_style.label_font_point > 0)),
+	hintFontValid(!!(_style.hint_font_point > 0)),
+	engFontValid(!!(_style.eng_font_point > 0)),
+	hinFontValid(!!(_style.hin_font_point > 0)),
+	urdFontValid(!!(_style.urd_font_point > 0)),
+	nepFontValid(!!(_style.nep_font_point > 0)),
+	indFontValid(!!(_style.ind_font_point > 0))
 {
 	offsetX = offsetY = 0;
 	if(_style.shadow_radius != 0)

@@ -59,8 +59,12 @@ namespace weasel
 		virtual CRect GetCandidateLabelRect(int id) const = 0;
 		virtual CRect GetCandidateTextRect(int id) const = 0;
 		virtual CRect GetCandidateRect(int id) const = 0;
-		virtual CRect GetCandidateCommentRect(int id) const = 0;
-		virtual CRect GetCandidateTextHintRect(int id) const = 0;
+		virtual CRect GetCandidateHintRect(int id) const = 0;
+		virtual CRect GetCandidateEngRect(int id) const = 0;
+		virtual CRect GetCandidateHinRect(int id) const = 0;
+		virtual CRect GetCandidateUrdRect(int id) const = 0;
+		virtual CRect GetCandidateNepRect(int id) const = 0;
+		virtual CRect GetCandidateIndRect(int id) const = 0;
 		virtual CRect GetStatusIconRect() const = 0;
 		virtual IsToRoundStruct GetRoundInfo(int id) = 0;
 		virtual IsToRoundStruct GetTextRoundInfo() = 0;
@@ -73,7 +77,7 @@ namespace weasel
 		virtual std::wstring GetLabelText(const std::vector<Text> &labels, int id, const wchar_t *format) const = 0;
 		virtual bool IsInlinePreedit() const = 0;
 		virtual bool ShouldDisplayStatusIcon() const = 0;
-		virtual void GetTextSizeDW(const std::wstring text, size_t nCount, IDWriteTextFormat1* pTextFormat, DirectWriteResources* pDWR,  LPSIZE lpSize) const = 0;
+		virtual void GetTextSizeDW(const std::wstring text, IDWriteTextFormat1* pTextFormat, DirectWriteResources* pDWR, LPSIZE lpSize, int characterSpacing = 0) const = 0;
 		
 		int offsetX = 0;
 		int offsetY = 0;
@@ -90,12 +94,25 @@ namespace weasel
 		const std::vector<Text> &candidates;
 		const std::vector<Text> &comments;
 		const std::vector<Text> &labels;
+		/*
+		const std::vector<Text> &hints;
+		const std::vector<Text> &engComments;
+		const std::vector<Text> &hinComments;
+		const std::vector<Text> &urdComments;
+		const std::vector<Text> &nepComments;
+		const std::vector<Text> &indComments;
+		*/
 		const int &id;
 		const int candidates_count;
 		const int real_margin_x;
 		const int real_margin_y;
-		const int labelFontValid;
 		const int textFontValid;
-		const int cmtFontValid;
+		const int labelFontValid;
+		const int hintFontValid;
+		const int engFontValid;
+		const int hinFontValid;
+		const int urdFontValid;
+		const int nepFontValid;
+		const int indFontValid;
 	};
 };

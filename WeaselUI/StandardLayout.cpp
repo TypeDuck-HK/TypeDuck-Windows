@@ -10,7 +10,7 @@ std::wstring StandardLayout::GetLabelText(const std::vector<Text> &labels, int i
 	return std::wstring(buffer);
 }
 
-void weasel::StandardLayout::GetTextSizeDW(const std::wstring text, size_t nCount, IDWriteTextFormat1* pTextFormat, DirectWriteResources* pDWR,  LPSIZE lpSize) const
+void weasel::StandardLayout::GetTextSizeDW(const std::wstring text, IDWriteTextFormat1* pTextFormat, DirectWriteResources* pDWR, LPSIZE lpSize, int characterSpacing) const
 {
 	D2D1_SIZE_F sz;
 	HRESULT hr = S_OK;
@@ -24,9 +24,9 @@ void weasel::StandardLayout::GetTextSizeDW(const std::wstring text, size_t nCoun
 	// 创建文本布局 
 	if (pTextFormat != NULL){
 		if (_style.layout_type == UIStyle::LAYOUT_VERTICAL_TEXT)
-			hr = pDWR->pDWFactory->CreateTextLayout(text.c_str(), nCount, pTextFormat, 0, _style.max_height, reinterpret_cast<IDWriteTextLayout**>(&pDWR->pTextLayout));
+			hr = pDWR->pDWFactory->CreateTextLayout(text.c_str(), text.length(), pTextFormat, 0, _style.max_height, reinterpret_cast<IDWriteTextLayout**>(&pDWR->pTextLayout));
 		else
-			hr = pDWR->pDWFactory->CreateTextLayout(text.c_str(), nCount, pTextFormat, _style.max_width, 0, reinterpret_cast<IDWriteTextLayout**>(&pDWR->pTextLayout));
+			hr = pDWR->pDWFactory->CreateTextLayout(text.c_str(), text.length(), pTextFormat, _style.max_width, 0, reinterpret_cast<IDWriteTextLayout**>(&pDWR->pTextLayout));
 	}
 
 	if (SUCCEEDED(hr))
@@ -36,6 +36,10 @@ void weasel::StandardLayout::GetTextSizeDW(const std::wstring text, size_t nCoun
 			DWRITE_FLOW_DIRECTION flow = _style.vertical_text_left_to_right ? DWRITE_FLOW_DIRECTION_LEFT_TO_RIGHT : DWRITE_FLOW_DIRECTION_RIGHT_TO_LEFT;
 			pDWR->pTextLayout->SetReadingDirection(DWRITE_READING_DIRECTION_TOP_TO_BOTTOM);
 			pDWR->pTextLayout->SetFlowDirection(flow);
+		}
+		if (characterSpacing)
+		{
+			pDWR->pTextLayout->SetCharacterSpacing(0, characterSpacing, 0, { 0, (UINT32)text.length() });
 		}
 		// 获取文本尺寸  
 		DWRITE_TEXT_METRICS textMetrics;
@@ -49,18 +53,22 @@ void weasel::StandardLayout::GetTextSizeDW(const std::wstring text, size_t nCoun
 		if(_style.layout_type != UIStyle::LAYOUT_VERTICAL_TEXT)
 		{
 			size_t max_width = _style.max_width == 0 ? textMetrics.width : _style.max_width;
-			hr = pDWR->pDWFactory->CreateTextLayout(text.c_str(), nCount, pTextFormat, max_width, textMetrics.height,  reinterpret_cast<IDWriteTextLayout**>(&pDWR->pTextLayout));
+			hr = pDWR->pDWFactory->CreateTextLayout(text.c_str(), text.length(), pTextFormat, max_width, textMetrics.height,  reinterpret_cast<IDWriteTextLayout**>(&pDWR->pTextLayout));
 		}
 		else
 		{
 			size_t max_height = _style.max_height == 0 ? textMetrics.height : _style.max_height;
-			hr = pDWR->pDWFactory->CreateTextLayout(text.c_str(), nCount, pTextFormat, textMetrics.width, max_height,  reinterpret_cast<IDWriteTextLayout**>(&pDWR->pTextLayout));
+			hr = pDWR->pDWFactory->CreateTextLayout(text.c_str(), text.length(), pTextFormat, textMetrics.width, max_height,  reinterpret_cast<IDWriteTextLayout**>(&pDWR->pTextLayout));
 		}
 
 		if (_style.layout_type == UIStyle::LAYOUT_VERTICAL_TEXT)
 		{
 			pDWR->pTextLayout->SetReadingDirection(DWRITE_READING_DIRECTION_TOP_TO_BOTTOM);
 			pDWR->pTextLayout->SetFlowDirection(DWRITE_FLOW_DIRECTION_RIGHT_TO_LEFT);
+		}
+		if (characterSpacing)
+		{
+			pDWR->pTextLayout->SetCharacterSpacing(0, characterSpacing, 0, { 0, (UINT32)text.length() });
 		}
 		DWRITE_OVERHANG_METRICS overhangMetrics;
 		hr = pDWR->pTextLayout->GetOverhangMetrics(&overhangMetrics);
@@ -91,9 +99,9 @@ CSize StandardLayout::GetPreeditSize(CDCHandle dc, const weasel::Text& text, IDW
 	std::wstring hilited_str = preedit.substr(range.start, range.end);
 	std::wstring after_str = preedit.substr(range.end);
 	CSize beforesz(0,0), hilitedsz(0,0), aftersz(0,0);
-	GetTextSizeDW(before_str, before_str.length(), pTextFormat, pDWR, &beforesz);
-	GetTextSizeDW(hilited_str, hilited_str.length(), pTextFormat, pDWR, &hilitedsz);
-	GetTextSizeDW(after_str, after_str.length(), pTextFormat, pDWR, &aftersz);
+	GetTextSizeDW(before_str, pTextFormat, pDWR, &beforesz);
+	GetTextSizeDW(hilited_str, pTextFormat, pDWR, &hilitedsz);
+	GetTextSizeDW(after_str, pTextFormat, pDWR, &aftersz);
 	size_t width_max = 0, height_max = 0;
 	if(_style.layout_type == UIStyle::LAYOUT_VERTICAL_TEXT)
 	{

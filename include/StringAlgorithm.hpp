@@ -4,8 +4,10 @@
 #include <cwctype>
 #include <numeric>
 #include <set>
+#include <unordered_set>
 #include <string>
 #include <vector>
+#include <regex>
 
 inline bool ends_with(const std::wstring& wstr, const std::wstring& wsub)
 {
@@ -30,8 +32,7 @@ inline void ireplace_last(std::wstring& input, const std::wstring& search, const
 		input.replace(pos, search.length(), sub);
 }
 
-template<typename T>
-inline std::string join(const T& list, const std::string& delim)
+inline std::string join(const std::set<std::string>& list, const std::string& delim)
 {
 	return std::accumulate(list.begin(), list.end(), std::string(), [&delim](std::string& str1, const std::string& str2)
 	{
@@ -51,6 +52,15 @@ inline std::vector<std::wstring>& split(std::vector<std::wstring>& result, const
 		result.push_back(input.substr(current, next - current));
 	} while (next != std::wstring::npos);
 	return result;
+}
+
+inline std::unordered_set<std::wstring> ws_split(const std::wstring& in, const std::wstring& delim) 
+{
+	std::wregex re{ delim };
+	return std::unordered_set<std::wstring> {
+		std::wsregex_token_iterator(in.begin(), in.end(), re, -1),
+			std::wsregex_token_iterator()
+	};
 }
 
 inline bool starts_with(const std::wstring& wstr, const std::wstring& wsub)

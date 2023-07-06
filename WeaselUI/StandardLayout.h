@@ -26,8 +26,12 @@ namespace weasel
 		virtual CRect GetHighlightRect() const { return _highlightRect; }
 		virtual CRect GetCandidateLabelRect(int id) const { return _candidateLabelRects[id]; }
 		virtual CRect GetCandidateTextRect(int id) const { return _candidateTextRects[id]; }
-		virtual CRect GetCandidateCommentRect(int id) const { return _candidateCommentRects[id]; }
-		virtual CRect GetCandidateTextHintRect(int id) const { return _candidateTextHintRects[id]; }
+		virtual CRect GetCandidateHintRect(int id) const { return _candidateHintRects[id]; }
+		virtual CRect GetCandidateEngRect(int id) const { return _candidateEngRects[id]; }
+		virtual CRect GetCandidateHinRect(int id) const { return _candidateHinRects[id]; }
+		virtual CRect GetCandidateUrdRect(int id) const { return _candidateUrdRects[id]; }
+		virtual CRect GetCandidateNepRect(int id) const { return _candidateNepRects[id]; }
+		virtual CRect GetCandidateIndRect(int id) const { return _candidateIndRects[id]; }
 		virtual CRect GetCandidateRect(int id) const { return _candidateRects[id]; }
 		virtual CRect GetStatusIconRect() const { return _statusIconRect; }
 		virtual std::wstring GetLabelText(const std::vector<Text> &labels, int id, const wchar_t *format) const;
@@ -41,7 +45,7 @@ namespace weasel
 		virtual CRect GetNextpageRect() { return _nextPageRect; }
 #endif /*  USE_PAGER_MARK */
 
-		void GetTextSizeDW(const std::wstring text, size_t nCount, IDWriteTextFormat1* pTextFormat, DirectWriteResources* pDWR, LPSIZE lpSize) const;
+		void GetTextSizeDW(const std::wstring text, IDWriteTextFormat1* pTextFormat, DirectWriteResources* pDWR, LPSIZE lpSize, int characterSpacing = 0) const;
 
 	protected:
 		/* Utility functions */
@@ -56,8 +60,12 @@ namespace weasel
 		CRect _candidateRects[MAX_CANDIDATES_COUNT];
 		CRect _candidateLabelRects[MAX_CANDIDATES_COUNT];
 		CRect _candidateTextRects[MAX_CANDIDATES_COUNT];
-		CRect _candidateCommentRects[MAX_CANDIDATES_COUNT];
-		CRect _candidateTextHintRects[MAX_CANDIDATES_COUNT];
+		CRect _candidateHintRects[MAX_CANDIDATES_COUNT];
+		CRect _candidateEngRects[MAX_CANDIDATES_COUNT];
+		CRect _candidateHinRects[MAX_CANDIDATES_COUNT];
+		CRect _candidateUrdRects[MAX_CANDIDATES_COUNT];
+		CRect _candidateNepRects[MAX_CANDIDATES_COUNT];
+		CRect _candidateIndRects[MAX_CANDIDATES_COUNT];
 		CRect _statusIconRect;
 		CRect _bgRect;
 		CRect _contentRect;

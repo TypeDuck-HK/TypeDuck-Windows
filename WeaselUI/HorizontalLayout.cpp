@@ -14,7 +14,7 @@ void HorizontalLayout::DoLayout(CDCHandle dc, DirectWriteResources* pDWR )
 	if (!_style.mark_text.empty() && (_style.hilited_mark_color & 0xff000000))
 	{
 		CSize sg;
-		GetTextSizeDW(_style.mark_text, _style.mark_text.length(), pDWR->pTextFormat, pDWR, &sg);
+		GetTextSizeDW(_style.mark_text, pDWR->pTextFormat, pDWR, &sg);
 		MARK_WIDTH = sg.cx;
 		MARK_HEIGHT = sg.cy;
 		MARK_GAP = MARK_WIDTH + 4;
@@ -27,8 +27,8 @@ void HorizontalLayout::DoLayout(CDCHandle dc, DirectWriteResources* pDWR )
 #ifdef USE_PAGER_MARK
 	// calc page indicator 
 	CSize pgszl, pgszr;
-	GetTextSizeDW(pre, pre.length(), pDWR->pPreeditTextFormat, pDWR, &pgszl);
-	GetTextSizeDW(next, next.length(), pDWR->pPreeditTextFormat, pDWR, &pgszr);
+	GetTextSizeDW(pre, pDWR->pPreeditTextFormat, pDWR, &pgszl);
+	GetTextSizeDW(next, pDWR->pPreeditTextFormat, pDWR, &pgszr);
 	int pgw = pgszl.cx + pgszr.cx + _style.hilite_spacing + _style.hilite_padding * 2;
 	int pgh = max(pgszl.cy, pgszr.cy);
 #endif /*  USE_PAGER_MARK */
@@ -77,7 +77,7 @@ void HorizontalLayout::DoLayout(CDCHandle dc, DirectWriteResources* pDWR )
 			if( id == i ) w += base_offset;
 			/* Label */
 			std::wstring label = GetLabelText(labels, i, _style.label_text_format.c_str());
-			GetTextSizeDW(label, label.length(), pDWR->pLabelTextFormat, pDWR, &size);
+			GetTextSizeDW(label, pDWR->pLabelTextFormat, pDWR, &size);
 			_candidateLabelRects[i].SetRect(w, height, w + size.cx * labelFontValid, height + size.cy);
 			w += size.cx * labelFontValid;
 			current_cand_width += size.cx * labelFontValid;
@@ -85,52 +85,18 @@ void HorizontalLayout::DoLayout(CDCHandle dc, DirectWriteResources* pDWR )
 			/* Text */
 			w += _style.hilite_spacing;
 			const std::wstring& text = candidates.at(i).str;
-			GetTextSizeDW(text, text.length(), pDWR->pTextFormat, pDWR, &size);
+			GetTextSizeDW(text, pDWR->pTextFormat, pDWR, &size);
 			_candidateTextRects[i].SetRect(w, height, w + size.cx * textFontValid, height + size.cy);
 			w += size.cx * textFontValid;
 			current_cand_width += (size.cx + _style.hilite_spacing) * textFontValid;
 
-			/* Comment */
-			if (!comments.at(i).str.empty() && cmtFontValid )
-			{
-				const std::wstring& comment = comments.at(i).str;
-				GetTextSizeDW(comment, comment.length(), pDWR->pCommentTextFormat, pDWR, &size);
-				w += _style.hilite_spacing;
-				_candidateCommentRects[i].SetRect(w, height, w + size.cx * cmtFontValid, height + size.cy);
-				w += size.cx * cmtFontValid;
-				current_cand_width += (size.cx + _style.hilite_spacing) * cmtFontValid;
-			}
-			else /* Used for highlighted candidate calculation below */
-				_candidateCommentRects[i].SetRect(w, height, w, height + size.cy);
-
 			int base_left = (i==id) ? _candidateLabelRects[i].left - base_offset : _candidateLabelRects[i].left;
 			// if not the first candidate of current row, and current candidate's right > _style.max_width
-			if(_style.max_width > 0 && (base_left > real_margin_x + offsetX) && (_candidateCommentRects[i].right - offsetX + real_margin_x > _style.max_width))
-			{
-				// max_width_of_rows current row
-				max_width_of_rows = max(max_width_of_rows, _candidateCommentRects[i-1].right);
-				w = offsetX + real_margin_x + (i==id ? base_offset : 0);
-				int ofx = w - _candidateLabelRects[i].left;
-				int ofy = height_of_rows[row_cnt] + _style.candidate_spacing;
-				// offset rects to next row
-				_candidateLabelRects[i].OffsetRect(ofx, ofy);
-				_candidateTextRects[i].OffsetRect(ofx, ofy);
-				_candidateCommentRects[i].OffsetRect(ofx, ofy);
-				// max width of next row, if it's the last candidate, make sure max_width_of_rows calc right
-				max_width_of_rows = max(max_width_of_rows, _candidateCommentRects[i].right);
-				mintop_of_rows[row_cnt] = height;
-				height += ofy;
-				// re calc rect position, decrease offsetX for origin 
-				w += current_cand_width;
-				row_cnt ++;
-			}
-			else
-				max_width_of_rows = max(max_width_of_rows, w);
+			max_width_of_rows = max(max_width_of_rows, w);
 			// calculate height of current row is the max of three rects
 			mintop_of_rows[row_cnt] = height;
 			height_of_rows[row_cnt] = max(height_of_rows[row_cnt], _candidateLabelRects[i].Height());
 			height_of_rows[row_cnt] = max(height_of_rows[row_cnt], _candidateTextRects[i].Height());
-			height_of_rows[row_cnt] = max(height_of_rows[row_cnt], _candidateCommentRects[i].Height());
 			// set row info of current candidate
 			row_of_candidate[i] = row_cnt;
 		}	
@@ -139,24 +105,19 @@ void HorizontalLayout::DoLayout(CDCHandle dc, DirectWriteResources* pDWR )
 		for (auto i = 0; i < candidates_count && i < MAX_CANDIDATES_COUNT; ++i)
 		{
 			int base_left = (i==id) ? _candidateLabelRects[i].left - base_offset : _candidateLabelRects[i].left;
-			_candidateRects[i].SetRect(base_left, mintop_of_rows[row_of_candidate[i]],
-					_candidateCommentRects[i].right, mintop_of_rows[row_of_candidate[i]] + height_of_rows[row_of_candidate[i]]);
-			int ol = 0, ot = 0, oc = 0;
+			int ol = 0, ot = 0;
 			if (_style.align_type == UIStyle::ALIGN_CENTER)
 			{
 				ol = (height_of_rows[row_of_candidate[i]] - _candidateLabelRects[i].Height()) / 2;
 				ot = (height_of_rows[row_of_candidate[i]] - _candidateTextRects[i].Height()) / 2;
-				oc = (height_of_rows[row_of_candidate[i]] - _candidateCommentRects[i].Height()) / 2;
 			}
 			else if (_style.align_type == UIStyle::ALIGN_BOTTOM)
 			{
 				ol = (height_of_rows[row_of_candidate[i]] - _candidateLabelRects[i].Height()) ;
 				ot = (height_of_rows[row_of_candidate[i]] - _candidateTextRects[i].Height()) ;
-				oc = (height_of_rows[row_of_candidate[i]] - _candidateCommentRects[i].Height()) ;
 			}
 			_candidateLabelRects[i].OffsetRect(0, ol);
 			_candidateTextRects[i].OffsetRect(0, ot);
-			_candidateCommentRects[i].OffsetRect(0, oc);
 			// make rightest candidate's rect right the same for better look
 			if(( i < candidates_count - 1 && row_of_candidate[i] < row_of_candidate[i+1] ) || (i == candidates_count - 1))
 				_candidateRects[i].right = max(width, max_width_of_rows);

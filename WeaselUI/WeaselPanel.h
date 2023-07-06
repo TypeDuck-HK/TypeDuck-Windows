@@ -142,7 +142,7 @@ private:
 	bool _DrawPreeditBack(weasel::Text const& text, CDCHandle dc, CRect const& rc);
 	bool _DrawCandidates(CDCHandle &dc, bool back = false);
 	void _HighlightText(CDCHandle &dc, CRect rc, COLORREF color, COLORREF shadowColor, int radius, BackType type, IsToRoundStruct rd, COLORREF bordercolor);
-	void _TextOut(CRect const& rc, std::wstring psz, size_t cch, int inColor, IDWriteTextFormat* pTextFormat = NULL);
+	void _TextOut(CRect const& rc, const std::wstring text, int inColor, IDWriteTextFormat* pTextFormat = NULL, int characterSpacing = 0);
 
 	void _LayerUpdate(const CRect& rc, CDCHandle dc);
 
