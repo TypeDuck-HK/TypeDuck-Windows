@@ -1,4 +1,4 @@
-#include "stdafx.h"
+﻿#include "stdafx.h"
 #include "WeaselPanel.h"
 #include <WeaselCommon.h>
 #include <ShellScalingApi.h>
@@ -517,17 +517,17 @@ bool WeaselPanel::_DrawPreedit(Text const& text, CDCHandle dc, CRect const& rc)
 #ifdef USE_PAGER_MARK
 		if(m_candidateCount && !m_style.inline_preedit && COLORNOTTRANSPARENT(m_style.prevpage_color) && COLORNOTTRANSPARENT(m_style.nextpage_color))
 		{
-			const std::wstring pre = L"<";
-			const std::wstring next = L">";
+			const std::wstring pre = L"‹";
+			const std::wstring next = L"›";
 			CRect prc = m_layout->GetPrepageRect();
 			// clickable color / disabled color
-			int color = m_ctx.cinfo.currentPage ? m_style.prevpage_color : m_style.text_color;
-			_TextOut(prc, pre, color, txtFormat);
+			int color = m_ctx.cinfo.currentPage ? m_style.prevpage_color : m_style.disabled_prevpage_color;
+			_TextOut(prc, pre, color, pDWR->pPageMarkFormat);
 
 			CRect nrc = m_layout->GetNextpageRect();
 			// clickable color / disabled color
-			color = m_ctx.cinfo.is_last_page ? m_style.text_color : m_style.nextpage_color;
-			_TextOut(nrc, next, color, txtFormat);
+			color = m_ctx.cinfo.is_last_page ? m_style.disabled_nextpage_color : m_style.nextpage_color;
+			_TextOut(nrc, next, color, pDWR->pPageMarkFormat);
 		}
 #endif /*  USE_PAGER_MARK */
 		drawn = true;

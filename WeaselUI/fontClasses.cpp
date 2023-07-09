@@ -45,7 +45,8 @@ DirectWriteResources::DirectWriteResources(weasel::UIStyle& style, UINT dpi = 0)
 	pHinTextFormat(NULL),
 	pUrdTextFormat(NULL),
 	pNepTextFormat(NULL),
-	pIndTextFormat(NULL)
+	pIndTextFormat(NULL),
+	pPageMarkFormat(NULL)
 {
 	// prepare d2d1 resources
 	HRESULT hResult = S_OK;
@@ -92,6 +93,7 @@ DirectWriteResources::~DirectWriteResources()
 	SafeRelease(&pUrdTextFormat);
 	SafeRelease(&pNepTextFormat);
 	SafeRelease(&pIndTextFormat);
+	SafeRelease(&pPageMarkFormat);
 	SafeRelease(&pRenderTarget);
 	SafeRelease(&pDWFactory);
 	SafeRelease(&pD2d1Factory);
@@ -144,6 +146,7 @@ HRESULT DirectWriteResources::InitResources(UIStyle& style, UINT dpi, bool verti
 	SafeRelease(&pUrdTextFormat);
 	SafeRelease(&pNepTextFormat);
 	SafeRelease(&pIndTextFormat);
+	SafeRelease(&pPageMarkFormat);
 
 	return S_OK
 		| _SetupTextFormat(style.preedit_font_face, style.preedit_font_point, &pPreeditTextFormat)
@@ -155,7 +158,8 @@ HRESULT DirectWriteResources::InitResources(UIStyle& style, UINT dpi, bool verti
 		| _SetupTextFormat(style.hin_font_face, style.hin_font_point, &pHinTextFormat)
 		| _SetupTextFormat(style.urd_font_face, style.urd_font_point, &pUrdTextFormat, DWRITE_READING_DIRECTION_RIGHT_TO_LEFT)
 		| _SetupTextFormat(style.nep_font_face, style.nep_font_point, &pNepTextFormat)
-		| _SetupTextFormat(style.ind_font_face, style.ind_font_point, &pIndTextFormat);
+		| _SetupTextFormat(style.ind_font_face, style.ind_font_point, &pIndTextFormat)
+		| _SetupTextFormat(style.font_face, style.font_point * 7 / 4, &pPageMarkFormat);
 }
 
 void weasel::DirectWriteResources::SetDpi(UINT dpi)

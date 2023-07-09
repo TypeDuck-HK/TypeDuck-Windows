@@ -973,8 +973,18 @@ static bool _UpdateUIStyleColor(RimeConfig* config, weasel::UIStyle& style, bool
 #ifdef USE_PAGER_MARK
 		style.prevpage_color = 0;
 		style.nextpage_color = 0;
+		style.disabled_prevpage_color = 0;
+		style.disabled_nextpage_color = 0;
 		RimeConfigGetColor32b(config, (prefix + "/prevpage_color").c_str(), &style.prevpage_color, fmt);
 		RimeConfigGetColor32b(config, (prefix + "/nextpage_color").c_str(), &style.nextpage_color, fmt);
+		if (!RimeConfigGetColor32b(config, (prefix + "/disabled_prevpage_color").c_str(), &style.disabled_prevpage_color, fmt))
+		{
+			style.disabled_prevpage_color = style.text_color;
+		}
+		if (!RimeConfigGetColor32b(config, (prefix + "/disabled_nextpage_color").c_str(), &style.disabled_nextpage_color, fmt))
+		{
+			style.disabled_nextpage_color = style.text_color;
+		}
 #endif /* USE_PAGER_MARK */
 		style.shadow_color &= 0xffffffff;
 		RimeConfigGetColor32b(config, (prefix + "/text_color").c_str(), &style.text_color, fmt);

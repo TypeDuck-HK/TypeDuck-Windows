@@ -60,6 +60,8 @@ preset_color_schemes:
 
     prevpage_color: 0xfffa820a
     nextpage_color: 0xfffa820a
+    disabled_prevpage_color: 0xffb7b7b7
+    disabled_nextpage_color: 0xffb7b7b7
     border_color: 0xe0e0e0
     hilited_mark_color: 0xfa820a
 

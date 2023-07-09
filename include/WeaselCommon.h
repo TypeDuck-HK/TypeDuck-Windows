@@ -356,6 +356,8 @@ namespace weasel
 #ifdef USE_PAGER_MARK
 		int prevpage_color;
 		int nextpage_color;
+		int disabled_prevpage_color;
+		int disabled_nextpage_color;
 #endif /*  USE_PAGER_MARK */
 		// per client
 		int client_caps;
@@ -447,6 +449,8 @@ namespace weasel
 #ifdef USE_PAGER_MARK
 			prevpage_color(0),
 			nextpage_color(0),
+			disabled_prevpage_color(0),
+			disabled_nextpage_color(0),
 #endif
 			client_caps(0) {}
 		bool operator!=(const UIStyle& st)
@@ -536,6 +540,8 @@ namespace weasel
 #ifdef USE_PAGER_MARK
 					|| prevpage_color != st.prevpage_color
 					|| nextpage_color != st.nextpage_color
+					|| disabled_prevpage_color != st.disabled_prevpage_color
+					|| disabled_nextpage_color != st.disabled_nextpage_color
 #endif /* USE_PAGER_MARK */
 					);
 		}
@@ -632,6 +638,8 @@ namespace boost {
 #ifdef USE_PAGER_MARK
 			ar & s.prevpage_color;
 			ar & s.nextpage_color;
+			ar & s.disabled_prevpage_color;
+			ar & s.disabled_nextpage_color;
 #endif
 			// per client
 			ar & s.client_caps;
