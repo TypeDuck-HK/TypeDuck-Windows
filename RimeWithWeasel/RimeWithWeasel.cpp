@@ -775,7 +775,7 @@ static void _UpdateUIStyle(RimeConfig* config, weasel::UI* ui, bool initialize)
 	char buffer[BUF_SIZE + 1];
 	const auto processFontFaceConfig = [&config, &style, &buffer, &BUF_SIZE](const char* key, std::wstring& value) {
 		memset(buffer, '\0', sizeof(buffer));
-		if (RimeConfigGetString(config, key, buffer, BUF_SIZE)) {
+		if (RimeConfigGetString(config, key, buffer, BUF_SIZE) || RimeConfigGetString(config, "style/font_face", buffer, BUF_SIZE)) {
 			std::wstring tmp = utf8towcs(buffer);
 			// remove spaces around seperators  : , 
 			_RemoveSpaceAroundSep(tmp);
@@ -783,6 +783,7 @@ static void _UpdateUIStyle(RimeConfig* config, weasel::UI* ui, bool initialize)
 		}
 	};
 	processFontFaceConfig("style/font_face", style.font_face);
+	processFontFaceConfig("style/preedit_font_face", style.preedit_font_face);
 	processFontFaceConfig("style/label_font_face", style.label_font_face);
 	processFontFaceConfig("style/hint_font_face", style.hint_font_face);
 	processFontFaceConfig("style/eng_font_face", style.eng_font_face);
@@ -791,14 +792,13 @@ static void _UpdateUIStyle(RimeConfig* config, weasel::UI* ui, bool initialize)
 	processFontFaceConfig("style/nep_font_face", style.nep_font_face);
 	processFontFaceConfig("style/ind_font_face", style.ind_font_face);
 
-	RimeConfigGetInt(config, "style/font_point", &style.font_point);
-	if (style.font_point <= 0)
-		style.font_point = 12;
 	const auto processFontPointConfig = [&config](const char* key, int* value) {
-		if (!RimeConfigGetInt(config, key, value)) {
-			RimeConfigGetInt(config, "style/font_point", value);
+		if (RimeConfigGetInt(config, key, value) || RimeConfigGetInt(config, "style/font_point", value)) {
+			if (value <= 0) *value = 12;
 		}
 	};
+	processFontPointConfig("style/font_point", &style.font_point);
+	processFontPointConfig("style/preedit_font_point", &style.preedit_font_point);
 	processFontPointConfig("style/label_font_point", &style.label_font_point);
 	processFontPointConfig("style/hint_font_point", &style.hint_font_point);
 	processFontPointConfig("style/eng_font_point", &style.eng_font_point);
@@ -806,6 +806,7 @@ static void _UpdateUIStyle(RimeConfig* config, weasel::UI* ui, bool initialize)
 	processFontPointConfig("style/urd_font_point", &style.urd_font_point);
 	processFontPointConfig("style/nep_font_point", &style.nep_font_point);
 	processFontPointConfig("style/ind_font_point", &style.ind_font_point);
+
 	Bool inline_preedit = False;
 	if (RimeConfigGetBool(config, "style/inline_preedit", &inline_preedit) || initialize)
 	{

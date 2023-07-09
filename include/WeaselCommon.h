@@ -274,6 +274,7 @@ namespace weasel
 		LayoutType layout_type;
 		bool vertical_text_left_to_right;
 		bool vertical_text_with_wrap;
+		std::wstring preedit_font_face;
 		std::wstring font_face;
 		std::wstring label_font_face;
 		std::wstring hint_font_face;
@@ -282,6 +283,7 @@ namespace weasel
 		std::wstring urd_font_face;
 		std::wstring nep_font_face;
 		std::wstring ind_font_face;
+		int preedit_font_point;
 		int font_point;
 		int label_font_point;
 		int hint_font_point;
@@ -357,7 +359,8 @@ namespace weasel
 		int client_caps;
 		std::wstring hint_settings;
 
-		UIStyle() : font_face(),
+		UIStyle() : preedit_font_face(),
+			font_face(),
 			label_font_face(),
 			hint_font_face(),
 			eng_font_face(),
@@ -365,6 +368,7 @@ namespace weasel
 			urd_font_face(),
 			nep_font_face(),
 			ind_font_face(),
+			preedit_font_point(0),
 			font_point(0),
 			label_font_point(0),
 			hint_font_point(0),
@@ -450,6 +454,7 @@ namespace weasel
 					|| layout_type != st.layout_type
 					|| vertical_text_left_to_right != st.vertical_text_left_to_right
 					|| vertical_text_with_wrap != st.vertical_text_with_wrap
+					|| preedit_font_face != st.preedit_font_face
 					|| font_face != st.font_face
 					|| label_font_face != st.label_font_face
 					|| hint_font_face != st.hint_font_face
@@ -458,6 +463,7 @@ namespace weasel
 					|| urd_font_face != st.urd_font_face
 					|| nep_font_face != st.nep_font_face
 					|| ind_font_face != st.ind_font_face
+					|| preedit_font_point != st.preedit_font_point
 					|| font_point != st.font_point
 					|| label_font_point != st.label_font_point
 					|| hint_font_point != st.hint_font_point
@@ -534,6 +540,7 @@ namespace boost {
 		template <typename Archive>
 		void serialize(Archive &ar, weasel::UIStyle &s, const unsigned int version)
 		{
+			ar & s.preedit_font_face;
 			ar & s.font_face;
 			ar & s.label_font_face;
 			ar & s.hint_font_face;
@@ -542,6 +549,7 @@ namespace boost {
 			ar & s.urd_font_face;
 			ar & s.nep_font_face;
 			ar & s.ind_font_face;
+			ar & s.preedit_font_point;
 			ar & s.font_point;
 			ar & s.label_font_point;
 			ar & s.hint_font_point;

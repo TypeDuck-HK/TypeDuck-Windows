@@ -116,7 +116,7 @@ void weasel::VerticalLayout::DoLayout(CDCHandle dc, DirectWriteResources* pDWR)
 			comment_group_1_height = engSize[i].cy + gap * _multiHintPanel->isHintEnabled(StatusHintColumn::Eng) * _multiHintPanel->isHintEnabled(StatusHintColumn::Ind) + indSize[i].cy,
 			comment_group_2_height = hinSize[i].cy + gap * _multiHintPanel->isHintEnabled(StatusHintColumn::Hin) * _multiHintPanel->isHintEnabled(StatusHintColumn::Nep) + nepSize[i].cy,
 			comment_group_3_height = urdSize[i].cy;
-		height += max(label_height, max(ruby_height, max(comment_group_1_height, max(comment_group_2_height, comment_group_3_height)))) - gap;
+		height += max(label_height, max(ruby_height, max(comment_group_1_height, max(comment_group_2_height, comment_group_3_height)))) - gap * 2;
 
 		_candidateLabelRects[i].SetRect(w, height - label_height, w + labelSize[i].cx, height - label_height + labelSize[i].cy);
 		_candidateLabelRects[i].OffsetRect(offsetX, offsetY);

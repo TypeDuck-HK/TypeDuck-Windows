@@ -36,8 +36,8 @@ DirectWriteResources::DirectWriteResources(weasel::UIStyle& style, UINT dpi = 0)
 	pD2d1Factory(NULL),
 	pDWFactory(NULL),
 	pRenderTarget(NULL),
-	pTextFormat(NULL),
 	pPreeditTextFormat(NULL),
+	pTextFormat(NULL),
 	pLabelTextFormat(NULL),
 	pHintTextFormat(NULL),
 	pEngTextFormat(NULL),
@@ -143,6 +143,7 @@ HRESULT DirectWriteResources::InitResources(UIStyle& style, UINT dpi, bool verti
 	SafeRelease(&pIndTextFormat);
 
 	return S_OK
+		| _SetupTextFormat(style.preedit_font_face, style.preedit_font_point, &pPreeditTextFormat)
 		| _SetupTextFormat(style.font_face, style.font_point, &pTextFormat)
 		| _SetupTextFormat(style.label_font_face, style.label_font_point, &pLabelTextFormat)
 		| _SetupTextFormat(style.hint_font_face, style.hint_font_point, &pHintTextFormat)
