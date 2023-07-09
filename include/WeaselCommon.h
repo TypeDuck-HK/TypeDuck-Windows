@@ -277,6 +277,7 @@ namespace weasel
 		std::wstring preedit_font_face;
 		std::wstring font_face;
 		std::wstring label_font_face;
+		std::wstring comment_font_face;
 		std::wstring hint_font_face;
 		std::wstring eng_font_face;
 		std::wstring hin_font_face;
@@ -286,6 +287,7 @@ namespace weasel
 		int preedit_font_point;
 		int font_point;
 		int label_font_point;
+		int comment_font_point;
 		int hint_font_point;
 		int eng_font_point;
 		int hin_font_point;
@@ -362,6 +364,7 @@ namespace weasel
 		UIStyle() : preedit_font_face(),
 			font_face(),
 			label_font_face(),
+			comment_font_face(),
 			hint_font_face(),
 			eng_font_face(),
 			hin_font_face(),
@@ -371,6 +374,7 @@ namespace weasel
 			preedit_font_point(0),
 			font_point(0),
 			label_font_point(0),
+			comment_font_point(0),
 			hint_font_point(0),
 			eng_font_point(0),
 			hin_font_point(0),
@@ -457,6 +461,7 @@ namespace weasel
 					|| preedit_font_face != st.preedit_font_face
 					|| font_face != st.font_face
 					|| label_font_face != st.label_font_face
+					|| comment_font_face != st.comment_font_face
 					|| hint_font_face != st.hint_font_face
 					|| eng_font_face != st.eng_font_face
 					|| hin_font_face != st.hin_font_face
@@ -466,6 +471,7 @@ namespace weasel
 					|| preedit_font_point != st.preedit_font_point
 					|| font_point != st.font_point
 					|| label_font_point != st.label_font_point
+					|| comment_font_point != st.comment_font_point
 					|| hint_font_point != st.hint_font_point
 					|| eng_font_point != st.eng_font_point
 					|| hin_font_point != st.hin_font_point
@@ -543,6 +549,7 @@ namespace boost {
 			ar & s.preedit_font_face;
 			ar & s.font_face;
 			ar & s.label_font_face;
+			ar & s.comment_font_face;
 			ar & s.hint_font_face;
 			ar & s.eng_font_face;
 			ar & s.hin_font_face;
@@ -552,6 +559,7 @@ namespace boost {
 			ar & s.preedit_font_point;
 			ar & s.font_point;
 			ar & s.label_font_point;
+			ar & s.comment_font_point;
 			ar & s.hint_font_point;
 			ar & s.eng_font_point;
 			ar & s.hin_font_point;

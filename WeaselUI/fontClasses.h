@@ -34,6 +34,7 @@ namespace weasel
 		IDWriteTextFormat1* pPreeditTextFormat;
 		IDWriteTextFormat1* pTextFormat;
 		IDWriteTextFormat1* pLabelTextFormat;
+		IDWriteTextFormat1* pCommentTextFormat;
 		IDWriteTextFormat1* pHintTextFormat;
 		IDWriteTextFormat1* pEngTextFormat;
 		IDWriteTextFormat1* pHinTextFormat;

@@ -26,7 +26,7 @@ void weasel::FullScreenLayout::DoLayout(CDCHandle dc, DirectWriteResources* pDWR
 	}
 
 	int step = 32;
-	do {
+	// do {
 		m_layout->DoLayout(dc, pDWR);
 #ifdef USE_HILITE_MARK
 		if (!_style.mark_text.empty() && (_style.hilited_mark_color & 0xff000000))
@@ -38,8 +38,8 @@ void weasel::FullScreenLayout::DoLayout(CDCHandle dc, DirectWriteResources* pDWR
 			MARK_GAP = MARK_WIDTH + 4;
 		}
 #endif
-	}
-	while (AdjustFontPoint(dc, workArea, step, pDWR));
+	// }
+	// while (AdjustFontPoint(dc, workArea, step, pDWR));
 
 	int offsetx = (workArea.Width() - m_layout->GetContentSize().cx) / 2;
 	int offsety = (workArea.Height() - m_layout->GetContentSize().cy) / 2;
@@ -63,6 +63,8 @@ void weasel::FullScreenLayout::DoLayout(CDCHandle dc, DirectWriteResources* pDWR
 		_candidateLabelRects[i].OffsetRect(offsetx, offsety);
 		_candidateTextRects[i] = m_layout->GetCandidateTextRect(i);
 		_candidateTextRects[i].OffsetRect(offsetx, offsety);
+		_candidateCommentRects[i] = m_layout->GetCandidateCommentRect(i);
+		_candidateCommentRects[i].OffsetRect(offsetx, offsety);
 		_candidateRects[i] = m_layout->GetCandidateRect(i);
 		_candidateRects[i].OffsetRect(offsetx, offsety);
 	}
@@ -73,6 +75,7 @@ void weasel::FullScreenLayout::DoLayout(CDCHandle dc, DirectWriteResources* pDWR
 	_contentRect.DeflateRect(offsetX, offsetY);
 }
 
+/*
 bool FullScreenLayout::AdjustFontPoint(CDCHandle dc, const CRect& workArea, int& step, DirectWriteResources* pDWR)
 {
 	if (_context.empty() || step == 0)
@@ -80,6 +83,7 @@ bool FullScreenLayout::AdjustFontPoint(CDCHandle dc, const CRect& workArea, int&
 	{
 		int fontPointLabel;
 		int fontPoint;
+		int fontPointComment;
 
 		if (pDWR->pLabelTextFormat != NULL)
 			fontPointLabel = pDWR->pLabelTextFormat->GetFontSize() / pDWR->dpiScaleX_;
@@ -89,6 +93,10 @@ bool FullScreenLayout::AdjustFontPoint(CDCHandle dc, const CRect& workArea, int&
 			fontPoint = pDWR->pTextFormat->GetFontSize() / pDWR->dpiScaleX_;
 		else
 			fontPoint = 0;
+		if (pDWR->pCommentTextFormat != NULL)
+			fontPointComment = pDWR->pCommentTextFormat->GetFontSize() / pDWR->dpiScaleX_;
+		else
+			fontPointComment = 0;
 		CSize sz = m_layout->GetContentSize();
 		if (sz.cx > workArea.Width() - offsetX * 2 || sz.cy > workArea.Height() - offsetY * 2)
 		{
@@ -98,6 +106,8 @@ bool FullScreenLayout::AdjustFontPoint(CDCHandle dc, const CRect& workArea, int&
 			}
 			fontPoint += step;
 			fontPointLabel += step;
+			fontPointComment += step;
+			pDWR->InitResources(_style.label_font_face, fontPointLabel, _style.font_face, fontPoint, _style.comment_font_face, fontPointComment);
 			return true;
 		}
 		else if (sz.cx <= (workArea.Width() - offsetX * 2) * 31 / 32 && sz.cy <= (workArea.Height() - offsetY * 2) * 31 / 32)
@@ -108,9 +118,12 @@ bool FullScreenLayout::AdjustFontPoint(CDCHandle dc, const CRect& workArea, int&
 			}
 			fontPoint += step;
 			fontPointLabel += step;
+			fontPointComment += step;
+			pDWR->InitResources(_style.label_font_face, fontPointLabel, _style.font_face, fontPoint, _style.comment_font_face, fontPointComment);
 			return true;
 		}
 
 		return false;
 	}
 }
+*/

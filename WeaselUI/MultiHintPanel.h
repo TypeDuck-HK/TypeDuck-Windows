@@ -46,8 +46,9 @@ class MultiHintPanel
 {
 public:
  	static MultiHintPanel* GetInstance();
-	bool containsCSV(const std::wstring& comment);
+	bool containsCSV(const std::wstring& comment) const;
 	void setMultiHintOptions(const std::wstring& settings);
+	std::wstring getHint(const std::wstring& comment) const;
 	bool isHintEnabled(int column) const;
 	bool isHintEnabled(StatusHintColumn column) const;
 	bool isEnabled() const { return settingsStatus_ != 0; }

@@ -601,7 +601,7 @@ bool RimeWithWeaselHandler::_Respond(UINT session_id, EatLine eat)
 				for (auto i = 0; i < ctx.menu.num_candidates; i++)
 				{
 					std::string label = m_ui->style().label_font_point > 0 ? _GetLabelText(cinfo.labels, i, m_ui->style().label_text_format.c_str()) : "";
-					std::string comment = m_ui->style().hint_font_point > 0 ? to_byte_string(cinfo.comments.at(i).str) : "";
+					std::string comment = m_ui->style().comment_font_point > 0 ? to_byte_string(cinfo.comments.at(i).str) : "";
 #ifdef USE_HILITE_MARK
 					std::string mark_text = m_ui->style().mark_text.empty() ? "*" : to_byte_string(m_ui->style().mark_text);
 					std::string prefix = (i != ctx.menu.highlighted_candidate_index) ? "" : mark_text;
@@ -785,6 +785,7 @@ static void _UpdateUIStyle(RimeConfig* config, weasel::UI* ui, bool initialize)
 	processFontFaceConfig("style/font_face", style.font_face);
 	processFontFaceConfig("style/preedit_font_face", style.preedit_font_face);
 	processFontFaceConfig("style/label_font_face", style.label_font_face);
+	processFontFaceConfig("style/comment_font_face", style.comment_font_face);
 	processFontFaceConfig("style/hint_font_face", style.hint_font_face);
 	processFontFaceConfig("style/eng_font_face", style.eng_font_face);
 	processFontFaceConfig("style/hin_font_face", style.hin_font_face);
@@ -800,6 +801,7 @@ static void _UpdateUIStyle(RimeConfig* config, weasel::UI* ui, bool initialize)
 	processFontPointConfig("style/font_point", &style.font_point);
 	processFontPointConfig("style/preedit_font_point", &style.preedit_font_point);
 	processFontPointConfig("style/label_font_point", &style.label_font_point);
+	processFontPointConfig("style/comment_font_point", &style.comment_font_point);
 	processFontPointConfig("style/hint_font_point", &style.hint_font_point);
 	processFontPointConfig("style/eng_font_point", &style.eng_font_point);
 	processFontPointConfig("style/hin_font_point", &style.hin_font_point);

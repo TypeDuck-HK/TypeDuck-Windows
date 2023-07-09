@@ -26,6 +26,7 @@ namespace weasel
 		virtual CRect GetHighlightRect() const { return _highlightRect; }
 		virtual CRect GetCandidateLabelRect(int id) const { return _candidateLabelRects[id]; }
 		virtual CRect GetCandidateTextRect(int id) const { return _candidateTextRects[id]; }
+		virtual CRect GetCandidateCommentRect(int id) const { return _candidateCommentRects[id]; }
 		virtual CRect GetCandidateHintRect(int id) const { return _candidateHintRects[id]; }
 		virtual CRect GetCandidateEngRect(int id) const { return _candidateEngRects[id]; }
 		virtual CRect GetCandidateHinRect(int id) const { return _candidateHinRects[id]; }
@@ -60,6 +61,7 @@ namespace weasel
 		CRect _candidateRects[MAX_CANDIDATES_COUNT];
 		CRect _candidateLabelRects[MAX_CANDIDATES_COUNT];
 		CRect _candidateTextRects[MAX_CANDIDATES_COUNT];
+		CRect _candidateCommentRects[MAX_CANDIDATES_COUNT];
 		CRect _candidateHintRects[MAX_CANDIDATES_COUNT];
 		CRect _candidateEngRects[MAX_CANDIDATES_COUNT];
 		CRect _candidateHinRects[MAX_CANDIDATES_COUNT];

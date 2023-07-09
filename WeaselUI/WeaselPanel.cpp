@@ -115,7 +115,7 @@ void WeaselPanel::Refresh()
 	// show tips status, two kind of situation: 1) only aux strings, don't care icon status; 2)only icon(ascii mode switching)
 	bool show_tips = (!m_ctx.aux.empty() && m_ctx.cinfo.empty() && m_ctx.preedit.empty()) || (m_ctx.empty() && should_show_icon);
 	// show schema menu status: always preedit start with "[Schema Menu]"
-	bool show_schema_menu = std::regex_search(m_ctx.preedit.str, std::wsmatch(), std::wregex(L"^\\[Schema Menu\\]", std::wregex::icase));
+	bool show_schema_menu = m_ctx.preedit.str.rfind(L"[Schema Menu]", 1) != std::wstring::npos;
 	bool margin_negative = (m_style.margin_x < 0 || m_style.margin_y < 0);
 	bool inline_no_candidates = m_style.inline_preedit && (m_ctx.cinfo.candies.size() == 0) && (!show_tips);
 	// when to hide_cadidates?
@@ -649,6 +649,7 @@ bool WeaselPanel::_DrawCandidates(CDCHandle &dc, bool back)
 	else
 	{
 		// begin draw candidate texts
+		const bool isSingleComment = m_style.layout_type != UIStyle::LAYOUT_VERTICAL || m_ctx.preedit.str.rfind(L"[Schema Menu]", 1) != std::wstring::npos;
 		int label_text_color, hint_text_color, candidate_text_color, comment_text_color;
 		for (size_t i = 0; i < m_candidateCount && i < MAX_CANDIDATES_COUNT; ++i) {
 			if (i == m_ctx.cinfo.highlighted)
@@ -691,11 +692,13 @@ bool WeaselPanel::_DrawCandidates(CDCHandle &dc, bool back)
 			// Draw text
 			std::wstring text = candidates.at(i).str;
 			if (!text.empty()) {
-				_TextOut(m_layout->GetCandidateTextRect((int)i), text, candidate_text_color, pDWR->pTextFormat, m_style.character_spacing);
+				_TextOut(m_layout->GetCandidateTextRect((int)i), text, candidate_text_color, pDWR->pTextFormat, m_style.character_spacing * !isSingleComment);
 			}
 			// Draw hint and comments
 			const std::wstring& comment = comments.at(i).str;
-			if (!comment.empty() && m_hintPanel->isEnabled()) {
+			if (isSingleComment) {
+				_TextOut(m_layout->GetCandidateCommentRect((int)i), m_hintPanel->getHint(comment), comment_text_color, pDWR->pCommentTextFormat);
+			} else if (!comment.empty() && m_hintPanel->isEnabled()) {
 				if (m_hintPanel->containsCSV(comment)) {
 					InfoMultiHint info(comment);
 					if (m_hintPanel->isHintEnabled(StatusHintColumn::Jyutping)) _TextOut(m_layout->GetCandidateHintRect((int)i), info.Jyutping, hint_text_color, pDWR->pHintTextFormat);

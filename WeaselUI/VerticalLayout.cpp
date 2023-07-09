@@ -45,7 +45,7 @@ void weasel::VerticalLayout::DoLayout(CDCHandle dc, DirectWriteResources* pDWR)
 		// icon size higher then preedit text
 		int yoffset = (STATUS_ICON_SIZE >= szy && ShouldDisplayStatusIcon()) ? (STATUS_ICON_SIZE - szy) / 2 : 0;
 		_preeditRect.SetRect(real_margin_x, height + yoffset, real_margin_x + size.cx, height + yoffset + size.cy);
-		height += szy + 2 * yoffset + _style.spacing - 1;
+		height += szy + 2 * (yoffset + _style.spacing);
 		width = max(width, real_margin_x * 2 + size.cx + szx);
 		if(ShouldDisplayStatusIcon()) width += STATUS_ICON_SIZE;
 		_preeditRect.OffsetRect(offsetX, offsetY);
@@ -58,20 +58,22 @@ void weasel::VerticalLayout::DoLayout(CDCHandle dc, DirectWriteResources* pDWR)
 		// icon size higher then auxiliary text
 		int yoffset = (STATUS_ICON_SIZE >= size.cy && ShouldDisplayStatusIcon()) ? (STATUS_ICON_SIZE - size.cy) / 2 : 0;
 		_auxiliaryRect.SetRect(real_margin_x, height + yoffset, real_margin_x + size.cx, height + yoffset + size.cy);
-		height += size.cy + 2 * yoffset + _style.spacing - 1;
+		height += size.cy + 2 * (yoffset + _style.spacing);
 		width = max(width, real_margin_x * 2 + size.cx);
 		_auxiliaryRect.OffsetRect(offsetX, offsetY);
 	}
 	/*  preedit and auxiliary rectangle calc end */
 
 	/* Candidates */
+	const bool isSingleComment = _context.preedit.str.rfind(L"[Schema Menu]", 1) != std::wstring::npos;
 	const bool showHint = _multiHintPanel->isHintEnabled(StatusHintColumn::Jyutping);
 
-	int label_width = 0, ruby_width = 0, comment_group_1_width = 0, comment_group_2_width = 0, comment_group_3_width = 0;
+	int label_width = 0, ruby_width = 0, comment_group_0_width = 0, comment_group_1_width = 0, comment_group_2_width = 0, comment_group_3_width = 0;
 
 	CSize labelSize[MAX_CANDIDATES_COUNT];
 	CSize hintSize[MAX_CANDIDATES_COUNT];
 	CSize textSize[MAX_CANDIDATES_COUNT];
+	CSize commentSize[MAX_CANDIDATES_COUNT];
 	CSize engSize[MAX_CANDIDATES_COUNT];
 	CSize hinSize[MAX_CANDIDATES_COUNT];
 	CSize urdSize[MAX_CANDIDATES_COUNT];
@@ -84,10 +86,13 @@ void weasel::VerticalLayout::DoLayout(CDCHandle dc, DirectWriteResources* pDWR)
 		label_width = max(label_width, labelSize[i].cx);
 
 		const std::wstring& text = candidates.at(i).str;
-		GetTextSizeDW(text, pDWR->pTextFormat, pDWR, &textSize[i], _style.character_spacing);
+		GetTextSizeDW(text, pDWR->pTextFormat, pDWR, &textSize[i], _style.character_spacing * !isSingleComment);
 
 		const std::wstring& comment = comments.at(i).str;
-		if (_multiHintPanel->isEnabled() && !comment.empty()) {
+		if (isSingleComment) {
+			GetTextSizeDW(comment, pDWR->pCommentTextFormat, pDWR, &commentSize[i]);
+			comment_group_0_width = max(comment_group_0_width, commentSize[i].cx);
+		} else if (_multiHintPanel->isEnabled() && !comment.empty()) {
 			if (_multiHintPanel->containsCSV(comment)) {
 				InfoMultiHint info(comment);
 				if (showHint) GetTextSizeDW(info.Jyutping, pDWR->pHintTextFormat, pDWR, &hintSize[i]);
@@ -113,10 +118,11 @@ void weasel::VerticalLayout::DoLayout(CDCHandle dc, DirectWriteResources* pDWR)
 		const int top = height,
 			label_height = gap + labelSize[i].cy,
 			ruby_height = hintSize[i].cy + gap * showHint + textSize[i].cy,
+			comment_group_0_height = commentSize[i].cy,
 			comment_group_1_height = engSize[i].cy + gap * _multiHintPanel->isHintEnabled(StatusHintColumn::Eng) * _multiHintPanel->isHintEnabled(StatusHintColumn::Ind) + indSize[i].cy,
 			comment_group_2_height = hinSize[i].cy + gap * _multiHintPanel->isHintEnabled(StatusHintColumn::Hin) * _multiHintPanel->isHintEnabled(StatusHintColumn::Nep) + nepSize[i].cy,
 			comment_group_3_height = urdSize[i].cy;
-		height += max(label_height, max(ruby_height, max(comment_group_1_height, max(comment_group_2_height, comment_group_3_height)))) - gap * 2;
+		height += max(label_height, max(ruby_height, max(comment_group_0_height, max(comment_group_1_height, max(comment_group_2_height, comment_group_3_height))))) - _style.hilite_padding;
 
 		_candidateLabelRects[i].SetRect(w, height - label_height, w + labelSize[i].cx, height - label_height + labelSize[i].cy);
 		_candidateLabelRects[i].OffsetRect(offsetX, offsetY);
@@ -131,7 +137,14 @@ void weasel::VerticalLayout::DoLayout(CDCHandle dc, DirectWriteResources* pDWR)
 		_candidateTextRects[i].SetRect(w, height - textSize[i].cy, w + textSize[i].cx, height);
 		_candidateTextRects[i].OffsetRect(offsetX, offsetY);
 
-		w += ruby_width + space * 2 * _multiHintPanel->isHintEnabled((int)StatusHintColumn::Eng | (int)StatusHintColumn::Ind);
+		w += ruby_width + space * 2 * isSingleComment;
+
+		if (isSingleComment) {
+			_candidateCommentRects[i].SetRect(w, height - commentSize[i].cy, w + commentSize[i].cx, height);
+			_candidateCommentRects[i].OffsetRect(offsetX, offsetY);
+		}
+
+		w += comment_group_0_width + space * 2 * _multiHintPanel->isHintEnabled((int)StatusHintColumn::Eng | (int)StatusHintColumn::Ind);
 
 		if (_multiHintPanel->isHintEnabled(StatusHintColumn::Eng)) {
 			_candidateEngRects[i].SetRect(w, height - comment_group_1_height, w + engSize[i].cx, height - comment_group_1_height + engSize[i].cy);
@@ -172,7 +185,7 @@ void weasel::VerticalLayout::DoLayout(CDCHandle dc, DirectWriteResources* pDWR)
 	/* Trim the last spacing if no candidates */
 	if(candidates_count == 0) height -= _style.spacing;
 
-	height += real_margin_y;
+	height += real_margin_y - _style.border;
 
 	if (!_context.preedit.str.empty() && !candidates.empty())
 	{

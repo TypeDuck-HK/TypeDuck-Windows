@@ -17,7 +17,7 @@ MultiHintPanel* MultiHintPanel::GetInstance()
 	return instance;
 }
 
-bool MultiHintPanel::containsCSV(const std::wstring& comment)
+bool MultiHintPanel::containsCSV(const std::wstring& comment) const
 {
 	return comment.find(',') != std::wstring::npos;
 }
@@ -44,6 +44,23 @@ void MultiHintPanel::setMultiHintOptions(const std::wstring& settings)
 		}
 	}
 	settingsStatus_ = status;
+}
+
+std::wstring MultiHintPanel::getHint(const std::wstring& comment) const
+{
+	if (!containsCSV(comment)) {
+		return comment;
+	}
+	InfoMultiHint info(comment);
+	std::wstring str = L"";
+	if (isHintEnabled(StatusHintColumn::Jyutping)) str += info.Jyutping + L"\t";
+	if (isHintEnabled(StatusHintColumn::Eng)) str += info.Properties.Definition.Eng + L"\t";
+	if (isHintEnabled(StatusHintColumn::Urd)) str += info.Properties.Definition.Urd + L"\t";
+	if (isHintEnabled(StatusHintColumn::Nep)) str += info.Properties.Definition.Nep + L"\t";
+	if (isHintEnabled(StatusHintColumn::Hin)) str += info.Properties.Definition.Hin + L"\t";
+	if (isHintEnabled(StatusHintColumn::Ind)) str += info.Properties.Definition.Ind + L"\t";
+	str.pop_back();
+	return str;
 }
 
 bool MultiHintPanel::isHintEnabled(int column) const

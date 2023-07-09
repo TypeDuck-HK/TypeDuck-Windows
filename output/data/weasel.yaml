@@ -38,12 +38,12 @@ style:
     max_width: 0
     min_height: 60
     max_height: 0
-    border_width: 3
+    border_width: 4
     margin_x: 10
-    margin_y: 6
-    spacing: 3
+    margin_y: 10
+    spacing: 6
     text_gap: 2
-    candidate_spacing: 2
+    candidate_spacing: 0
     hilite_spacing: 10
     hilite_padding: 5
     character_spacing: 16
@@ -58,8 +58,8 @@ preset_color_schemes:
     name: 碧水／Aqua
     author: 佛振 <chen.sst@gmail.com>
 
-    prevpage_color: 0x000000
-    nextpage_color: 0x000000
+    prevpage_color: 0xfffa820a
+    nextpage_color: 0xfffa820a
     border_color: 0xe0e0e0
     hilited_mark_color: 0xfa820a
 
@@ -78,7 +78,7 @@ preset_color_schemes:
     shadow_color: 0x00000000
 
     hilited_text_color: 0x000000
-    hilited_back_color: 0xd4d4d4
+    hilited_back_color: 0xffe3c7
     hilited_shadow_color: 0x00000000
 
     candidate_back_color: 0xf5f5f5

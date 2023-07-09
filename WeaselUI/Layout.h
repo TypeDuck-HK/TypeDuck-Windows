@@ -59,6 +59,7 @@ namespace weasel
 		virtual CRect GetCandidateLabelRect(int id) const = 0;
 		virtual CRect GetCandidateTextRect(int id) const = 0;
 		virtual CRect GetCandidateRect(int id) const = 0;
+		virtual CRect GetCandidateCommentRect(int id) const = 0;
 		virtual CRect GetCandidateHintRect(int id) const = 0;
 		virtual CRect GetCandidateEngRect(int id) const = 0;
 		virtual CRect GetCandidateHinRect(int id) const = 0;
@@ -94,20 +95,13 @@ namespace weasel
 		const std::vector<Text> &candidates;
 		const std::vector<Text> &comments;
 		const std::vector<Text> &labels;
-		/*
-		const std::vector<Text> &hints;
-		const std::vector<Text> &engComments;
-		const std::vector<Text> &hinComments;
-		const std::vector<Text> &urdComments;
-		const std::vector<Text> &nepComments;
-		const std::vector<Text> &indComments;
-		*/
 		const int &id;
 		const int candidates_count;
 		const int real_margin_x;
 		const int real_margin_y;
 		const int textFontValid;
 		const int labelFontValid;
+		const int cmtFontValid;
 		const int hintFontValid;
 		const int engFontValid;
 		const int hinFontValid;

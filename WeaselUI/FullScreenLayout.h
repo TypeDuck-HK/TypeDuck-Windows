@@ -14,7 +14,7 @@ namespace weasel
 		virtual void DoLayout(CDCHandle dc, DirectWriteResources* pDWR = NULL);
 
 	private:
-		bool AdjustFontPoint(CDCHandle dc, const CRect& workArea, int& step, DirectWriteResources* pDWR = NULL);
+		// bool AdjustFontPoint(CDCHandle dc, const CRect& workArea, int& step, DirectWriteResources* pDWR = NULL);
 
 		const CRect& mr_inputPos;
 		Layout* m_layout;

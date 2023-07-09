@@ -39,6 +39,7 @@ DirectWriteResources::DirectWriteResources(weasel::UIStyle& style, UINT dpi = 0)
 	pPreeditTextFormat(NULL),
 	pTextFormat(NULL),
 	pLabelTextFormat(NULL),
+	pCommentTextFormat(NULL),
 	pHintTextFormat(NULL),
 	pEngTextFormat(NULL),
 	pHinTextFormat(NULL),
@@ -84,6 +85,7 @@ DirectWriteResources::~DirectWriteResources()
 	SafeRelease(&pPreeditTextFormat);
 	SafeRelease(&pTextFormat);
 	SafeRelease(&pLabelTextFormat);
+	SafeRelease(&pCommentTextFormat);
 	SafeRelease(&pHintTextFormat);
 	SafeRelease(&pEngTextFormat);
 	SafeRelease(&pHinTextFormat);
@@ -135,6 +137,7 @@ HRESULT DirectWriteResources::InitResources(UIStyle& style, UINT dpi, bool verti
 	SafeRelease(&pPreeditTextFormat);
 	SafeRelease(&pTextFormat);
 	SafeRelease(&pLabelTextFormat);
+	SafeRelease(&pCommentTextFormat);
 	SafeRelease(&pHintTextFormat);
 	SafeRelease(&pEngTextFormat);
 	SafeRelease(&pHinTextFormat);
@@ -146,6 +149,7 @@ HRESULT DirectWriteResources::InitResources(UIStyle& style, UINT dpi, bool verti
 		| _SetupTextFormat(style.preedit_font_face, style.preedit_font_point, &pPreeditTextFormat)
 		| _SetupTextFormat(style.font_face, style.font_point, &pTextFormat)
 		| _SetupTextFormat(style.label_font_face, style.label_font_point, &pLabelTextFormat)
+		| _SetupTextFormat(style.comment_font_face, style.comment_font_point, &pCommentTextFormat)
 		| _SetupTextFormat(style.hint_font_face, style.hint_font_point, &pHintTextFormat)
 		| _SetupTextFormat(style.eng_font_face, style.eng_font_point, &pEngTextFormat)
 		| _SetupTextFormat(style.hin_font_face, style.hin_font_point, &pHinTextFormat)
