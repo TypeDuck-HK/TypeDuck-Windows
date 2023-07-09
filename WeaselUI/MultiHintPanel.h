@@ -23,6 +23,7 @@ struct InfoProperties {
 };
 
 struct InfoMultiHint {
+	InfoMultiHint() {}
 	InfoMultiHint(const std::wstring& input);
 	std::wstring Jyutping;
 	std::wstring Sandhi;

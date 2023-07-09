@@ -65,6 +65,8 @@ void weasel::VerticalLayout::DoLayout(CDCHandle dc, DirectWriteResources* pDWR)
 	/*  preedit and auxiliary rectangle calc end */
 
 	/* Candidates */
+	std::wstring dictionary_entry;
+	InfoMultiHint dictionary_info;
 	const bool isSingleComment = _context.preedit.str.rfind(L"[Schema Menu]", 1) != std::wstring::npos;
 	const bool showHint = _multiHintPanel->isHintEnabled(StatusHintColumn::Jyutping);
 
@@ -104,6 +106,10 @@ void weasel::VerticalLayout::DoLayout(CDCHandle dc, DirectWriteResources* pDWR)
 				comment_group_1_width = max(comment_group_1_width, max(engSize[i].cx, indSize[i].cx));
 				comment_group_2_width = max(comment_group_2_width, max(hinSize[i].cx, nepSize[i].cx));
 				comment_group_3_width = max(comment_group_3_width, urdSize[i].cx);
+				if (i == _context.cinfo.highlighted) {
+					dictionary_entry = text;
+					dictionary_info = info;
+				}
 			} else if (showHint) {
 				GetTextSizeDW(comment, pDWR->pHintTextFormat, pDWR, &hintSize[i]);
 			}
@@ -215,6 +221,22 @@ void weasel::VerticalLayout::DoLayout(CDCHandle dc, DirectWriteResources* pDWR)
 		}
 	}
 #endif /*  USE_PAGER_MARK */
+
+	if (dictionary_entry.empty()) {
+		_dictionaryEntryRect.SetRectEmpty();
+	} else {
+		const int w = _contentSize.cx;
+		_contentSize.cx += _style.dictionary_panel_padding;
+		GetTextSizeDW(dictionary_entry, pDWR->pEntryTextFormat, pDWR, &size);
+		const int h = _style.dictionary_panel_padding + size.cy;
+		_dictionaryEntryRect.SetRect(_contentSize.cx, _style.dictionary_panel_padding, _contentSize.cx + size.cx, h);
+		_contentSize.cx += size.cx + _style.dictionary_entry_gap;
+		GetTextSizeDW(dictionary_info.Jyutping, pDWR->pPronTextFormat, pDWR, &size);
+		_dictionaryPronRect.SetRect(_contentSize.cx, h - size.cy, _contentSize.cx + size.cx, h);
+		_contentSize.cx += size.cx + _style.dictionary_panel_padding;
+		_dictionaryRect.SetRect(w, _style.border, _contentSize.cx - _style.border, _contentSize.cy - _style.border);
+	}
+
 	// calc roundings start
 	_contentRect.SetRect(0, 0, _contentSize.cx, _contentSize.cy);
 	// background rect prepare for Hemispherical calculation

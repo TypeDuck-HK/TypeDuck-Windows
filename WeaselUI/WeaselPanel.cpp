@@ -644,11 +644,24 @@ bool WeaselPanel::_DrawCandidates(CDCHandle &dc, bool back)
 #endif
 			drawn = true;
 		}
+
+		rect = m_layout->GetDictionaryRect();
+		if (!rect.IsRectEmpty()) {
+			IsToRoundStruct rd = m_layout->GetRoundInfo(m_ctx.cinfo.highlighted);
+#ifdef USE_CANDIDATE_BORDER
+			_HighlightText(dc, rect, m_style.hilited_candidate_back_color, m_style.hilited_candidate_shadow_color, m_style.round_corner, bkType, rd, m_style.hilited_candidate_border_color);
+#else
+			_HighlightText(dc, rect, m_style.hilited_candidate_back_color, m_style.hilited_candidate_shadow_color, m_style.round_corner, bkType, rd);
+#endif
+			drawn = true;
+		}
 	}
 	// draw text with direct write
 	else
 	{
 		// begin draw candidate texts
+		std::wstring dictionary_entry;
+		InfoMultiHint dictionary_info;
 		const bool isSingleComment = m_style.layout_type != UIStyle::LAYOUT_VERTICAL || m_ctx.preedit.str.rfind(L"[Schema Menu]", 1) != std::wstring::npos;
 		int label_text_color, hint_text_color, candidate_text_color, comment_text_color;
 		for (size_t i = 0; i < m_candidateCount && i < MAX_CANDIDATES_COUNT; ++i) {
@@ -707,11 +720,19 @@ bool WeaselPanel::_DrawCandidates(CDCHandle &dc, bool back)
 					if (m_hintPanel->isHintEnabled(StatusHintColumn::Urd)) _TextOut(m_layout->GetCandidateUrdRect((int)i), info.Properties.Definition.Urd, comment_text_color, pDWR->pUrdTextFormat);
 					if (m_hintPanel->isHintEnabled(StatusHintColumn::Nep)) _TextOut(m_layout->GetCandidateNepRect((int)i), info.Properties.Definition.Nep, comment_text_color, pDWR->pNepTextFormat);
 					if (m_hintPanel->isHintEnabled(StatusHintColumn::Ind)) _TextOut(m_layout->GetCandidateIndRect((int)i), info.Properties.Definition.Ind, comment_text_color, pDWR->pIndTextFormat);
+					if (i == m_ctx.cinfo.highlighted) {
+						dictionary_entry = text;
+						dictionary_info = info;
+					}
 				} else if (m_hintPanel->isHintEnabled(StatusHintColumn::Jyutping)) {
 					_TextOut(m_layout->GetCandidateHintRect((int)i), comment, hint_text_color, pDWR->pHintTextFormat);
 				}
 			}
 			drawn = true;
+		}
+		if (!dictionary_entry.empty()) {
+			_TextOut(m_layout->GetDictionaryEntryRect(), dictionary_entry, m_style.hilited_candidate_text_color, pDWR->pEntryTextFormat);
+			_TextOut(m_layout->GetDictionaryPronRect(), dictionary_info.Jyutping, m_style.hilited_hint_text_color, pDWR->pPronTextFormat);
 		}
 	}
 	return drawn;

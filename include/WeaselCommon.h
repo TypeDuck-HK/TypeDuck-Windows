@@ -324,6 +324,9 @@ namespace weasel
 		int shadow_radius;
 		int shadow_offset_x;
 		int shadow_offset_y;
+		int dictionary_panel_padding;
+		int dictionary_entry_gap;
+		int dictionary_spacing;
 		// color scheme
 		int text_color;
 		int candidate_text_color;
@@ -417,6 +420,9 @@ namespace weasel
 			shadow_radius(0),
 			shadow_offset_x(0),
 			shadow_offset_y(0),
+			dictionary_panel_padding(0),
+			dictionary_entry_gap(0),
+			dictionary_spacing(0),
 			text_color(0),
 			candidate_text_color(0),
 			candidate_back_color(0),
@@ -510,6 +516,9 @@ namespace weasel
 					|| shadow_radius != st.shadow_radius
 					|| shadow_offset_x != st.shadow_offset_x
 					|| shadow_offset_y != st.shadow_offset_y
+					|| dictionary_panel_padding != st.dictionary_panel_padding
+					|| dictionary_entry_gap != st.dictionary_entry_gap
+					|| dictionary_spacing != st.dictionary_spacing
 					|| text_color != st.text_color
 					|| candidate_text_color != st.candidate_text_color
 					|| candidate_back_color != st.candidate_back_color
@@ -606,6 +615,9 @@ namespace boost {
 			ar & s.shadow_radius;
 			ar & s.shadow_offset_x;
 			ar & s.shadow_offset_y;
+			ar & s.dictionary_panel_padding;
+			ar & s.dictionary_entry_gap;
+			ar & s.dictionary_spacing;
 			// color scheme
 			ar & s.text_color;
 			ar & s.candidate_text_color;

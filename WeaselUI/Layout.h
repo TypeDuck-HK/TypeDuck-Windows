@@ -56,6 +56,9 @@ namespace weasel
 		virtual CRect GetPreeditRect() const = 0;
 		virtual CRect GetAuxiliaryRect() const = 0;
 		virtual CRect GetHighlightRect() const = 0;
+		virtual CRect GetDictionaryRect() const = 0;
+		virtual CRect GetDictionaryEntryRect() const = 0;
+		virtual CRect GetDictionaryPronRect() const = 0;
 		virtual CRect GetCandidateLabelRect(int id) const = 0;
 		virtual CRect GetCandidateTextRect(int id) const = 0;
 		virtual CRect GetCandidateRect(int id) const = 0;

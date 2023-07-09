@@ -901,6 +901,9 @@ static void _UpdateUIStyle(RimeConfig* config, weasel::UI* ui, bool initialize)
 		style.margin_y = style.hilite_padding;
 	else if (style.hilite_padding > -style.margin_y && style.margin_y < 0)
 		style.margin_y = -(style.hilite_padding);
+	RimeConfigGetInt(config, "style/layout/dictionary_panel_padding", &style.dictionary_panel_padding);
+	RimeConfigGetInt(config, "style/layout/dictionary_entry_gap", &style.dictionary_entry_gap);
+	RimeConfigGetInt(config, "style/layout/dictionary_spacing", &style.dictionary_spacing);
 	// color scheme
 #ifdef USE_THEME_DARK
 	bool is_light = IsThemeLight();
