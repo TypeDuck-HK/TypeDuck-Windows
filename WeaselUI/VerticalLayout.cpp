@@ -189,9 +189,7 @@ void weasel::VerticalLayout::DoLayout(CDCHandle dc, DirectWriteResources* pDWR)
 	}
 
 	/* Trim the last spacing if no candidates */
-	if(candidates_count == 0) height -= _style.spacing;
-
-	height += real_margin_y - _style.border;
+	height += real_margin_y - (candidates_count ? _style.border : _style.spacing * 2);
 
 	if (!_context.preedit.str.empty() && !candidates.empty())
 	{
@@ -210,7 +208,7 @@ void weasel::VerticalLayout::DoLayout(CDCHandle dc, DirectWriteResources* pDWR)
 	if(candidates_count && !_style.inline_preedit)
 	{
 		int _prex = _contentSize.cx - offsetX - real_margin_x + _style.hilite_padding - pgw;
-		int _prey = (_preeditRect.top + _preeditRect.bottom) / 2 - pgszl.cy / 2;
+		int _prey = (_preeditRect.top + _preeditRect.bottom) / 2 - pgszl.cy / 2 - _style.hilite_padding;
 		_prePageRect.SetRect(_prex, _prey, _prex + pgszl.cx, _prey + pgszl.cy);
 		_nextPageRect.SetRect(_prePageRect.right + _style.hilite_spacing, 
 				_prey, _prePageRect.right + _style.hilite_spacing + pgszr.cx, _prey + pgszr.cy);
@@ -225,16 +223,18 @@ void weasel::VerticalLayout::DoLayout(CDCHandle dc, DirectWriteResources* pDWR)
 	if (dictionary_entry.empty()) {
 		_dictionaryEntryRect.SetRectEmpty();
 	} else {
+		_contentSize.cx -= real_margin_x;
 		const int w = _contentSize.cx;
 		_contentSize.cx += _style.dictionary_panel_padding;
 		GetTextSizeDW(dictionary_entry, pDWR->pEntryTextFormat, pDWR, &size);
-		const int h = _style.dictionary_panel_padding + size.cy;
-		_dictionaryEntryRect.SetRect(_contentSize.cx, _style.dictionary_panel_padding, _contentSize.cx + size.cx, h);
+		const int h = _style.dictionary_panel_padding + real_margin_y + size.cy;
+		_dictionaryEntryRect.SetRect(_contentSize.cx, _style.dictionary_panel_padding + real_margin_y, _contentSize.cx + size.cx, h);
 		_contentSize.cx += size.cx + _style.dictionary_entry_gap;
 		GetTextSizeDW(dictionary_info.Jyutping, pDWR->pPronTextFormat, pDWR, &size);
 		_dictionaryPronRect.SetRect(_contentSize.cx, h - size.cy, _contentSize.cx + size.cx, h);
 		_contentSize.cx += size.cx + _style.dictionary_panel_padding;
-		_dictionaryRect.SetRect(w, _style.border, _contentSize.cx - _style.border, _contentSize.cy - _style.border);
+		_dictionaryRect.SetRect(w, real_margin_y, _contentSize.cx, _contentSize.cy - real_margin_y - 1);
+		_contentSize.cx += real_margin_x;
 	}
 
 	// calc roundings start

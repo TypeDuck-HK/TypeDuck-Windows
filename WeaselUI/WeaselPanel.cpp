@@ -352,7 +352,7 @@ LRESULT WeaselPanel::OnMouseLeave(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL&
 #endif /*  USE_MOUSE_HOVER */
 #endif /* USE_MOUSE_EVENTS */
 
-void WeaselPanel::_HighlightText(CDCHandle &dc, CRect rc, COLORREF color, COLORREF shadowColor, int radius, BackType type = BackType::TEXT, IsToRoundStruct rd = IsToRoundStruct(), COLORREF bordercolor=TRANS_COLOR)
+void WeaselPanel::_HighlightText(CDCHandle &dc, CRect rc, COLORREF color, COLORREF shadowColor, int radius, BackType type = BackType::TEXT, IsToRoundStruct rd = IsToRoundStruct(), COLORREF bordercolor=TRANS_COLOR, int candTop = 0, int candBottom = 0)
 {
 	// Graphics obj with SmoothingMode
 	Gdiplus::Graphics g_back(dc);
@@ -363,7 +363,9 @@ void WeaselPanel::_HighlightText(CDCHandle &dc, CRect rc, COLORREF color, COLORR
 	int blurMarginY = m_layout->offsetY * 3;
 
 	GraphicsRoundRectPath* hiliteBackPath;
-	if (rd.Hemispherical && type!= BackType::BACKGROUND && NOT_FULLSCREENLAYOUT(m_style)) 
+	if (type == BackType::DICTIONARY_PANEL)
+		hiliteBackPath = new GraphicsRoundRectPath(rc, radius, candTop, candBottom);
+	else if (rd.Hemispherical && type!= BackType::BACKGROUND && NOT_FULLSCREENLAYOUT(m_style)) 
 		hiliteBackPath = new GraphicsRoundRectPath(rc, m_style.round_corner_ex - m_style.border/2 + (m_style.border % 2), rd.IsTopLeftNeedToRound, rd.IsTopRightNeedToRound, rd.IsBottomRightNeedToRound, rd.IsBottomLeftNeedToRound);
 	else // background or current candidate background not out of window background
 		hiliteBackPath = new GraphicsRoundRectPath(rc, radius);
@@ -648,10 +650,12 @@ bool WeaselPanel::_DrawCandidates(CDCHandle &dc, bool back)
 		rect = m_layout->GetDictionaryRect();
 		if (!rect.IsRectEmpty()) {
 			IsToRoundStruct rd = m_layout->GetRoundInfo(m_ctx.cinfo.highlighted);
+			CRect highlightedCandRect = m_layout->GetCandidateRect(m_ctx.cinfo.highlighted);
+			highlightedCandRect.InflateRect(m_style.hilite_padding, m_style.hilite_padding);
 #ifdef USE_CANDIDATE_BORDER
-			_HighlightText(dc, rect, m_style.hilited_candidate_back_color, m_style.hilited_candidate_shadow_color, m_style.round_corner, bkType, rd, m_style.hilited_candidate_border_color);
+			_HighlightText(dc, rect, m_style.hilited_candidate_back_color, m_style.hilited_candidate_shadow_color, m_style.round_corner, BackType::DICTIONARY_PANEL, rd, m_style.hilited_candidate_border_color, highlightedCandRect.top, highlightedCandRect.bottom);
 #else
-			_HighlightText(dc, rect, m_style.hilited_candidate_back_color, m_style.hilited_candidate_shadow_color, m_style.round_corner, bkType, rd);
+			_HighlightText(dc, rect, m_style.hilited_candidate_back_color, m_style.hilited_candidate_shadow_color, m_style.round_corner, BackType::DICTIONARY_PANEL, rd, TRANS_COLOR, highlightedCandRect.top, highlightedCandRect.bottom);
 #endif
 			drawn = true;
 		}

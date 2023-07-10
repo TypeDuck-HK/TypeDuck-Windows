@@ -25,6 +25,8 @@ namespace weasel
 
 		GraphicsRoundRectPath(const CRect rc, int corner, bool roundTopLeft, bool roundTopRight, bool roundBottomRight, bool roundBottomLeft);
 
+		GraphicsRoundRectPath(const CRect rc, int corner, int candTop, int candBottom);
+
 	public:
 		void AddRoundRect(int left, int top, int width, int height, int cornerx, int cornery);
 	};

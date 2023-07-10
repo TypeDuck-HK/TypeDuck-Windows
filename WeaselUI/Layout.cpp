@@ -60,6 +60,41 @@ GraphicsRoundRectPath::GraphicsRoundRectPath(const CRect rc, int corner, bool ro
 	}
 }
 
+GraphicsRoundRectPath::GraphicsRoundRectPath(const CRect rc, int corner, int candTop, int candBottom) {
+	if (corner <= 0) {
+		Gdiplus::Rect& rcp = Gdiplus::Rect(rc.left, rc.top, rc.Width(), rc.Height());
+		AddRectangle(rcp);
+	} else {
+		int cnx = ((corner * 2 <= rc.Width()) ? corner : (rc.Width() / 2));
+		int cny = ((corner * 2 <= rc.Height()) ? corner : (rc.Height() / 2));
+		int elWid = 2 * cnx;
+		int elHei = 2 * cny;
+		AddArc(rc.left, rc.top, elWid, elHei, 180, 90);
+		AddLine(rc.left + cnx, rc.top, rc.right - cnx, rc.top);
+
+		AddArc(rc.right - elWid, rc.top, elWid, elHei, 270, 90);
+		AddLine(rc.right, rc.top + cny, rc.right, rc.bottom - cny);
+
+		AddArc(rc.right - elWid, rc.bottom - elHei, elWid, elHei, 0, 90);
+
+		if (candBottom > rc.bottom - elHei) {
+			AddLine(rc.right - cnx, rc.bottom, rc.left - cnx, rc.bottom);
+			AddLine(rc.left - cnx, rc.bottom, rc.left - cnx, candTop);
+		} else {
+			AddLine(rc.right - cnx, rc.bottom, rc.left + cnx, rc.bottom);
+
+			AddArc(rc.left, rc.bottom - elHei, elWid, elHei, 90, 90);
+			AddLine(rc.left, rc.bottom - cny, rc.left, candBottom + cny);
+
+			AddArc(rc.left - elWid, candBottom, elWid, elHei, 270, 90);
+			AddLine(rc.left - cnx, candBottom, rc.left - cnx, candTop);
+		}
+
+		AddArc(rc.left - elWid, candTop - elHei, elWid, elHei, 0, 90);
+		AddLine(rc.left, candTop - cny, rc.left, rc.top + cny);
+	}
+}
+
 void GraphicsRoundRectPath::AddRoundRect(int left, int top, int width, int height, int cornerx, int cornery)
 {
 	if (cornery > 0 && cornerx > 0) {
