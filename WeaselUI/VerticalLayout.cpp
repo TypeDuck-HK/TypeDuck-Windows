@@ -174,14 +174,15 @@ void weasel::VerticalLayout::DoLayout(CDCHandle dc, DirectWriteResources* pDWR)
 			_candidateNepRects[i].OffsetRect(offsetX, offsetY);
 		}
 
-		w += comment_group_2_width + space * 2 * _multiHintPanel->isHintEnabled(StatusHintColumn::Urd);
+		// Urdu right align
+		w += comment_group_2_width + space * 2 * _multiHintPanel->isHintEnabled(StatusHintColumn::Urd) + comment_group_3_width;
 
 		if (_multiHintPanel->isHintEnabled(StatusHintColumn::Urd)) {
-			_candidateUrdRects[i].SetRect(w, height - comment_group_3_height, w + urdSize[i].cx, height);
+			_candidateUrdRects[i].SetRect(w - urdSize[i].cx, height - comment_group_3_height, w, height);
 			_candidateUrdRects[i].OffsetRect(offsetX, offsetY);
 		}
 
-		w += comment_group_3_width + _style.hilite_padding + real_margin_x;
+		w += _style.hilite_padding * 2 + real_margin_x;
 
 		width = max(width, w);
 		height += _style.hilite_padding;
