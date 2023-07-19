@@ -2,6 +2,15 @@
 
 #include <WeaselCommon.h>
 #include <boost/tokenizer.hpp>
+#include "fontClasses.h"
+
+class MultiHintPanel;
+
+struct InfoLanguage {
+	std::wstring Key;
+	std::wstring Value;
+	IDWriteTextFormat1* TextFormat;
+};
 
 struct InfoDefinition {
 	std::wstring Eng;
@@ -9,6 +18,7 @@ struct InfoDefinition {
 	std::wstring Nep;
 	std::wstring Hin;
 	std::wstring Ind;
+	std::vector<InfoLanguage> Get(MultiHintPanel* panel, DirectWriteResources* pDWR) const;
 };
 
 struct InfoProperties {
@@ -17,8 +27,12 @@ struct InfoProperties {
 	std::wstring Label;
 	std::wstring Normalized;
 	std::wstring Written;
-	std::wstring Colloquial;
+	std::wstring Vernacular;
 	std::wstring Collocation;
+	std::vector<std::wstring> GetPartsOfSpeech() const;
+	std::wstring GetRegister() const;
+	std::vector<std::wstring> GetLabels() const;
+	std::vector<std::vector<std::wstring> > GetOtherData() const;
 	InfoDefinition Definition;
 };
 
@@ -28,6 +42,7 @@ struct InfoMultiHint {
 	std::wstring Jyutping;
 	std::wstring Sandhi;
 	std::wstring LitColReading;
+	std::wstring GetPronType() const;
 	InfoProperties Properties;
 };
 

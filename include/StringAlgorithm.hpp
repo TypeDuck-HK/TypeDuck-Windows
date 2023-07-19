@@ -40,9 +40,9 @@ inline std::string join(const std::set<std::string>& list, const std::string& de
 	});
 }
 
-inline std::vector<std::wstring>& split(std::vector<std::wstring>& result, const std::wstring& input, const wchar_t* delim)
+inline std::vector<std::wstring>& split(std::vector<std::wstring>& result, const std::wstring& input, const wchar_t* delim, bool clear = true)
 {
-	result.clear();
+	if (clear) result.clear();
 	size_t current = 0;
 	size_t next = std::wstring::npos;
 	do

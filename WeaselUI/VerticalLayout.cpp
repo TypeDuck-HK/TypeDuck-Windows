@@ -222,20 +222,168 @@ void weasel::VerticalLayout::DoLayout(CDCHandle dc, DirectWriteResources* pDWR)
 #endif /*  USE_PAGER_MARK */
 
 	if (dictionary_entry.empty()) {
-		_dictionaryEntryRect.SetRectEmpty();
+		_dictionaryRect.SetRectEmpty();
 	} else {
-		_contentSize.cx -= real_margin_x;
-		const int w = _contentSize.cx;
-		_contentSize.cx += _style.dictionary_panel_padding;
-		GetTextSizeDW(dictionary_entry, pDWR->pEntryTextFormat, pDWR, &size);
-		const int h = _style.dictionary_panel_padding + real_margin_y + size.cy;
-		_dictionaryEntryRect.SetRect(_contentSize.cx, _style.dictionary_panel_padding + real_margin_y, _contentSize.cx + size.cx, h);
-		_contentSize.cx += size.cx + _style.dictionary_entry_gap;
-		GetTextSizeDW(dictionary_info.Jyutping, pDWR->pPronTextFormat, pDWR, &size);
-		_dictionaryPronRect.SetRect(_contentSize.cx, h - size.cy, _contentSize.cx + size.cx, h);
-		_contentSize.cx += size.cx + _style.dictionary_panel_padding;
-		_dictionaryRect.SetRect(w, real_margin_y, _contentSize.cx, _contentSize.cy - real_margin_y - 1);
-		_contentSize.cx += real_margin_x;
+		_dictionaryPanelRects.clear();
+		DictionaryPanelRects rects;
+		const int left = _contentSize.cx - real_margin_x;
+		const int minW = left + _style.dictionary_panel_style.padding;
+
+		// | -padding- [entry] -title_gap- [pron] -title_gap- [pron_type] -padding- |
+		std::wstring pronType = dictionary_info.GetPronType();
+		CSize entrySize, pronSize, pronTypeSize;
+		GetTextSizeDW(dictionary_entry, pDWR->pEntryTextFormat, pDWR, &entrySize);
+		if (!dictionary_info.Jyutping.empty()) GetTextSizeDW(dictionary_info.Jyutping, pDWR->pPronTextFormat, pDWR, &pronSize);
+		if (!pronType.empty()) GetTextSizeDW(pronType, pDWR->pPronTypeTextFormat, pDWR, &pronTypeSize);
+		int h = /* real_margin_y + */ _style.dictionary_panel_style.padding + max(entrySize.cy, max(pronSize.cy, pronTypeSize.cy));
+
+		int w = minW;
+		rects.entryLabel.SetRect(w, h - entrySize.cy, w + entrySize.cx, h);
+		w += entrySize.cx + _style.dictionary_panel_style.title_gap * !dictionary_info.Jyutping.empty();
+		rects.pronLabel.SetRect(w, h - pronSize.cy, w + pronSize.cx, h);
+		w += pronSize.cx + _style.dictionary_panel_style.title_gap * !pronType.empty();
+		rects.pronTypeLabel.SetRect(w, h - pronTypeSize.cy, w + pronTypeSize.cx, h);
+		w += pronTypeSize.cx + _style.dictionary_panel_style.padding;
+		width = w;
+
+		// | -padding- [pos] -pos_gap- [pos] -definition_gap- [register] -definition_gap- [lbl] -lbl_gap- [lbl] -definition_gap- [definition] -padding- |
+		std::vector<std::wstring> partsOfSpeech = dictionary_info.Properties.GetPartsOfSpeech();
+		std::wstring registerLabel = dictionary_info.Properties.GetRegister();
+		std::vector<std::wstring> lbls = dictionary_info.Properties.GetLabels();
+		std::vector<InfoLanguage> definitions = dictionary_info.Properties.Definition.Get(_multiHintPanel, pDWR);
+		if (!partsOfSpeech.empty() || !registerLabel.empty() || !lbls.empty() || !definitions.empty()) {
+			int maxH = 0;
+			std::vector<CSize> posSizes, lblSizes;
+			CSize registerSize, definitionSize;
+			for (const std::wstring pos : partsOfSpeech) {
+				CSize posSize;
+				GetTextSizeDW(pos, pDWR->pPOSTextFormat, pDWR, &posSize);
+				posSizes.push_back(posSize);
+				maxH = max(maxH, posSize.cy + _style.dictionary_panel_style.pos_padding * 2);
+			}
+			if (!registerLabel.empty()) {
+				GetTextSizeDW(registerLabel, pDWR->pRegisterTextFormat, pDWR, &registerSize);
+				maxH = max(maxH, registerSize.cy);
+			}
+			for (const std::wstring lbl : lbls) {
+				CSize lblSize;
+				GetTextSizeDW(lbl, pDWR->pLblTextFormat, pDWR, &lblSize);
+				lblSizes.push_back(lblSize);
+				maxH = max(maxH, lblSize.cy);
+			}
+			if (!definitions.empty()) {
+				GetTextSizeDW(definitions[0].Value, definitions[0].TextFormat, pDWR, &definitionSize);
+				maxH = max(maxH, definitionSize.cy);
+			}
+			h += _style.dictionary_panel_style.spacing + maxH - _style.dictionary_panel_style.pos_padding;
+
+			w = minW;
+			std::vector<CRect> posRects, lblRects;
+			for (const CSize posSize : posSizes) {
+				w += _style.dictionary_panel_style.pos_padding;
+				posRects.push_back({ w, h - posSize.cy, w + posSize.cx, h });
+				w += posSize.cx + _style.dictionary_panel_style.pos_padding + _style.dictionary_panel_style.pos_gap;
+			}
+			rects.posLabels = posRects;
+			if (!posSizes.empty()) w += _style.dictionary_panel_style.definition_gap - _style.dictionary_panel_style.pos_gap;
+
+			h += _style.dictionary_panel_style.pos_padding;
+			rects.registerLabel.SetRect(w, h - registerSize.cy, w + registerSize.cx, h);
+			w += registerSize.cx + _style.dictionary_panel_style.definition_gap * !registerLabel.empty();
+
+			for (const CSize lblSize : lblSizes) {
+				lblRects.push_back({ w, h - lblSize.cy, w + lblSize.cx, h });
+				w += lblSize.cx + _style.dictionary_panel_style.lbl_gap;
+			}
+			rects.lblLabels = lblRects;
+			if (!lblSizes.empty()) w += _style.dictionary_panel_style.definition_gap - _style.dictionary_panel_style.lbl_gap;
+
+			rects.definitionLabel.SetRect(w, h - definitionSize.cy, w + definitionSize.cx, h);
+			w += definitionSize.cx - _style.dictionary_panel_style.definition_gap * definitions.empty() + _style.dictionary_panel_style.padding;
+			width = max(width, w);
+		}
+
+		// | -padding- [field_key] -field_spacing- [field_value] -padding- |
+		int maxKeyWidth = 0;
+		std::vector<std::vector<std::wstring> > otherData = dictionary_info.Properties.GetOtherData();
+		std::vector<std::vector<CSize> > otherDataSizes;
+		for (const std::vector<std::wstring>& row : otherData) {
+			std::vector<CSize> rowSizes;
+			bool first = true;
+			for (const std::wstring item : row) {
+				CSize itemSize;
+				GetTextSizeDW(item, first ? pDWR->pFieldKeyTextFormat : pDWR->pFieldValueTextFormat, pDWR, &itemSize);
+				rowSizes.push_back(itemSize);
+				if (first) {
+					maxKeyWidth = max(maxKeyWidth, itemSize.cx);
+					first = false;
+				}
+			}
+			otherDataSizes.push_back(rowSizes);
+		}
+
+		bool first = true;
+		std::vector<std::vector<CRect> > otherDataRects;
+		for (const std::vector<CSize>& rowSizes : otherDataSizes) {
+			h += (first ? _style.dictionary_panel_style.spacing : _style.dictionary_panel_style.field_spacing) + max(rowSizes[0].cy, rowSizes[1].cy);
+			first = false;
+			w = minW + maxKeyWidth;
+			std::vector<CRect> rowRects = {{ w - rowSizes[0].cx, h - rowSizes[0].cy, w, h }};
+			w += _style.dictionary_panel_style.field_gap;
+			rowRects.push_back({ w, h - rowSizes[1].cy, w + rowSizes[1].cx, h });
+			int maxValueWidth = rowSizes[1].cx;
+			for (size_t i = 2; i < rowSizes.size(); i++) {
+				rowRects.push_back({ w, h, w + rowSizes[i].cx, h + rowSizes[i].cy });
+				h += rowSizes[i].cy;
+				maxValueWidth = max(maxValueWidth, rowSizes[i].cx);
+			}
+			otherDataRects.push_back(rowRects);
+			w += maxValueWidth + _style.dictionary_panel_style.padding;
+			width = max(width, w);
+		}
+		rects.fieldLabels = otherDataRects;
+
+		if (definitions.size() > 1) {
+			w = minW;
+			h += _style.dictionary_panel_style.spacing;
+			GetTextSizeDW(L"More Languages", pDWR->pMoreLanguagesHeadTextFormat, pDWR, &size);
+			rects.moreLanguagesHeadLabel.SetRect(w, h, w + size.cx, h + size.cy);
+			h += size.cy;
+			w += size.cx + _style.dictionary_panel_style.padding;
+			width = max(width, w);
+
+			int maxKeyWidth = 0;
+			std::vector<std::pair<CSize, CSize> > languageSizes;
+			for (size_t i = 1; i < definitions.size(); i++) {
+				CSize keySize, valueSize;
+				GetTextSizeDW(definitions[i].Key, pDWR->pFieldKeyTextFormat, pDWR, &keySize);
+				maxKeyWidth = max(maxKeyWidth, keySize.cx);
+				GetTextSizeDW(definitions[i].Value, definitions[i].TextFormat, pDWR, &valueSize);
+				languageSizes.push_back({ keySize, valueSize });
+			}
+
+			w = minW;
+			bool first = true;
+			std::vector<std::pair<CRect, CRect> > languageRects;
+			for (const std::pair<CSize, CSize>& languageSize : languageSizes) {
+				h += (first ? _style.dictionary_panel_style.more_languages_spacing : _style.dictionary_panel_style.field_spacing) + max(languageSize.first.cy, languageSize.second.cy);
+				first = false;
+				w = minW + maxKeyWidth;
+				const CRect keyRect = { w - languageSize.first.cx, h - languageSize.first.cy, w, h };
+				w += _style.dictionary_panel_style.field_gap;
+				languageRects.push_back({ keyRect, { w, h - languageSize.second.cy, w + languageSize.second.cx, h } });
+				w += languageSize.second.cx + _style.dictionary_panel_style.padding;
+				width = max(width, w);
+			}
+			rects.moreLanguageLabels = languageRects;
+		}
+
+		h += _style.dictionary_panel_style.padding + real_margin_y;
+		_contentSize.cy = max(_contentSize.cy, h);
+
+		_dictionaryPanelRects = { rects };
+		_dictionaryRect.SetRect(left, real_margin_y, width, _contentSize.cy - real_margin_y - 1);
+		_contentSize.cx = width + real_margin_x;
 	}
 
 	// calc roundings start

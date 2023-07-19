@@ -25,8 +25,7 @@ namespace weasel
 		virtual CRect GetAuxiliaryRect() const { return _auxiliaryRect; }
 		virtual CRect GetHighlightRect() const { return _highlightRect; }
 		virtual CRect GetDictionaryRect() const { return _dictionaryRect; }
-		virtual CRect GetDictionaryEntryRect() const { return _dictionaryEntryRect; }
-		virtual CRect GetDictionaryPronRect() const { return _dictionaryPronRect; }
+		virtual std::vector<DictionaryPanelRects> GetDictionaryPanelRects() const { return _dictionaryPanelRects; }
 		virtual CRect GetCandidateLabelRect(int id) const { return _candidateLabelRects[id]; }
 		virtual CRect GetCandidateTextRect(int id) const { return _candidateTextRects[id]; }
 		virtual CRect GetCandidateCommentRect(int id) const { return _candidateCommentRects[id]; }
@@ -74,7 +73,8 @@ namespace weasel
 		CRect _statusIconRect;
 		CRect _bgRect;
 		CRect _contentRect;
-		CRect _dictionaryRect, _dictionaryEntryRect, _dictionaryPronRect;
+		CRect _dictionaryRect;
+		std::vector<DictionaryPanelRects> _dictionaryPanelRects;
 		IsToRoundStruct _roundInfo[MAX_CANDIDATES_COUNT];
 		IsToRoundStruct _textRoundInfo;
 		MultiHintPanel* _multiHintPanel;

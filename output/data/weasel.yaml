@@ -10,23 +10,27 @@ app_options:
     ascii_mode: true
 
 style:
-  color_scheme: aqua
+  color_scheme: default
   font_face: Microsoft JhengHei, MingLiU HKSCS, MingLiU HKSCS ExtB
   label_font_face: Century Gothic, Segoe UI
-  hint_font_face: Segoe UI, Microsoft JhengHei
-  eng_font_face: Segoe UI
+  # comment_font_face: Microsoft JhengHei, MingLiU HKSCS, MingLiU HKSCS ExtB
+  hint_font_face: Segoe UI, Microsoft JhengHei, MingLiU HKSCS, MingLiU HKSCS ExtB
+  eng_font_face: Segoe UI, Microsoft JhengHei, MingLiU HKSCS, MingLiU HKSCS ExtB
   hin_font_face: Nirmala UI, Mangal
   urd_font_face: Urdu Typesetting, Tahoma, Segoe UI
   nep_font_face: Nirmala UI, Mangal
   ind_font_face: Times New Roman
+  # page_mark_font_face: Microsoft JhengHei
   font_point: 15
   label_font_point: 14
+  # comment_font_point: 15
   hint_font_point: 12
   eng_font_point: 14
   hin_font_point: 13
   urd_font_point: 15
   nep_font_point: 13
   ind_font_point: 14
+  page_mark_font_point: 28
   language_list: Jyutping, Eng
   inline_preedit: false
   preedit_type: composition
@@ -52,20 +56,50 @@ style:
     shadow_radius: 0
     shadow_offset_x: 4
     shadow_offset_y: 4
-    dictionary_panel_padding: 32
-    dictionary_entry_gap: 24
-    dictionary_spacing: 16
+  dictionary_panel:
+    entry_font_face: DFKai-SB, MingLiU HKSCS, MingLiU HKSCS ExtB
+    pron_font_face: Segoe UI
+    pron_type_font_face: Segoe UI, Microsoft JhengHei, MingLiU HKSCS, MingLiU HKSCS ExtB
+    pos_font_face: Segoe UI:light, Microsoft JhengHei, MingLiU HKSCS, MingLiU HKSCS ExtB
+    register_font_face: Segoe UI:italic
+    lbl_font_face: Segoe UI
+    field_key_font_face: Segoe UI
+    # field_value_font_face: Microsoft JhengHei, MingLiU HKSCS, MingLiU HKSCS ExtB
+    more_languages_head_font_face: Segoe UI:medium
+    entry_font_point: 36
+    pron_font_point: 24
+    pron_type_font_point: 14
+    pos_font_point: 11
+    register_font_point: 14
+    lbl_font_point: 14
+    field_key_font_point: 14
+    field_value_font_point: 14
+    more_languages_head_font_point: 15
+    layout:
+      padding: 36
+      title_gap: 24
+      spacing: 28
+      pos_border_width: 1
+      pos_border_radius: 4
+      pos_padding: 3
+      pos_gap: 8
+      lbl_gap: 8
+      definition_gap: 20
+      field_spacing: 6
+      field_gap: 12
+      more_languages_spacing: 6
+      entry_spacing: 48
 
 preset_color_schemes:
-  aqua:
-    name: 碧水／Aqua
-    author: 佛振 <chen.sst@gmail.com>
+  default:
+    name: TypeDuck
+    author: TypeDuck Team
 
     prevpage_color: 0xfffa820a
     nextpage_color: 0xfffa820a
     disabled_prevpage_color: 0xffb7b7b7
     disabled_nextpage_color: 0xffb7b7b7
-    border_color: 0xe0e0e0
+    border_color: 0xdddddd
     hilited_mark_color: 0xfa820a
 
     label_color: 0x453e37
@@ -73,8 +107,8 @@ preset_color_schemes:
     candidate_text_color: 0x000000
     comment_text_color: 0x000000
 
-    hilited_label_color: 0xfff4e8
-    hilited_hint_text_color: 0xfff4e8
+    hilited_label_color: 0xffecd9
+    hilited_hint_text_color: 0xffecd9
     hilited_candidate_text_color: 0xffffff
     hilited_comment_text_color: 0xffffff
 
@@ -93,6 +127,26 @@ preset_color_schemes:
     hilited_candidate_back_color: 0xfa820a
     hilited_candidate_shadow_color: 0x00000000
     hilited_candidate_border_color: 0x00000000
+
+    dictionary_panel:
+      pos_border_color: 0xffffc387
+
+  aqua:
+    name: 碧水／Aqua
+    author: 佛振 <chen.sst@gmail.com>
+    text_color: 0x000000                          #默认文字颜色
+    back_color: 0xeceeee                          #候选窗背景色
+    shadow_color: 0x00000000                      #候选窗阴影色，默认全透明（无阴影）
+    border_color: 0xe0e0e0                        #候选窗边框颜色
+    hilited_text_color: 0x000000                  #编码文字颜色
+    hilited_back_color: 0xd4d4d4                  #编码背景颜色
+    hilited_shadow_color: 0x00000000              #编码背景块阴影颜色
+    hilited_candidate_text_color: 0xffffff        #高亮候选文字颜色
+    hilited_candidate_back_color: 0xfa3a0a        #高亮候选背景颜色
+    hilited_candidate_shadow_color: 0x00000000    #高亮候选背景块阴影颜色
+    candidate_text_color: 0x000000                #非高亮候选文字颜色
+    candidate_back_color: 0xeceeee                #非高亮候选背景颜色
+    candidate_shadow_color: 0x00000000            #非高亮候选背景块阴影颜色
 
   azure:
     name: 青天／Azure

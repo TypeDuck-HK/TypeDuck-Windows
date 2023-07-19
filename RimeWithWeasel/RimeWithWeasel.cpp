@@ -792,10 +792,21 @@ static void _UpdateUIStyle(RimeConfig* config, weasel::UI* ui, bool initialize)
 	processFontFaceConfig("style/urd_font_face", style.urd_font_face);
 	processFontFaceConfig("style/nep_font_face", style.nep_font_face);
 	processFontFaceConfig("style/ind_font_face", style.ind_font_face);
+	processFontFaceConfig("style/page_mark_font_face", style.page_mark_font_face);
+
+	processFontFaceConfig("style/dictionary_panel/entry_font_face", style.dictionary_panel_style.entry_font_face);
+	processFontFaceConfig("style/dictionary_panel/pron_face", style.dictionary_panel_style.pron_face);
+	processFontFaceConfig("style/dictionary_panel/pron_type_font_face", style.dictionary_panel_style.pron_type_font_face);
+	processFontFaceConfig("style/dictionary_panel/pos_font_face", style.dictionary_panel_style.pos_font_face);
+	processFontFaceConfig("style/dictionary_panel/register_font_face", style.dictionary_panel_style.register_font_face);
+	processFontFaceConfig("style/dictionary_panel/lbl_font_face", style.dictionary_panel_style.lbl_font_face);
+	processFontFaceConfig("style/dictionary_panel/field_key_font_face", style.dictionary_panel_style.field_key_font_face);
+	processFontFaceConfig("style/dictionary_panel/field_value_font_face", style.dictionary_panel_style.field_value_font_face);
+	processFontFaceConfig("style/dictionary_panel/more_languages_head_font_face", style.dictionary_panel_style.more_languages_head_font_face);
 
 	const auto processFontPointConfig = [&config](const char* key, int* value) {
 		if (RimeConfigGetInt(config, key, value) || RimeConfigGetInt(config, "style/font_point", value)) {
-			if (value <= 0) *value = 12;
+			if (*value <= 0) *value = 12;
 		}
 	};
 	processFontPointConfig("style/font_point", &style.font_point);
@@ -808,6 +819,17 @@ static void _UpdateUIStyle(RimeConfig* config, weasel::UI* ui, bool initialize)
 	processFontPointConfig("style/urd_font_point", &style.urd_font_point);
 	processFontPointConfig("style/nep_font_point", &style.nep_font_point);
 	processFontPointConfig("style/ind_font_point", &style.ind_font_point);
+	processFontPointConfig("style/page_mark_font_point", &style.page_mark_font_point);
+
+	processFontPointConfig("style/dictionary_panel/entry_font_point", &style.dictionary_panel_style.entry_font_point);
+	processFontPointConfig("style/dictionary_panel/pron_point", &style.dictionary_panel_style.pron_point);
+	processFontPointConfig("style/dictionary_panel/pron_type_font_point", &style.dictionary_panel_style.pron_type_font_point);
+	processFontPointConfig("style/dictionary_panel/pos_font_point", &style.dictionary_panel_style.pos_font_point);
+	processFontPointConfig("style/dictionary_panel/register_font_point", &style.dictionary_panel_style.register_font_point);
+	processFontPointConfig("style/dictionary_panel/lbl_font_point", &style.dictionary_panel_style.lbl_font_point);
+	processFontPointConfig("style/dictionary_panel/field_key_font_point", &style.dictionary_panel_style.field_key_font_point);
+	processFontPointConfig("style/dictionary_panel/field_value_font_point", &style.dictionary_panel_style.field_value_font_point);
+	processFontPointConfig("style/dictionary_panel/more_languages_head_font_point", &style.dictionary_panel_style.more_languages_head_font_point);
 
 	Bool inline_preedit = False;
 	if (RimeConfigGetBool(config, "style/inline_preedit", &inline_preedit) || initialize)
@@ -901,9 +923,20 @@ static void _UpdateUIStyle(RimeConfig* config, weasel::UI* ui, bool initialize)
 		style.margin_y = style.hilite_padding;
 	else if (style.hilite_padding > -style.margin_y && style.margin_y < 0)
 		style.margin_y = -(style.hilite_padding);
-	RimeConfigGetInt(config, "style/layout/dictionary_panel_padding", &style.dictionary_panel_padding);
-	RimeConfigGetInt(config, "style/layout/dictionary_entry_gap", &style.dictionary_entry_gap);
-	RimeConfigGetInt(config, "style/layout/dictionary_spacing", &style.dictionary_spacing);
+	// dictionary panel
+	RimeConfigGetInt(config, "style/dictionary_panel/layout/padding", &style.dictionary_panel_style.padding);
+	RimeConfigGetInt(config, "style/dictionary_panel/layout/title_gap", &style.dictionary_panel_style.title_gap);
+	RimeConfigGetInt(config, "style/dictionary_panel/layout/spacing", &style.dictionary_panel_style.spacing);
+	RimeConfigGetInt(config, "style/dictionary_panel/layout/pos_border_width", &style.dictionary_panel_style.pos_border_width);
+	RimeConfigGetInt(config, "style/dictionary_panel/layout/pos_border_radius", &style.dictionary_panel_style.pos_border_radius);
+	RimeConfigGetInt(config, "style/dictionary_panel/layout/pos_padding", &style.dictionary_panel_style.pos_padding);
+	RimeConfigGetInt(config, "style/dictionary_panel/layout/pos_gap", &style.dictionary_panel_style.pos_gap);
+	RimeConfigGetInt(config, "style/dictionary_panel/layout/lbl_gap", &style.dictionary_panel_style.lbl_gap);
+	RimeConfigGetInt(config, "style/dictionary_panel/layout/definition_gap", &style.dictionary_panel_style.definition_gap);
+	RimeConfigGetInt(config, "style/dictionary_panel/layout/field_spacing", &style.dictionary_panel_style.field_spacing);
+	RimeConfigGetInt(config, "style/dictionary_panel/layout/field_gap", &style.dictionary_panel_style.field_gap);
+	RimeConfigGetInt(config, "style/dictionary_panel/layout/more_languages_spacing", &style.dictionary_panel_style.more_languages_spacing);
+	RimeConfigGetInt(config, "style/dictionary_panel/layout/entry_spacing", &style.dictionary_panel_style.entry_spacing);
 	// color scheme
 #ifdef USE_THEME_DARK
 	bool is_light = IsThemeLight();
@@ -1082,6 +1115,12 @@ static bool _UpdateUIStyleColor(RimeConfig* config, weasel::UIStyle& style, bool
 		style.hint_text_color &= 0xffffffff;
 		RimeConfigGetColor32b(config, (prefix + "/hilited_hint_text_color").c_str(), &style.hilited_hint_text_color, fmt);
 		style.hilited_hint_text_color &= 0xffffffff;
+
+		if (!RimeConfigGetColor32b(config, (prefix + "/dictionary_panel/pos_border_color").c_str(), &style.dictionary_panel_style.pos_border_color, fmt))
+		{
+			style.dictionary_panel_style.pos_border_color = style.border_color;
+		}
+		style.dictionary_panel_style.pos_border_color &= 0xffffffff;
 #ifdef USE_HILITE_MARK
 		if (!RimeConfigGetColor32b(config, (prefix + "/hilited_mark_color").c_str(), &style.hilited_mark_color, fmt))
 		{

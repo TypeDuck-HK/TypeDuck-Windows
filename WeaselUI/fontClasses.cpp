@@ -47,8 +47,16 @@ DirectWriteResources::DirectWriteResources(weasel::UIStyle& style, UINT dpi = 0)
 	pNepTextFormat(NULL),
 	pIndTextFormat(NULL),
 	pPageMarkFormat(NULL),
+
 	pEntryTextFormat(NULL),
-	pPronTextFormat(NULL)
+	pPronTextFormat(NULL),
+	pPronTypeTextFormat(NULL),
+	pPOSTextFormat(NULL),
+	pRegisterTextFormat(NULL),
+	pLblTextFormat(NULL),
+	pFieldKeyTextFormat(NULL),
+	pFieldValueTextFormat(NULL),
+	pMoreLanguagesHeadTextFormat(NULL)
 {
 	// prepare d2d1 resources
 	HRESULT hResult = S_OK;
@@ -96,8 +104,17 @@ DirectWriteResources::~DirectWriteResources()
 	SafeRelease(&pNepTextFormat);
 	SafeRelease(&pIndTextFormat);
 	SafeRelease(&pPageMarkFormat);
+
 	SafeRelease(&pEntryTextFormat);
 	SafeRelease(&pPronTextFormat);
+	SafeRelease(&pPronTypeTextFormat);
+	SafeRelease(&pPOSTextFormat);
+	SafeRelease(&pRegisterTextFormat);
+	SafeRelease(&pLblTextFormat);
+	SafeRelease(&pFieldKeyTextFormat);
+	SafeRelease(&pFieldValueTextFormat);
+	SafeRelease(&pMoreLanguagesHeadTextFormat);
+
 	SafeRelease(&pRenderTarget);
 	SafeRelease(&pDWFactory);
 	SafeRelease(&pD2d1Factory);
@@ -151,8 +168,16 @@ HRESULT DirectWriteResources::InitResources(UIStyle& style, UINT dpi, bool verti
 	SafeRelease(&pNepTextFormat);
 	SafeRelease(&pIndTextFormat);
 	SafeRelease(&pPageMarkFormat);
+
 	SafeRelease(&pEntryTextFormat);
 	SafeRelease(&pPronTextFormat);
+	SafeRelease(&pPronTypeTextFormat);
+	SafeRelease(&pPOSTextFormat);
+	SafeRelease(&pRegisterTextFormat);
+	SafeRelease(&pLblTextFormat);
+	SafeRelease(&pFieldKeyTextFormat);
+	SafeRelease(&pFieldValueTextFormat);
+	SafeRelease(&pMoreLanguagesHeadTextFormat);
 
 	return S_OK
 		| _SetupTextFormat(style.preedit_font_face, style.preedit_font_point, &pPreeditTextFormat)
@@ -165,9 +190,17 @@ HRESULT DirectWriteResources::InitResources(UIStyle& style, UINT dpi, bool verti
 		| _SetupTextFormat(style.urd_font_face, style.urd_font_point, &pUrdTextFormat, DWRITE_READING_DIRECTION_RIGHT_TO_LEFT)
 		| _SetupTextFormat(style.nep_font_face, style.nep_font_point, &pNepTextFormat)
 		| _SetupTextFormat(style.ind_font_face, style.ind_font_point, &pIndTextFormat)
-		| _SetupTextFormat(style.font_face, style.font_point * 15 / 8, &pPageMarkFormat)
-		| _SetupTextFormat(style.font_face, style.font_point * 4 / 3, &pEntryTextFormat)
-		| _SetupTextFormat(style.hint_font_face, style.hint_font_point * 4 / 3, &pPronTextFormat);
+		| _SetupTextFormat(style.page_mark_font_face, style.page_mark_font_point, &pPageMarkFormat)
+
+		| _SetupTextFormat(style.dictionary_panel_style.entry_font_face, style.dictionary_panel_style.entry_font_point, &pEntryTextFormat)
+		| _SetupTextFormat(style.dictionary_panel_style.pron_face, style.dictionary_panel_style.pron_point, &pPronTextFormat)
+		| _SetupTextFormat(style.dictionary_panel_style.pron_type_font_face, style.dictionary_panel_style.pron_type_font_point, &pPronTypeTextFormat)
+		| _SetupTextFormat(style.dictionary_panel_style.pos_font_face, style.dictionary_panel_style.pos_font_point, &pPOSTextFormat)
+		| _SetupTextFormat(style.dictionary_panel_style.register_font_face, style.dictionary_panel_style.register_font_point, &pRegisterTextFormat)
+		| _SetupTextFormat(style.dictionary_panel_style.lbl_font_face, style.dictionary_panel_style.lbl_font_point, &pLblTextFormat)
+		| _SetupTextFormat(style.dictionary_panel_style.field_key_font_face, style.dictionary_panel_style.field_key_font_point, &pFieldKeyTextFormat)
+		| _SetupTextFormat(style.dictionary_panel_style.field_value_font_face, style.dictionary_panel_style.field_value_font_point, &pFieldValueTextFormat)
+		| _SetupTextFormat(style.dictionary_panel_style.more_languages_head_font_face, style.dictionary_panel_style.more_languages_head_font_point, &pMoreLanguagesHeadTextFormat);
 }
 
 void weasel::DirectWriteResources::SetDpi(UINT dpi)

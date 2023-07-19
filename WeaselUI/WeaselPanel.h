@@ -81,7 +81,8 @@ enum class BackType
 	TEXT = 0,
 	CAND = 1,
 	BACKGROUND = 2,	// background
-	DICTIONARY_PANEL = 3
+	DICTIONARY_PANEL = 3,
+	PART_OF_SPEECH = 4
 };
 
 class WeaselPanel : 

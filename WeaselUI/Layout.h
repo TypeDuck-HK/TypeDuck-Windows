@@ -47,6 +47,17 @@ namespace weasel
 		{}
 	};
 
+	struct DictionaryPanelRects
+	{
+		CRect entryLabel, pronLabel, pronTypeLabel;
+		std::vector<CRect> posLabels, lblLabels;
+		CRect registerLabel, definitionLabel;
+		std::vector<std::vector<CRect> > fieldLabels;
+		CRect moreLanguagesHeadLabel;
+		std::vector<std::pair<CRect, CRect> > moreLanguageLabels;
+		DictionaryPanelRects() {}
+	};
+
 	class Layout
 	{
 	public:
@@ -59,8 +70,7 @@ namespace weasel
 		virtual CRect GetAuxiliaryRect() const = 0;
 		virtual CRect GetHighlightRect() const = 0;
 		virtual CRect GetDictionaryRect() const = 0;
-		virtual CRect GetDictionaryEntryRect() const = 0;
-		virtual CRect GetDictionaryPronRect() const = 0;
+		virtual std::vector<DictionaryPanelRects> GetDictionaryPanelRects() const = 0;
 		virtual CRect GetCandidateLabelRect(int id) const = 0;
 		virtual CRect GetCandidateTextRect(int id) const = 0;
 		virtual CRect GetCandidateRect(int id) const = 0;

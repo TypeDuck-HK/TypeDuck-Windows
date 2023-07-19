@@ -243,6 +243,114 @@ namespace weasel
 		bool inline_preedit;
 	};
 
+	struct DictionaryPanelStyle
+	{
+		std::wstring entry_font_face;
+		std::wstring pron_face;
+		std::wstring pron_type_font_face;
+		std::wstring pos_font_face;
+		std::wstring register_font_face;
+		std::wstring lbl_font_face;
+		std::wstring field_key_font_face;
+		std::wstring field_value_font_face;
+		std::wstring more_languages_head_font_face;
+		int entry_font_point;
+		int pron_point;
+		int pron_type_font_point;
+		int pos_font_point;
+		int register_font_point;
+		int lbl_font_point;
+		int field_key_font_point;
+		int field_value_font_point;
+		int more_languages_head_font_point;
+
+		int padding;
+		int title_gap;
+		int spacing;
+		int pos_border_width;
+		int pos_border_radius;
+		int pos_border_color;
+		int pos_padding;
+		int pos_gap;
+		int lbl_gap;
+		int definition_gap;
+		int field_spacing;
+		int field_gap;
+		int more_languages_spacing;
+		int entry_spacing;
+
+		DictionaryPanelStyle() : entry_font_face(),
+			pron_face(),
+			pron_type_font_face(),
+			pos_font_face(),
+			register_font_face(),
+			lbl_font_face(),
+			field_key_font_face(),
+			field_value_font_face(),
+			more_languages_head_font_face(),
+			entry_font_point(0),
+			pron_point(0),
+			pron_type_font_point(0),
+			pos_font_point(0),
+			register_font_point(0),
+			lbl_font_point(0),
+			field_key_font_point(0),
+			field_value_font_point(0),
+			more_languages_head_font_point(0),
+			padding(0),
+			title_gap(0),
+			spacing(0),
+			pos_border_width(0),
+			pos_border_radius(0),
+			pos_border_color(0),
+			pos_padding(0),
+			pos_gap(0),
+			lbl_gap(0),
+			definition_gap(0),
+			field_spacing(0),
+			field_gap(0),
+			more_languages_spacing(0),
+			entry_spacing(0) {}
+
+		bool operator!=(const DictionaryPanelStyle& st) {
+			return
+				(
+					entry_font_face != st.entry_font_face
+					|| pron_face != st.pron_face
+					|| pron_type_font_face != st.pron_type_font_face
+					|| pos_font_face != st.pos_font_face
+					|| register_font_face != st.register_font_face
+					|| lbl_font_face != st.lbl_font_face
+					|| field_key_font_face != st.field_key_font_face
+					|| field_value_font_face != st.field_value_font_face
+					|| more_languages_head_font_face != st.more_languages_head_font_face
+					|| entry_font_point != st.entry_font_point
+					|| pron_point != st.pron_point
+					|| pron_type_font_point != st.pron_type_font_point
+					|| pos_font_point != st.pos_font_point
+					|| register_font_point != st.register_font_point
+					|| lbl_font_point != st.lbl_font_point
+					|| field_key_font_point != st.field_key_font_point
+					|| field_value_font_point != st.field_value_font_point
+					|| more_languages_head_font_point != st.more_languages_head_font_point
+					|| padding != st.padding
+					|| title_gap != st.title_gap
+					|| spacing != st.spacing
+					|| pos_border_width != st.pos_border_width
+					|| pos_border_radius != st.pos_border_radius
+					|| pos_border_color != st.pos_border_color
+					|| pos_padding != st.pos_padding
+					|| pos_gap != st.pos_gap
+					|| lbl_gap != st.lbl_gap
+					|| definition_gap != st.definition_gap
+					|| field_spacing != st.field_spacing
+					|| field_gap != st.field_gap
+					|| more_languages_spacing != st.more_languages_spacing
+					|| entry_spacing != st.entry_spacing
+				);
+		}
+	};
+
 	struct UIStyle
 	{
 		enum PreeditType
@@ -284,6 +392,7 @@ namespace weasel
 		std::wstring urd_font_face;
 		std::wstring nep_font_face;
 		std::wstring ind_font_face;
+		std::wstring page_mark_font_face;
 		int preedit_font_point;
 		int font_point;
 		int label_font_point;
@@ -294,6 +403,7 @@ namespace weasel
 		int urd_font_point;
 		int nep_font_point;
 		int ind_font_point;
+		int page_mark_font_point;
 		bool inline_preedit;
 #ifdef USE_BLUR_UNDER_WINDOWS10
 		bool blur_window;
@@ -324,9 +434,6 @@ namespace weasel
 		int shadow_radius;
 		int shadow_offset_x;
 		int shadow_offset_y;
-		int dictionary_panel_padding;
-		int dictionary_entry_gap;
-		int dictionary_spacing;
 		// color scheme
 		int text_color;
 		int candidate_text_color;
@@ -365,6 +472,7 @@ namespace weasel
 		// per client
 		int client_caps;
 		std::wstring hint_settings;
+		DictionaryPanelStyle dictionary_panel_style;
 
 		UIStyle() : preedit_font_face(),
 			font_face(),
@@ -376,6 +484,7 @@ namespace weasel
 			urd_font_face(),
 			nep_font_face(),
 			ind_font_face(),
+			page_mark_font_face(),
 			preedit_font_point(0),
 			font_point(0),
 			label_font_point(0),
@@ -386,6 +495,7 @@ namespace weasel
 			urd_font_point(0),
 			nep_font_point(0),
 			ind_font_point(0),
+			page_mark_font_point(0),
 			inline_preedit(false),
 			align_type(ALIGN_BOTTOM),
 			preedit_type(COMPOSITION),
@@ -420,9 +530,6 @@ namespace weasel
 			shadow_radius(0),
 			shadow_offset_x(0),
 			shadow_offset_y(0),
-			dictionary_panel_padding(0),
-			dictionary_entry_gap(0),
-			dictionary_spacing(0),
 			text_color(0),
 			candidate_text_color(0),
 			candidate_back_color(0),
@@ -449,6 +556,7 @@ namespace weasel
 			hilited_hint_text_color(0),
 			hilited_comment_text_color(0),
 			hint_settings(),
+			dictionary_panel_style(),
 #ifdef USE_HILITE_MARK
 			hilited_mark_color(0),
 #endif
@@ -478,6 +586,7 @@ namespace weasel
 					|| urd_font_face != st.urd_font_face
 					|| nep_font_face != st.nep_font_face
 					|| ind_font_face != st.ind_font_face
+					|| page_mark_font_face != st.page_mark_font_face
 					|| preedit_font_point != st.preedit_font_point
 					|| font_point != st.font_point
 					|| label_font_point != st.label_font_point
@@ -488,6 +597,7 @@ namespace weasel
 					|| urd_font_point != st.urd_font_point
 					|| nep_font_point != st.nep_font_point
 					|| ind_font_point != st.ind_font_point
+					|| page_mark_font_point != st.page_mark_font_point
 					|| inline_preedit != st.inline_preedit
 #ifdef USE_BLUR_UNDER_WINDOWS10
 					|| blur_window != st.blur_window
@@ -516,9 +626,6 @@ namespace weasel
 					|| shadow_radius != st.shadow_radius
 					|| shadow_offset_x != st.shadow_offset_x
 					|| shadow_offset_y != st.shadow_offset_y
-					|| dictionary_panel_padding != st.dictionary_panel_padding
-					|| dictionary_entry_gap != st.dictionary_entry_gap
-					|| dictionary_spacing != st.dictionary_spacing
 					|| text_color != st.text_color
 					|| candidate_text_color != st.candidate_text_color
 					|| candidate_back_color != st.candidate_back_color
@@ -543,6 +650,7 @@ namespace weasel
 					|| hilited_hint_text_color != st.hilited_hint_text_color
 					|| hilited_comment_text_color != st.hilited_comment_text_color
 					|| hint_settings != st.hint_settings
+					|| dictionary_panel_style != st.dictionary_panel_style
 #ifdef USE_HILITE_MARK
 					|| hilited_mark_color != st.hilited_mark_color
 #endif
@@ -581,6 +689,7 @@ namespace boost {
 			ar & s.urd_font_point;
 			ar & s.nep_font_point;
 			ar & s.ind_font_point;
+			ar & s.page_mark_font_point;
 			ar & s.inline_preedit;
 			ar & s.align_type;
 #ifdef USE_BLUR_UNDER_WINDOWS10
@@ -615,9 +724,6 @@ namespace boost {
 			ar & s.shadow_radius;
 			ar & s.shadow_offset_x;
 			ar & s.shadow_offset_y;
-			ar & s.dictionary_panel_padding;
-			ar & s.dictionary_entry_gap;
-			ar & s.dictionary_spacing;
 			// color scheme
 			ar & s.text_color;
 			ar & s.candidate_text_color;
@@ -657,6 +763,44 @@ namespace boost {
 			ar & s.client_caps;
 			// hint settings
 			ar & s.hint_settings;
+			// dictionary panel
+			ar & s.dictionary_panel_style;
+		}
+
+		template <typename Archive>
+		void serialize(Archive& ar, weasel::DictionaryPanelStyle& s, const unsigned int version) {
+			ar & s.entry_font_face;
+			ar & s.pron_face;
+			ar & s.pron_type_font_face;
+			ar & s.pos_font_face;
+			ar & s.register_font_face;
+			ar & s.lbl_font_face;
+			ar & s.field_key_font_face;
+			ar & s.field_value_font_face;
+			ar & s.more_languages_head_font_face;
+			ar & s.entry_font_point;
+			ar & s.pron_point;
+			ar & s.pron_type_font_point;
+			ar & s.pos_font_point;
+			ar & s.register_font_point;
+			ar & s.lbl_font_point;
+			ar & s.field_key_font_point;
+			ar & s.field_value_font_point;
+			ar & s.more_languages_head_font_point;
+			ar & s.padding;
+			ar & s.title_gap;
+			ar & s.spacing;
+			ar & s.pos_border_width;
+			ar & s.pos_border_radius;
+			ar & s.pos_border_color;
+			ar & s.pos_padding;
+			ar & s.pos_gap;
+			ar & s.lbl_gap;
+			ar & s.definition_gap;
+			ar & s.field_spacing;
+			ar & s.field_gap;
+			ar & s.more_languages_spacing;
+			ar & s.entry_spacing;
 		}
 
 		template <typename Archive>

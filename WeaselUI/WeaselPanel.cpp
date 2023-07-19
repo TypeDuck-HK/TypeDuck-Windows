@@ -429,10 +429,11 @@ void WeaselPanel::_HighlightText(CDCHandle &dc, CRect rc, COLORREF color, COLORR
 		g_back.FillPath(&back_brush, hiliteBackPath);
 	}
 	// draw border, for bordercolor not transparent and border valid
-	if(COLORNOTTRANSPARENT(bordercolor) && m_style.border > 0)
+	const int border_width = type == BackType::PART_OF_SPEECH ? m_style.dictionary_panel_style.pos_border_width : m_style.border;
+	if(COLORNOTTRANSPARENT(bordercolor) && border_width > 0)
 	{
 		Gdiplus::Color border_color = GDPCOLOR_FROM_COLORREF(bordercolor);
-		Gdiplus::Pen gPenBorder(border_color, (Gdiplus::REAL)m_style.border);
+		Gdiplus::Pen gPenBorder(border_color, (Gdiplus::REAL)border_width);
 		// candidate window border
 		if (type == BackType::BACKGROUND) {
 			GraphicsRoundRectPath bgPath(rc, m_style.round_corner_ex);
@@ -657,6 +658,12 @@ bool WeaselPanel::_DrawCandidates(CDCHandle &dc, bool back)
 #else
 			_HighlightText(dc, rect, m_style.hilited_candidate_back_color, m_style.hilited_candidate_shadow_color, m_style.round_corner, BackType::DICTIONARY_PANEL, rd, TRANS_COLOR, highlightedCandRect.top, highlightedCandRect.bottom);
 #endif
+			std::vector<CRect> posRects = m_layout->GetDictionaryPanelRects()[0].posLabels;
+			for (size_t i = 0; i < posRects.size(); i++) {
+				CRect posRect(posRects[i]);
+				posRect.InflateRect(m_style.dictionary_panel_style.pos_padding, m_style.dictionary_panel_style.pos_padding);
+				_HighlightText(dc, posRect, TRANS_COLOR, TRANS_COLOR, m_style.dictionary_panel_style.pos_border_radius, BackType::PART_OF_SPEECH, rd, m_style.dictionary_panel_style.pos_border_color);
+			}
 			drawn = true;
 		}
 	}
@@ -734,9 +741,37 @@ bool WeaselPanel::_DrawCandidates(CDCHandle &dc, bool back)
 			}
 			drawn = true;
 		}
-		if (!dictionary_entry.empty()) {
-			_TextOut(m_layout->GetDictionaryEntryRect(), dictionary_entry, m_style.hilited_candidate_text_color, pDWR->pEntryTextFormat);
-			_TextOut(m_layout->GetDictionaryPronRect(), dictionary_info.Jyutping, m_style.hilited_hint_text_color, pDWR->pPronTextFormat);
+		if (!dictionary_entry.empty() && m_style.layout_type == UIStyle::LAYOUT_VERTICAL) {
+			DictionaryPanelRects rects = m_layout->GetDictionaryPanelRects()[0];
+			_TextOut(rects.entryLabel, dictionary_entry, m_style.hilited_candidate_text_color, pDWR->pEntryTextFormat);
+			_TextOut(rects.pronLabel, dictionary_info.Jyutping, m_style.hilited_hint_text_color, pDWR->pPronTextFormat);
+			_TextOut(rects.pronTypeLabel, dictionary_info.GetPronType(), m_style.hilited_hint_text_color, pDWR->pPronTypeTextFormat);
+
+			const std::vector<std::wstring> pos = dictionary_info.Properties.GetPartsOfSpeech();
+			for (size_t i = 0; i < rects.posLabels.size() && i < pos.size(); i++) {
+				_TextOut(rects.posLabels[i], pos[i], m_style.hilited_hint_text_color, pDWR->pPOSTextFormat);
+			}
+			_TextOut(rects.registerLabel, dictionary_info.Properties.GetRegister(), m_style.hilited_hint_text_color, pDWR->pRegisterTextFormat);
+			const std::vector<std::wstring> lbl = dictionary_info.Properties.GetLabels();
+			for (size_t i = 0; i < rects.lblLabels.size() && i < lbl.size(); i++) {
+				_TextOut(rects.lblLabels[i], lbl[i], m_style.hilited_hint_text_color, pDWR->pLblTextFormat);
+			}
+			std::vector<InfoLanguage> definitions = dictionary_info.Properties.Definition.Get(m_hintPanel, pDWR);
+			if (!definitions.empty()) _TextOut(rects.definitionLabel, definitions[0].Value, m_style.hilited_comment_text_color, definitions[0].TextFormat);
+
+			std::vector<std::vector<std::wstring> > fields = dictionary_info.Properties.GetOtherData();
+			for (size_t i = 0; i < rects.fieldLabels.size() && i < fields.size(); i++) {
+				for (size_t j = 0; j < rects.fieldLabels[i].size() && j < fields[i].size(); j++) {
+					if (j) _TextOut(rects.fieldLabels[i][j], fields[i][j], m_style.hilited_comment_text_color, pDWR->pFieldValueTextFormat);
+					else _TextOut(rects.fieldLabels[i][j], fields[i][j], m_style.hilited_hint_text_color, pDWR->pFieldKeyTextFormat);
+				}
+			}
+
+			if (definitions.size() > 1) _TextOut(rects.moreLanguagesHeadLabel, L"More Languages", m_style.hilited_comment_text_color, pDWR->pMoreLanguagesHeadTextFormat);
+			for (size_t i = 1; i <= rects.moreLanguageLabels.size() && i < definitions.size(); i++) {
+				_TextOut(rects.moreLanguageLabels[i - 1].first, definitions[i].Key, m_style.hilited_hint_text_color, pDWR->pFieldKeyTextFormat);
+				_TextOut(rects.moreLanguageLabels[i - 1].second, definitions[i].Value, m_style.hilited_comment_text_color, definitions[i].TextFormat);
+			}
 		}
 	}
 	return drawn;
@@ -931,7 +966,7 @@ void WeaselPanel::_RepositionWindow(bool adj)
 
 void WeaselPanel::_TextOut(CRect const& rc, const std::wstring text, int inColor, IDWriteTextFormat* pTextFormat, int characterSpacing)
 {
-	if (pTextFormat == NULL) return;
+	if (pTextFormat == NULL || text.empty()) return;
 	float r = (float)(GetRValue(inColor))/255.0f;
 	float g = (float)(GetGValue(inColor))/255.0f;
 	float b = (float)(GetBValue(inColor))/255.0f;
