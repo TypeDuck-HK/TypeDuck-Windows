@@ -68,10 +68,13 @@ public:
 	bool isHintEnabled(int column) const;
 	bool isHintEnabled(StatusHintColumn column) const;
 	bool isEnabled() const { return settingsStatus_ != 0; }
+	bool isShowDictionary() const { return isShowDictionary_; }
+	void setShowDictionary(bool show) { isShowDictionary_ = show; }
 private:
 	MultiHintPanel() : settingsStatus_(0) {}
 	~MultiHintPanel() {}
 	StatusHintSetting settingsStatus_;
 	// Private static pointer
 	static MultiHintPanel* volatile instance;
+	bool isShowDictionary_  = false;
 };

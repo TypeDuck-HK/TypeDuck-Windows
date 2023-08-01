@@ -319,11 +319,14 @@ LRESULT WeaselPanel::OnMouseHover(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL&
 
 	for (size_t i = 0; i < m_candidateCount && i < MAX_CANDIDATES_COUNT; ++i) {
 		CRect rect = m_layout->GetCandidateRect((int)i);
-		if (rect.PtInRect(point))
+		if (!rect.PtInRect(point))
 		{
-			m_ctx.cinfo.highlighted = i;
-			Refresh();
+			m_hintPanel->setShowDictionary(false);
+			continue;
 		}
+		m_ctx.cinfo.highlighted = i;
+		m_hintPanel->setShowDictionary(true);
+		Refresh();
 	}
 	bHandled = true;
 	return 0;
@@ -339,6 +342,7 @@ LRESULT WeaselPanel::OnMouseMove(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& 
 		tme.dwHoverTime = 400; // 400 ms 
 		tme.hwndTrack = m_hWnd;
 		TrackMouseEvent(&tme);
+		m_hintPanel->setShowDictionary(false);
 	}
 	return 0;
 }
@@ -741,7 +745,10 @@ bool WeaselPanel::_DrawCandidates(CDCHandle &dc, bool back)
 			}
 			drawn = true;
 		}
-		if (!dictionary_entry.empty() && m_style.layout_type == UIStyle::LAYOUT_VERTICAL) {
+		
+		if (!dictionary_entry.empty() 
+				&& m_style.layout_type == UIStyle::LAYOUT_VERTICAL
+				&& m_hintPanel->isShowDictionary()) {
 			DictionaryPanelRects rects = m_layout->GetDictionaryPanelRects()[0];
 			_TextOut(rects.entryLabel, dictionary_entry, m_style.hilited_candidate_text_color, pDWR->pEntryTextFormat);
 			_TextOut(rects.pronLabel, dictionary_info.Jyutping, m_style.hilited_hint_text_color, pDWR->pPronTextFormat);

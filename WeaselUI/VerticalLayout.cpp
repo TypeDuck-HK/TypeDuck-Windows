@@ -221,7 +221,7 @@ void weasel::VerticalLayout::DoLayout(CDCHandle dc, DirectWriteResources* pDWR)
 	}
 #endif /*  USE_PAGER_MARK */
 
-	if (dictionary_entry.empty()) {
+	if (dictionary_entry.empty() || !_multiHintPanel->isShowDictionary()) {
 		_dictionaryRect.SetRectEmpty();
 	} else {
 		_dictionaryPanelRects.clear();
