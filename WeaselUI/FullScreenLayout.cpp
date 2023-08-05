@@ -59,12 +59,18 @@ void weasel::FullScreenLayout::DoLayout(CDCHandle dc, DirectWriteResources* pDWR
 
 	for (auto i = 0, n = (int)_context.cinfo.candies.size(); i < n && i < MAX_CANDIDATES_COUNT; ++i)
 	{
-		_candidateLabelRects[i] = m_layout->GetCandidateLabelRect(i);
-		_candidateLabelRects[i].OffsetRect(offsetx, offsety);
-		_candidateTextRects[i] = m_layout->GetCandidateTextRect(i);
-		_candidateTextRects[i].OffsetRect(offsetx, offsety);
-		_candidateCommentRects[i] = m_layout->GetCandidateCommentRect(i);
-		_candidateCommentRects[i].OffsetRect(offsetx, offsety);
+		for (CandidateFieldRects& rects : m_layout->GetCandidateFieldRects(i))
+		{
+			rects.label.OffsetRect(offsetx, offsety);
+			rects.hint.OffsetRect(offsetx, offsety);
+			rects.text.OffsetRect(offsetx, offsety);
+			rects.comment.OffsetRect(offsetx, offsety);
+			rects.eng.OffsetRect(offsetx, offsety);
+			rects.ind.OffsetRect(offsetx, offsety);
+			rects.hin.OffsetRect(offsetx, offsety);
+			rects.nep.OffsetRect(offsetx, offsety);
+			rects.urd.OffsetRect(offsetx, offsety);
+		}
 		_candidateRects[i] = m_layout->GetCandidateRect(i);
 		_candidateRects[i].OffsetRect(offsetx, offsety);
 	}

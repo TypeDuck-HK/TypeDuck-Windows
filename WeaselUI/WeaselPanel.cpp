@@ -7,6 +7,7 @@
 #include "HorizontalLayout.h"
 #include "FullScreenLayout.h"
 #include "VHorizontalLayout.h"
+#include <StringAlgorithm.hpp>
 
 // for IDI_ZH, IDI_EN
 #include <resource.h>
@@ -676,8 +677,8 @@ bool WeaselPanel::_DrawCandidates(CDCHandle &dc, bool back)
 	{
 		// begin draw candidate texts
 		std::wstring dictionary_entry;
-		InfoMultiHint dictionary_info;
-		const bool isSingleComment = m_style.layout_type != UIStyle::LAYOUT_VERTICAL || m_ctx.preedit.str.rfind(L"[Schema Menu]", 1) != std::wstring::npos;
+		std::vector<InfoMultiHint> dictionary_entries;
+		const bool showHint = m_hintPanel->isHintEnabled(StatusHintColumn::Jyutping);
 		int label_text_color, hint_text_color, candidate_text_color, comment_text_color;
 		for (size_t i = 0; i < m_candidateCount && i < MAX_CANDIDATES_COUNT; ++i) {
 			if (i == m_ctx.cinfo.highlighted)
@@ -712,44 +713,78 @@ bool WeaselPanel::_DrawCandidates(CDCHandle &dc, bool back)
 				_TextOut(hlRc, m_style.mark_text, m_style.mark_text.length(), m_style.hilited_mark_color, pDWR->pTextFormat);
 			}
 #endif
+			const std::vector<CandidateFieldRects>& candidateFieldRects = m_layout->GetCandidateFieldRects((int)i);
+			if (candidateFieldRects.empty())
+				continue;
+
+			const std::wstring& comment = comments.at(i).str;
+			size_t jyutpingStartPos = comment.find(L'\f');
+			const bool containsJyutping = jyutpingStartPos != std::wstring::npos && comment.length() > jyutpingStartPos + 1;
+
 			// Draw label
 			std::wstring label = m_layout->GetLabelText(labels, (int)i, m_style.label_text_format.c_str());
 			if (!label.empty()) {
-				_TextOut(m_layout->GetCandidateLabelRect((int)i), label, label_text_color, pDWR->pLabelTextFormat);
+				_TextOut(candidateFieldRects[0].label, label, label_text_color, pDWR->pLabelTextFormat);
 			}
+
 			// Draw text
 			std::wstring text = candidates.at(i).str;
 			if (!text.empty()) {
-				_TextOut(m_layout->GetCandidateTextRect((int)i), text, candidate_text_color, pDWR->pTextFormat, m_style.character_spacing * !isSingleComment);
+				for (const CandidateFieldRects& rects : candidateFieldRects) {
+					_TextOut(rects.text, text, candidate_text_color, pDWR->pTextFormat, m_style.character_spacing * containsJyutping * showHint);
+				}
 			}
+
 			// Draw hint and comments
-			const std::wstring& comment = comments.at(i).str;
-			if (isSingleComment) {
-				_TextOut(m_layout->GetCandidateCommentRect((int)i), m_hintPanel->getHint(comment), comment_text_color, pDWR->pCommentTextFormat);
-			} else if (!comment.empty() && m_hintPanel->isEnabled()) {
-				if (m_hintPanel->containsCSV(comment)) {
-					InfoMultiHint info(comment);
-					if (m_hintPanel->isHintEnabled(StatusHintColumn::Jyutping)) _TextOut(m_layout->GetCandidateHintRect((int)i), info.Jyutping, hint_text_color, pDWR->pHintTextFormat);
-					if (m_hintPanel->isHintEnabled(StatusHintColumn::Eng)) _TextOut(m_layout->GetCandidateEngRect((int)i), info.Properties.Definition.Eng, comment_text_color, pDWR->pEngTextFormat);
-					if (m_hintPanel->isHintEnabled(StatusHintColumn::Hin)) _TextOut(m_layout->GetCandidateHinRect((int)i), info.Properties.Definition.Hin, comment_text_color, pDWR->pHinTextFormat);
-					if (m_hintPanel->isHintEnabled(StatusHintColumn::Urd)) _TextOut(m_layout->GetCandidateUrdRect((int)i), info.Properties.Definition.Urd, comment_text_color, pDWR->pUrdTextFormat);
-					if (m_hintPanel->isHintEnabled(StatusHintColumn::Nep)) _TextOut(m_layout->GetCandidateNepRect((int)i), info.Properties.Definition.Nep, comment_text_color, pDWR->pNepTextFormat);
-					if (m_hintPanel->isHintEnabled(StatusHintColumn::Ind)) _TextOut(m_layout->GetCandidateIndRect((int)i), info.Properties.Definition.Ind, comment_text_color, pDWR->pIndTextFormat);
-					if (i == m_ctx.cinfo.highlighted) {
-						dictionary_entry = text;
-						dictionary_info = info;
+			if (m_hintPanel->isEnabled() && !comment.empty()) {
+				if (comment[0] != '\v' || m_hintPanel->isHintEnabled(StatusHintColumn::Reverse)) {
+					const std::wstring commentPart = comment.substr(comment[0] == '\v', jyutpingStartPos);
+					if (!commentPart.empty()) {
+						_TextOut(candidateFieldRects[0].comment, commentPart, comment_text_color, pDWR->pCommentTextFormat);
 					}
-				} else if (m_hintPanel->isHintEnabled(StatusHintColumn::Jyutping)) {
-					_TextOut(m_layout->GetCandidateHintRect((int)i), comment, hint_text_color, pDWR->pHintTextFormat);
+				}
+				if (containsJyutping) {
+					const std::wstring cantonese = comment.substr(jyutpingStartPos + 1);
+					if (cantonese[0] == '\r') {
+						std::vector<std::wstring> lines;
+						split(lines, cantonese.substr(1), L"\r", false);
+						std::vector<InfoMultiHint> entries;
+						size_t j = 0;
+						for (std::wstring& entry : lines) {
+							InfoMultiHint info(entry);
+							if (info.Properties.Label == L"composition") {
+								info.Properties.Definition.Eng = L"[✏]";
+							} else if (i == m_ctx.cinfo.highlighted) {
+								entries.push_back(info);
+							}
+							if (entry[0] == L'1' && j < candidateFieldRects.size()) {
+								const CandidateFieldRects& rects = candidateFieldRects[j];
+								if (showHint) _TextOut(rects.hint, info.Jyutping, hint_text_color, pDWR->pHintTextFormat);
+								if (m_hintPanel->isHintEnabled(StatusHintColumn::Eng)) _TextOut(rects.eng, info.Properties.Definition.Eng, comment_text_color, pDWR->pEngTextFormat);
+								if (m_hintPanel->isHintEnabled(StatusHintColumn::Hin)) _TextOut(rects.hin, info.Properties.Definition.Hin, comment_text_color, pDWR->pHinTextFormat);
+								if (m_hintPanel->isHintEnabled(StatusHintColumn::Urd)) _TextOut(rects.urd, info.Properties.Definition.Urd, comment_text_color, pDWR->pUrdTextFormat);
+								if (m_hintPanel->isHintEnabled(StatusHintColumn::Nep)) _TextOut(rects.nep, info.Properties.Definition.Nep, comment_text_color, pDWR->pNepTextFormat);
+								if (m_hintPanel->isHintEnabled(StatusHintColumn::Ind)) _TextOut(rects.ind, info.Properties.Definition.Ind, comment_text_color, pDWR->pIndTextFormat);
+								j++;
+							}
+						}
+						if (i == m_ctx.cinfo.highlighted && m_hintPanel->shouldShowDictionary()) {
+							dictionary_entry = text;
+							dictionary_entries = entries;
+						}
+					} else if (showHint) {
+						_TextOut(candidateFieldRects[0].hint, cantonese, hint_text_color, pDWR->pHintTextFormat);
+					}
 				}
 			}
 			drawn = true;
 		}
-		
-		if (!dictionary_entry.empty() 
-				&& m_style.layout_type == UIStyle::LAYOUT_VERTICAL
-				&& m_hintPanel->isShowDictionary()) {
-			DictionaryPanelRects rects = m_layout->GetDictionaryPanelRects()[0];
+
+		std::vector<DictionaryPanelRects> allPanelRects = m_layout->GetDictionaryPanelRects();
+		for (size_t k = 0; k < dictionary_entries.size() && k < allPanelRects.size(); k++) {
+			const InfoMultiHint& dictionary_info = dictionary_entries[k];
+			const DictionaryPanelRects& rects = allPanelRects[k];
+
 			_TextOut(rects.entryLabel, dictionary_entry, m_style.hilited_candidate_text_color, pDWR->pEntryTextFormat);
 			_TextOut(rects.pronLabel, dictionary_info.Jyutping, m_style.hilited_hint_text_color, pDWR->pPronTextFormat);
 			_TextOut(rects.pronTypeLabel, dictionary_info.GetPronType(), m_style.hilited_hint_text_color, pDWR->pPronTypeTextFormat);

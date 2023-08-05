@@ -18,13 +18,9 @@ MultiHintPanel* MultiHintPanel::GetInstance()
 	return instance;
 }
 
-bool MultiHintPanel::containsCSV(const std::wstring& comment) const
-{
-	return comment.find(',') != std::wstring::npos;
-}
-
 const static std::pair<std::wstring, int> columns[] = {
 	{ L"Jyutping", (int)StatusHintColumn::Jyutping },
+	{ L"Reverse", (int)StatusHintColumn::Reverse },
 	{ L"Eng", (int)StatusHintColumn::Eng },
 	{ L"Urd", (int)StatusHintColumn::Urd },
 	{ L"Nep", (int)StatusHintColumn::Nep },
@@ -47,23 +43,6 @@ void MultiHintPanel::setMultiHintOptions(const std::wstring& settings)
 	settingsStatus_ = status;
 }
 
-std::wstring MultiHintPanel::getHint(const std::wstring& comment) const
-{
-	if (!containsCSV(comment)) {
-		return comment;
-	}
-	InfoMultiHint info(comment);
-	std::wstring str = L"";
-	if (isHintEnabled(StatusHintColumn::Jyutping)) str += info.Jyutping + L"\t";
-	if (isHintEnabled(StatusHintColumn::Eng)) str += info.Properties.Definition.Eng + L"\t";
-	if (isHintEnabled(StatusHintColumn::Urd)) str += info.Properties.Definition.Urd + L"\t";
-	if (isHintEnabled(StatusHintColumn::Nep)) str += info.Properties.Definition.Nep + L"\t";
-	if (isHintEnabled(StatusHintColumn::Hin)) str += info.Properties.Definition.Hin + L"\t";
-	if (isHintEnabled(StatusHintColumn::Ind)) str += info.Properties.Definition.Ind + L"\t";
-	str.pop_back();
-	return str;
-}
-
 bool MultiHintPanel::isHintEnabled(int column) const
 {
   return (settingsStatus_ & column) != 0;
@@ -77,23 +56,27 @@ bool MultiHintPanel::isHintEnabled(StatusHintColumn column) const
 InfoMultiHint::InfoMultiHint(const std::wstring& input) {
 	boost::tokenizer<boost::escaped_list_separator<wchar_t>, std::wstring::const_iterator, std::wstring> columns(input);
 	auto column = columns.begin();
-	/*  0 */ Jyutping = *column++;
-	/*  1 */ Sandhi = *column++;
-	/*  2 */ LitColReading = *column++;
+	MatchInputBuffer = *column++;
+	Jyutping = *column++;
+	PronOrder = *column++;
+	Sandhi = *column++;
+	LitColReading = *column++;
+
 	Properties = InfoProperties();
-	/*  3 */ Properties.PartOfSpeech = *column++;
-	/*  4 */ Properties.Register = *column++;
-	/*  5 */ Properties.Label = *column++;
-	/*  6 */ Properties.Normalized = *column++;
-	/*  7 */ Properties.Written = *column++;
-	/*  8 */ Properties.Vernacular = *column++;
-	/*  9 */ Properties.Collocation = *column++;
+	Properties.PartOfSpeech = *column++;
+	Properties.Register = *column++;
+	Properties.Label = *column++;
+	Properties.Normalized = *column++;
+	Properties.Written = *column++;
+	Properties.Vernacular = *column++;
+	Properties.Collocation = *column++;
+
 	Properties.Definition = InfoDefinition();
-	/* 10 */ Properties.Definition.Eng = *column++;
-	/* 11 */ Properties.Definition.Urd = *column++;
-	/* 12 */ Properties.Definition.Nep = *column++;
-	/* 13 */ Properties.Definition.Hin = *column++;
-	/* 14 */ Properties.Definition.Ind = *column++;
+	Properties.Definition.Eng = *column++;
+	Properties.Definition.Urd = *column++;
+	Properties.Definition.Nep = *column++;
+	Properties.Definition.Hin = *column++;
+	Properties.Definition.Ind = *column++;
 	Jyutping = std::regex_replace(Jyutping, std::wregex(L"\\d"), L"$& ");
 	Jyutping.pop_back();
 }
@@ -122,9 +105,6 @@ const static std::map<std::wstring, std::wstring> partsOfSpeech = {
 	{ L"v", L"verb 動詞" },
 	{ L"adj", L"adjective 形容詞" },
 	{ L"adv", L"adverb 副詞" },
-	{ L"conj", L"conjunction 連接詞" },
-	{ L"prep", L"preposition 前置詞" },
-	{ L"pron", L"pronoun 代名詞" },
 	{ L"morph", L"morpheme 語素" },
 	{ L"mw", L"measure word 量詞" },
 	{ L"part", L"particle 助詞" },
@@ -184,9 +164,9 @@ std::vector<std::vector<std::wstring> > InfoProperties::GetOtherData() const {
 std::vector<InfoLanguage> InfoDefinition::Get(MultiHintPanel* panel, DirectWriteResources* pDWR) const {
 	std::vector<InfoLanguage> info;
 	if (panel->isHintEnabled(StatusHintColumn::Eng) && !Eng.empty()) info.push_back({ L"English", Eng, pDWR->pEngTextFormat });
-	if (panel->isHintEnabled(StatusHintColumn::Eng) && !Urd.empty()) info.push_back({ L"Urdu", Urd, pDWR->pUrdTextFormat });
-	if (panel->isHintEnabled(StatusHintColumn::Eng) && !Nep.empty()) info.push_back({ L"Nepali", Nep, pDWR->pNepTextFormat });
-	if (panel->isHintEnabled(StatusHintColumn::Eng) && !Hin.empty()) info.push_back({ L"Hindi", Hin, pDWR->pHinTextFormat });
-	if (panel->isHintEnabled(StatusHintColumn::Eng) && !Ind.empty()) info.push_back({ L"Indonesian", Ind, pDWR->pIndTextFormat });
+	if (panel->isHintEnabled(StatusHintColumn::Urd) && !Urd.empty()) info.push_back({ L"Urdu", Urd, pDWR->pUrdTextFormat });
+	if (panel->isHintEnabled(StatusHintColumn::Nep) && !Nep.empty()) info.push_back({ L"Nepali", Nep, pDWR->pNepTextFormat });
+	if (panel->isHintEnabled(StatusHintColumn::Hin) && !Hin.empty()) info.push_back({ L"Hindi", Hin, pDWR->pHinTextFormat });
+	if (panel->isHintEnabled(StatusHintColumn::Ind) && !Ind.empty()) info.push_back({ L"Indonesian", Ind, pDWR->pIndTextFormat });
 	return info;
 }

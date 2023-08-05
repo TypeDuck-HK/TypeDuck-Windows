@@ -1,7 +1,14 @@
-#include "stdafx.h"
+﻿#include "stdafx.h"
 #include "VerticalLayout.h"
+#include <StringAlgorithm.hpp>
 
 using namespace weasel;
+
+template <typename T>
+inline T* init(std::vector<T>& c, size_t i) {
+	for (; c.size() <= i; c.push_back(T()));
+	return &c[i];
+}
 
 void weasel::VerticalLayout::DoLayout(CDCHandle dc, DirectWriteResources* pDWR)
 {
@@ -66,127 +73,171 @@ void weasel::VerticalLayout::DoLayout(CDCHandle dc, DirectWriteResources* pDWR)
 
 	/* Candidates */
 	std::wstring dictionary_entry;
-	InfoMultiHint dictionary_info;
-	const bool isSingleComment = _context.preedit.str.rfind(L"[Schema Menu]", 1) != std::wstring::npos;
+	std::vector<InfoMultiHint> dictionary_entries;
 	const bool showHint = _multiHintPanel->isHintEnabled(StatusHintColumn::Jyutping);
 
 	int label_width = 0, ruby_width = 0, comment_group_0_width = 0, comment_group_1_width = 0, comment_group_2_width = 0, comment_group_3_width = 0;
+	bool hasComment = false;
+
+	size_t j = 0;
+	size_t entryEnds[MAX_CANDIDATES_COUNT] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
 
 	CSize labelSize[MAX_CANDIDATES_COUNT];
-	CSize hintSize[MAX_CANDIDATES_COUNT];
+	std::vector<CSize> hintSize;
 	CSize textSize[MAX_CANDIDATES_COUNT];
 	CSize commentSize[MAX_CANDIDATES_COUNT];
-	CSize engSize[MAX_CANDIDATES_COUNT];
-	CSize hinSize[MAX_CANDIDATES_COUNT];
-	CSize urdSize[MAX_CANDIDATES_COUNT];
-	CSize nepSize[MAX_CANDIDATES_COUNT];
-	CSize indSize[MAX_CANDIDATES_COUNT];
+	std::vector<CSize> engSize;
+	std::vector<CSize> hinSize;
+	std::vector<CSize> urdSize;
+	std::vector<CSize> nepSize;
+	std::vector<CSize> indSize;
 
 	for (int i = 0; i < candidates_count && i < MAX_CANDIDATES_COUNT; ++i) {
+		_candidateFieldRects[i].clear();
+
 		const std::wstring& label = GetLabelText(labels, i, _style.label_text_format.c_str());
 		GetTextSizeDW(label, pDWR->pLabelTextFormat, pDWR, &labelSize[i]);
 		label_width = max(label_width, labelSize[i].cx);
 
 		const std::wstring& text = candidates.at(i).str;
-		GetTextSizeDW(text, pDWR->pTextFormat, pDWR, &textSize[i], _style.character_spacing * !isSingleComment);
-
 		const std::wstring& comment = comments.at(i).str;
-		if (isSingleComment) {
-			GetTextSizeDW(comment, pDWR->pCommentTextFormat, pDWR, &commentSize[i]);
-			comment_group_0_width = max(comment_group_0_width, commentSize[i].cx);
-		} else if (_multiHintPanel->isEnabled() && !comment.empty()) {
-			if (_multiHintPanel->containsCSV(comment)) {
-				InfoMultiHint info(comment);
-				if (showHint) GetTextSizeDW(info.Jyutping, pDWR->pHintTextFormat, pDWR, &hintSize[i]);
-				if (_multiHintPanel->isHintEnabled(StatusHintColumn::Eng)) GetTextSizeDW(info.Properties.Definition.Eng, pDWR->pEngTextFormat, pDWR, &engSize[i]);
-				if (_multiHintPanel->isHintEnabled(StatusHintColumn::Hin)) GetTextSizeDW(info.Properties.Definition.Hin, pDWR->pHinTextFormat, pDWR, &hinSize[i]);
-				if (_multiHintPanel->isHintEnabled(StatusHintColumn::Urd)) GetTextSizeDW(info.Properties.Definition.Urd, pDWR->pUrdTextFormat, pDWR, &urdSize[i]);
-				if (_multiHintPanel->isHintEnabled(StatusHintColumn::Nep)) GetTextSizeDW(info.Properties.Definition.Nep, pDWR->pNepTextFormat, pDWR, &nepSize[i]);
-				if (_multiHintPanel->isHintEnabled(StatusHintColumn::Ind)) GetTextSizeDW(info.Properties.Definition.Ind, pDWR->pIndTextFormat, pDWR, &indSize[i]);
-				comment_group_1_width = max(comment_group_1_width, max(engSize[i].cx, indSize[i].cx));
-				comment_group_2_width = max(comment_group_2_width, max(hinSize[i].cx, nepSize[i].cx));
-				comment_group_3_width = max(comment_group_3_width, urdSize[i].cx);
-				if (i == _context.cinfo.highlighted) {
-					dictionary_entry = text;
-					dictionary_info = info;
+		size_t jyutpingStartPos = comment.find(L'\f');
+		const bool containsJyutping = jyutpingStartPos != std::wstring::npos && comment.length() > jyutpingStartPos + 1;
+		GetTextSizeDW(text, pDWR->pTextFormat, pDWR, &textSize[i], _style.character_spacing * containsJyutping * showHint);
+
+		if (_multiHintPanel->isEnabled() && !comment.empty()) {
+			if (comment[0] != '\v' || _multiHintPanel->isHintEnabled(StatusHintColumn::Reverse)) {
+				const std::wstring commentPart = comment.substr(comment[0] == '\v', jyutpingStartPos);
+				if (!commentPart.empty()) {
+					GetTextSizeDW(commentPart, pDWR->pCommentTextFormat, pDWR, &commentSize[i]);
+					comment_group_0_width = max(comment_group_0_width, commentSize[i].cx);
+					hasComment = true;
 				}
-			} else if (showHint) {
-				GetTextSizeDW(comment, pDWR->pHintTextFormat, pDWR, &hintSize[i]);
 			}
+			if (containsJyutping) {
+				const std::wstring cantonese = comment.substr(jyutpingStartPos + 1);
+				if (cantonese[0] == '\r') {
+					std::vector<std::wstring> lines;
+					split(lines, cantonese.substr(1), L"\r", false);
+					std::vector<InfoMultiHint> entries;
+					for (std::wstring& entry : lines) {
+						InfoMultiHint info(entry);
+						if (info.Properties.Label == L"composition") {
+							info.Properties.Definition.Eng = L"[✏]";
+						} else if (i == _context.cinfo.highlighted) {
+							entries.push_back(info);
+						}
+						if (entry[0] == L'1') {
+							if (showHint) GetTextSizeDW(info.Jyutping, pDWR->pHintTextFormat, pDWR, init(hintSize, j));
+							if (_multiHintPanel->isHintEnabled(StatusHintColumn::Eng)) GetTextSizeDW(info.Properties.Definition.Eng, pDWR->pEngTextFormat, pDWR, init(engSize, j));
+							if (_multiHintPanel->isHintEnabled(StatusHintColumn::Hin)) GetTextSizeDW(info.Properties.Definition.Hin, pDWR->pHinTextFormat, pDWR, init(hinSize, j));
+							if (_multiHintPanel->isHintEnabled(StatusHintColumn::Urd)) GetTextSizeDW(info.Properties.Definition.Urd, pDWR->pUrdTextFormat, pDWR, init(urdSize, j));
+							if (_multiHintPanel->isHintEnabled(StatusHintColumn::Nep)) GetTextSizeDW(info.Properties.Definition.Nep, pDWR->pNepTextFormat, pDWR, init(nepSize, j));
+							if (_multiHintPanel->isHintEnabled(StatusHintColumn::Ind)) GetTextSizeDW(info.Properties.Definition.Ind, pDWR->pIndTextFormat, pDWR, init(indSize, j));
+							ruby_width = max(ruby_width, max(hintSize[j].cx, textSize[i].cx));
+							comment_group_1_width = max(comment_group_1_width, max(engSize[j].cx, indSize[j].cx));
+							comment_group_2_width = max(comment_group_2_width, max(hinSize[j].cx, nepSize[j].cx));
+							comment_group_3_width = max(comment_group_3_width, urdSize[j].cx);
+							j++;
+						}
+					}
+					if (i == _context.cinfo.highlighted && _multiHintPanel->shouldShowDictionary()) {
+						dictionary_entry = text;
+						dictionary_entries = entries;
+					}
+				} else {
+					if (showHint) {
+						GetTextSizeDW(cantonese, pDWR->pHintTextFormat, pDWR, init(hintSize, j));
+						ruby_width = max(ruby_width, max(hintSize[j].cx, textSize[i].cx));
+					}
+					j++;
+				}
+			} else {
+				j++;
+			}
+			entryEnds[i] = j;
 		}
-		ruby_width = max(ruby_width, max(hintSize[i].cx, textSize[i].cx));
 	}
 
-	for (int i = 0; i < candidates_count && i < MAX_CANDIDATES_COUNT; ++i) {
-		if (i > 0) height += _style.candidate_spacing;
+	int top = height;
+	j = 0;
+	for (int i = 0; i < candidates_count && i < MAX_CANDIDATES_COUNT; j++) {
+		if (j > 0) height += _style.candidate_spacing;
+		CandidateFieldRects rects;
 
 		int w = real_margin_x + _style.hilite_padding + base_offset;
-		const int top = height,
+		const int
 			label_height = gap + labelSize[i].cy,
-			ruby_height = hintSize[i].cy + gap * showHint + textSize[i].cy,
+			ruby_height = hintSize[j].cy + gap * showHint + textSize[i].cy,
 			comment_group_0_height = commentSize[i].cy,
-			comment_group_1_height = engSize[i].cy + gap * _multiHintPanel->isHintEnabled(StatusHintColumn::Eng) * _multiHintPanel->isHintEnabled(StatusHintColumn::Ind) + indSize[i].cy,
-			comment_group_2_height = hinSize[i].cy + gap * _multiHintPanel->isHintEnabled(StatusHintColumn::Hin) * _multiHintPanel->isHintEnabled(StatusHintColumn::Nep) + nepSize[i].cy,
-			comment_group_3_height = urdSize[i].cy;
+			comment_group_1_height = engSize[j].cy + gap * _multiHintPanel->isHintEnabled(StatusHintColumn::Eng) * _multiHintPanel->isHintEnabled(StatusHintColumn::Ind) + indSize[j].cy,
+			comment_group_2_height = hinSize[j].cy + gap * _multiHintPanel->isHintEnabled(StatusHintColumn::Hin) * _multiHintPanel->isHintEnabled(StatusHintColumn::Nep) + nepSize[j].cy,
+			comment_group_3_height = urdSize[j].cy;
 		height += max(label_height, max(ruby_height, max(comment_group_0_height, max(comment_group_1_height, max(comment_group_2_height, comment_group_3_height))))) - _style.hilite_padding;
 
-		_candidateLabelRects[i].SetRect(w, height - label_height, w + labelSize[i].cx, height - label_height + labelSize[i].cy);
-		_candidateLabelRects[i].OffsetRect(offsetX, offsetY);
+		rects.label.SetRect(w, height - label_height, w + labelSize[i].cx, height - label_height + labelSize[i].cy);
+		rects.label.OffsetRect(offsetX, offsetY);
 
 		w += label_width + space;
 
 		if (showHint) {
-			_candidateHintRects[i].SetRect(w, height - ruby_height, w + hintSize[i].cx, height - ruby_height + hintSize[i].cy);
-			_candidateHintRects[i].OffsetRect(offsetX, offsetY);
+			rects.hint.SetRect(w, height - ruby_height, w + hintSize[j].cx, height - ruby_height + hintSize[j].cy);
+			rects.hint.OffsetRect(offsetX, offsetY);
 		}
 
-		_candidateTextRects[i].SetRect(w, height - textSize[i].cy, w + textSize[i].cx, height);
-		_candidateTextRects[i].OffsetRect(offsetX, offsetY);
+		rects.text.SetRect(w, height - textSize[i].cy, w + textSize[i].cx, height);
+		rects.text.OffsetRect(offsetX, offsetY);
 
-		w += ruby_width + space * 2 * isSingleComment;
+		w += ruby_width + space * 2 * hasComment;
 
-		if (isSingleComment) {
-			_candidateCommentRects[i].SetRect(w, height - commentSize[i].cy, w + commentSize[i].cx, height);
-			_candidateCommentRects[i].OffsetRect(offsetX, offsetY);
+		if (hasComment) {
+			rects.text.SetRect(w, height - commentSize[i].cy, w + commentSize[i].cx, height);
+			rects.text.OffsetRect(offsetX, offsetY);
 		}
 
 		w += comment_group_0_width + space * 2 * _multiHintPanel->isHintEnabled((int)StatusHintColumn::Eng | (int)StatusHintColumn::Ind);
 
 		if (_multiHintPanel->isHintEnabled(StatusHintColumn::Eng)) {
-			_candidateEngRects[i].SetRect(w, height - comment_group_1_height, w + engSize[i].cx, height - comment_group_1_height + engSize[i].cy);
-			_candidateEngRects[i].OffsetRect(offsetX, offsetY);
+			rects.eng.SetRect(w, height - comment_group_1_height, w + engSize[j].cx, height - comment_group_1_height + engSize[j].cy);
+			rects.eng.OffsetRect(offsetX, offsetY);
 		}
 
 		if (_multiHintPanel->isHintEnabled(StatusHintColumn::Ind)) {
-			_candidateIndRects[i].SetRect(w, height - indSize[i].cy, w + indSize[i].cx, height);
-			_candidateIndRects[i].OffsetRect(offsetX, offsetY);
+			rects.ind.SetRect(w, height - indSize[j].cy, w + indSize[j].cx, height);
+			rects.ind.OffsetRect(offsetX, offsetY);
 		}
 
 		w += comment_group_1_width + space * 2 * _multiHintPanel->isHintEnabled((int)StatusHintColumn::Hin | (int)StatusHintColumn::Nep);
 
 		if (_multiHintPanel->isHintEnabled(StatusHintColumn::Hin)) {
-			_candidateHinRects[i].SetRect(w, height - comment_group_2_height, w + hinSize[i].cx, height - comment_group_2_height + hinSize[i].cy);
-			_candidateHinRects[i].OffsetRect(offsetX, offsetY);
+			rects.hin.SetRect(w, height - comment_group_2_height, w + hinSize[j].cx, height - comment_group_2_height + hinSize[j].cy);
+			rects.hin.OffsetRect(offsetX, offsetY);
 		}
 
 		if (_multiHintPanel->isHintEnabled(StatusHintColumn::Nep)) {
-			_candidateNepRects[i].SetRect(w, height - nepSize[i].cy, w + nepSize[i].cx, height);
-			_candidateNepRects[i].OffsetRect(offsetX, offsetY);
+			rects.nep.SetRect(w, height - nepSize[j].cy, w + nepSize[j].cx, height);
+			rects.nep.OffsetRect(offsetX, offsetY);
 		}
 
 		// Urdu right align
 		w += comment_group_2_width + space * 2 * _multiHintPanel->isHintEnabled(StatusHintColumn::Urd) + comment_group_3_width;
 
 		if (_multiHintPanel->isHintEnabled(StatusHintColumn::Urd)) {
-			_candidateUrdRects[i].SetRect(w - urdSize[i].cx, height - comment_group_3_height, w, height);
-			_candidateUrdRects[i].OffsetRect(offsetX, offsetY);
+			rects.urd.SetRect(w - urdSize[j].cx, height - comment_group_3_height, w, height);
+			rects.urd.OffsetRect(offsetX, offsetY);
 		}
 
+		_candidateFieldRects[i].push_back(rects);
 		w += _style.hilite_padding * 2 + real_margin_x;
 
 		width = max(width, w);
 		height += _style.hilite_padding;
-		_candidateRects[i].SetRect(real_margin_x + offsetX, top, width - real_margin_x + offsetX, height);
+
+		if (j == entryEnds[i] - 1) {
+			_candidateRects[i].SetRect(real_margin_x + offsetX, top, width - real_margin_x + offsetX, height);
+			top = height + _style.candidate_spacing;
+			i++;
+		}
 	}
 
 	/* Trim the last spacing if no candidates */
@@ -221,13 +272,13 @@ void weasel::VerticalLayout::DoLayout(CDCHandle dc, DirectWriteResources* pDWR)
 	}
 #endif /*  USE_PAGER_MARK */
 
-	if (dictionary_entry.empty() || !_multiHintPanel->isShowDictionary()) {
-		_dictionaryRect.SetRectEmpty();
-	} else {
-		_dictionaryPanelRects.clear();
+	_dictionaryPanelRects.clear();
+	const int left = _contentSize.cx - real_margin_x;
+	const int minW = left + _style.dictionary_panel_style.padding;
+	int h = _style.dictionary_panel_style.padding;
+
+	for (InfoMultiHint& dictionary_info : dictionary_entries) {
 		DictionaryPanelRects rects;
-		const int left = _contentSize.cx - real_margin_x;
-		const int minW = left + _style.dictionary_panel_style.padding;
 
 		// | -padding- [entry] -title_gap- [pron] -title_gap- [pron_type] -padding- |
 		std::wstring pronType = dictionary_info.GetPronType();
@@ -235,7 +286,7 @@ void weasel::VerticalLayout::DoLayout(CDCHandle dc, DirectWriteResources* pDWR)
 		GetTextSizeDW(dictionary_entry, pDWR->pEntryTextFormat, pDWR, &entrySize);
 		if (!dictionary_info.Jyutping.empty()) GetTextSizeDW(dictionary_info.Jyutping, pDWR->pPronTextFormat, pDWR, &pronSize);
 		if (!pronType.empty()) GetTextSizeDW(pronType, pDWR->pPronTypeTextFormat, pDWR, &pronTypeSize);
-		int h = /* real_margin_y + */ _style.dictionary_panel_style.padding + max(entrySize.cy, max(pronSize.cy, pronTypeSize.cy));
+		h += max(entrySize.cy, max(pronSize.cy, pronTypeSize.cy));
 
 		int w = minW;
 		rects.entryLabel.SetRect(w, h - entrySize.cy, w + entrySize.cx, h);
@@ -244,7 +295,7 @@ void weasel::VerticalLayout::DoLayout(CDCHandle dc, DirectWriteResources* pDWR)
 		w += pronSize.cx + _style.dictionary_panel_style.title_gap * !pronType.empty();
 		rects.pronTypeLabel.SetRect(w, h - pronTypeSize.cy, w + pronTypeSize.cx, h);
 		w += pronTypeSize.cx + _style.dictionary_panel_style.padding;
-		width = w;
+		width = max(width, w);
 
 		// | -padding- [pos] -pos_gap- [pos] -definition_gap- [register] -definition_gap- [lbl] -lbl_gap- [lbl] -definition_gap- [definition] -padding- |
 		std::vector<std::wstring> partsOfSpeech = dictionary_info.Properties.GetPartsOfSpeech();
@@ -378,10 +429,15 @@ void weasel::VerticalLayout::DoLayout(CDCHandle dc, DirectWriteResources* pDWR)
 			rects.moreLanguageLabels = languageRects;
 		}
 
-		h += _style.dictionary_panel_style.padding + real_margin_y;
+		_dictionaryPanelRects.push_back(rects);
+		h += _style.dictionary_panel_style.entry_spacing;
+	}
+	if (dictionary_entries.empty()) {
+		_dictionaryRect.SetRectEmpty();
+	} else {
+		h += _style.dictionary_panel_style.padding - _style.dictionary_panel_style.entry_spacing + real_margin_y;
 		_contentSize.cy = max(_contentSize.cy, h);
 
-		_dictionaryPanelRects = { rects };
 		_dictionaryRect.SetRect(left, real_margin_y, width, _contentSize.cy - real_margin_y - 1);
 		_contentSize.cx = width + real_margin_x;
 	}

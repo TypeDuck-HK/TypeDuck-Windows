@@ -47,6 +47,12 @@ namespace weasel
 		{}
 	};
 
+	struct CandidateFieldRects
+	{
+		CRect label, hint, text, comment;
+		CRect eng, ind, hin, nep, urd;
+	};
+
 	struct DictionaryPanelRects
 	{
 		CRect entryLabel, pronLabel, pronTypeLabel;
@@ -71,16 +77,8 @@ namespace weasel
 		virtual CRect GetHighlightRect() const = 0;
 		virtual CRect GetDictionaryRect() const = 0;
 		virtual std::vector<DictionaryPanelRects> GetDictionaryPanelRects() const = 0;
-		virtual CRect GetCandidateLabelRect(int id) const = 0;
-		virtual CRect GetCandidateTextRect(int id) const = 0;
+		virtual std::vector<CandidateFieldRects> GetCandidateFieldRects(int id) const = 0;
 		virtual CRect GetCandidateRect(int id) const = 0;
-		virtual CRect GetCandidateCommentRect(int id) const = 0;
-		virtual CRect GetCandidateHintRect(int id) const = 0;
-		virtual CRect GetCandidateEngRect(int id) const = 0;
-		virtual CRect GetCandidateHinRect(int id) const = 0;
-		virtual CRect GetCandidateUrdRect(int id) const = 0;
-		virtual CRect GetCandidateNepRect(int id) const = 0;
-		virtual CRect GetCandidateIndRect(int id) const = 0;
 		virtual CRect GetStatusIconRect() const = 0;
 		virtual IsToRoundStruct GetRoundInfo(int id) = 0;
 		virtual IsToRoundStruct GetTextRoundInfo() = 0;

@@ -5,6 +5,7 @@
 
 const static std::wstring LanguageList[] {
 	L"Jyutping",
+	L"Code in Reverse Lookup",
 	L"English",
 	L"Hindi",
 	L"Indonesian",
@@ -14,6 +15,7 @@ const static std::wstring LanguageList[] {
 
 const static std::string LanguageConfigNameList[] = {
 	"Jyutping",
+	"Reverse",
 	"Eng",
 	"Hin",
 	"Ind",
