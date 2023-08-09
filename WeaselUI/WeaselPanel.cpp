@@ -8,6 +8,7 @@
 #include "FullScreenLayout.h"
 #include "VHorizontalLayout.h"
 #include <StringAlgorithm.hpp>
+#include <boost/algorithm/string/join.hpp>
 
 // for IDI_ZH, IDI_EN
 #include <resource.h>
@@ -663,11 +664,14 @@ bool WeaselPanel::_DrawCandidates(CDCHandle &dc, bool back)
 #else
 			_HighlightText(dc, rect, m_style.hilited_candidate_back_color, m_style.hilited_candidate_shadow_color, m_style.round_corner, BackType::DICTIONARY_PANEL, rd, TRANS_COLOR, highlightedCandRect.top, highlightedCandRect.bottom);
 #endif
-			std::vector<CRect> posRects = m_layout->GetDictionaryPanelRects()[0].posLabels;
-			for (size_t i = 0; i < posRects.size(); i++) {
-				CRect posRect(posRects[i]);
-				posRect.InflateRect(m_style.dictionary_panel_style.pos_padding, m_style.dictionary_panel_style.pos_padding);
-				_HighlightText(dc, posRect, TRANS_COLOR, TRANS_COLOR, m_style.dictionary_panel_style.pos_border_radius, BackType::PART_OF_SPEECH, rd, m_style.dictionary_panel_style.pos_border_color);
+			std::vector<DictionaryPanelRects>& allPanelRects = m_layout->GetDictionaryPanelRects();
+			for (size_t i = 0; i < allPanelRects.size(); i++) {
+				std::vector<CRect>& posRects = allPanelRects[i].posLabels;
+				for (size_t j = 0; j < posRects.size(); j++) {
+					CRect posRect(posRects[j]);
+					posRect.InflateRect(m_style.dictionary_panel_style.pos_padding, m_style.dictionary_panel_style.pos_padding);
+					_HighlightText(dc, posRect, TRANS_COLOR, TRANS_COLOR, m_style.dictionary_panel_style.pos_border_radius, BackType::PART_OF_SPEECH, rd, m_style.dictionary_panel_style.pos_border_color);
+				}
 			}
 			drawn = true;
 		}
@@ -752,25 +756,36 @@ bool WeaselPanel::_DrawCandidates(CDCHandle &dc, bool back)
 						size_t j = 0;
 						for (std::wstring& entry : lines) {
 							InfoMultiHint info(entry);
-							if (info.Properties.Label == L"composition") {
-								info.Properties.Definition.Eng = L"[✏]";
-							} else if (i == m_ctx.cinfo.highlighted) {
-								entries.push_back(info);
-							}
+							const bool infoIsDictionaryEntry = m_hintPanel->isDictionaryEntry(&info);
+							if (infoIsDictionaryEntry) entries.push_back(info);
 							if (entry[0] == L'1' && j < candidateFieldRects.size()) {
 								const CandidateFieldRects& rects = candidateFieldRects[j];
 								if (showHint) _TextOut(rects.hint, info.Jyutping, hint_text_color, pDWR->pHintTextFormat);
-								if (m_hintPanel->isHintEnabled(StatusHintColumn::Eng)) _TextOut(rects.eng, info.Properties.Definition.Eng, comment_text_color, pDWR->pEngTextFormat);
-								if (m_hintPanel->isHintEnabled(StatusHintColumn::Hin)) _TextOut(rects.hin, info.Properties.Definition.Hin, comment_text_color, pDWR->pHinTextFormat);
-								if (m_hintPanel->isHintEnabled(StatusHintColumn::Urd)) _TextOut(rects.urd, info.Properties.Definition.Urd, comment_text_color, pDWR->pUrdTextFormat);
-								if (m_hintPanel->isHintEnabled(StatusHintColumn::Nep)) _TextOut(rects.nep, info.Properties.Definition.Nep, comment_text_color, pDWR->pNepTextFormat);
-								if (m_hintPanel->isHintEnabled(StatusHintColumn::Ind)) _TextOut(rects.ind, info.Properties.Definition.Ind, comment_text_color, pDWR->pIndTextFormat);
+								if (infoIsDictionaryEntry) {
+									if (m_hintPanel->isHintEnabled(StatusHintColumn::Eng)) _TextOut(rects.eng, info.Properties.Definition.Eng, comment_text_color, pDWR->pEngTextFormat);
+									if (m_hintPanel->isHintEnabled(StatusHintColumn::Hin)) _TextOut(rects.hin, info.Properties.Definition.Hin, comment_text_color, pDWR->pHinTextFormat);
+									if (m_hintPanel->isHintEnabled(StatusHintColumn::Urd)) _TextOut(rects.urd, info.Properties.Definition.Urd, comment_text_color, pDWR->pUrdTextFormat);
+									if (m_hintPanel->isHintEnabled(StatusHintColumn::Nep)) _TextOut(rects.nep, info.Properties.Definition.Nep, comment_text_color, pDWR->pNepTextFormat);
+									if (m_hintPanel->isHintEnabled(StatusHintColumn::Ind)) _TextOut(rects.ind, info.Properties.Definition.Ind, comment_text_color, pDWR->pIndTextFormat);
+								} else if (!info.Properties.Label.empty()) {
+									_TextOut(
+										m_hintPanel->isHintEnabled(StatusHintColumn::Eng) ? rects.eng :
+										m_hintPanel->isHintEnabled(StatusHintColumn::Ind) ? rects.ind :
+										m_hintPanel->isHintEnabled(StatusHintColumn::Hin) ? rects.hin :
+										m_hintPanel->isHintEnabled(StatusHintColumn::Nep) ? rects.nep :
+										m_hintPanel->isHintEnabled(StatusHintColumn::Urd) ? rects.urd :
+																							rects.eng,
+										boost::join(info.Properties.GetLabels(), L" "), hint_text_color, pDWR->pLblTextFormat);
+								}
 								j++;
 							}
 						}
-						if (i == m_ctx.cinfo.highlighted && m_hintPanel->shouldShowDictionary()) {
-							dictionary_entry = text;
-							dictionary_entries = entries;
+						if (!entries.empty()) {
+							_TextOut(candidateFieldRects[0].info, L"ⓘ", comment_text_color, pDWR->pCommentTextFormat);
+							if (i == m_ctx.cinfo.highlighted && m_hintPanel->shouldShowDictionary()) {
+								dictionary_entry = text;
+								dictionary_entries = entries;
+							}
 						}
 					} else if (showHint) {
 						_TextOut(candidateFieldRects[0].hint, cantonese, hint_text_color, pDWR->pHintTextFormat);

@@ -53,6 +53,21 @@ bool MultiHintPanel::isHintEnabled(StatusHintColumn column) const
   return isHintEnabled((int)column);
 }
 
+bool MultiHintPanel::isDictionaryEntry(InfoMultiHint* info) const {
+	return false
+		|| !info->Properties.PartOfSpeech.empty()
+		|| !info->Properties.Register.empty()
+		|| !info->Properties.Normalized.empty()
+		|| !info->Properties.Written.empty()
+		|| !info->Properties.Vernacular.empty()
+		|| !info->Properties.Collocation.empty()
+		|| isHintEnabled(StatusHintColumn::Eng) && !info->Properties.Definition.Eng.empty()
+		|| isHintEnabled(StatusHintColumn::Urd) && !info->Properties.Definition.Urd.empty()
+		|| isHintEnabled(StatusHintColumn::Nep) && !info->Properties.Definition.Nep.empty()
+		|| isHintEnabled(StatusHintColumn::Hin) && !info->Properties.Definition.Hin.empty()
+		|| isHintEnabled(StatusHintColumn::Ind) && !info->Properties.Definition.Ind.empty();
+}
+
 InfoMultiHint::InfoMultiHint(const std::wstring& input) {
 	boost::tokenizer<boost::escaped_list_separator<wchar_t>, std::wstring::const_iterator, std::wstring> columns(input);
 	auto column = columns.begin();

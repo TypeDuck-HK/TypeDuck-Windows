@@ -15,7 +15,7 @@ void weasel::StandardLayout::GetTextSizeDW(const std::wstring text, IDWriteTextF
 	D2D1_SIZE_F sz;
 	HRESULT hr = S_OK;
 
-	if (pTextFormat == NULL)
+	if (pTextFormat == NULL || text.empty())
 	{
 		lpSize->cx = 0;
 		lpSize->cy = 0;

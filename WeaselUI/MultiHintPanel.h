@@ -69,6 +69,7 @@ public:
 	bool isHintEnabled(int column) const;
 	bool isHintEnabled(StatusHintColumn column) const;
 	bool isEnabled() const { return settingsStatus_ != 0; }
+	bool isDictionaryEntry(InfoMultiHint* info) const;
 	bool shouldShowDictionary() const { return shouldShowDictionary_; }
 	void setShowDictionary(bool show) { shouldShowDictionary_ = show; }
 private:

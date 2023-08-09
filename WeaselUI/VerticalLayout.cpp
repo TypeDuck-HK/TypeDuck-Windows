@@ -1,14 +1,9 @@
 ﻿#include "stdafx.h"
 #include "VerticalLayout.h"
 #include <StringAlgorithm.hpp>
+#include <boost/algorithm/string/join.hpp>
 
 using namespace weasel;
-
-template <typename T>
-inline T* init(std::vector<T>& c, size_t i) {
-	for (; c.size() <= i; c.push_back(T()));
-	return &c[i];
-}
 
 void weasel::VerticalLayout::DoLayout(CDCHandle dc, DirectWriteResources* pDWR)
 {
@@ -32,8 +27,8 @@ void weasel::VerticalLayout::DoLayout(CDCHandle dc, DirectWriteResources* pDWR)
 #ifdef USE_PAGER_MARK
 	// calc page indicator 
 	CSize pgszl, pgszr;
-	GetTextSizeDW(pre, pDWR->pPreeditTextFormat, pDWR, &pgszl);
-	GetTextSizeDW(next, pDWR->pPreeditTextFormat, pDWR, &pgszr);
+	GetTextSizeDW(pre, pDWR->pPageMarkFormat, pDWR, &pgszl);
+	GetTextSizeDW(next, pDWR->pPageMarkFormat, pDWR, &pgszr);
 	int pgw = pgszl.cx + pgszr.cx + _style.hilite_spacing + _style.hilite_padding * 2;
 	int pgh = max(pgszl.cy, pgszr.cy);
 #endif /* USE_PAGER_MARK */
@@ -52,7 +47,7 @@ void weasel::VerticalLayout::DoLayout(CDCHandle dc, DirectWriteResources* pDWR)
 		// icon size higher then preedit text
 		int yoffset = (STATUS_ICON_SIZE >= szy && ShouldDisplayStatusIcon()) ? (STATUS_ICON_SIZE - szy) / 2 : 0;
 		_preeditRect.SetRect(real_margin_x, height + yoffset, real_margin_x + size.cx, height + yoffset + size.cy);
-		height += szy + 2 * (yoffset + _style.spacing);
+		height += szy + 2 * yoffset - _style.spacing;
 		width = max(width, real_margin_x * 2 + size.cx + szx);
 		if(ShouldDisplayStatusIcon()) width += STATUS_ICON_SIZE;
 		_preeditRect.OffsetRect(offsetX, offsetY);
@@ -65,22 +60,25 @@ void weasel::VerticalLayout::DoLayout(CDCHandle dc, DirectWriteResources* pDWR)
 		// icon size higher then auxiliary text
 		int yoffset = (STATUS_ICON_SIZE >= size.cy && ShouldDisplayStatusIcon()) ? (STATUS_ICON_SIZE - size.cy) / 2 : 0;
 		_auxiliaryRect.SetRect(real_margin_x, height + yoffset, real_margin_x + size.cx, height + yoffset + size.cy);
-		height += size.cy + 2 * (yoffset + _style.spacing);
+		height += size.cy + 2 * yoffset - _style.spacing;
 		width = max(width, real_margin_x * 2 + size.cx);
 		_auxiliaryRect.OffsetRect(offsetX, offsetY);
 	}
 	/*  preedit and auxiliary rectangle calc end */
 
 	/* Candidates */
+	CSize infoIconSize;
+	GetTextSizeDW(L"ⓘ", pDWR->pCommentTextFormat, pDWR, &infoIconSize);
+
 	std::wstring dictionary_entry;
 	std::vector<InfoMultiHint> dictionary_entries;
 	const bool showHint = _multiHintPanel->isHintEnabled(StatusHintColumn::Jyutping);
 
 	int label_width = 0, ruby_width = 0, comment_group_0_width = 0, comment_group_1_width = 0, comment_group_2_width = 0, comment_group_3_width = 0;
-	bool hasComment = false;
+	bool hasComment = false, hasEntry = false;
 
 	size_t j = 0;
-	size_t entryEnds[MAX_CANDIDATES_COUNT] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
+	size_t entryEnds[MAX_CANDIDATES_COUNT] {};
 
 	CSize labelSize[MAX_CANDIDATES_COUNT];
 	std::vector<CSize> hintSize;
@@ -91,6 +89,26 @@ void weasel::VerticalLayout::DoLayout(CDCHandle dc, DirectWriteResources* pDWR)
 	std::vector<CSize> urdSize;
 	std::vector<CSize> nepSize;
 	std::vector<CSize> indSize;
+	bool isEntry[MAX_CANDIDATES_COUNT] {};
+
+	auto push_back = [&hintSize, &engSize, &hinSize, &urdSize, &nepSize, &indSize]() {
+		hintSize.push_back(CSize());
+		engSize.push_back(CSize());
+		hinSize.push_back(CSize());
+		urdSize.push_back(CSize());
+		nepSize.push_back(CSize());
+		indSize.push_back(CSize());
+	};
+
+	const bool anyLanguageEnabled = _multiHintPanel->isHintEnabled((int)StatusHintColumn::Eng | (int)StatusHintColumn::Ind |
+									  (int)StatusHintColumn::Hin | (int)StatusHintColumn::Nep | (int)StatusHintColumn::Urd);
+	
+	std::vector<CSize>& languageForLabelSize = _multiHintPanel->isHintEnabled(StatusHintColumn::Eng) ? engSize :
+											   _multiHintPanel->isHintEnabled(StatusHintColumn::Ind) ? indSize :
+											   _multiHintPanel->isHintEnabled(StatusHintColumn::Hin) ? hinSize :
+											   _multiHintPanel->isHintEnabled(StatusHintColumn::Nep) ? nepSize :
+											   _multiHintPanel->isHintEnabled(StatusHintColumn::Urd) ? urdSize :
+																									   engSize;
 
 	for (int i = 0; i < candidates_count && i < MAX_CANDIDATES_COUNT; ++i) {
 		_candidateFieldRects[i].clear();
@@ -122,18 +140,20 @@ void weasel::VerticalLayout::DoLayout(CDCHandle dc, DirectWriteResources* pDWR)
 					std::vector<InfoMultiHint> entries;
 					for (std::wstring& entry : lines) {
 						InfoMultiHint info(entry);
-						if (info.Properties.Label == L"composition") {
-							info.Properties.Definition.Eng = L"[✏]";
-						} else if (i == _context.cinfo.highlighted) {
-							entries.push_back(info);
-						}
+						const bool infoIsDictionaryEntry = _multiHintPanel->isDictionaryEntry(&info);
+						if (infoIsDictionaryEntry) entries.push_back(info);
 						if (entry[0] == L'1') {
-							if (showHint) GetTextSizeDW(info.Jyutping, pDWR->pHintTextFormat, pDWR, init(hintSize, j));
-							if (_multiHintPanel->isHintEnabled(StatusHintColumn::Eng)) GetTextSizeDW(info.Properties.Definition.Eng, pDWR->pEngTextFormat, pDWR, init(engSize, j));
-							if (_multiHintPanel->isHintEnabled(StatusHintColumn::Hin)) GetTextSizeDW(info.Properties.Definition.Hin, pDWR->pHinTextFormat, pDWR, init(hinSize, j));
-							if (_multiHintPanel->isHintEnabled(StatusHintColumn::Urd)) GetTextSizeDW(info.Properties.Definition.Urd, pDWR->pUrdTextFormat, pDWR, init(urdSize, j));
-							if (_multiHintPanel->isHintEnabled(StatusHintColumn::Nep)) GetTextSizeDW(info.Properties.Definition.Nep, pDWR->pNepTextFormat, pDWR, init(nepSize, j));
-							if (_multiHintPanel->isHintEnabled(StatusHintColumn::Ind)) GetTextSizeDW(info.Properties.Definition.Ind, pDWR->pIndTextFormat, pDWR, init(indSize, j));
+							push_back();
+							if (showHint) GetTextSizeDW(info.Jyutping, pDWR->pHintTextFormat, pDWR, &hintSize[j]);
+							if (infoIsDictionaryEntry) {
+								if (_multiHintPanel->isHintEnabled(StatusHintColumn::Eng)) GetTextSizeDW(info.Properties.Definition.Eng, pDWR->pEngTextFormat, pDWR, &engSize[j]);
+								if (_multiHintPanel->isHintEnabled(StatusHintColumn::Hin)) GetTextSizeDW(info.Properties.Definition.Hin, pDWR->pHinTextFormat, pDWR, &hinSize[j]);
+								if (_multiHintPanel->isHintEnabled(StatusHintColumn::Urd)) GetTextSizeDW(info.Properties.Definition.Urd, pDWR->pUrdTextFormat, pDWR, &urdSize[j]);
+								if (_multiHintPanel->isHintEnabled(StatusHintColumn::Nep)) GetTextSizeDW(info.Properties.Definition.Nep, pDWR->pNepTextFormat, pDWR, &nepSize[j]);
+								if (_multiHintPanel->isHintEnabled(StatusHintColumn::Ind)) GetTextSizeDW(info.Properties.Definition.Ind, pDWR->pIndTextFormat, pDWR, &indSize[j]);
+							} else if (!info.Properties.Label.empty()) {
+								GetTextSizeDW(boost::join(info.Properties.GetLabels(), L" "), pDWR->pLblTextFormat, pDWR, &languageForLabelSize[j]);
+							}
 							ruby_width = max(ruby_width, max(hintSize[j].cx, textSize[i].cx));
 							comment_group_1_width = max(comment_group_1_width, max(engSize[j].cx, indSize[j].cx));
 							comment_group_2_width = max(comment_group_2_width, max(hinSize[j].cx, nepSize[j].cx));
@@ -141,22 +161,35 @@ void weasel::VerticalLayout::DoLayout(CDCHandle dc, DirectWriteResources* pDWR)
 							j++;
 						}
 					}
-					if (i == _context.cinfo.highlighted && _multiHintPanel->shouldShowDictionary()) {
-						dictionary_entry = text;
-						dictionary_entries = entries;
+					if (!entries.empty()) {
+						hasEntry = true;
+						isEntry[i] = true;
+						if (i == _context.cinfo.highlighted && _multiHintPanel->shouldShowDictionary()) {
+							dictionary_entry = text;
+							dictionary_entries = entries;
+						}
+					}
+					if (lines.empty()) {
+						push_back();
+						j++;
 					}
 				} else {
+					push_back();
 					if (showHint) {
-						GetTextSizeDW(cantonese, pDWR->pHintTextFormat, pDWR, init(hintSize, j));
+						GetTextSizeDW(cantonese, pDWR->pHintTextFormat, pDWR, &hintSize[j]);
 						ruby_width = max(ruby_width, max(hintSize[j].cx, textSize[i].cx));
 					}
 					j++;
 				}
 			} else {
+				push_back();
 				j++;
 			}
-			entryEnds[i] = j;
+		} else {
+			push_back();
+			j++;
 		}
+		entryEnds[i] = j;
 	}
 
 	int top = height;
@@ -172,8 +205,10 @@ void weasel::VerticalLayout::DoLayout(CDCHandle dc, DirectWriteResources* pDWR)
 			comment_group_0_height = commentSize[i].cy,
 			comment_group_1_height = engSize[j].cy + gap * _multiHintPanel->isHintEnabled(StatusHintColumn::Eng) * _multiHintPanel->isHintEnabled(StatusHintColumn::Ind) + indSize[j].cy,
 			comment_group_2_height = hinSize[j].cy + gap * _multiHintPanel->isHintEnabled(StatusHintColumn::Hin) * _multiHintPanel->isHintEnabled(StatusHintColumn::Nep) + nepSize[j].cy,
-			comment_group_3_height = urdSize[j].cy;
-		height += max(label_height, max(ruby_height, max(comment_group_0_height, max(comment_group_1_height, max(comment_group_2_height, comment_group_3_height))))) - _style.hilite_padding;
+			comment_group_3_height = urdSize[j].cy,
+			info_icon_height = infoIconSize.cy * isEntry[i],
+			currentTop = height;
+		height += max(label_height, max(ruby_height, max(comment_group_0_height, max(comment_group_1_height, max(comment_group_2_height, max(comment_group_3_height, info_icon_height)))))) - _style.hilite_padding;
 
 		rects.label.SetRect(w, height - label_height, w + labelSize[i].cx, height - label_height + labelSize[i].cy);
 		rects.label.OffsetRect(offsetX, offsetY);
@@ -195,7 +230,7 @@ void weasel::VerticalLayout::DoLayout(CDCHandle dc, DirectWriteResources* pDWR)
 			rects.text.OffsetRect(offsetX, offsetY);
 		}
 
-		w += comment_group_0_width + space * 2 * _multiHintPanel->isHintEnabled((int)StatusHintColumn::Eng | (int)StatusHintColumn::Ind);
+		w += comment_group_0_width + space * 2 * (_multiHintPanel->isHintEnabled((int)StatusHintColumn::Eng | (int)StatusHintColumn::Ind) || !anyLanguageEnabled);
 
 		if (_multiHintPanel->isHintEnabled(StatusHintColumn::Eng)) {
 			rects.eng.SetRect(w, height - comment_group_1_height, w + engSize[j].cx, height - comment_group_1_height + engSize[j].cy);
@@ -227,8 +262,15 @@ void weasel::VerticalLayout::DoLayout(CDCHandle dc, DirectWriteResources* pDWR)
 			rects.urd.OffsetRect(offsetX, offsetY);
 		}
 
+		w += space * 2 * hasEntry;
+
+		if (isEntry[i]) {
+			rects.info.SetRect(w, (height + currentTop - infoIconSize.cy) / 2 - gap, w + infoIconSize.cx, (height + currentTop + infoIconSize.cy) / 2 - gap);
+			rects.info.OffsetRect(offsetX, offsetY);
+		}
+
 		_candidateFieldRects[i].push_back(rects);
-		w += _style.hilite_padding * 2 + real_margin_x;
+		w += (infoIconSize.cx - _style.hilite_padding) * hasEntry + _style.hilite_padding * 2 + real_margin_x;
 
 		width = max(width, w);
 		height += _style.hilite_padding;

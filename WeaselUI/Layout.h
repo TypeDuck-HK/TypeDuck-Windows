@@ -51,6 +51,7 @@ namespace weasel
 	{
 		CRect label, hint, text, comment;
 		CRect eng, ind, hin, nep, urd;
+		CRect info;
 	};
 
 	struct DictionaryPanelRects
