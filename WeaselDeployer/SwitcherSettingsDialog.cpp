@@ -102,13 +102,13 @@ LRESULT SwitcherSettingsDialog::OnClose(UINT, WPARAM, LPARAM, BOOL&) {
 
 LRESULT SwitcherSettingsDialog::OnGetSchemata(WORD, WORD, HWND hWndCtl, BOOL&) {
 	HKEY hKey;
-	LSTATUS ret = RegOpenKey(HKEY_LOCAL_MACHINE, _T("Software\\Rime\\Weasel"), &hKey);
+	LSTATUS ret = RegOpenKey(HKEY_LOCAL_MACHINE, _T("Software\\Rime\\TypeDuck"), &hKey);
 	if (ret == ERROR_SUCCESS) {
 		WCHAR value[MAX_PATH];
 		DWORD len = sizeof(value);
 		DWORD type = 0;
 		DWORD data = 0;
-		ret = RegQueryValueExW(hKey, L"WeaselRoot", NULL, &type, (LPBYTE)value, &len);
+		ret = RegQueryValueExW(hKey, L"TypeDuckRoot", NULL, &type, (LPBYTE)value, &len);
 		if (ret == ERROR_SUCCESS && type == REG_SZ) {
 			WCHAR parameters[MAX_PATH + 37];
 			wcscpy_s<_countof(parameters)>(parameters, (std::wstring(L"/k \"") + value + L"\\rime-install.bat\"").c_str());

@@ -48,7 +48,7 @@ static int CustomInstall(bool installing)
 	bool silent = false;
 	std::wstring user_dir;
 
-	const WCHAR KEY[] = L"Software\\Rime\\Weasel";
+	const WCHAR KEY[] = L"Software\\Rime\\TypeDuck";
 	HKEY hKey;
 	LSTATUS ret = RegOpenKey(HKEY_CURRENT_USER, KEY, &hKey);
 	if (ret == ERROR_SUCCESS)
@@ -104,7 +104,7 @@ static int CustomInstall(bool installing)
 						(user_dir.length() + 1) * sizeof(WCHAR));
 	if (FAILED(HRESULT_FROM_WIN32(ret)))
 	{
-		MessageBox(NULL, L"Unable to write to the “RimeUserDir” folder.", L"Installation Failed", MB_ICONERROR | MB_OK);
+		MessageBox(NULL, L"Unable to write to the “RimeUserDir” Registry key.", L"Installation Failed", MB_ICONERROR | MB_OK);
 		return 1;
 	}
 
@@ -112,7 +112,7 @@ static int CustomInstall(bool installing)
 	ret = RegSetValueEx(hKey, L"Hant", 0, REG_DWORD, (const BYTE*)&data, sizeof(DWORD));
 	if (FAILED(HRESULT_FROM_WIN32(ret)))
 	{
-		MessageBox(NULL, L"Unable to write to the “Hant” folder.", L"Installation Failed", MB_ICONERROR | MB_OK);
+		MessageBox(NULL, L"Unable to write to the “Hant” Registry key.", L"Installation Failed", MB_ICONERROR | MB_OK);
 		return 1;
 	}
 

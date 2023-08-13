@@ -82,7 +82,7 @@ int install_ime_file(std::wstring& srcPath, const std::wstring& ext, bool hant, 
 	srcPath = std::wstring(drive) + dir + srcFileName;
 
 	GetSystemDirectoryW(path, _countof(path));
-	std::wstring destPath = std::wstring(path) + L"\\weasel" + ext;
+	std::wstring destPath = std::wstring(path) + L"\\TypeDuck" + ext;
 
 	int retval = 0;
 	// 复制 .dll/.ime 到系统目录
@@ -124,7 +124,7 @@ int uninstall_ime_file(const std::wstring& ext, bool silent, ime_register_func f
 	WCHAR path[MAX_PATH];
 	GetSystemDirectoryW(path, _countof(path));
 	std::wstring imePath(path);
-	imePath += L"\\weasel" + ext;
+	imePath += L"\\TypeDuck" + ext;
 	retval += func(imePath, false, false, false, silent);
 	if (!delete_file(imePath))
 	{
@@ -191,7 +191,7 @@ int register_ime(const std::wstring& ime_path, bool register_ime, bool is_wow64,
 						ret = RegQueryValueEx(hSubKey, L"Ime File", NULL, &type, (LPBYTE)imeFile, &len);
 						if (ret = ERROR_SUCCESS)
 						{
-							if (_wcsicmp(imeFile, L"weasel.ime") == 0)
+							if (_wcsicmp(imeFile, L"TypeDuck.ime") == 0)
 							{
 								hKL = (HKL)k;  // already there
 							}
@@ -204,7 +204,7 @@ int register_ime(const std::wstring& ime_path, bool register_ime, bool is_wow64,
 						ret = RegCreateKey(hKey, hkl_str, &hSubKey);
 						if (ret == ERROR_SUCCESS)
 						{
-							const WCHAR ime_file[] = L"weasel.ime";
+							const WCHAR ime_file[] = L"TypeDuck.ime";
 							RegSetValueEx(hSubKey, L"Ime File", 0, REG_SZ, (LPBYTE)ime_file, sizeof(ime_file));
 							const WCHAR layout_file[] = L"kbdus.dll";
 							RegSetValueEx(hSubKey, L"Layout File", 0, REG_SZ, (LPBYTE)layout_file, sizeof(layout_file));
@@ -288,7 +288,7 @@ int register_ime(const std::wstring& ime_path, bool register_ime, bool is_wow64,
 				continue;
 
 			// 小狼毫?
-			if (_wcsicmp(imeFile, L"weasel.ime") == 0)
+			if (_wcsicmp(imeFile, L"TypeDuck.ime") == 0)
 			{
 				DWORD value;
 				swscanf_s(subKey, L"%x", &value);
@@ -435,12 +435,12 @@ int install(bool hant, bool silent)
 	_wsplitpath_s(ime_src_path.c_str(), drive, _countof(drive), dir, _countof(dir), NULL, 0, NULL, 0);
 	std::wstring rootDir = std::wstring(drive) + dir;
 	rootDir.pop_back();
-	ret = RegSetValueEx(hKey, L"WeaselRoot", 0, REG_SZ,
+	ret = RegSetValueEx(hKey, L"TypeDuckRoot", 0, REG_SZ,
 		                (const BYTE*)rootDir.c_str(),
 						(rootDir.length() + 1) * sizeof(WCHAR));
 	if (FAILED(HRESULT_FROM_WIN32(ret)))
 	{
-		if (!silent) MessageBox(NULL, L"Unable to write to the “WeaselRoot” Registry key.", L"Installation Failed", MB_ICONERROR | MB_OK);
+		if (!silent) MessageBox(NULL, L"Unable to write to the “TypeDuckRoot” Registry key.", L"Installation Failed", MB_ICONERROR | MB_OK);
 		return 1;
 	}
 
@@ -485,6 +485,6 @@ bool has_installed() {
 	WCHAR path[MAX_PATH];
 	GetSystemDirectory(path, _countof(path));
 	std::wstring sysPath(path);
-	DWORD attr = GetFileAttributesW((sysPath + L"\\weasel.ime").c_str());
+	DWORD attr = GetFileAttributesW((sysPath + L"\\TypeDuck.ime").c_str());
 	return (attr != INVALID_FILE_ATTRIBUTES && !(attr & FILE_ATTRIBUTE_DIRECTORY));
 }

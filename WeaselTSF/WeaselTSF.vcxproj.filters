@@ -35,10 +35,11 @@
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
     <ClInclude Include="WeaselTSF.h" />
+    <ClInclude Include="resource.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="ReadMe.txt" />
-    <None Include="..\resource\weasel.ico">
+    <None Include="..\resource\TypeDuck.ico">
       <Filter>Resource Files</Filter>
     </None>
     <None Include="..\resource\zh.ico">

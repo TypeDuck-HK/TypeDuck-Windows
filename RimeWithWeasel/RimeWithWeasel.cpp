@@ -85,7 +85,7 @@ void RimeWithWeaselHandler::_Setup()
 	weasel_traits.distribution_name = utf8_str;
 	weasel_traits.distribution_code_name = WEASEL_CODE_NAME;
 	weasel_traits.distribution_version = WEASEL_VERSION;
-	weasel_traits.app_name = "rime.weasel";
+	weasel_traits.app_name = "rime.TypeDuck";
 	RimeSetup(&weasel_traits);
 	RimeSetNotificationHandler(&RimeWithWeaselHandler::OnNotify, this);
 }
@@ -384,7 +384,7 @@ void RimeWithWeaselHandler::OnUpdateUI(std::function<void()> const &cb)
 
 bool RimeWithWeaselHandler::_IsDeployerRunning()
 {
-	HANDLE hMutex = CreateMutex(NULL, TRUE, L"WeaselDeployerMutex");
+	HANDLE hMutex = CreateMutex(NULL, TRUE, L"TypeDuckDeployerMutex");
 	bool deployer_detected = hMutex && GetLastError() == ERROR_ALREADY_EXISTS;
 	if (hMutex)
 	{
@@ -492,7 +492,7 @@ bool RimeWithWeaselHandler::_ShowMessage(weasel::Context& ctx, weasel::Status& s
 		else if (m_message_value == "success")
 			tips = L"Deployment completed. TypeDuck is now available for use.";
 		else if (m_message_value == "failure")
-			tips = L"An error has occurred. See the log file %TEMP%\\rime.weasel.*.INFO for more information.";
+			tips = L"An error has occurred. See the log file %TEMP%\\rime.TypeDuck.*.INFO for more information.";
 	}
 	else if (m_message_type == "schema") {
 		tips = /*L"[" + */status.schema_name/* + L"]"*/;

@@ -38,7 +38,7 @@ BOOL WINAPI ImeConfigure(HKL hKL, HWND hWnd, DWORD dwMode, LPVOID lpData)
 	if (g_is_winlogon) return TRUE;
 
 	// TODO:
-	MessageBox(hWnd, L"Weasel lacks a Settings UI.", L"No IME Settings", MB_OK);
+	MessageBox(hWnd, L"TypeDuck lacks a Settings UI.", L"No IME Settings", MB_OK);
 	return TRUE;
 }
 

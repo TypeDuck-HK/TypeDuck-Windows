@@ -31,7 +31,7 @@ void Configurator::Initialize()
 	weasel_traits.distribution_name = utf8_str;
 	weasel_traits.distribution_code_name = WEASEL_CODE_NAME;
 	weasel_traits.distribution_version = WEASEL_VERSION;
-	weasel_traits.app_name = "rime.weasel";
+	weasel_traits.app_name = "rime.TypeDuck";
 	RimeSetup(&weasel_traits);
 	
 	LOG(INFO) << "WeaselDeployer reporting.";
@@ -107,10 +107,10 @@ int Configurator::Run(bool installing)
 }
 
 int Configurator::UpdateWorkspace(bool report_errors) {
-	HANDLE hMutex = CreateMutex(NULL, TRUE, L"WeaselDeployerMutex");
+	HANDLE hMutex = CreateMutex(NULL, TRUE, L"TypeDuckDeployerMutex");
 	if (!hMutex)
 	{
-		LOG(ERROR) << "Error creating WeaselDeployerMutex.";
+		LOG(ERROR) << "Error creating TypeDuckDeployerMutex.";
 		return 1;
 	}
 	if (GetLastError() == ERROR_ALREADY_EXISTS)
@@ -119,7 +119,7 @@ int Configurator::UpdateWorkspace(bool report_errors) {
 		CloseHandle(hMutex);
 		if (report_errors)
 		{
-			MessageBox(NULL, L"Another deployment task is in progress. Weasel needs to be restarted for changes to take effect.", L"[Weasel]", MB_OK | MB_ICONINFORMATION);
+			MessageBox(NULL, L"Another deployment task is in progress. TypeDuck needs to be restarted for changes to take effect.", L"TypeDuck Deployment Failed", MB_OK | MB_ICONINFORMATION);
 		}
 		return 1;
 	}
@@ -150,17 +150,17 @@ int Configurator::UpdateWorkspace(bool report_errors) {
 }
 
 int Configurator::DictManagement() {
-	HANDLE hMutex = CreateMutex(NULL, TRUE, L"WeaselDeployerMutex");
+	HANDLE hMutex = CreateMutex(NULL, TRUE, L"TypeDuckDeployerMutex");
 	if (!hMutex)
 	{
-		LOG(ERROR) << "Error creating WeaselDeployerMutex.";
+		LOG(ERROR) << "Error creating TypeDuckDeployerMutex.";
 		return 1;
 	}
 	if (GetLastError() == ERROR_ALREADY_EXISTS)
 	{
 		LOG(WARNING) << "another deployer process is running; aborting operation.";
 		CloseHandle(hMutex);
-		MessageBox(NULL, L"Another deployment task is in progress. Please try again later.", L"[Weasel]", MB_OK | MB_ICONINFORMATION);
+		MessageBox(NULL, L"Another deployment task is in progress. Please try again later.", L"TypeDuck Deployment Failed", MB_OK | MB_ICONINFORMATION);
 		return 1;
 	}
 
@@ -192,17 +192,17 @@ int Configurator::DictManagement() {
 }
 
 int Configurator::SyncUserData() {
-	HANDLE hMutex = CreateMutex(NULL, TRUE, L"WeaselDeployerMutex");
+	HANDLE hMutex = CreateMutex(NULL, TRUE, L"TypeDuckDeployerMutex");
 	if (!hMutex)
 	{
-		LOG(ERROR) << "Error creating WeaselDeployerMutex.";
+		LOG(ERROR) << "Error creating TypeDuckDeployerMutex.";
 		return 1;
 	}
 	if (GetLastError() == ERROR_ALREADY_EXISTS)
 	{
 		LOG(WARNING) << "another deployer process is running; aborting operation.";
 		CloseHandle(hMutex);
-		MessageBox(NULL, L"Another deployment task is in progress. Please try again later.", L"[Weasel]", MB_OK | MB_ICONINFORMATION);
+		MessageBox(NULL, L"Another deployment task is in progress. Please try again later.", L"TypeDuck Deployment Failed", MB_OK | MB_ICONINFORMATION);
 		return 1;
 	}
 

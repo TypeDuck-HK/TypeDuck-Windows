@@ -49,7 +49,7 @@ LRESULT DictManagementDialog::OnClose(UINT, WPARAM, LPARAM, BOOL&) {
 LRESULT DictManagementDialog::OnBackup(WORD, WORD code, HWND, BOOL&) {
 	int sel = user_dict_list_.GetCurSel();
 	if (sel < 0 || sel >= user_dict_list_.GetCount()) {
-		MessageBox(L"Please select the names of the dictionaries to export in the left column.", L"Empty Selection", MB_OK | MB_ICONINFORMATION);
+		MessageBox(L"Please select the name of the dictionary to export in the left column.", L"Empty Selection", MB_OK | MB_ICONINFORMATION);
 		return 0;
 	}
 	std::wstring path;
@@ -63,7 +63,7 @@ LRESULT DictManagementDialog::OnBackup(WORD, WORD code, HWND, BOOL&) {
 	if (_waccess_s(path.c_str(), 0) != 0 &&
 		!CreateDirectoryW(path.c_str(), NULL) &&
 		GetLastError() == ERROR_PATH_NOT_FOUND) {
-		MessageBox(L"Unable to export user dictionaries. Please ensure that the folder is accessible by Weasel.", L"Export Failed", MB_OK | MB_ICONERROR);
+		MessageBox(L"Unable to export user dictionaries. Please ensure that the folder is accessible by TypeDuck.", L"Export Failed", MB_OK | MB_ICONERROR);
 		return 0;
 	}
 	WCHAR dict_name[100] = {0};
@@ -89,7 +89,7 @@ LRESULT DictManagementDialog::OnRestore(WORD, WORD code, HWND, BOOL&) {
 		char path[MAX_PATH] = {0};
 		WideCharToMultiByte(CP_ACP, 0, dlg.m_szFileName, -1, path, _countof(path), NULL, NULL);
 		if (!api_->restore_user_dict(path)) {
-			MessageBox(L"Unable to complete the restore user dictionaries. An unknown error has occurred.", L"Restoration Failed", MB_OK | MB_ICONERROR);
+			MessageBox(L"Unable to restore user dictionaries. An unknown error has occurred.", L"Restoration Failed", MB_OK | MB_ICONERROR);
 		}
 		else {
 			MessageBox(L"Successfully restored user dictionaries.", L"Restoration Completed", MB_OK | MB_ICONINFORMATION);
@@ -101,7 +101,7 @@ LRESULT DictManagementDialog::OnRestore(WORD, WORD code, HWND, BOOL&) {
 LRESULT DictManagementDialog::OnExport(WORD, WORD code, HWND, BOOL&) {
 	int sel = user_dict_list_.GetCurSel();
 	if (sel < 0 || sel >= user_dict_list_.GetCount()) {
-		MessageBox(L"Please select the names of the dictionaries to export in the left column.", L"Empty Selection", MB_OK | MB_ICONINFORMATION);
+		MessageBox(L"Please select the name of the dictionary to export in the left column.", L"Empty Selection", MB_OK | MB_ICONINFORMATION);
 		return 0;
 	}
 	WCHAR dict_name[MAX_PATH] = {0};
@@ -132,7 +132,7 @@ LRESULT DictManagementDialog::OnExport(WORD, WORD code, HWND, BOOL&) {
 LRESULT DictManagementDialog::OnImport(WORD, WORD code, HWND, BOOL&) {
 	int sel = user_dict_list_.GetCurSel();
 	if (sel < 0 || sel >= user_dict_list_.GetCount()) {
-		MessageBox(L"Please select the names of the dictionaries to import in the left column.", L"Empty Selection", MB_OK | MB_ICONINFORMATION);
+		MessageBox(L"Please select the name of the dictionary to import in the left column.", L"Empty Selection", MB_OK | MB_ICONINFORMATION);
 		return 0;
 	}
 	WCHAR dict_name[MAX_PATH] = {0};
@@ -145,7 +145,7 @@ LRESULT DictManagementDialog::OnImport(WORD, WORD code, HWND, BOOL&) {
 		WideCharToMultiByte(CP_ACP, 0, dlg.m_szFileName, -1, path, _countof(path), NULL, NULL);
 		int result = api_->import_user_dict(wcstoutf8(dict_name), path);
 		if (result < 0) {
-			MessageBox(L"Unable to export user dictionaries. An unknown error has occurred.", L"Import Failed", MB_OK | MB_ICONERROR);
+			MessageBox(L"Unable to import user dictionaries. An unknown error has occurred.", L"Import Failed", MB_OK | MB_ICONERROR);
 		}
 		else {
 			std::wstring report(L"Successfully imported " + std::to_wstring(result) + L" records.");

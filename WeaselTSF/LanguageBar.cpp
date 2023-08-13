@@ -88,7 +88,7 @@ STDAPI CLangBarItemButton::GetInfo(TF_LANGBARITEMINFO *pInfo)
 	pInfo->guidItem = _guid;
 	pInfo->dwStyle = TF_LBI_STYLE_BTN_BUTTON | TF_LBI_STYLE_BTN_MENU | TF_LBI_STYLE_SHOWNINTRAY;
 	pInfo->ulSort = 1;
-	lstrcpyW(pInfo->szDescription, L"WeaselTSF Button");
+	lstrcpyW(pInfo->szDescription, L"TypeDuckTSF Button");
 	return S_OK;
 }
 
@@ -165,7 +165,7 @@ STDAPI CLangBarItemButton::GetIcon(HICON *phIcon)
 
 STDAPI CLangBarItemButton::GetText(BSTR *pbstrText)
 {
-	*pbstrText = SysAllocString(L"WeaselTSF Button");
+	*pbstrText = SysAllocString(L"TypeDuckTSF Button");
 	return (*pbstrText == NULL)? E_OUTOFMEMORY: S_OK;
 }
 

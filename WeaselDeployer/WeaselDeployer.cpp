@@ -34,7 +34,7 @@ int APIENTRY _tWinMain(HINSTANCE hInstance,
 	CreateDirectory(WeaselUserDataPath().c_str(), NULL);
 
 	int ret = 0;
-	HANDLE hMutex = CreateMutex(NULL, TRUE, L"WeaselDeployerExclusiveMutex");
+	HANDLE hMutex = CreateMutex(NULL, TRUE, L"TypeDuckDeployerExclusiveMutex");
 	if (!hMutex)
 	{
 		ret = 1;

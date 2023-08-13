@@ -45,10 +45,10 @@ static bool launch_server()
 	WCHAR value[MAX_PATH];
 	DWORD len = sizeof(value);
 	DWORD type = 0;
-	ret = RegQueryValueEx(hKey, L"WeaselRoot", NULL, &type, (LPBYTE)value, &len);
+	ret = RegQueryValueEx(hKey, L"TypeDuckRoot", NULL, &type, (LPBYTE)value, &len);
 	if (ret != ERROR_SUCCESS)
 	{
-		error_message(L"The “WeaselRoot” Registry key is not set.");
+		error_message(L"The “TypeDuckRoot” Registry key is not set.");
 		RegCloseKey(hKey);
 		return false;
 	}
@@ -154,7 +154,7 @@ HRESULT WeaselIME::UnregisterUIClass()
 
 LPCWSTR WeaselIME::GetUIClassName()
 {
-	return L"WeaselUIClass";
+	return L"TypeDuckUIClass";
 }
 
 LRESULT WINAPI WeaselIME::UIWndProc(HWND hWnd, UINT uMsg, WPARAM wp, LPARAM lp)

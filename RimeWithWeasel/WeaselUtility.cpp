@@ -3,7 +3,7 @@
 
 std::wstring WeaselUserDataPath() {
 	WCHAR path[MAX_PATH] = {0};
-	const WCHAR KEY[] = L"Software\\Rime\\Weasel";
+	const WCHAR KEY[] = L"Software\\Rime\\TypeDuck";
 	HKEY hKey;
 	LSTATUS ret = RegOpenKey(HKEY_CURRENT_USER, KEY, &hKey);
 	if (ret == ERROR_SUCCESS)
@@ -19,7 +19,7 @@ std::wstring WeaselUserDataPath() {
 		}
 	}
 	// default location
-	ExpandEnvironmentStringsW(L"%AppData%\\Rime", path, _countof(path));
+	ExpandEnvironmentStringsW(L"%AppData%\\TypeDuck", path, _countof(path));
 	return path;
 }
 

@@ -37,14 +37,9 @@
     </ResourceCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\resource\weasel.ico">
+    <None Include="..\resource\TypeDuck_Transparent.ico">
       <Filter>Resource Files</Filter>
     </None>
     <None Include="..\output\WeaselDeployer.exe" />
-  </ItemGroup>
-  <ItemGroup>
-    <Image Include="..\resource\bitmap1.bmp">
-      <Filter>Resource Files</Filter>
-    </Image>
   </ItemGroup>
 </Project>

@@ -19,9 +19,7 @@
 #define IDC_RADIO_CUSTOM_DIR            1003
 #define IDC_EDIT_DIR                    1004
 #define IDC_REMOVE                      1005
-#ifndef IDC_STATIC
 #define IDC_STATIC                      -1
-#endif
 
 // Next default values for new objects
 // 
