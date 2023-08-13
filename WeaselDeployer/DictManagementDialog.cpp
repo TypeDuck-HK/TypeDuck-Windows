@@ -1,4 +1,4 @@
-#include "stdafx.h"
+﻿#include "stdafx.h"
 #include "DictManagementDialog.h"
 #include "Configurator.h"
 #include <WeaselUtility.h>
@@ -33,6 +33,10 @@ LRESULT DictManagementDialog::OnInitDialog(UINT, WPARAM, LPARAM, BOOL&) {
 	export_.EnableWindow(FALSE);
 	import_.Attach(GetDlgItem(IDC_IMPORT));
 	import_.EnableWindow(FALSE);
+	backup_restore_description_.Attach(GetDlgItem(IDC_BACKUP_RESTORE_DESCRIPTION));
+	backup_restore_description_.SetWindowTextW(L"To migrate a user dictionary, which contains your typing practices, to another device equipped with TypeDuck, select the name of the dictionary to export and press the “Export Snapshot” button below. On another device, load the dictionary by the “Import Snapshot” button such that the entries in the snapshot file are merged into the dictionary to which they belong.");
+	export_import_description_.Attach(GetDlgItem(IDC_EXPORT_IMPORT_DESCRIPTION));
+	export_import_description_.SetWindowTextW(L"“Export Corpus” is a function designed to complement the lexicon of a schema by exporting new phrases created during typing in a RIME-compatible format for viewing and editing. To convert data from other sources into TSV format, use the “Import Corpus” function.");
 	
 	Populate();
 	

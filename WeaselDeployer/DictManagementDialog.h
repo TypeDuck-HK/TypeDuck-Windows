@@ -38,6 +38,8 @@ protected:
 	CButton restore_;
 	CButton export_;
 	CButton import_;
+	CStatic backup_restore_description_;
+	CStatic export_import_description_;
 
 	RimeLeversApi* api_;
 };
