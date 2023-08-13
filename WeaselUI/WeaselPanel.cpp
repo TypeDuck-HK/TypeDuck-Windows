@@ -680,7 +680,6 @@ bool WeaselPanel::_DrawCandidates(CDCHandle &dc, bool back)
 	else
 	{
 		// begin draw candidate texts
-		std::wstring dictionary_entry;
 		std::vector<InfoMultiHint> dictionary_entries;
 		const bool showHint = m_hintPanel->isHintEnabled(StatusHintColumn::Jyutping);
 		int label_text_color, hint_text_color, candidate_text_color, comment_text_color;
@@ -722,36 +721,31 @@ bool WeaselPanel::_DrawCandidates(CDCHandle &dc, bool back)
 				continue;
 
 			const std::wstring& comment = comments.at(i).str;
-			size_t jyutpingStartPos = comment.find(L'\f');
+			const size_t jyutpingStartPos = comment.find(L'\f');
 			const bool containsJyutping = jyutpingStartPos != std::wstring::npos && comment.length() > jyutpingStartPos + 1;
 
-			// Draw label
-			std::wstring label = m_layout->GetLabelText(labels, (int)i, m_style.label_text_format.c_str());
+			// Draw labels
+			const std::wstring& label = m_layout->GetLabelText(labels, (int)i, m_style.label_text_format.c_str());
 			if (!label.empty()) {
 				_TextOut(candidateFieldRects[0].label, label, label_text_color, pDWR->pLabelTextFormat);
 			}
 
-			// Draw text
-			std::wstring text = candidates.at(i).str;
-			if (!text.empty()) {
-				for (const CandidateFieldRects& rects : candidateFieldRects) {
-					_TextOut(rects.text, text, candidate_text_color, pDWR->pTextFormat, m_style.character_spacing * containsJyutping * showHint);
-				}
-			}
-
-			// Draw hint and comments
+			// Draw texts, hints and comments
+			const std::wstring& text = candidates.at(i).str;
 			if (m_hintPanel->isEnabled() && !comment.empty()) {
-				if (comment[0] != '\v' || m_hintPanel->isHintEnabled(StatusHintColumn::Reverse)) {
-					const std::wstring commentPart = comment.substr(comment[0] == '\v', jyutpingStartPos);
+				const bool isReverseLookup = comment[0] == L'\v';
+				if (!isReverseLookup || m_hintPanel->isHintEnabled(StatusHintColumn::Reverse)) {
+					std::wstring commentPart = comment.substr(isReverseLookup, jyutpingStartPos - isReverseLookup);
+					commentPart.erase(std::remove(commentPart.begin(), commentPart.end(), L'\v'), commentPart.end());
 					if (!commentPart.empty()) {
 						_TextOut(candidateFieldRects[0].comment, commentPart, comment_text_color, pDWR->pCommentTextFormat);
 					}
 				}
 				if (containsJyutping) {
 					const std::wstring cantonese = comment.substr(jyutpingStartPos + 1);
-					if (cantonese[0] == '\r') {
+					if (cantonese[0] == L'\r') {
 						std::vector<std::wstring> lines;
-						split(lines, cantonese.substr(1), L"\r", false);
+						split(lines, cantonese.substr(1), L"\r");
 						std::vector<InfoMultiHint> entries;
 						size_t j = 0;
 						for (std::wstring& entry : lines) {
@@ -760,6 +754,7 @@ bool WeaselPanel::_DrawCandidates(CDCHandle &dc, bool back)
 							if (infoIsDictionaryEntry) entries.push_back(info);
 							if (entry[0] == L'1' && j < candidateFieldRects.size()) {
 								const CandidateFieldRects& rects = candidateFieldRects[j];
+								_TextOut(rects.text, info.Honzi, candidate_text_color, pDWR->pTextFormat, m_style.character_spacing * showHint);
 								if (showHint) _TextOut(rects.hint, info.Jyutping, hint_text_color, pDWR->pHintTextFormat);
 								if (infoIsDictionaryEntry) {
 									if (m_hintPanel->isHintEnabled(StatusHintColumn::Eng)) _TextOut(rects.eng, info.Properties.Definition.Eng, comment_text_color, pDWR->pEngTextFormat);
@@ -781,16 +776,22 @@ bool WeaselPanel::_DrawCandidates(CDCHandle &dc, bool back)
 							}
 						}
 						if (!entries.empty()) {
-							_TextOut(candidateFieldRects[0].info, L"ⓘ", comment_text_color, pDWR->pCommentTextFormat);
+							_TextOut(candidateFieldRects[0].info, L"ⓘ", comment_text_color, pDWR->pLabelTextFormat);
 							if (i == m_ctx.cinfo.highlighted && m_hintPanel->shouldShowDictionary()) {
-								dictionary_entry = text;
 								dictionary_entries = entries;
 							}
 						}
-					} else if (showHint) {
-						_TextOut(candidateFieldRects[0].hint, cantonese, hint_text_color, pDWR->pHintTextFormat);
+					} else {
+						_TextOut(candidateFieldRects[0].text, text, candidate_text_color, pDWR->pTextFormat, m_style.character_spacing * showHint);
+						if (showHint) {
+							_TextOut(candidateFieldRects[0].hint, cantonese, hint_text_color, pDWR->pHintTextFormat);
+						}
 					}
+				} else {
+					_TextOut(candidateFieldRects[0].text, text, candidate_text_color, pDWR->pTextFormat);
 				}
+			} else {
+				_TextOut(candidateFieldRects[0].text, text, candidate_text_color, pDWR->pTextFormat);
 			}
 			drawn = true;
 		}
@@ -800,7 +801,7 @@ bool WeaselPanel::_DrawCandidates(CDCHandle &dc, bool back)
 			const InfoMultiHint& dictionary_info = dictionary_entries[k];
 			const DictionaryPanelRects& rects = allPanelRects[k];
 
-			_TextOut(rects.entryLabel, dictionary_entry, m_style.hilited_candidate_text_color, pDWR->pEntryTextFormat);
+			_TextOut(rects.entryLabel, dictionary_info.Honzi, m_style.hilited_candidate_text_color, pDWR->pEntryTextFormat);
 			_TextOut(rects.pronLabel, dictionary_info.Jyutping, m_style.hilited_hint_text_color, pDWR->pPronTextFormat);
 			_TextOut(rects.pronTypeLabel, dictionary_info.GetPronType(), m_style.hilited_hint_text_color, pDWR->pPronTypeTextFormat);
 

@@ -40,6 +40,7 @@ struct InfoMultiHint {
 	InfoMultiHint() {}
 	InfoMultiHint(const std::wstring& input);
 	std::wstring MatchInputBuffer;
+	std::wstring Honzi;
 	std::wstring Jyutping;
 	std::wstring PronOrder;
 	std::wstring Sandhi;

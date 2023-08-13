@@ -72,6 +72,7 @@ InfoMultiHint::InfoMultiHint(const std::wstring& input) {
 	boost::tokenizer<boost::escaped_list_separator<wchar_t>, std::wstring::const_iterator, std::wstring> columns(input);
 	auto column = columns.begin();
 	MatchInputBuffer = *column++;
+	Honzi = *column++;
 	Jyutping = *column++;
 	PronOrder = *column++;
 	Sandhi = *column++;
