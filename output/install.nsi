@@ -154,18 +154,7 @@ program_files:
 
   SetOutPath $INSTDIR
 
-  ; test /T flag for zh_TW locale
-  StrCpy $R2  "/i"
-  ${GetParameters} $R0
-  ClearErrors
-  ${GetOptions} $R0 "/S" $R1
-  IfErrors +2 0
-  StrCpy $R2 "/s"
-  ${GetOptions} $R0 "/T" $R1
-  IfErrors +2 0
-  StrCpy $R2 "/t"
-
-  ExecWait '"$INSTDIR\WeaselSetup.exe" $R2'
+  ExecWait "$INSTDIR\WeaselSetup.exe /t"
 
   ; run as user...
   ExecWait "$INSTDIR\WeaselDeployer.exe /install"

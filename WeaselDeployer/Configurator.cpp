@@ -90,8 +90,9 @@ int Configurator::Run(bool installing)
 	UIStyleSettings ui_style_settings;
 	HintSettings hint_settings;
 
-	bool skip_switcher_settings = installing && !api->is_first_run((RimeCustomSettings*)switcher_settings);
-	bool skip_ui_style_settings = installing && !api->is_first_run(ui_style_settings.settings());
+	// We don't even need these
+	bool skip_switcher_settings = true;  // installing && !api->is_first_run((RimeCustomSettings*) switcher_settings);
+	bool skip_ui_style_settings = true;  // installing && !api->is_first_run(ui_style_settings.settings());
 	bool skip_multiHint_settings = installing && !api->is_first_run(hint_settings.settings());
 
 	(skip_switcher_settings || configure_switcher(api, switcher_settings, &reconfigured)) &&
