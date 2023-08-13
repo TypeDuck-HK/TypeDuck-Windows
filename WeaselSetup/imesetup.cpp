@@ -178,7 +178,7 @@ int register_ime(const std::wstring& ime_path, bool register_ime, bool is_wow64,
 			LSTATUS ret = RegOpenKey(HKEY_LOCAL_MACHINE, KEYBOARD_LAYOUTS_KEY, &hKey);
 			if (ret == ERROR_SUCCESS)
 			{
-				for (DWORD k = 0xE0200000 + (hant ? 0x0404 : 0x0804); k <= 0xE0FF0804; k += 0x10000)
+				for (DWORD k = 0xE0200000 + (hant ? 0x0C04 : 0x0804); k <= 0xE0FF0C04; k += 0x10000)
 				{
 					StringCchPrintfW(hkl_str, _countof(hkl_str), L"%08X", k);
 					HKEY hSubKey;
@@ -272,7 +272,7 @@ int register_ime(const std::wstring& ime_path, bool register_ime, bool is_wow64,
 			break;
 
 		// 中文键盘布局?
-		if (wcscmp(subKey + 4, L"0804") == 0 || wcscmp(subKey + 4, L"0404") == 0)
+		if (wcscmp(subKey + 4, L"0804") == 0 || wcscmp(subKey + 4, L"0C04") == 0)
 		{
 			HKEY hSubKey;
 			ret = RegOpenKey(hKey, subKey, &hSubKey);
@@ -354,7 +354,7 @@ void enable_profile(BOOL fEnable, bool hant) {
 
 	if(SUCCEEDED(hr))
 	{
-		LANGID lang_id = hant ? 0x0404 : 0x0804;
+		LANGID lang_id = hant ? 0x0C04 : 0x0804;
 		if (fEnable) {
 			pProfiles->EnableLanguageProfile(c_clsidTextService, lang_id, c_guidProfile, fEnable);
 			pProfiles->EnableLanguageProfileByDefault(c_clsidTextService, lang_id, c_guidProfile, fEnable);
