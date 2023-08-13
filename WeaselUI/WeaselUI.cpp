@@ -37,7 +37,7 @@ public:
 		  _In_  UINT_PTR idEvent,
 		  _In_  DWORD dwTime
 	);
-	static const int AUTOHIDE_TIMER = 20121220;
+	static const int AUTOHIDE_TIMER = 29488888;
 	static UINT_PTR timer;
 	bool shown;
 };
