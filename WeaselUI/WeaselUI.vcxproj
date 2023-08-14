@@ -37,7 +37,8 @@
   <PropertyGroup Label="Globals">
     <ProjectGuid>{10B3B8BF-7294-4661-9A8A-2FFC920FA2F4}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
-    <RootNamespace>WeaselUI</RootNamespace>
+    <RootNamespace>TypeDuckUI</RootNamespace>
+    <ProjectName>TypeDuckUI</ProjectName>
   </PropertyGroup>
   <Import Project="..\weasel.props" />
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />

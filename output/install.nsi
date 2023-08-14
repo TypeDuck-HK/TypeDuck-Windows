@@ -95,8 +95,8 @@ Section "TypeDuck"
   ; Reset INSTDIR for the new version
   StrCpy $INSTDIR "${WEASEL_ROOT}"
 
-  IfFileExists "$INSTDIR\WeaselServer.exe" 0 +2
-  ExecWait '"$INSTDIR\WeaselServer.exe" /quit'
+  IfFileExists "$INSTDIR\TypeDuckServer.exe" 0 +2
+  ExecWait '"$INSTDIR\TypeDuckServer.exe" /quit'
 
   SetOverwrite try
   ; Set output path to the installation directory.
@@ -118,25 +118,25 @@ program_files:
   File "curl-ca-bundle.crt"
   File "rime-install.bat"
   File "rime-install-config.bat"
-  File "weasel.dll"
+  File "typeduck.dll"
   ${If} ${RunningX64}
-    File "weaselx64.dll"
+    File "typeduckx64.dll"
   ${EndIf}
-  File "weaselt.dll"
+  File "typeduckt.dll"
   ${If} ${RunningX64}
-    File "weaseltx64.dll"
+    File "typeducktx64.dll"
   ${EndIf}
-  File "weasel.ime"
+  File "typeduck.ime"
   ${If} ${RunningX64}
-    File "weaselx64.ime"
+    File "typeduckx64.ime"
   ${EndIf}
-  File "weaselt.ime"
+  File "typeduckt.ime"
   ${If} ${RunningX64}
-    File "weaseltx64.ime"
+    File "typeducktx64.ime"
   ${EndIf}
-  File "WeaselDeployer.exe"
-  File "WeaselServer.exe"
-  File "WeaselSetup.exe"
+  File "TypeDuckDeployer.exe"
+  File "TypeDuckServer.exe"
+  File "TypeDuckSetup.exe"
   File "rime.dll"
   File "WinSparkle.dll"
   ; shared data files
@@ -154,10 +154,10 @@ program_files:
 
   SetOutPath $INSTDIR
 
-  ExecWait "$INSTDIR\WeaselSetup.exe /t"
+  ExecWait "$INSTDIR\TypeDuckSetup.exe /t"
 
   ; run as user...
-  ExecWait "$INSTDIR\WeaselDeployer.exe /install"
+  ExecWait "$INSTDIR\TypeDuckDeployer.exe /install"
 
   ; Write the uninstall keys for Windows
   WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\TypeDuck" "DisplayName" "TypeDuck"
@@ -167,9 +167,9 @@ program_files:
   WriteUninstaller "$INSTDIR\uninstall.exe"
 
   ; Write autorun key
-  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Run" "TypeDuckServer" "$INSTDIR\WeaselServer.exe"
-  ; Start WeaselServer
-  Exec "$INSTDIR\WeaselServer.exe"
+  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Run" "TypeDuckServer" "$INSTDIR\TypeDuckServer.exe"
+  ; Start TypeDuckServer
+  Exec "$INSTDIR\TypeDuckServer.exe"
 
   ; Prompt reboot
   StrCmp $0 "Upgrade" 0 +2
@@ -181,15 +181,15 @@ SectionEnd
 Section "Start Menu Shortcuts"
   SetShellVarContext all
   CreateDirectory "$SMPROGRAMS\TypeDuck"
-  CreateShortCut "$SMPROGRAMS\TypeDuck\IME Settings.lnk" "$INSTDIR\WeaselDeployer.exe" "" "$SYSDIR\shell32.dll" 21
-  CreateShortCut "$SMPROGRAMS\TypeDuck\User Dictionary Management.lnk" "$INSTDIR\WeaselDeployer.exe" "/dict" "$SYSDIR\shell32.dll" 6
-  CreateShortCut "$SMPROGRAMS\TypeDuck\User Data Sync.lnk" "$INSTDIR\WeaselDeployer.exe" "/sync" "$SYSDIR\shell32.dll" 26
-  CreateShortCut "$SMPROGRAMS\TypeDuck\Redeploy.lnk" "$INSTDIR\WeaselDeployer.exe" "/deploy" "$SYSDIR\shell32.dll" 144
-  CreateShortCut "$SMPROGRAMS\TypeDuck\TypeDuck Server.lnk" "$INSTDIR\WeaselServer.exe" "" "$INSTDIR\WeaselServer.exe" 0
-  CreateShortCut "$SMPROGRAMS\TypeDuck\User Folder.lnk" "$INSTDIR\WeaselServer.exe" "/userdir" "$SYSDIR\shell32.dll" 126
-  CreateShortCut "$SMPROGRAMS\TypeDuck\Program Folder.lnk" "$INSTDIR\WeaselServer.exe" "/weaseldir" "$SYSDIR\shell32.dll" 19
-  CreateShortCut "$SMPROGRAMS\TypeDuck\Check for Updates.lnk" "$INSTDIR\WeaselServer.exe" "/update" "$SYSDIR\shell32.dll" 13
-  CreateShortCut "$SMPROGRAMS\TypeDuck\Install Options.lnk" "$INSTDIR\WeaselSetup.exe" "" "$SYSDIR\shell32.dll" 162
+  CreateShortCut "$SMPROGRAMS\TypeDuck\IME Settings.lnk" "$INSTDIR\TypeDuckDeployer.exe" "" "$SYSDIR\shell32.dll" 21
+  CreateShortCut "$SMPROGRAMS\TypeDuck\User Dictionary Management.lnk" "$INSTDIR\TypeDuckDeployer.exe" "/dict" "$SYSDIR\shell32.dll" 6
+  CreateShortCut "$SMPROGRAMS\TypeDuck\User Data Sync.lnk" "$INSTDIR\TypeDuckDeployer.exe" "/sync" "$SYSDIR\shell32.dll" 26
+  CreateShortCut "$SMPROGRAMS\TypeDuck\Redeploy.lnk" "$INSTDIR\TypeDuckDeployer.exe" "/deploy" "$SYSDIR\shell32.dll" 144
+  CreateShortCut "$SMPROGRAMS\TypeDuck\TypeDuck Server.lnk" "$INSTDIR\TypeDuckServer.exe" "" "$INSTDIR\TypeDuckServer.exe" 0
+  CreateShortCut "$SMPROGRAMS\TypeDuck\User Folder.lnk" "$INSTDIR\TypeDuckServer.exe" "/userdir" "$SYSDIR\shell32.dll" 126
+  CreateShortCut "$SMPROGRAMS\TypeDuck\Program Folder.lnk" "$INSTDIR\TypeDuckServer.exe" "/typeduckdir" "$SYSDIR\shell32.dll" 19
+  CreateShortCut "$SMPROGRAMS\TypeDuck\Check for Updates.lnk" "$INSTDIR\TypeDuckServer.exe" "/update" "$SYSDIR\shell32.dll" 13
+  CreateShortCut "$SMPROGRAMS\TypeDuck\Install Options.lnk" "$INSTDIR\TypeDuckSetup.exe" "" "$SYSDIR\shell32.dll" 162
   CreateShortCut "$SMPROGRAMS\TypeDuck\Uninstall TypeDuck.lnk" "$INSTDIR\uninstall.exe" "" "$INSTDIR\uninstall.exe" 0
 
 SectionEnd
@@ -200,9 +200,9 @@ SectionEnd
 
 Section "Uninstall"
 
-  ExecWait '"$INSTDIR\WeaselServer.exe" /quit'
+  ExecWait '"$INSTDIR\TypeDuckServer.exe" /quit'
 
-  ExecWait '"$INSTDIR\WeaselSetup.exe" /u'
+  ExecWait '"$INSTDIR\TypeDuckSetup.exe" /u'
 
   ; Remove registry keys
   DeleteRegKey HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\TypeDuck"

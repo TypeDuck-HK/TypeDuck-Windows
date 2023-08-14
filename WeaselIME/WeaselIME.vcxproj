@@ -36,8 +36,10 @@
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{A958FE3D-9F6E-44CB-981E-F2AE181657B3}</ProjectGuid>
-    <RootNamespace>WeaselIME</RootNamespace>
+    <RootNamespace>TypeDuckIME</RootNamespace>
     <Keyword>Win32Proj</Keyword>
+    <ProjectName>TypeDuckIME</ProjectName>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="..\weasel.props" />
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -121,13 +123,13 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <OutDir>$(SolutionDir)output\</OutDir>
     <LinkIncremental>false</LinkIncremental>
-    <TargetName>weasel</TargetName>
+    <TargetName>typeduck</TargetName>
     <TargetExt>.ime</TargetExt>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseHant|Win32'">
     <OutDir>$(SolutionDir)output\</OutDir>
     <LinkIncremental>false</LinkIncremental>
-    <TargetName>weaselt</TargetName>
+    <TargetName>typeduckt</TargetName>
     <TargetExt>.ime</TargetExt>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseHans|Win32'">
@@ -139,13 +141,13 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <OutDir>$(SolutionDir)output\</OutDir>
     <LinkIncremental>false</LinkIncremental>
-    <TargetName>weasel$(Platform)</TargetName>
+    <TargetName>typeduck$(Platform)</TargetName>
     <TargetExt>.ime</TargetExt>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseHant|x64'">
     <OutDir>$(SolutionDir)output\</OutDir>
     <LinkIncremental>false</LinkIncremental>
-    <TargetName>weaselt$(Platform)</TargetName>
+    <TargetName>typeduckt$(Platform)</TargetName>
     <TargetExt>.ime</TargetExt>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseHans|x64'">
@@ -167,7 +169,7 @@
     </ClCompile>
     <Link>
       <AdditionalDependencies>imm32.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <OutputFile>$(SolutionDir)output\weasel$(TargetExt)</OutputFile>
+      <OutputFile>$(SolutionDir)output\typeduck$(TargetExt)</OutputFile>
       <AdditionalLibraryDirectories>$(SolutionDir)\lib;$(BOOST_ROOT)\stage\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <ModuleDefinitionFile>weasel.def</ModuleDefinitionFile>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -194,7 +196,7 @@
     </ClCompile>
     <Link>
       <AdditionalDependencies>imm32.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <OutputFile>$(SolutionDir)output\weasel$(TargetExt)</OutputFile>
+      <OutputFile>$(SolutionDir)output\typeduck$(TargetExt)</OutputFile>
       <AdditionalLibraryDirectories>$(SolutionDir)\lib;$(BOOST_ROOT)\stage\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <ModuleDefinitionFile>weasel.def</ModuleDefinitionFile>
       <GenerateDebugInformation>false</GenerateDebugInformation>
@@ -230,7 +232,7 @@
     </ResourceCompile>
     <Link>
       <AdditionalDependencies>imm32.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <OutputFile>$(SolutionDir)output\weaselt$(TargetExt)</OutputFile>
+      <OutputFile>$(SolutionDir)output\typeduckt$(TargetExt)</OutputFile>
       <AdditionalLibraryDirectories>$(SolutionDir)\lib;$(BOOST_ROOT)\stage\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <ModuleDefinitionFile>weasel.def</ModuleDefinitionFile>
       <GenerateDebugInformation>false</GenerateDebugInformation>
@@ -263,7 +265,7 @@
     </ResourceCompile>
     <Link>
       <AdditionalDependencies>imm32.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <OutputFile>$(SolutionDir)\output\weasels.ime</OutputFile>
+      <OutputFile>$(SolutionDir)\output\typeducks.ime</OutputFile>
       <AdditionalLibraryDirectories>$(SolutionDir)\lib;$(BOOST_ROOT)\stage\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <ModuleDefinitionFile>weasel.def</ModuleDefinitionFile>
       <GenerateDebugInformation>false</GenerateDebugInformation>
@@ -295,7 +297,7 @@
     </ClCompile>
     <Link>
       <AdditionalDependencies>imm32.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <OutputFile>$(SolutionDir)output\weasel$(Platform)$(TargetExt)</OutputFile>
+      <OutputFile>$(SolutionDir)output\typeduck$(Platform)$(TargetExt)</OutputFile>
       <AdditionalLibraryDirectories>$(SolutionDir)\lib;$(BOOST_ROOT)\stage_x64\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <ModuleDefinitionFile>weasel.def</ModuleDefinitionFile>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -324,7 +326,7 @@
     </ClCompile>
     <Link>
       <AdditionalDependencies>imm32.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <OutputFile>$(SolutionDir)output\weasel$(Platform)$(TargetExt)</OutputFile>
+      <OutputFile>$(SolutionDir)output\typeduck$(Platform)$(TargetExt)</OutputFile>
       <AdditionalLibraryDirectories>$(SolutionDir)\lib;$(BOOST_ROOT)\stage_x64\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <ModuleDefinitionFile>weasel.def</ModuleDefinitionFile>
       <GenerateDebugInformation>false</GenerateDebugInformation>
@@ -363,7 +365,7 @@
     </ResourceCompile>
     <Link>
       <AdditionalDependencies>imm32.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <OutputFile>$(SolutionDir)output\weaselt$(Platform)$(TargetExt)</OutputFile>
+      <OutputFile>$(SolutionDir)output\typeduckt$(Platform)$(TargetExt)</OutputFile>
       <AdditionalLibraryDirectories>$(SolutionDir)\lib;$(BOOST_ROOT)\stage_x64\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <ModuleDefinitionFile>weasel.def</ModuleDefinitionFile>
       <GenerateDebugInformation>false</GenerateDebugInformation>
@@ -399,7 +401,7 @@
     </ResourceCompile>
     <Link>
       <AdditionalDependencies>imm32.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <OutputFile>$(SolutionDir)\output\weaselsx64.ime</OutputFile>
+      <OutputFile>$(SolutionDir)\output\typeducksx64.ime</OutputFile>
       <AdditionalLibraryDirectories>$(SolutionDir)\lib;$(BOOST_ROOT)\stage_x64\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <ModuleDefinitionFile>weasel.def</ModuleDefinitionFile>
       <GenerateDebugInformation>false</GenerateDebugInformation>

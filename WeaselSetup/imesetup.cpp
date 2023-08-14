@@ -74,7 +74,7 @@ int install_ime_file(std::wstring& srcPath, const std::wstring& ext, bool hant, 
 	WCHAR path[MAX_PATH];
 	GetModuleFileNameW(GetModuleHandle(NULL), path, _countof(path));
 
-	std::wstring srcFileName = (hant ? L"weaselt" : L"weasel");
+	std::wstring srcFileName = (hant ? L"typeduckt" : L"typeduck");
 	srcFileName += ext;
 	WCHAR drive[_MAX_DRIVE];
 	WCHAR dir[_MAX_DIR];
@@ -444,7 +444,7 @@ int install(bool hant, bool silent)
 		return 1;
 	}
 
-	const std::wstring executable = L"WeaselServer.exe";
+	const std::wstring executable = L"TypeDuckServer.exe";
 	ret = RegSetValueEx(hKey, L"ServerExecutable", 0, REG_SZ,
 		                (const BYTE*)executable.c_str(),
 						(executable.length() + 1) * sizeof(WCHAR));

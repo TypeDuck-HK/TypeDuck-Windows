@@ -39,9 +39,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="ReadMe.txt" />
-    <None Include="..\resource\TypeDuck.ico">
-      <Filter>Resource Files</Filter>
-    </None>
     <None Include="..\resource\zh.ico">
       <Filter>Resource Files</Filter>
     </None>
@@ -52,6 +49,9 @@
       <Filter>Resource Files</Filter>
     </None>
     <None Include="WeaselTSF.def" />
+    <None Include="..\resource\TypeDuck_Small.ico">
+      <Filter>Resource Files</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="WeaselTSF.rc">
