@@ -69,17 +69,32 @@ GraphicsRoundRectPath::GraphicsRoundRectPath(const CRect rc, int corner, int can
 		int cny = ((corner * 2 <= rc.Height()) ? corner : (rc.Height() / 2));
 		int elWid = 2 * cnx;
 		int elHei = 2 * cny;
-		AddArc(rc.left, rc.top, elWid, elHei, 180, 90);
-		AddLine(rc.left + cnx, rc.top, rc.right - cnx, rc.top);
+		const bool topFlat = candTop < rc.top + elHei;
+		const bool bottomFlat = candBottom > rc.bottom - elHei;
+
+		if (topFlat) {
+			if (bottomFlat)
+				AddLine(rc.left - cnx, rc.bottom, rc.left - cnx, rc.top);
+			else
+				AddLine(rc.left - cnx, candBottom, rc.left - cnx, rc.top);
+			AddLine(rc.left - cnx, rc.top, rc.right - cnx, rc.top);
+		} else {
+			AddArc(rc.left - elWid, candTop - elHei, elWid, elHei, 0, 90);
+			AddLine(rc.left, candTop - cny, rc.left, rc.top + cny);
+
+			AddArc(rc.left, rc.top, elWid, elHei, 180, 90);
+			AddLine(rc.left + cnx, rc.top, rc.right - cnx, rc.top);
+		}
 
 		AddArc(rc.right - elWid, rc.top, elWid, elHei, 270, 90);
 		AddLine(rc.right, rc.top + cny, rc.right, rc.bottom - cny);
 
 		AddArc(rc.right - elWid, rc.bottom - elHei, elWid, elHei, 0, 90);
 
-		if (candBottom > rc.bottom - elHei) {
+		if (bottomFlat) {
 			AddLine(rc.right - cnx, rc.bottom, rc.left - cnx, rc.bottom);
-			AddLine(rc.left - cnx, rc.bottom, rc.left - cnx, candTop);
+			if (!topFlat)
+				AddLine(rc.left - cnx, rc.bottom, rc.left - cnx, candTop);
 		} else {
 			AddLine(rc.right - cnx, rc.bottom, rc.left + cnx, rc.bottom);
 
@@ -87,11 +102,9 @@ GraphicsRoundRectPath::GraphicsRoundRectPath(const CRect rc, int corner, int can
 			AddLine(rc.left, rc.bottom - cny, rc.left, candBottom + cny);
 
 			AddArc(rc.left - elWid, candBottom, elWid, elHei, 270, 90);
-			AddLine(rc.left - cnx, candBottom, rc.left - cnx, candTop);
+			if (!topFlat)
+				AddLine(rc.left - cnx, candBottom, rc.left - cnx, candTop);
 		}
-
-		AddArc(rc.left - elWid, candTop - elHei, elWid, elHei, 0, 90);
-		AddLine(rc.left, candTop - cny, rc.left, rc.top + cny);
 	}
 }
 

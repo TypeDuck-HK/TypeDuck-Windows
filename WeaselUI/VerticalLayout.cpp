@@ -47,11 +47,12 @@ void weasel::VerticalLayout::DoLayout(CDCHandle dc, DirectWriteResources* pDWR)
 		// icon size higher then preedit text
 		int yoffset = (STATUS_ICON_SIZE >= szy && ShouldDisplayStatusIcon()) ? (STATUS_ICON_SIZE - szy) / 2 : 0;
 		_preeditRect.SetRect(real_margin_x, height + yoffset, real_margin_x + size.cx, height + yoffset + size.cy);
-		height += szy + 2 * yoffset - _style.spacing;
+		height += szy + 2 * yoffset - _style.spacing + 1;
 		width = max(width, real_margin_x * 2 + size.cx + szx);
 		if(ShouldDisplayStatusIcon()) width += STATUS_ICON_SIZE;
 		_preeditRect.OffsetRect(offsetX, offsetY);
 	}
+	else if (_context.aux.str.empty()) height += _style.hilite_padding;
 
 	/* Auxiliary */
 	if (!_context.aux.str.empty())
@@ -493,7 +494,8 @@ void weasel::VerticalLayout::DoLayout(CDCHandle dc, DirectWriteResources* pDWR)
 	// background rect prepare for Hemispherical calculation
 	CopyRect(_bgRect, _contentRect);
 	_bgRect.DeflateRect(offsetX + 1, offsetY + 1);
-	_PrepareRoundInfo(dc);
+	// Disable this line such that candidates are always rounded
+	// _PrepareRoundInfo(dc);
 
 	// truely draw content size calculation
 	int deflatex = offsetX - _style.border / 2;
