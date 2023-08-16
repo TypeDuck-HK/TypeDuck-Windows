@@ -64,20 +64,22 @@ LRESULT DictManagementDialog::OnBackup(WORD, WORD code, HWND, BOOL&) {
 		MultiByteToWideChar(CP_ACP, 0, dir, -1, wdir, _countof(wdir));
 		path = wdir;
 	}
-	if (_waccess_s(path.c_str(), 0) != 0 &&
-		!CreateDirectoryW(path.c_str(), NULL) &&
-		GetLastError() == ERROR_PATH_NOT_FOUND) {
-		MessageBox(L"Unable to export user dictionaries. Please ensure that the folder is accessible by TypeDuck.", L"Export Failed", MB_OK | MB_ICONERROR);
-		return 0;
-	}
 	WCHAR dict_name[100] = {0};
 	user_dict_list_.GetText(sel, dict_name);
-	path += std::wstring(L"\\") + dict_name + L".userdb.txt";
 	if (!api_->backup_user_dict(wcstoutf8(dict_name))) {
-		MessageBox(L"Unable to export user dictionaries. An unknown error has occurred.", L"Export Failed", MB_OK | MB_ICONERROR);
-		return 0;
+		if (_waccess_s(path.c_str(), 0) != 0 &&
+			!CreateDirectoryW(path.c_str(), NULL) &&
+			GetLastError() == ERROR_PATH_NOT_FOUND) {
+			MessageBox(L"Unable to export user dictionaries. Please ensure that the folder is accessible by TypeDuck.", L"Export Failed", MB_OK | MB_ICONERROR);
+			return 0;
+		}
+		if (!api_->backup_user_dict(wcstoutf8(dict_name))) {
+			MessageBox(L"Unable to export user dictionaries. An unknown error has occurred.", L"Export Failed", MB_OK | MB_ICONERROR);
+			return 0;
+		}
 	}
-	else if (_waccess(path.c_str(), 0) != 0) {
+	path += std::wstring(L"\\") + dict_name + L".userdb.txt";
+	if (_waccess(path.c_str(), 0) != 0) {
 		MessageBox(L"Unable to export user dictionaries. The exported file cannot be found.", L"Export Failed", MB_OK | MB_ICONERROR);
 		return 0;
 	}
