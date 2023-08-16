@@ -11,10 +11,10 @@ on:
         type: string
 jobs:
   build:
-    runs-on: windows-2019
+    runs-on: windows-2022
     env:
-      boost_version: 1.78.0
-      BOOST_ROOT: ${{ github.workspace }}\deps\boost_1_78_0
+      boost_version: 1.83.0
+      BOOST_ROOT: ${{ github.workspace }}\deps\boost_1_83_0
       RIME_PLUGINS: ${{ inputs.rime_plugins }}
     steps:
       - name: Checkout last commit
@@ -25,9 +25,10 @@ jobs:
 
       - name: Configure build environment
         run: |
-          copy env.vs2019.bat env.bat
-          $git_ref_name = git describe --always
-          echo "git_ref_name=$git_ref_name" >> $env:GITHUB_ENV
+          copy env.vs2022.bat env.bat
+          echo git_ref_name="$(git describe --always)" >> $env:GITHUB_ENV
+          cd librime
+          echo rime_version="$(git describe --always)" >> $env:GITHUB_ENV
 
       - name: Cache Boost
         id: cache-boost
@@ -50,30 +51,22 @@ jobs:
         with:
           path: |
             librime
-            plum
           key: ${{ runner.os }}-deps-${{ hashFiles('submodule-status') }}
 
       - name: Add msbuild to PATH
-        uses: microsoft/setup-msbuild@v1.1.3
-
-      - name: Build dependencies
-        if: steps.cache-deps.outputs.cache-hit != 'true'
-        run: .\build.bat opencc
+        uses: microsoft/setup-msbuild@v1.3.1
 
       - name: Copy Rime files
         run: .\github.install.bat
 
-
       - name: Build Weasel
         id: build_weasel
         run: |
-          .\build.bat data
-          .\build.bat hant
-          .\build.bat installer
+          .\build.bat weasel hant installer
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v3
         with:
           if-no-files-found: error
           path: |
-            .\output\archives\weasel*.exe
+            .\output\archives\TypeDuck*.exe
