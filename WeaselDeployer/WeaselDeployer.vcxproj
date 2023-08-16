@@ -205,7 +205,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="..\resource\TypeDuck_Transparent.ico" />
-    <None Include="..\output\WeaselDeployer.exe" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

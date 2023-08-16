@@ -40,11 +40,6 @@
     <None Include="..\resource\TypeDuck_Transparent.ico">
       <Filter>Resource Files</Filter>
     </None>
-    <None Include="..\output\WeaselDeployer.exe" />
-    <None Include="..\output\weaselx64.dll" />
-    <None Include="..\output\weasel.dll" />
-    <None Include="..\output\weaselt.dll" />
-    <None Include="..\output\weaseltx64.dll" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="..\resource\full.ico">
