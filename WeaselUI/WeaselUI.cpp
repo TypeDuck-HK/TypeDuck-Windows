@@ -24,7 +24,7 @@ public:
 			KillTimer(panel.m_hWnd, AUTOHIDE_TIMER);
 			timer = 0;
 		}
-		panel.Refresh();
+		panel.Reset();
 	}
 	void Show();
 	void Hide();

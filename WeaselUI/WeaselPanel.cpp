@@ -315,48 +315,59 @@ LRESULT WeaselPanel::OnLeftClicked(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL
 #ifdef USE_MOUSE_HOVER
 LRESULT WeaselPanel::OnMouseHover(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
 {
-	CPoint point;
-	point.x = GET_X_LPARAM(lParam);
-	point.y = GET_Y_LPARAM(lParam);
-
+	CPoint point(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
+	const int prev_highlighted = m_ctx.cinfo.highlighted;
 	for (size_t i = 0; i < m_candidateCount && i < MAX_CANDIDATES_COUNT; ++i) {
 		CRect rect = m_layout->GetCandidateRect((int)i);
+		rect.InflateRect(m_style.hilite_padding, m_style.hilite_padding);
 		if (!rect.PtInRect(point))
-		{
-			m_hintPanel->setShowDictionary(false);
 			continue;
+		if (i != prev_highlighted || !m_hintPanel->shouldShowDictionary()) {
+			m_ctx.cinfo.highlighted = i;
+			m_hintPanel->setShowDictionary(true);
+			m_mouse_entry = 0;
+			Refresh();
+			bHandled = true;
 		}
-		m_ctx.cinfo.highlighted = i;
-		m_hintPanel->setShowDictionary(true);
-		Refresh();
+		return 0;
 	}
-	bHandled = true;
+	CRect rect = m_layout->GetDictionaryRect();
+	if (!rect.PtInRect(point) && m_hintPanel->shouldShowDictionary()) {
+		m_hintPanel->setShowDictionary(false);
+		m_mouse_entry = 0;
+		Refresh();
+		bHandled = true;
+	}
 	return 0;
 }
 
 LRESULT WeaselPanel::OnMouseMove(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
 {
-	if (m_mouse_entry == false)
-	{
-		TRACKMOUSEEVENT tme;
-		tme.cbSize = sizeof(TRACKMOUSEEVENT);
-		tme.dwFlags = TME_HOVER | TME_LEAVE;
-		tme.dwHoverTime = 400; // 400 ms 
-		tme.hwndTrack = m_hWnd;
-		TrackMouseEvent(&tme);
-		m_hintPanel->setShowDictionary(false);
+	CPoint point(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
+	if (point != prevPoint) {
+		if (m_mouse_entry >= 2)
+			OnMouseHover(uMsg, wParam, lParam, bHandled);
+		else
+			m_mouse_entry++;
+		prevPoint = point;
 	}
 	return 0;
 }
 
 LRESULT WeaselPanel::OnMouseLeave(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
 {
-	m_mouse_entry = false;
-	Refresh();
+	Reset();
 	return 0;
 }
 #endif /*  USE_MOUSE_HOVER */
 #endif /* USE_MOUSE_EVENTS */
+
+void WeaselPanel::Reset()
+{
+	m_hintPanel->setShowDictionary(false);
+	m_mouse_entry = 0;
+	Refresh();
+}
 
 void WeaselPanel::_HighlightText(CDCHandle &dc, CRect rc, COLORREF color, COLORREF shadowColor, int radius, BackType type = BackType::TEXT, IsToRoundStruct rd = IsToRoundStruct(), COLORREF bordercolor=TRANS_COLOR, int candTop = 0, int candBottom = 0)
 {
@@ -655,7 +666,7 @@ bool WeaselPanel::_DrawCandidates(CDCHandle &dc, bool back)
 		}
 
 		rect = m_layout->GetDictionaryRect();
-		if (!rect.IsRectEmpty()) {
+		if (!rect.IsRectEmpty() && m_hintPanel->shouldShowDictionary()) {
 			IsToRoundStruct rd = m_layout->GetRoundInfo(m_ctx.cinfo.highlighted);
 			CRect highlightedCandRect = m_layout->GetCandidateRect(m_ctx.cinfo.highlighted);
 			highlightedCandRect.InflateRect(m_style.hilite_padding, m_style.hilite_padding);

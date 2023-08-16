@@ -126,6 +126,7 @@ public:
 
 	void MoveTo(RECT const& rc);
 	void Refresh();
+	void Reset();
 	void DoPaint(CDCHandle dc);
 	void CleanUp();
 
@@ -134,7 +135,8 @@ private:
 #ifdef USE_MOUSE_EVENTS
 	void _CaptureRect(CRect& rect);
 #ifdef USE_MOUSE_HOVER
-	bool m_mouse_entry = false;
+	CPoint prevPoint;
+	int m_mouse_entry = 0;
 #endif /*  USE_MOUSE_HOVER */
 #endif	/* USE_MOUSE_EVENTS */
 	void _CreateLayout();
