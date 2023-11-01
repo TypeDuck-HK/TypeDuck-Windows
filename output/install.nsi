@@ -179,10 +179,6 @@ program_files:
   ; Start TypeDuckServer
   Exec "$INSTDIR\TypeDuckServer.exe"
 
-  ; Prompt reboot
-  StrCmp $0 "Upgrade" 0 +2
-  SetRebootFlag true
-
 SectionEnd
 
 ; Optional section (can be disabled by the user)
@@ -229,8 +225,5 @@ Section "Uninstall"
   SetShellVarContext all
   Delete /REBOOTOK "$SMPROGRAMS\TypeDuck\*.*"
   RMDir /REBOOTOK "$SMPROGRAMS\TypeDuck"
-
-  ; Prompt reboot
-  SetRebootFlag true
 
 SectionEnd
