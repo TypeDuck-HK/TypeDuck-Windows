@@ -37,7 +37,7 @@ std::vector<bool> HintSettings::GetActiveLanguages()
 	char buffer[511];
 	api_->settings_get_config(settings_, &config);
 	RimeApi* rime = rime_get_api();
-	rime->config_get_string(&config, "style/language_list", buffer, 512);
+	rime->config_get_string(&config, "style/language_list", buffer, 512) || strcpy(buffer, "Jyutping, Reverse, Eng");
 	std::wstring str = utf8towcs(buffer);
 	str = std::regex_replace(str, std::wregex(L"\\s*,\\s*"), L",");
 	str = std::regex_replace(str, std::wregex(L"^\\s*|\\s*$"), L"");
