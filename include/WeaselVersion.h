@@ -1,7 +1,7 @@
 #pragma once
 
-#define WEASEL_VERSION_STR "0.0.0-dev.3"
-#define WEASEL_VERSION_NUM 0,0,0,3
+#define WEASEL_VERSION_STR "0.0.0-dev.4"
+#define WEASEL_VERSION_NUM 0,0,0,4
 
 #define WEASEL_CODE_NAME "TypeDuck"
 #define WEASEL_VERSION WEASEL_VERSION_STR
