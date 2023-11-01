@@ -5,6 +5,7 @@
 #define IDC_MYICON                      2
 #define IDD_HINT_SETTING                3
 #define IDD_WEASELDEPLOYER_DIALOG       102
+#define IDD_ABOUTBOX                    103
 #define IDI_WEASELDEPLOYER              107
 #define IDI_SMALL                       108
 #define IDR_MAINFRAME                   128
@@ -29,6 +30,8 @@
 #define IDC_MFCVSLISTBOX1               1016
 #define IDC_BACKUP_RESTORE_DESCRIPTION  1017
 #define IDC_EXPORT_IMPORT_DESCRIPTION   1018
+#define IDC_DESCRIPTION                 1019
+#define IDC_TITLE                       1020
 #define IDC_STATIC                      -1
 
 // Next default values for new objects
@@ -38,7 +41,7 @@
 #define _APS_NO_MFC                     1
 #define _APS_NEXT_RESOURCE_VALUE        137
 #define _APS_NEXT_COMMAND_VALUE         32771
-#define _APS_NEXT_CONTROL_VALUE         1019
+#define _APS_NEXT_CONTROL_VALUE         1021
 #define _APS_NEXT_SYMED_VALUE           110
 #endif
 #endif

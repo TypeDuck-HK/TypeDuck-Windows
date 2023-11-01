@@ -5,6 +5,7 @@
 #include <fstream>
 #include "WeaselDeployer.h"
 #include "Configurator.h"
+#include "AboutDialog.h"
 
 CAppModule _Module;
 
@@ -91,6 +92,13 @@ static int Run(LPTSTR lpCmdLine)
 	if (sync_user_dict)
 	{
 		return configurator.SyncUserData();
+	}
+
+	bool show_about_box = !wcscmp(L"/about", lpCmdLine);
+	if (show_about_box)
+	{
+		AboutDialog().DoModal();
+		return true;
 	}
 
 	bool installing = !wcscmp(L"/install", lpCmdLine);

@@ -50,6 +50,7 @@ void WeaselServerApp::SetupMenuHandlers()
 	m_server.AddMenuHandler(ID_WEASELTRAY_SETTINGS, std::bind(execute, dir + L"\\TypeDuckDeployer.exe", std::wstring()));
 	m_server.AddMenuHandler(ID_WEASELTRAY_DICT_MANAGEMENT, std::bind(execute, dir + L"\\TypeDuckDeployer.exe", std::wstring(L"/dict")));
 	m_server.AddMenuHandler(ID_WEASELTRAY_SYNC, std::bind(execute, dir + L"\\TypeDuckDeployer.exe", std::wstring(L"/sync")));
+	m_server.AddMenuHandler(ID_WEASELTRAY_ABOUT, std::bind(execute, dir + L"\\TypeDuckDeployer.exe", std::wstring(L"/about")));
 	m_server.AddMenuHandler(ID_WEASELTRAY_HOMEPAGE, std::bind(open, L"https://typeduck.hk/"));
 	m_server.AddMenuHandler(ID_WEASELTRAY_CHECKUPDATE, check_update);
 	m_server.AddMenuHandler(ID_WEASELTRAY_INSTALLDIR, std::bind(explore, dir));

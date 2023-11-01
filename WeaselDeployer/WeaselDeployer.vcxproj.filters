@@ -18,6 +18,7 @@
     <ClInclude Include="UIStyleSettings.h" />
     <ClInclude Include="UIStyleSettingsDialog.h" />
     <ClInclude Include="WeaselDeployer.h" />
+    <ClInclude Include="AboutDialog.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Configurator.cpp" />
@@ -30,6 +31,7 @@
     <ClCompile Include="UIStyleSettingsDialog.cpp" />
     <ClCompile Include="WeaselDeployer.cpp" />
     <ClCompile Include="..\RimeWithWeasel\WeaselUtility.cpp" />
+    <ClCompile Include="AboutDialog.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="WeaselDeployer.rc">

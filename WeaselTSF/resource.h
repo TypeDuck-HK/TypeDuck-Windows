@@ -9,6 +9,7 @@
 #define IDR_MENU_POPUP                  105
 #define IDI_FULL_SHAPE                  106
 #define IDI_HALF_SHAPE                  107
+
 #define ID_WEASELTRAY_QUIT              40001
 #define ID_WEASELTRAY_DEPLOY            40002
 #define ID_WEASELTRAY_CHECKUPDATE       40003
@@ -22,13 +23,14 @@
 #define ID_WEASELTRAY_SYNC              40012
 #define ID_WEASELTRAY_ENABLE_ASCII      40013
 #define ID_WEASELTRAY_DISABLE_ASCII     40014
+#define ID_WEASELTRAY_ABOUT             40015
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        104
-#define _APS_NEXT_COMMAND_VALUE         40001
+#define _APS_NEXT_COMMAND_VALUE         40016
 #define _APS_NEXT_CONTROL_VALUE         1001
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
