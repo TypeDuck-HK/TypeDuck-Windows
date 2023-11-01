@@ -23,6 +23,16 @@ VIAddVersionKey "FileDescription" "TypeDuck IME"
 VIAddVersionKey "FileVersion" "${WEASEL_VERSION}"
 
 !define MUI_ICON ..\resource\TypeDuck.ico
+!define MUI_WELCOMEPAGE_TITLE "歡迎使用 TypeDuck"
+!define MUI_WELCOMEPAGE_TEXT "\
+歡迎使用 TypeDuck 打得 – 設有少數族裔語言提示粵拼輸入法！有字想打？一裝即用，毋須再等，即刻打得！$\r$\n\
+Welcome to TypeDuck: a Cantonese input keyboard with minority language prompts! Got something you want to type? Have your fingers ready, get, set, TYPE DUCK!$\r$\n\
+$\r$\n\
+如有任何查詢，歡迎電郵至 admin@typeduck.hk 或 lchaakming@eduhk.hk。$\r$\n\
+Should you have any enquiries, please email admin@typeduck.hk or lchaakming@eduhk.hk.$\r$\n\
+$\r$\n\
+本輸入法由香港教育大學語言學及現代語言系開發。特別鳴謝「語文教育及研究常務委員會」 資助本計劃。$\r$\n\
+This input method is developed by the Department of Linguistics and Modern Languages, the Education University of Hong Kong. Special thanks to the Standing Committee on Language Education and Research for funding this project."
 SetCompressor /SOLID lzma
 
 ; The default installation directory
@@ -39,7 +49,8 @@ RequestExecutionLevel admin
 
 ; Pages
 
-!insertmacro MUI_PAGE_LICENSE "LICENSE.txt"
+!insertmacro MUI_PAGE_WELCOME
+; !insertmacro MUI_PAGE_LICENSE "LICENSE.txt"
 !insertmacro MUI_PAGE_DIRECTORY
 !insertmacro MUI_PAGE_INSTFILES
 !insertmacro MUI_PAGE_FINISH
@@ -109,7 +120,7 @@ Section "TypeDuck"
 
 program_files:
   File "LICENSE.txt"
-  File "README.txt"
+  ; File "README.txt"
   File "7-zip-license.txt"
   File "7z.dll"
   File "7z.exe"
@@ -178,10 +189,11 @@ SectionEnd
 Section "Start Menu Shortcuts"
   SetShellVarContext all
   CreateDirectory "$SMPROGRAMS\TypeDuck"
+  CreateShortCut "$SMPROGRAMS\TypeDuck\About TypeDuck….lnk" "$INSTDIR\TypeDuckDeployer.exe" "/about" "$SYSDIR\shell32.dll" 277
   CreateShortCut "$SMPROGRAMS\TypeDuck\IME Settings.lnk" "$INSTDIR\TypeDuckDeployer.exe" "" "$SYSDIR\shell32.dll" 21
   CreateShortCut "$SMPROGRAMS\TypeDuck\User Dictionary Management.lnk" "$INSTDIR\TypeDuckDeployer.exe" "/dict" "$SYSDIR\shell32.dll" 6
   CreateShortCut "$SMPROGRAMS\TypeDuck\User Data Sync.lnk" "$INSTDIR\TypeDuckDeployer.exe" "/sync" "$SYSDIR\shell32.dll" 26
-  CreateShortCut "$SMPROGRAMS\TypeDuck\Redeploy.lnk" "$INSTDIR\TypeDuckDeployer.exe" "/deploy" "$SYSDIR\shell32.dll" 144
+  CreateShortCut "$SMPROGRAMS\TypeDuck\Redeploy.lnk" "$INSTDIR\TypeDuckDeployer.exe" "/deploy" "$SYSDIR\shell32.dll" 238
   CreateShortCut "$SMPROGRAMS\TypeDuck\TypeDuck Server.lnk" "$INSTDIR\TypeDuckServer.exe" "" "$INSTDIR\TypeDuckServer.exe" 0
   CreateShortCut "$SMPROGRAMS\TypeDuck\User Folder.lnk" "$INSTDIR\TypeDuckServer.exe" "/userdir" "$SYSDIR\shell32.dll" 126
   CreateShortCut "$SMPROGRAMS\TypeDuck\Program Folder.lnk" "$INSTDIR\TypeDuckServer.exe" "/typeduckdir" "$SYSDIR\shell32.dll" 19
