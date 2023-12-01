@@ -98,10 +98,10 @@ InfoMultiHint::InfoMultiHint(const std::wstring& input) {
 }
 
 const static std::vector<std::pair<std::wstring, std::wstring InfoProperties::*> > otherData = {
-	{ L"Standard Form", &InfoProperties::Normalized },
-	{ L"Written Form", &InfoProperties::Written },
-	{ L"Vernacular Form", &InfoProperties::Vernacular },
-	{ L"Word Form", &InfoProperties::Collocation },
+	{ L"Standard Form 標準字形", &InfoProperties::Normalized },
+	{ L"Written Form 書面語", &InfoProperties::Written },
+	{ L"Vernacular Form 口語", &InfoProperties::Vernacular },
+	{ L"Collocation 配搭", &InfoProperties::Collocation },
 };
 
 const static std::map<std::wstring, std::wstring> litColReadings = {
@@ -110,10 +110,10 @@ const static std::map<std::wstring, std::wstring> litColReadings = {
 };
 
 const static std::map<std::wstring, std::wstring> registers = {
-	{ L"wri", L"written" },
-	{ L"ver", L"vernacular" },
-	{ L"for", L"formal" },
-	{ L"lzh", L"archaic" },
+	{ L"wri", L"written 書面語" },
+	{ L"ver", L"vernacular 口語" },
+	{ L"for", L"formal 公文體" },
+	{ L"lzh", L"classical Chinese 文言" },
 };
 
 const static std::map<std::wstring, std::wstring> partsOfSpeech = {
