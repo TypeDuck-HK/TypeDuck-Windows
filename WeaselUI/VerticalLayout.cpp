@@ -72,10 +72,9 @@ void weasel::VerticalLayout::DoLayout(CDCHandle dc, DirectWriteResources* pDWR)
 	GetTextSizeDW(L"ⓘ", pDWR->pLabelTextFormat, pDWR, &infoIconSize);
 
 	std::vector<InfoMultiHint> dictionary_entries;
-	const bool showHint = _multiHintPanel->isHintEnabled(StatusHintColumn::Jyutping);
 
 	int label_width = 0, ruby_width = 0, comment_group_0_width = 0, comment_group_1_width = 0, comment_group_2_width = 0, comment_group_3_width = 0;
-	bool hasComment = false, hasEntry = false;
+	bool hasHint = false, hasComment = false, hasEntry = false;
 
 	size_t j = 0;
 	size_t entryEnds[MAX_CANDIDATES_COUNT] {};
@@ -135,6 +134,7 @@ void weasel::VerticalLayout::DoLayout(CDCHandle dc, DirectWriteResources* pDWR)
 				}
 			}
 			if (containsJyutping) {
+				const bool showHint = _multiHintPanel->isHintEnabled(StatusHintColumn::Jyutping) || !_multiHintPanel->neverShowRomanization() && isReverseLookup;
 				const std::wstring cantonese = comment.substr(jyutpingStartPos + 1);
 				if (cantonese[0] == L'\r') {
 					std::vector<std::wstring> lines;
@@ -147,7 +147,10 @@ void weasel::VerticalLayout::DoLayout(CDCHandle dc, DirectWriteResources* pDWR)
 						if (entry[0] == L'1') {
 							push_back();
 							GetTextSizeDW(info.Honzi, pDWR->pTextFormat, pDWR, &textSize[j], _style.character_spacing * showHint);
-							if (showHint) GetTextSizeDW(info.Jyutping, pDWR->pHintTextFormat, pDWR, &hintSize[j]);
+							if (showHint) {
+								GetTextSizeDW(info.Jyutping, pDWR->pHintTextFormat, pDWR, &hintSize[j]);
+								hasHint = true;
+							}
 							if (infoIsDictionaryEntry) {
 								if (_multiHintPanel->isHintEnabled(StatusHintColumn::Eng)) GetTextSizeDW(info.Properties.Definition.Eng, pDWR->pEngTextFormat, pDWR, &engSize[j]);
 								if (_multiHintPanel->isHintEnabled(StatusHintColumn::Hin)) GetTextSizeDW(info.Properties.Definition.Hin, pDWR->pHinTextFormat, pDWR, &hinSize[j]);
@@ -207,7 +210,7 @@ void weasel::VerticalLayout::DoLayout(CDCHandle dc, DirectWriteResources* pDWR)
 		int w = real_margin_x + _style.hilite_padding + base_offset;
 		const int
 			label_height = gap + labelSize[i].cy,
-			ruby_height = hintSize[j].cy + gap * showHint + textSize[j].cy,
+			ruby_height = hintSize[j].cy + gap * hasHint + textSize[j].cy,
 			comment_group_0_height = commentSize[i].cy,
 			comment_group_1_height = engSize[j].cy + gap * _multiHintPanel->isHintEnabled(StatusHintColumn::Eng) * _multiHintPanel->isHintEnabled(StatusHintColumn::Ind) + indSize[j].cy,
 			comment_group_2_height = hinSize[j].cy + gap * _multiHintPanel->isHintEnabled(StatusHintColumn::Hin) * _multiHintPanel->isHintEnabled(StatusHintColumn::Nep) + nepSize[j].cy,
@@ -221,7 +224,7 @@ void weasel::VerticalLayout::DoLayout(CDCHandle dc, DirectWriteResources* pDWR)
 
 		w += label_width + space;
 
-		if (showHint) {
+		if (hasHint) {
 			rects.hint.SetRect(w, height - ruby_height, w + hintSize[j].cx, height - ruby_height + hintSize[j].cy);
 			rects.hint.OffsetRect(offsetX, offsetY);
 		}

@@ -692,7 +692,6 @@ bool WeaselPanel::_DrawCandidates(CDCHandle &dc, bool back)
 	{
 		// begin draw candidate texts
 		std::vector<InfoMultiHint> dictionary_entries;
-		const bool showHint = m_hintPanel->isHintEnabled(StatusHintColumn::Jyutping);
 		int label_text_color, hint_text_color, candidate_text_color, comment_text_color;
 		for (size_t i = 0; i < m_candidateCount && i < MAX_CANDIDATES_COUNT; ++i) {
 			if (i == m_ctx.cinfo.highlighted)
@@ -753,6 +752,7 @@ bool WeaselPanel::_DrawCandidates(CDCHandle &dc, bool back)
 					}
 				}
 				if (containsJyutping) {
+					const bool showHint = m_hintPanel->isHintEnabled(StatusHintColumn::Jyutping) || !m_hintPanel->neverShowRomanization() && isReverseLookup;
 					const std::wstring cantonese = comment.substr(jyutpingStartPos + 1);
 					if (cantonese[0] == L'\r') {
 						std::vector<std::wstring> lines;
