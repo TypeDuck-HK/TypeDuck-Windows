@@ -189,7 +189,7 @@ int register_ime(const std::wstring& ime_path, bool register_ime, bool is_wow64,
 						DWORD len = sizeof(imeFile);
 						DWORD type = 0;
 						ret = RegQueryValueEx(hSubKey, L"Ime File", NULL, &type, (LPBYTE)imeFile, &len);
-						if (ret = ERROR_SUCCESS)
+						if (ret == ERROR_SUCCESS)
 						{
 							if (_wcsicmp(imeFile, L"TypeDuck.ime") == 0)
 							{
@@ -220,27 +220,7 @@ int register_ime(const std::wstring& ime_path, bool register_ime, bool is_wow64,
 			}
 			if (hKL)
 			{
-				HKEY hPreloadKey;
-				ret = RegOpenKey(HKEY_CURRENT_USER, PRELOAD_KEY, &hPreloadKey);
-				if (ret == ERROR_SUCCESS)
-				{
-					for (size_t i = 1; true; ++i)
-					{
-						std::wstring number = std::to_wstring(i);
-						DWORD type = 0;
-						WCHAR value[32];
-						DWORD len = sizeof(value);
-						ret = RegQueryValueEx(hPreloadKey, number.c_str(), 0, &type, (LPBYTE)value, &len);
-						if (ret != ERROR_SUCCESS)
-						{
-							RegSetValueEx(hPreloadKey, number.c_str(), 0, REG_SZ,
-											(const BYTE*)hkl_str,
-											(wcslen(hkl_str) + 1) * sizeof(WCHAR));
-							break;
-						}
-					}
-					RegCloseKey(hPreloadKey);
-				}
+				return 0;
 			}
 		}
 		if (!hKL)
@@ -251,16 +231,13 @@ int register_ime(const std::wstring& ime_path, bool register_ime, bool is_wow64,
 			if (!silent) MessageBox(NULL, msg, L"Installation Failed", MB_ICONERROR | MB_OK);
 			return 1;
 		}
-		return 0;
 	}
-
-	// unregister ime
 
 	HKEY hKey;
 	LSTATUS ret = RegOpenKey(HKEY_LOCAL_MACHINE, KEYBOARD_LAYOUTS_KEY, &hKey);
 	if (ret != ERROR_SUCCESS)
 	{
-		if (!silent) MessageBox(NULL, KEYBOARD_LAYOUTS_KEY, L"Uninstall Failed", MB_ICONERROR | MB_OK);
+		if (!silent) MessageBox(NULL, KEYBOARD_LAYOUTS_KEY, register_ime ? L"Installation Failed" : L"Uninstall Failed", MB_ICONERROR | MB_OK);
 		return 1;
 	}
 
@@ -271,8 +248,7 @@ int register_ime(const std::wstring& ime_path, bool register_ime, bool is_wow64,
 		if (ret != ERROR_SUCCESS)
 			break;
 
-		// 中文键盘布局?
-		if (wcscmp(subKey + 4, L"0804") == 0 || wcscmp(subKey + 4, L"0C04") == 0)
+		if (wcsnicmp(subKey, L"E0", 2) == 0)
 		{
 			HKEY hSubKey;
 			ret = RegOpenKey(hKey, subKey, &hSubKey);
@@ -287,14 +263,19 @@ int register_ime(const std::wstring& ime_path, bool register_ime, bool is_wow64,
 			if (ret != ERROR_SUCCESS)
 				continue;
 
-			// 小狼毫?
 			if (_wcsicmp(imeFile, L"TypeDuck.ime") == 0)
 			{
-				DWORD value;
-				swscanf_s(subKey, L"%x", &value);
-				UnloadKeyboardLayout((HKL)value);
+				if (!register_ime)
+				{
+					// unregister ime
 
-				RegDeleteKey(hKey, subKey);
+					DWORD value;
+					swscanf_s(subKey, L"%x", &value);
+					UnloadKeyboardLayout((HKL)value);
+
+					RegDeleteKey(hKey, subKey);
+					break;
+				}
 
 				// 移除preload
 				HKEY hPreloadKey;
@@ -334,6 +315,7 @@ int register_ime(const std::wstring& ime_path, bool register_ime, bool is_wow64,
 								  (preloads[i].length() + 1) * sizeof(WCHAR));
 				}
 				RegCloseKey(hPreloadKey);
+				break;
 			}
 		}
 	}
