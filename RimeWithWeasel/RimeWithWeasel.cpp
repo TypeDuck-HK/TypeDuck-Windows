@@ -1129,15 +1129,26 @@ static bool _UpdateUIStyleColor(RimeConfig* config, weasel::UIStyle& style, bool
 		}
 		style.hilited_mark_color &= 0xffffffff;
 #endif	/* USE_HILITE_MARK */
-		char hint_settings[128] = { 0 };
-		RimeConfigGetString(config, "style/language_list", hint_settings, sizeof(hint_settings) - 1);
-		if (strlen(hint_settings) > 0) {
-			// don't know why sometime it is empty even though settings is correct
-			style.hint_settings = utf8towcs(hint_settings);
-			style.hint_settings.erase(
-					std::remove_if(style.hint_settings.begin(), style.hint_settings.end(), ::isspace),
-					style.hint_settings.end());
+
+		// TypeDuck IME Settings
+		RimeConfigIterator it;
+		if (RimeConfigBeginList(&it, config, "typeduck/display_languages")) {
+			std::unordered_set<std::string> languages;
+			while (RimeConfigNext(&it)) {
+				char language[512] = { 0 };
+				if (RimeConfigGetString(config, it.path, language, sizeof(language) - 1))
+					languages.insert(language);
+			}
+			RimeConfigEnd(&it);
+			style.display_languages = languages;
 		}
+		char show_romanization[32] = { 0 };
+		if (RimeConfigGetString(config, "typeduck/show_romanization", show_romanization, sizeof(show_romanization) - 1))
+			style.show_romanization = show_romanization;
+		Bool show_reverse_code = True;
+		if (RimeConfigGetBool(config, "typeduck/show_reverse_code", &show_reverse_code))
+			style.show_reverse_code = !!show_reverse_code;
+
 		return true;
 	}
 	return false;

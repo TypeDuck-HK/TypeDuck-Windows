@@ -18,29 +18,26 @@ MultiHintPanel* MultiHintPanel::GetInstance()
 	return instance;
 }
 
-const static std::pair<std::wstring, int> columns[] = {
-	{ L"Jyutping", (int)StatusHintColumn::Jyutping },
-	{ L"Reverse", (int)StatusHintColumn::Reverse },
-	{ L"Eng", (int)StatusHintColumn::Eng },
-	{ L"Urd", (int)StatusHintColumn::Urd },
-	{ L"Nep", (int)StatusHintColumn::Nep },
-	{ L"Hin", (int)StatusHintColumn::Hin },
-	{ L"Ind", (int)StatusHintColumn::Ind }
+const static std::pair<std::string, StatusHintColumn> languages[] = {
+	{ "Eng", StatusHintColumn::Eng },
+	{ "Urd", StatusHintColumn::Urd },
+	{ "Nep", StatusHintColumn::Nep },
+	{ "Hin", StatusHintColumn::Hin },
+	{ "Ind", StatusHintColumn::Ind }
 };
 
-void MultiHintPanel::setMultiHintOptions(const std::wstring& settings)
+void MultiHintPanel::setMultiHintOptions(const UIStyle& style)
 {
 	StatusHintSetting status = (int)StatusHintColumn::None;
-	std::wstring str = settings;
-	str = std::regex_replace(str, std::wregex(L"\\s*,\\s*"), L",");
-	str = std::regex_replace(str, std::wregex(L"^\\s*|\\s*$"), L"");
-	std::unordered_set<std::wstring> options = ws_split(str, L",");
-	for (auto& column : columns) {
-		if (options.find(column.first) != options.end()) {
-			status |= column.second;
+	if (style.show_romanization == "always") status |= (int)StatusHintColumn::Jyutping;
+	if (style.show_reverse_code) status |= (int)StatusHintColumn::Reverse;
+	for (auto& language : languages) {
+		if (style.display_languages.find(language.first) != style.display_languages.end()) {
+			status |= (int)language.second;
 		}
 	}
 	settingsStatus_ = status;
+	neverShowRomanization_ = style.show_romanization == "never";
 }
 
 bool MultiHintPanel::isHintEnabled(int column) const

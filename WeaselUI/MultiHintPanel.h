@@ -66,18 +66,20 @@ class MultiHintPanel
 {
 public:
  	static MultiHintPanel* GetInstance();
-	void setMultiHintOptions(const std::wstring& settings);
+	void setMultiHintOptions(const UIStyle& style);
 	bool isHintEnabled(int column) const;
 	bool isHintEnabled(StatusHintColumn column) const;
 	bool isAnyLanguageEnabled() const;
 	bool isDictionaryEntry(InfoMultiHint* info) const;
+	bool neverShowRomanization() const { return neverShowRomanization_; }
 	bool shouldShowDictionary() const { return shouldShowDictionary_; }
 	void setShowDictionary(bool show) { shouldShowDictionary_ = show; }
 private:
-	MultiHintPanel() : settingsStatus_(0) {}
+	MultiHintPanel() {}
 	~MultiHintPanel() {}
-	StatusHintSetting settingsStatus_;
+	StatusHintSetting settingsStatus_ = (int)StatusHintColumn::None;
+	bool neverShowRomanization_ = false;
+	bool shouldShowDictionary_ = false;
 	// Private static pointer
 	static MultiHintPanel* volatile instance;
-	bool shouldShowDictionary_ = false;
 };

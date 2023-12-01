@@ -2,8 +2,10 @@
 
 //#include <string>
 //#include <vector>
+#include <unordered_set>
 #include <boost/serialization/vector.hpp>
 #include <boost/serialization/string.hpp>
+#include <boost/serialization/unordered_set.hpp>
 
 #define WEASEL_IME_NAME L"TypeDuck"
 #define WEASEL_REG_KEY L"Software\\Rime\\TypeDuck"
@@ -471,7 +473,9 @@ namespace weasel
 #endif /*  USE_PAGER_MARK */
 		// per client
 		int client_caps;
-		std::wstring hint_settings;
+		std::unordered_set<std::string> display_languages;
+		std::string show_romanization;
+		bool show_reverse_code;
 		DictionaryPanelStyle dictionary_panel_style;
 
 		UIStyle() : preedit_font_face(),
@@ -555,7 +559,9 @@ namespace weasel
 			hilited_label_text_color(0),
 			hilited_hint_text_color(0),
 			hilited_comment_text_color(0),
-			hint_settings(),
+			display_languages({"Eng"}),
+			show_romanization("always"),
+			show_reverse_code(true),
 			dictionary_panel_style(),
 #ifdef USE_HILITE_MARK
 			hilited_mark_color(0),
@@ -649,7 +655,9 @@ namespace weasel
 					|| hilited_label_text_color != st.hilited_label_text_color
 					|| hilited_hint_text_color != st.hilited_hint_text_color
 					|| hilited_comment_text_color != st.hilited_comment_text_color
-					|| hint_settings != st.hint_settings
+					|| display_languages != st.display_languages
+					|| show_romanization != st.show_romanization
+					|| show_reverse_code != st.show_reverse_code
 					|| dictionary_panel_style != st.dictionary_panel_style
 #ifdef USE_HILITE_MARK
 					|| hilited_mark_color != st.hilited_mark_color
@@ -762,7 +770,9 @@ namespace boost {
 			// per client
 			ar & s.client_caps;
 			// hint settings
-			ar & s.hint_settings;
+			ar & s.display_languages;
+			ar & s.show_romanization;
+			ar & s.show_reverse_code;
 			// dictionary panel
 			ar & s.dictionary_panel_style;
 		}

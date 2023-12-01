@@ -58,7 +58,7 @@ WeaselPanel::WeaselPanel(weasel::UI& ui)
 	m_ostyle = m_style;
 
 	m_hintPanel = MultiHintPanel::GetInstance();
-	m_hintPanel->setMultiHintOptions(m_style.hint_settings);
+	m_hintPanel->setMultiHintOptions(m_style);
 }
 
 WeaselPanel::~WeaselPanel()
