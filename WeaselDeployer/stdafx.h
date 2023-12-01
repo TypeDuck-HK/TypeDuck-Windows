@@ -21,5 +21,6 @@
 #include <wtl/atlctrlx.h>
 #include <wtl/atlmisc.h>
 #include <wtl/atldlgs.h>
+#include <wtl/atlddx.h>
 
 #include <logging.h>

@@ -76,6 +76,7 @@ static int Run(LPTSTR lpCmdLine)
 	configurator.Initialize();
 	CreateFileIfNotExist("default.custom.yaml");
 	CreateFileIfNotExist("weasel.custom.yaml");
+	CreateFileIfNotExist("common.custom.yaml");
 	bool deployment_scheduled = !wcscmp(L"/deploy", lpCmdLine);
 	if (deployment_scheduled)
 	{

@@ -5,7 +5,7 @@
 #include "UIStyleSettings.h"
 #include "UIStyleSettingsDialog.h"
 #include "DictManagementDialog.h"
-#include "HintSettingsDialog.h"
+#include "TypeDuckSettingsDialog.h"
 #include <WeaselCommon.h>
 #include <WeaselIPC.h>
 #include <WeaselUtility.h>
@@ -64,17 +64,18 @@ static bool configure_ui(RimeLeversApi* api, UIStyleSettings* ui_style_settings,
 	return false;
 }
 
-static bool configure_multiHint(RimeLeversApi* api, HintSettings* hintSettings, bool* reconfigured) {
-	RimeCustomSettings* settings = hintSettings->settings();
-	HintSettingsDialog dialog(hintSettings);
-	api->load_settings(settings);
-	if (dialog.DoModal() == IDOK) {
-		if (api->save_settings(settings)) {
-			*reconfigured = true;
-			return true;
-		}
+static bool configure_typeduck(RimeLeversApi* api, TypeDuckSettings* typeduck_settings, bool* reconfigured) {
+	RimeCustomSettings* settings = typeduck_settings->settings();
+	RimeCustomSettings* custom_settings = typeduck_settings->custom_settings();
+	if (!api->load_settings(settings) || !api->load_settings(custom_settings))
+		return false;
+	{ // This has to be scoped. See https://www.codeproject.com/Articles/4028/WTL-for-MFC-Programmers-Part-IV-Dialogs-and-Contro#:~:text=The%20block%20around,apps%20did%20crash.%29
+		TypeDuckSettingsDialog dialog(typeduck_settings);
+		dialog.DoModal();
 	}
-	return false;
+	if (api->save_settings(settings) || api->save_settings(custom_settings))
+		*reconfigured = true;
+	return true;
 }
 
 int Configurator::Run(bool installing)
@@ -85,22 +86,10 @@ int Configurator::Run(bool installing)
 	if (!api) return 1;
 
 	bool reconfigured = false;
-
-	RimeSwitcherSettings* switcher_settings = api->switcher_settings_init();
-	UIStyleSettings ui_style_settings;
-	HintSettings hint_settings;
-
-	// We don't even need these
-	bool skip_switcher_settings = true;  // installing && !api->is_first_run((RimeCustomSettings*) switcher_settings);
-	bool skip_ui_style_settings = true;  // installing && !api->is_first_run(ui_style_settings.settings());
-	bool skip_multiHint_settings = installing && !api->is_first_run(hint_settings.settings());
-
-	(skip_switcher_settings || configure_switcher(api, switcher_settings, &reconfigured)) &&
-		(skip_ui_style_settings || configure_ui(api, &ui_style_settings, &reconfigured)) &&
-		(skip_multiHint_settings || configure_multiHint(api, &hint_settings, &reconfigured));
-
-	api->custom_settings_destroy((RimeCustomSettings*)switcher_settings);
-
+	TypeDuckSettings typeduck_settings(api);
+	if (!installing || api->is_first_run(typeduck_settings.settings()) || api->is_first_run(typeduck_settings.custom_settings()))
+		configure_typeduck(api, &typeduck_settings, &reconfigured);
+	
 	if (installing || reconfigured) {
 		return UpdateWorkspace(reconfigured);
 	}

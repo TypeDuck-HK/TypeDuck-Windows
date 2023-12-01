@@ -32,6 +32,13 @@
 #define IDC_EXPORT_IMPORT_DESCRIPTION   1018
 #define IDC_DESCRIPTION                 1019
 #define IDC_TITLE                       1020
+#define IDC_ROMAN_ALWAYS                1022
+#define IDC_ROMAN_REVERSE_ONLY          1023
+#define IDC_ROMAN_NEVER                 1024
+#define IDC_SHOW_REVERSE_CODE           1025
+#define IDC_ENABLE_CORRECTION           1026
+#define IDC_CANGJIE_3                   1027
+#define IDC_CANGJIE_5                   1028
 #define IDC_STATIC                      -1
 
 // Next default values for new objects
@@ -41,7 +48,7 @@
 #define _APS_NO_MFC                     1
 #define _APS_NEXT_RESOURCE_VALUE        137
 #define _APS_NEXT_COMMAND_VALUE         32771
-#define _APS_NEXT_CONTROL_VALUE         1021
+#define _APS_NEXT_CONTROL_VALUE         1029
 #define _APS_NEXT_SYMED_VALUE           110
 #endif
 #endif

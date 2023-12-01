@@ -9,8 +9,8 @@
   <ItemGroup>
     <ClInclude Include="Configurator.h" />
     <ClInclude Include="DictManagementDialog.h" />
-    <ClInclude Include="HintSettings.h" />
-    <ClInclude Include="HintSettingsDialog.h" />
+    <ClInclude Include="TypeDuckSettings.h" />
+    <ClInclude Include="TypeDuckSettingsDialog.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="SwitcherSettingsDialog.h" />
@@ -23,8 +23,8 @@
   <ItemGroup>
     <ClCompile Include="Configurator.cpp" />
     <ClCompile Include="DictManagementDialog.cpp" />
-    <ClCompile Include="HintSettings.cpp" />
-    <ClCompile Include="HintSettingsDialog.cpp" />
+    <ClCompile Include="TypeDuckSettings.cpp" />
+    <ClCompile Include="TypeDuckSettingsDialog.cpp" />
     <ClCompile Include="stdafx.cpp" />
     <ClCompile Include="SwitcherSettingsDialog.cpp" />
     <ClCompile Include="UIStyleSettings.cpp" />
