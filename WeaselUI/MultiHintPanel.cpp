@@ -53,6 +53,11 @@ bool MultiHintPanel::isHintEnabled(StatusHintColumn column) const
   return isHintEnabled((int)column);
 }
 
+bool MultiHintPanel::isAnyLanguageEnabled() const
+{
+  return isHintEnabled(~((int)StatusHintColumn::Jyutping | (int)StatusHintColumn::Reverse));
+}
+
 bool MultiHintPanel::isDictionaryEntry(InfoMultiHint* info) const {
 	return false
 		|| !info->Properties.PartOfSpeech.empty()

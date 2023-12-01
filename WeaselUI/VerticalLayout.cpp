@@ -123,7 +123,7 @@ void weasel::VerticalLayout::DoLayout(CDCHandle dc, DirectWriteResources* pDWR)
 		const size_t jyutpingStartPos = comment.find(L'\f');
 		const bool containsJyutping = jyutpingStartPos != std::wstring::npos && comment.length() > jyutpingStartPos + 1;
 
-		if (_multiHintPanel->isEnabled() && !comment.empty()) {
+		if (!comment.empty()) {
 			const bool isReverseLookup = comment[0] == L'\v';
 			if (!isReverseLookup || _multiHintPanel->isHintEnabled(StatusHintColumn::Reverse)) {
 				std::wstring commentPart = comment.substr(isReverseLookup, jyutpingStartPos - isReverseLookup);
@@ -154,7 +154,7 @@ void weasel::VerticalLayout::DoLayout(CDCHandle dc, DirectWriteResources* pDWR)
 								if (_multiHintPanel->isHintEnabled(StatusHintColumn::Urd)) GetTextSizeDW(info.Properties.Definition.Urd, pDWR->pUrdTextFormat, pDWR, &urdSize[j]);
 								if (_multiHintPanel->isHintEnabled(StatusHintColumn::Nep)) GetTextSizeDW(info.Properties.Definition.Nep, pDWR->pNepTextFormat, pDWR, &nepSize[j]);
 								if (_multiHintPanel->isHintEnabled(StatusHintColumn::Ind)) GetTextSizeDW(info.Properties.Definition.Ind, pDWR->pIndTextFormat, pDWR, &indSize[j]);
-							} else if (!info.Properties.Label.empty()) {
+							} else if (_multiHintPanel->isAnyLanguageEnabled() && !info.Properties.Label.empty()) {
 								GetTextSizeDW(boost::join(info.Properties.GetLabels(), L" "), pDWR->pLblTextFormat, pDWR, &languageForLabelSize[j]);
 							}
 							ruby_width = max(ruby_width, max(hintSize[j].cx, textSize[j].cx));
@@ -162,6 +162,7 @@ void weasel::VerticalLayout::DoLayout(CDCHandle dc, DirectWriteResources* pDWR)
 							comment_group_2_width = max(comment_group_2_width, max(hinSize[j].cx, nepSize[j].cx));
 							comment_group_3_width = max(comment_group_3_width, urdSize[j].cx);
 							j++;
+							if (!_multiHintPanel->isHintEnabled(~(int)StatusHintColumn::Reverse)) break;
 						}
 					}
 					if (!entries.empty()) {

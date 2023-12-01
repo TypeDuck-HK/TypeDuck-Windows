@@ -743,7 +743,7 @@ bool WeaselPanel::_DrawCandidates(CDCHandle &dc, bool back)
 
 			// Draw texts, hints and comments
 			const std::wstring& text = candidates.at(i).str;
-			if (m_hintPanel->isEnabled() && !comment.empty()) {
+			if (!comment.empty()) {
 				const bool isReverseLookup = comment[0] == L'\v';
 				if (!isReverseLookup || m_hintPanel->isHintEnabled(StatusHintColumn::Reverse)) {
 					std::wstring commentPart = comment.substr(isReverseLookup, jyutpingStartPos - isReverseLookup);
@@ -773,7 +773,7 @@ bool WeaselPanel::_DrawCandidates(CDCHandle &dc, bool back)
 									if (m_hintPanel->isHintEnabled(StatusHintColumn::Urd)) _TextOut(rects.urd, info.Properties.Definition.Urd, comment_text_color, pDWR->pUrdTextFormat);
 									if (m_hintPanel->isHintEnabled(StatusHintColumn::Nep)) _TextOut(rects.nep, info.Properties.Definition.Nep, comment_text_color, pDWR->pNepTextFormat);
 									if (m_hintPanel->isHintEnabled(StatusHintColumn::Ind)) _TextOut(rects.ind, info.Properties.Definition.Ind, comment_text_color, pDWR->pIndTextFormat);
-								} else if (!info.Properties.Label.empty()) {
+								} else if (m_hintPanel->isAnyLanguageEnabled() && !info.Properties.Label.empty()) {
 									_TextOut(
 										m_hintPanel->isHintEnabled(StatusHintColumn::Eng) ? rects.eng :
 										m_hintPanel->isHintEnabled(StatusHintColumn::Ind) ? rects.ind :
@@ -784,6 +784,7 @@ bool WeaselPanel::_DrawCandidates(CDCHandle &dc, bool back)
 										boost::join(info.Properties.GetLabels(), L" "), hint_text_color, pDWR->pLblTextFormat);
 								}
 								j++;
+								if (!m_hintPanel->isHintEnabled(~(int)StatusHintColumn::Reverse)) break;
 							}
 						}
 						if (!entries.empty()) {
