@@ -152,7 +152,15 @@ program_files:
   File "WinSparkle.dll"
   ; shared data files
   SetOutPath $INSTDIR\data
-  File /x "user.yaml" /x "installation.yaml" /x "trime.yaml" /x "squirrel.yaml" "data\*.yaml"
+  File \
+    /x "user.yaml" \
+    /x "installation.yaml" \
+    /x "trime.yaml" \
+    /x "squirrel.yaml" \
+    /x "jyut6ping3_mobile*.yaml" \
+    /x "*_longpress*.yaml" \
+    /x "*.custom.yaml" \
+    "data\*.yaml"
   File /nonfatal "data\*.txt"
   File /nonfatal "data\*.gram"
   ; opencc data files
