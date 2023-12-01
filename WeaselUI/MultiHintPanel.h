@@ -51,13 +51,13 @@ struct InfoMultiHint {
 
 enum class StatusHintColumn {
 	None     = 0,
-	Jyutping = 1 << 1,
-	Reverse  = 1 << 2,
-	Eng      = 1 << 3,
-	Urd      = 1 << 4,
-	Nep      = 1 << 5,
-	Hin      = 1 << 6,
-	Ind      = 1 << 7,
+	Jyutping = 1 << 0,
+	Reverse  = 1 << 1,
+	Eng      = 1 << 2,
+	Urd      = 1 << 3,
+	Nep      = 1 << 4,
+	Hin      = 1 << 5,
+	Ind      = 1 << 6,
 };
 
 using StatusHintSetting = int;
