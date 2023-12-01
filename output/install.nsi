@@ -12,7 +12,7 @@ Unicode true
 Name "TypeDuck ${WEASEL_VERSION}"
 
 ; The file to write
-OutFile "archives\TypeDuck-${WEASEL_VERSION}-dev.${WEASEL_BUILD}-installer.exe"
+OutFile "archives\TypeDuck-Windows-${WEASEL_VERSION}-installer.exe"
 
 VIProductVersion "${WEASEL_VERSION}.${WEASEL_BUILD}"
 VIAddVersionKey "ProductName" "TypeDuck"
@@ -24,6 +24,7 @@ VIAddVersionKey "FileVersion" "${WEASEL_VERSION}"
 
 !define MUI_ICON ..\resource\TypeDuck.ico
 !define MUI_WELCOMEPAGE_TITLE "歡迎使用 TypeDuck"
+!define MUI_WELCOMEPAGE_TITLE_3LINES "Welcome to TypeDuck"
 !define MUI_WELCOMEPAGE_TEXT "\
 歡迎使用 TypeDuck 打得 – 設有少數族裔語言提示粵拼輸入法！有字想打？一裝即用，毋須再等，即刻打得！$\r$\n\
 Welcome to TypeDuck: a Cantonese input keyboard with minority language prompts! Got something you want to type? Have your fingers ready, get, set, TYPE DUCK!$\r$\n\
@@ -120,7 +121,6 @@ Section "TypeDuck"
 
 program_files:
   File "LICENSE.txt"
-  ; File "README.txt"
   File "7-zip-license.txt"
   File "7z.dll"
   File "7z.exe"
