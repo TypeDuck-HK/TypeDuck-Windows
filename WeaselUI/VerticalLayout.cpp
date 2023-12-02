@@ -270,13 +270,15 @@ void weasel::VerticalLayout::DoLayout(CDCHandle dc, DirectWriteResources* pDWR)
 
 		w += space * 2 * hasEntry;
 
+		const int infoAndPaddingWidth = (infoIconSize.cx - _style.hilite_padding) * hasEntry + _style.hilite_padding * 2 + real_margin_x;
 		if (isEntry[i]) {
+			w = max(w, width - infoAndPaddingWidth);
 			rects.info.SetRect(w, (height + currentTop - infoIconSize.cy) / 2 - gap, w + infoIconSize.cx, (height + currentTop + infoIconSize.cy) / 2 - gap);
 			rects.info.OffsetRect(offsetX, offsetY);
 		}
 
 		_candidateFieldRects[i].push_back(rects);
-		w += (infoIconSize.cx - _style.hilite_padding) * hasEntry + _style.hilite_padding * 2 + real_margin_x;
+		w += infoAndPaddingWidth;
 
 		width = max(width, w);
 		height += _style.hilite_padding;
