@@ -40,6 +40,7 @@
     <None Include="..\resource\TypeDuck_Transparent.ico">
       <Filter>Resource Files</Filter>
     </None>
+    <None Include="..\output\TypeDuckSetup.exe" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="..\resource\full.ico">

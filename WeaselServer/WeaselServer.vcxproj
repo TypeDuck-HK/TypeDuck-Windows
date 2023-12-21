@@ -494,6 +494,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\output\TypeDuckSetup.exe" />
     <None Include="..\resource\en.ico" />
     <None Include="..\resource\reload.ico" />
     <None Include="..\resource\zh.ico" />

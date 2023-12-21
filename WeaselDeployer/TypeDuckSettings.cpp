@@ -18,7 +18,7 @@ static inline char* toIndexKey(const size_t i)
 TypeDuckSettings::TypeDuckSettings(RimeLeversApi* api) : api_(api)
 {
 	settings_ = api_->custom_settings_init("weasel", "Weasel::TypeDuckSettings");
-	custom_settings_ = api_->custom_settings_init("custom", "Weasel::TypeDuckSettings");
+	custom_settings_ = api_->custom_settings_init("common", "Weasel::TypeDuckSettings");
 }
 
 std::vector<bool> TypeDuckSettings::GetActiveLanguages()
@@ -51,8 +51,14 @@ bool TypeDuckSettings::SetLanguageList(const std::vector<bool> result)
 	success &= rime->config_init(&config);
 	success &= rime->config_create_list(&config, "");
 	for (size_t i = 0; i < LanguageConfigSize; ++i) {
-		if (result[i]) success &= rime->config_set_string(&config, toIndexKey(j++), LanguageConfigNameList[i]);
+		if (!result[i])
+		{
+			continue;
+		}
+		success &= rime->config_list_append_string(&config, "", LanguageConfigNameList[i]);
 	}
+	int languageListSize = rime->config_list_size(&config, "");
+	rime->config_set_item(&config, "", &config);
 	success &= api_->customize_item(settings_, DISPLAY_LANGUAGES_KEY, &config);
 	return success;
 }
@@ -104,9 +110,10 @@ bool TypeDuckSettings::Save()
 	RimeConfig config = { 0 };
 	success &= rime->config_init(&config);
 	success &= rime->config_create_list(&config, "");
-	                      success &= rime->config_set_string(&config, toIndexKey(j++), SHOW_CANGJIE_ROOTS_VALUE);
-	if (enableCorrection) success &= rime->config_set_string(&config, toIndexKey(j++), ENABLE_CORRECTION_VALUE);
-	if (!isCangjie5)      success &= rime->config_set_string(&config, toIndexKey(j++), USE_CANGJIE3_VALUE);
-	success &= api_->customize_item(custom_settings_, "", &config);
+	success &= rime->config_list_append_string(&config, "", SHOW_CANGJIE_ROOTS_VALUE);
+  if (enableCorrection) success &= rime->config_list_append_string(&config, "", ENABLE_CORRECTION_VALUE);
+	if (!isCangjie5) success &= rime->config_list_append_string(&config, "" , USE_CANGJIE3_VALUE);
+	rime->config_set_item(&config, "", &config);
+	success &= api_->customize_item(custom_settings_, "common/__patch", &config);
 	return success;
 }

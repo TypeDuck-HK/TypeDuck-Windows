@@ -73,8 +73,8 @@ static bool configure_typeduck(RimeLeversApi* api, TypeDuckSettings* typeduck_se
 		TypeDuckSettingsDialog dialog(typeduck_settings);
 		dialog.DoModal();
 	}
-	if (api->save_settings(settings) || api->save_settings(custom_settings))
-		*reconfigured = true;
+	*reconfigured = api->save_settings(settings);
+	*reconfigured = api->save_settings(custom_settings);
 	return true;
 }
 
