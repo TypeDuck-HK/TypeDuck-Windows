@@ -6,8 +6,8 @@ if not exist env.bat copy env.bat.template env.bat
 
 if exist env.bat call env.bat
 
-if not defined WEASEL_VERSION set WEASEL_VERSION=0.0.0
-if not defined WEASEL_BUILD set WEASEL_BUILD=4
+if not defined WEASEL_VERSION set WEASEL_VERSION=1.0.0
+if not defined WEASEL_BUILD set WEASEL_BUILD=0
 if not defined WEASEL_ROOT set WEASEL_ROOT=%CD%
 
 echo WEASEL_VERSION=%WEASEL_VERSION%
