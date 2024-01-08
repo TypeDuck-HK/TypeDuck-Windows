@@ -4,6 +4,8 @@
 #include <vector>
 #include <unordered_set>
 
+#define DEFAULT_DISPLAY_LANGUAGES { true, false, false, false, false }
+
 constexpr static wchar_t* LanguageList[] {
 	L"英語 English",
 	L"印地語 Hindi",

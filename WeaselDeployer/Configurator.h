@@ -8,7 +8,7 @@ public:
 	explicit Configurator();
 
 	void Initialize();
-	int Run(bool installing);
+	int Run(bool installing, bool setDefault);
 	int UpdateWorkspace(bool report_errors = false);
 	int DictManagement();
 	int SyncUserData();

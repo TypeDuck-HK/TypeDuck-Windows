@@ -103,5 +103,6 @@ static int Run(LPTSTR lpCmdLine)
 	}
 
 	bool installing = !wcscmp(L"/install", lpCmdLine);
-	return configurator.Run(installing);
+	bool setDefault = !wcscmp(L"/setdefault", lpCmdLine);
+	return configurator.Run(installing, setDefault);
 }

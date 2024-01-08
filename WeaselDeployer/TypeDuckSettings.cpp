@@ -25,7 +25,7 @@ std::vector<bool> TypeDuckSettings::GetActiveLanguages()
 	RimeApi* rime = rime_get_api();
 	RimeConfigIterator it = { 0 };
 	if (!rime->config_begin_list(&it, &config, DISPLAY_LANGUAGES_KEY))
-		return { true, false, false, false, false };
+		return DEFAULT_DISPLAY_LANGUAGES;
 	std::unordered_set<std::string> columns;
 	while (rime->config_next(&it)) {
 		char buffer[512];

@@ -64,12 +64,15 @@ static bool configure_ui(RimeLeversApi* api, UIStyleSettings* ui_style_settings,
 	return false;
 }
 
-static bool configure_typeduck(RimeLeversApi* api, TypeDuckSettings* typeduck_settings, bool* reconfigured) {
+static bool configure_typeduck(RimeLeversApi* api, TypeDuckSettings* typeduck_settings, bool setDefault, bool* reconfigured) {
 	RimeCustomSettings* settings = typeduck_settings->settings();
 	RimeCustomSettings* custom_settings = typeduck_settings->custom_settings();
 	if (!api->load_settings(settings) || !api->load_settings(custom_settings))
 		return false;
-	{ // This has to be scoped. See https://www.codeproject.com/Articles/4028/WTL-for-MFC-Programmers-Part-IV-Dialogs-and-Contro#:~:text=The%20block%20around,apps%20did%20crash.%29
+	if (setDefault) {
+		typeduck_settings->SetLanguageList(DEFAULT_DISPLAY_LANGUAGES);
+		typeduck_settings->Save();
+	} else {
 		TypeDuckSettingsDialog dialog(typeduck_settings);
 		dialog.DoModal();
 	}
@@ -78,7 +81,7 @@ static bool configure_typeduck(RimeLeversApi* api, TypeDuckSettings* typeduck_se
 	return true;
 }
 
-int Configurator::Run(bool installing)
+int Configurator::Run(bool installing, bool setDefault)
 {
 	RimeModule* levers = rime_get_api()->find_module("levers");
 	if (!levers) return 1;
@@ -88,7 +91,7 @@ int Configurator::Run(bool installing)
 	bool reconfigured = false;
 	TypeDuckSettings typeduck_settings(api);
 	if (!installing || api->is_first_run(typeduck_settings.settings()) || api->is_first_run(typeduck_settings.custom_settings()))
-		configure_typeduck(api, &typeduck_settings, &reconfigured);
+		configure_typeduck(api, &typeduck_settings, setDefault, &reconfigured);
 	
 	if (installing || reconfigured) {
 		return UpdateWorkspace(reconfigured);

@@ -192,7 +192,11 @@ program_files:
   ExecWait "$INSTDIR\TypeDuckSetup.exe /t"
 
   ; run as user...
-  ExecWait "$INSTDIR\TypeDuckDeployer.exe /install"
+  ${If} ${Silent}
+    ExecWait "$INSTDIR\TypeDuckDeployer.exe /setdefault"
+  ${Else}
+    ExecWait "$INSTDIR\TypeDuckDeployer.exe /install"
+  ${EndIf}
 
   ; Write the uninstall keys for Windows
   WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\TypeDuck" "DisplayName" "TypeDuck"
@@ -203,6 +207,11 @@ program_files:
 
   ; Write autorun key
   WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Run" "TypeDuckServer" "$INSTDIR\TypeDuckServer.exe"
+
+  ${If} ${Silent}
+    WriteRegStr HKLM SOFTWARE\Rime\TypeDuck\Updates "CheckForUpdates" 0
+  ${EndIf}
+
   ; Start TypeDuckServer
   Exec "$INSTDIR\TypeDuckServer.exe"
 
