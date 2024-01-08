@@ -42,5 +42,11 @@
     <None Include="..\resource\TypeDuck_Transparent.ico">
       <Filter>Resource Files</Filter>
     </None>
+    <Image Include="..\resource\Credit_Logos.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="..\resource\About_Banner.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
   </ItemGroup>
 </Project>

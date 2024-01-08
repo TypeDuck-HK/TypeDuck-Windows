@@ -207,6 +207,8 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="..\resource\TypeDuck_Transparent.ico" />
+    <Image Include="..\resource\About_Banner.bmp" />
+    <Image Include="..\resource\Credit_Logos.bmp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

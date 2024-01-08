@@ -13,6 +13,8 @@
 #define IDD_STYLE_SETTING               130
 #define IDI_DEPLOY                      131
 #define IDD_DICT_MANAGEMENT             132
+#define IDB_CREDIT_LOGOS                133
+#define IDB_ABOUT_BANNER                134
 #define IDC_SCHEMA_LIST                 1000
 #define IDC_SCHEMA_DESCRIPTION          1001
 #define IDC_GET_SCHEMATA                1002
@@ -46,7 +48,7 @@
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NO_MFC                     1
-#define _APS_NEXT_RESOURCE_VALUE        137
+#define _APS_NEXT_RESOURCE_VALUE        135
 #define _APS_NEXT_COMMAND_VALUE         32771
 #define _APS_NEXT_CONTROL_VALUE         1029
 #define _APS_NEXT_SYMED_VALUE           110

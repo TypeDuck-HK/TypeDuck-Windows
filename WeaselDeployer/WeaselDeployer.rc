@@ -90,15 +90,15 @@ BEGIN
     CONTROL         "五代 Version 5",IDC_CANGJIE_5,"Button",BS_AUTORADIOBUTTON | WS_TABSTOP,210,114,60,10
 END
 
-IDD_ABOUTBOX DIALOGEX 0, 0, 292, 197
-STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+IDD_ABOUTBOX DIALOGEX 0, 0, 376, 262
+STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "About TypeDuck"
-FONT 8, "MS Shell Dlg", 0, 0, 0x1
+FONT 12, "Microsoft JhengHei UI", 400, 0, 0x0
 BEGIN
-    ICON            IDI_DEPLOY,-1,14,14,20,20
-    LTEXT           "TypeDuck",IDC_TITLE,42,14,235,19,SS_NOPREFIX
-    LTEXT           "Description of TypeDuck",IDC_DESCRIPTION,14,40,263,132
-    DEFPUSHBUTTON   "關閉 Close",IDOK,117,176,58,14,WS_GROUP
+    CONTROL         IDB_ABOUT_BANNER,IDC_STATIC,"Static",SS_BITMAP,9,9,196,36
+    LTEXT           "Description of TypeDuck",IDC_DESCRIPTION,10,49,355,97
+    DEFPUSHBUTTON   "關閉 Close",IDOK,159,241,58,14,WS_GROUP
+    CONTROL         IDB_CREDIT_LOGOS,IDC_STATIC,"Static",SS_BITMAP | SS_CENTERIMAGE,11,148,352,87
 END
 
 
@@ -145,9 +145,9 @@ BEGIN
     IDD_ABOUTBOX, DIALOG
     BEGIN
         LEFTMARGIN, 7
-        RIGHTMARGIN, 284
+        RIGHTMARGIN, 368
         TOPMARGIN, 7
-        BOTTOMMARGIN, 190
+        BOTTOMMARGIN, 255
     END
 END
 #endif    // APSTUDIO_INVOKED
@@ -161,6 +161,16 @@ END
 // Icon with lowest ID value placed first to ensure application icon
 // remains consistent on all systems.
 IDI_DEPLOY              ICON                    "..\\resource\\TypeDuck_Transparent.ico"
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Bitmap
+//
+
+IDB_CREDIT_LOGOS        BITMAP                  "..\\resource\\Credit_Logos.bmp"
+
+IDB_ABOUT_BANNER        BITMAP                  "..\\resource\\About_Banner.bmp"
 
 #endif    // 中性 (預設值) resources
 /////////////////////////////////////////////////////////////////////////////
