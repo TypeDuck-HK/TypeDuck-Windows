@@ -1,24 +1,21 @@
 #include "stdafx.h"
 #include "TypeDuckSettings.h"
 
-constexpr static char* DISPLAY_LANGUAGES_KEY = "typeduck/display_languages";
-constexpr static char* SHOW_ROMANIZATION_KEY = "typeduck/show_romanization";
-constexpr static char* SHOW_REVERSE_CODE_KEY = "typeduck/show_reverse_code";
-constexpr static char* SHOW_CANGJIE_ROOTS_VALUE = "common:/show_cangjie_roots";
-constexpr static char* ENABLE_CORRECTION_VALUE = "common:/enable_correction";
-constexpr static char* USE_CANGJIE3_VALUE = "common:/use_cangjie3";
+#define DISPLAY_LANGUAGES_KEY "typeduck/display_languages"
+#define SHOW_ROMANIZATION_KEY "typeduck/show_romanization"
+#define SHOW_REVERSE_CODE_KEY "typeduck/show_reverse_code"
+#define ENABLE_CORRECTION_KEY "typeduck/enable_correction"
+#define USE_CANGJIE5_KEY "typeduck/use_cangjie5"
 
-static inline char* toIndexKey(const size_t i)
-{
-	char buffer[8] {};
-	snprintf(buffer, sizeof(buffer), "@%d", i);
-	return buffer;
-}
+#define PATCH_DIRECTIVE "__patch"
+#define SHOW_CANGJIE_ROOTS_VALUE "common:/show_cangjie_roots"
+#define ENABLE_CORRECTION_VALUE "common:/enable_correction"
+#define USE_CANGJIE3_VALUE "common:/use_cangjie3"
 
 TypeDuckSettings::TypeDuckSettings(RimeLeversApi* api) : api_(api)
 {
 	settings_ = api_->custom_settings_init("weasel", "Weasel::TypeDuckSettings");
-	custom_settings_ = api_->custom_settings_init("custom", "Weasel::TypeDuckSettings");
+	custom_settings_ = api_->custom_settings_init("common", "Weasel::TypeDuckSettings");
 }
 
 std::vector<bool> TypeDuckSettings::GetActiveLanguages()
@@ -44,17 +41,18 @@ std::vector<bool> TypeDuckSettings::GetActiveLanguages()
 
 bool TypeDuckSettings::SetLanguageList(const std::vector<bool> result)
 {
-	bool success = true;
+	Bool success = true;
 	size_t j = 0;
 	RimeApi* rime = rime_get_api();
 	RimeConfig config = { 0 };
 	success &= rime->config_init(&config);
 	success &= rime->config_create_list(&config, "");
 	for (size_t i = 0; i < LanguageConfigSize; ++i) {
-		if (result[i]) success &= rime->config_set_string(&config, toIndexKey(j++), LanguageConfigNameList[i]);
+		if (result[i]) success &= rime->config_list_append_string(&config, "", LanguageConfigNameList[i]);
 	}
+	rime->config_set_item(&config, "", &config);
 	success &= api_->customize_item(settings_, DISPLAY_LANGUAGES_KEY, &config);
-	return success;
+	return !!success;
 }
 
 bool TypeDuckSettings::Load()
@@ -64,7 +62,7 @@ bool TypeDuckSettings::Load()
 	enableCorrection = false;
 	isCangjie5 = true;
 
-	bool success = true;
+	Bool success = true;
 	RimeConfig config = { 0 };
 	api_->settings_get_config(settings_, &config);
 	RimeApi* rime = rime_get_api();
@@ -76,37 +74,28 @@ bool TypeDuckSettings::Load()
 			break;
 		}
 	}
-	Bool temp = True;
-	if (rime->config_get_bool(&config, SHOW_REVERSE_CODE_KEY, &temp)) showReverseCode = !!temp;
-	else success = false;
-
-	RimeConfig customConfig = { 0 };
-	api_->settings_get_config(custom_settings_, &customConfig);
-	RimeConfigIterator it = { 0 };
-	success &= rime->config_begin_list(&it, &customConfig, "");
-	while (rime->config_next(&it)) {
-		char buffer[512];
-		if (!rime->config_get_string(&customConfig, it.path, buffer, sizeof(buffer) - 1)) continue;
-		if (!strcmp(buffer, ENABLE_CORRECTION_VALUE)) enableCorrection = true;
-		else if (!strcmp(buffer, USE_CANGJIE3_VALUE)) isCangjie5 = false;
-	}
-	rime->config_end(&it);
-	return success;
+	success &= rime->config_get_bool(&config, SHOW_REVERSE_CODE_KEY, &showReverseCode);
+	success &= rime->config_get_bool(&config, ENABLE_CORRECTION_KEY, &enableCorrection);
+	success &= rime->config_get_bool(&config, USE_CANGJIE5_KEY, &isCangjie5);
+	return !!success;
 }
 
 bool TypeDuckSettings::Save()
 {
-	bool success = true;
+	Bool success = true;
 	success &= api_->customize_string(settings_, SHOW_ROMANIZATION_KEY, ShowRomanizationValues[showRomanization]);
 	success &= api_->customize_bool(settings_, SHOW_REVERSE_CODE_KEY, showReverseCode);
+	success &= api_->customize_bool(settings_, ENABLE_CORRECTION_KEY, enableCorrection);
+	success &= api_->customize_bool(settings_, USE_CANGJIE5_KEY, isCangjie5);
 	size_t j = 0;
 	RimeApi* rime = rime_get_api();
 	RimeConfig config = { 0 };
 	success &= rime->config_init(&config);
 	success &= rime->config_create_list(&config, "");
-	                      success &= rime->config_set_string(&config, toIndexKey(j++), SHOW_CANGJIE_ROOTS_VALUE);
-	if (enableCorrection) success &= rime->config_set_string(&config, toIndexKey(j++), ENABLE_CORRECTION_VALUE);
-	if (!isCangjie5)      success &= rime->config_set_string(&config, toIndexKey(j++), USE_CANGJIE3_VALUE);
-	success &= api_->customize_item(custom_settings_, "", &config);
-	return success;
+	                      success &= rime->config_list_append_string(&config, "", SHOW_CANGJIE_ROOTS_VALUE);
+	if (enableCorrection) success &= rime->config_list_append_string(&config, "", ENABLE_CORRECTION_VALUE);
+	if (!isCangjie5)      success &= rime->config_list_append_string(&config, "", USE_CANGJIE3_VALUE);
+	rime->config_set_item(&config, "", &config);
+	success &= api_->customize_item(custom_settings_, PATCH_DIRECTIVE, &config);
+	return !!success;
 }

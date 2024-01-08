@@ -43,9 +43,9 @@ public:
 	bool Save();
 
 	int showRomanization = 0;
-	bool showReverseCode = true;
-	bool enableCorrection = false;
-	int isCangjie5 = true;
+	Bool showReverseCode = true;
+	Bool enableCorrection = false;
+	Bool isCangjie5 = true;
 
 private:
 	RimeLeversApi* api_;
