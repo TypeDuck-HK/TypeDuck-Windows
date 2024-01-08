@@ -27,7 +27,12 @@ VIAddVersionKey "FileVersion" "${WEASEL_VERSION}"
 !define MUI_WELCOMEFINISHPAGE_BITMAP ..\resource\Installer.bmp
 !define MUI_UNWELCOMEFINISHPAGE_BITMAP ..\resource\Installer.bmp
 !define MUI_WELCOMEPAGE_TITLE "歡迎使用 TypeDuck$\r$\nWelcome to TypeDuck"
-!define MUI_WELCOMEPAGE_TEXT "\
+!define MUI_PAGE_CUSTOMFUNCTION_SHOW WelcomePageShowCallback
+
+SetCompressor /SOLID lzma
+
+Function WelcomePageShowCallback
+${NSD_CreateLabel} 120u 38u 195u 150u "\
 歡迎使用 TypeDuck 打得 —— 設有少數族裔語言提示粵拼輸入法！有字想打？一裝即用，毋須再等，即刻打得！$\r$\n\
 Welcome to TypeDuck: a Cantonese input keyboard with minority language prompts! Got something you want to type? Have your fingers ready, get, set, TYPE DUCK!$\r$\n\
 $\r$\n\
@@ -36,7 +41,9 @@ Should you have any enquiries, please email info@typeduck.hk or lchaakming@eduhk
 $\r$\n\
 本輸入法由香港教育大學語言學及現代語言系開發。特別鳴謝「語文教育及研究常務委員會」資助本計劃。$\r$\n\
 This input method is developed by the Department of Linguistics and Modern Languages, the Education University of Hong Kong. Special thanks to the Standing Committee on Language Education and Research for funding this project."
-SetCompressor /SOLID lzma
+Pop $0
+SetCtlColors $0 "000000" "FFFFFF"
+FunctionEnd
 
 ; The default installation directory
 InstallDir $PROGRAMFILES\Rime
