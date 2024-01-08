@@ -117,6 +117,7 @@ BEGIN
         MENUITEM SEPARATOR
         MENUITEM "About TypeDuck… (&A)",        ID_WEASELTRAY_ABOUT
         MENUITEM "TypeDuck Website (&H)",       ID_WEASELTRAY_HOMEPAGE
+        MENUITEM "Check for Updates (&U)",      ID_WEASELTRAY_CHECKUPDATE
         MENUITEM SEPARATOR
         MENUITEM "Redeploy (&R)",               ID_WEASELTRAY_DEPLOY
         MENUITEM "Terminate IME (&Q)",          ID_WEASELTRAY_QUIT
