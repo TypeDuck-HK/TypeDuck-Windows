@@ -27,6 +27,16 @@ VIAddVersionKey "FileVersion" "${WEASEL_VERSION}"
 !define MUI_WELCOMEFINISHPAGE_BITMAP ..\resource\Installer.bmp
 !define MUI_UNWELCOMEFINISHPAGE_BITMAP ..\resource\Installer.bmp
 !define MUI_WELCOMEPAGE_TITLE "歡迎使用 TypeDuck$\r$\nWelcome to TypeDuck"
+!define MUI_TEXT_FINISH_INFO_TITLE "安裝完成$\r$\nInstallation Completed"
+!define MUI_TEXT_FINISH_INFO_TEXT "\
+你已成功安裝 TypeDuck 輸入法。$\r$\n\
+TypeDuck has been sucessfully installed on your computer.$\r$\n\
+$\r$\n\
+如「TypeDuck」於輸入法功能表多次出現，請選擇帶有圖示之項目，或嘗試重新啟動電腦。$\r$\n\
+If “TypeDuck” appears multiple times in the IME menu, please choose the one with an icon, or try restarting the computer.$\r$\n\
+$\r$\n\
+按「完成」以關閉安裝程式。$\r$\n\
+Click “Finish” to close this Setup."
 !define MUI_PAGE_CUSTOMFUNCTION_SHOW WelcomePageShowCallback
 
 SetCompressor /SOLID lzma
