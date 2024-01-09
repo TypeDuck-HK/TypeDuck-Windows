@@ -1,10 +1,8 @@
 name: Release CI
 
 on:
-  workflow_dispatch:
   push:
     tags:
-      - '[0-9]+.*'
 
 jobs:
   windows:
@@ -17,15 +15,9 @@ jobs:
       - name: Download artifacts
         uses: actions/download-artifact@v3
 
-      - name: Get reference name
-        run: |
-          echo git_ref_name="$(git describe --always)" >> $env:GITHUB_ENV
-
       - name: Create GitHub release
-        uses: 'marvinpinto/action-automatic-releases@latest'
+        uses: softprops/action-gh-release@v1
         with:
-          repo_token: ${{ secrets.GITHUB_TOKEN }}
-          automatic_release_tag: ${{ env.git_ref_name }}
-          title: "TypeDuck for Windows: ${{ env.git_ref_name }}"
+          name: "TypeDuck for Windows: ${{ github.ref_name }}"
           files: |
             artifact/*

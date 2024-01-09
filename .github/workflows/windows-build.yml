@@ -1,33 +1,23 @@
 name: Windows build
 on:
   workflow_call:
-    inputs:
-      repository:
-        default: ${{ github.repository }}
-        required: false
-        type: string
-      rime_plugins:
-        required: false
-        type: string
 jobs:
   build:
     runs-on: windows-2022
     env:
       boost_version: 1.83.0
       BOOST_ROOT: ${{ github.workspace }}\deps\boost_1_83_0
-      RIME_PLUGINS: ${{ inputs.rime_plugins }}
     steps:
       - name: Checkout last commit
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
-          repository: ${{ inputs.repository }}
           submodules: recursive
 
       - name: Configure build environment
         run: |
           copy env.vs2022.bat env.bat
-          echo git_ref_name="$(git describe --always)" >> $env:GITHUB_ENV
           cd librime
+          git fetch origin "refs/tags/*:refs/tags/*"
           echo rime_version="$(git describe --always)" >> $env:GITHUB_ENV
 
       - name: Cache Boost
