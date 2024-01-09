@@ -27,6 +27,12 @@ VIAddVersionKey "FileVersion" "${WEASEL_VERSION}"
 !define MUI_WELCOMEFINISHPAGE_BITMAP ..\resource\Installer.bmp
 !define MUI_UNWELCOMEFINISHPAGE_BITMAP ..\resource\Installer.bmp
 !define MUI_WELCOMEPAGE_TITLE "歡迎使用 TypeDuck$\r$\nWelcome to TypeDuck"
+!define MUI_DIRECTORYPAGE_TEXT_TOP "\
+安裝程式會將 TypeDuck 安裝至以下資料夾。按「安裝」以繼續。$\r$\n\
+The Setup will install TypeDuck in the following folder. Click “Install” to continue.$\r$\n\
+$\r$\n\
+本程式乃根據 GNU 通用公眾特許條款第三版發佈。你可以前往 www.gnu.org/licenses/gpl，或於安裝後瀏覽以下安裝資料夾以閲覽其內容。$\r$\n\
+This program is distributed under the GNU General Public License v3, which can be found at www.gnu.org/licenses/gpl or in the following destination folder after the installation."
 !define MUI_TEXT_FINISH_INFO_TITLE "安裝完成$\r$\nInstallation Completed"
 !define MUI_TEXT_FINISH_INFO_TEXT "\
 你已成功安裝 TypeDuck 輸入法。$\r$\n\
