@@ -160,6 +160,7 @@ msbuild.exe weasel.sln %build_option% /p:Configuration=%build_config% /p:Platfor
 if errorlevel 1 goto error
 
 if %build_installer% == 1 (
+  copy LICENSE.txt output\
   "%ProgramFiles(x86)%"\NSIS\Bin\makensis.exe ^
   /DWEASEL_VERSION=%WEASEL_VERSION% ^
   /DWEASEL_BUILD=%WEASEL_BUILD% ^
@@ -207,7 +208,6 @@ if %build_x64% == 1 (
 exit /b
 
 :build_data
-copy %WEASEL_ROOT%\LICENSE.txt output\
 copy %WEASEL_ROOT%\README.md output\README.txt
 copy %WEASEL_ROOT%\plum\rime-install.bat output\
 set plum_dir=plum
