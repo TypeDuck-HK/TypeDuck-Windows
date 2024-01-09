@@ -93,20 +93,18 @@ RequestExecutionLevel admin
 
 ;--------------------------------
 
-Function .onInit
+; The stuff to install
+Section "TypeDuck"
+
+  SectionIn RO
+
   ReadRegStr $R0 HKLM \
   "Software\Microsoft\Windows\CurrentVersion\Uninstall\TypeDuck" \
   "UninstallString"
-  StrCmp $R0 "" done
+  StrCmp $R0 "" install
 
   StrCpy $0 "Upgrade"
-  IfSilent uninst 0
-  MessageBox MB_OKCANCEL|MB_ICONINFORMATION \
-  "Detected an old version of TypeDuck.$\n$\nAre you sure you want to install? This will cause the old version to be removed." \
-  IDOK uninst
-  Abort
 
-uninst:
   ; Backup data directory from previous installation, user files may exist
   ReadRegStr $R1 HKLM SOFTWARE\Rime\TypeDuck "TypeDuckRoot"
   StrCmp $R1 "" call_uninstaller
@@ -116,16 +114,8 @@ uninst:
 
 call_uninstaller:
   ExecWait '$R0 /S'
-  Sleep 800
 
-done:
-FunctionEnd
-
-; The stuff to install
-Section "TypeDuck"
-
-  SectionIn RO
-
+install:
   ; Write the new installation path into the registry
   WriteRegStr HKLM SOFTWARE\Rime\TypeDuck "InstallDir" "$INSTDIR"
 
