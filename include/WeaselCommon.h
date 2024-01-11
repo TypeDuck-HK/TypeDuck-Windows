@@ -248,7 +248,7 @@ namespace weasel
 	struct DictionaryPanelStyle
 	{
 		std::wstring entry_font_face;
-		std::wstring pron_face;
+		std::wstring pron_font_face;
 		std::wstring pron_type_font_face;
 		std::wstring pos_font_face;
 		std::wstring register_font_face;
@@ -257,7 +257,7 @@ namespace weasel
 		std::wstring field_value_font_face;
 		std::wstring more_languages_head_font_face;
 		int entry_font_point;
-		int pron_point;
+		int pron_font_point;
 		int pron_type_font_point;
 		int pos_font_point;
 		int register_font_point;
@@ -266,7 +266,8 @@ namespace weasel
 		int field_value_font_point;
 		int more_languages_head_font_point;
 
-		int padding;
+		int padding_x;
+		int padding_y;
 		int title_gap;
 		int spacing;
 		int pos_border_width;
@@ -282,7 +283,7 @@ namespace weasel
 		int entry_spacing;
 
 		DictionaryPanelStyle() : entry_font_face(),
-			pron_face(),
+			pron_font_face(),
 			pron_type_font_face(),
 			pos_font_face(),
 			register_font_face(),
@@ -291,7 +292,7 @@ namespace weasel
 			field_value_font_face(),
 			more_languages_head_font_face(),
 			entry_font_point(0),
-			pron_point(0),
+			pron_font_point(0),
 			pron_type_font_point(0),
 			pos_font_point(0),
 			register_font_point(0),
@@ -299,7 +300,8 @@ namespace weasel
 			field_key_font_point(0),
 			field_value_font_point(0),
 			more_languages_head_font_point(0),
-			padding(0),
+			padding_x(0),
+			padding_y(0),
 			title_gap(0),
 			spacing(0),
 			pos_border_width(0),
@@ -318,7 +320,7 @@ namespace weasel
 			return
 				(
 					entry_font_face != st.entry_font_face
-					|| pron_face != st.pron_face
+					|| pron_font_face != st.pron_font_face
 					|| pron_type_font_face != st.pron_type_font_face
 					|| pos_font_face != st.pos_font_face
 					|| register_font_face != st.register_font_face
@@ -327,7 +329,7 @@ namespace weasel
 					|| field_value_font_face != st.field_value_font_face
 					|| more_languages_head_font_face != st.more_languages_head_font_face
 					|| entry_font_point != st.entry_font_point
-					|| pron_point != st.pron_point
+					|| pron_font_point != st.pron_font_point
 					|| pron_type_font_point != st.pron_type_font_point
 					|| pos_font_point != st.pos_font_point
 					|| register_font_point != st.register_font_point
@@ -335,7 +337,8 @@ namespace weasel
 					|| field_key_font_point != st.field_key_font_point
 					|| field_value_font_point != st.field_value_font_point
 					|| more_languages_head_font_point != st.more_languages_head_font_point
-					|| padding != st.padding
+					|| padding_x != st.padding_x
+					|| padding_y != st.padding_y
 					|| title_gap != st.title_gap
 					|| spacing != st.spacing
 					|| pos_border_width != st.pos_border_width
@@ -780,7 +783,7 @@ namespace boost {
 		template <typename Archive>
 		void serialize(Archive& ar, weasel::DictionaryPanelStyle& s, const unsigned int version) {
 			ar & s.entry_font_face;
-			ar & s.pron_face;
+			ar & s.pron_font_face;
 			ar & s.pron_type_font_face;
 			ar & s.pos_font_face;
 			ar & s.register_font_face;
@@ -789,7 +792,7 @@ namespace boost {
 			ar & s.field_value_font_face;
 			ar & s.more_languages_head_font_face;
 			ar & s.entry_font_point;
-			ar & s.pron_point;
+			ar & s.pron_font_point;
 			ar & s.pron_type_font_point;
 			ar & s.pos_font_point;
 			ar & s.register_font_point;
@@ -797,7 +800,8 @@ namespace boost {
 			ar & s.field_key_font_point;
 			ar & s.field_value_font_point;
 			ar & s.more_languages_head_font_point;
-			ar & s.padding;
+			ar & s.padding_x;
+			ar & s.padding_y;
 			ar & s.title_gap;
 			ar & s.spacing;
 			ar & s.pos_border_width;

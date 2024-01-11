@@ -827,20 +827,20 @@ bool WeaselPanel::_DrawCandidates(CDCHandle &dc, bool back)
 				_TextOut(rects.lblLabels[i], lbl[i], m_style.hilited_hint_text_color, pDWR->pLblTextFormat);
 			}
 			std::vector<InfoLanguage> definitions = dictionary_info.Properties.Definition.Get(m_hintPanel, pDWR);
-			if (!definitions.empty()) _TextOut(rects.definitionLabel, definitions[0].Value, m_style.hilited_comment_text_color, definitions[0].TextFormat);
+			if (!definitions.empty()) _TextOut(rects.definitionLabel, definitions[0].Value, m_style.hilited_candidate_text_color, definitions[0].TextFormat);
 
 			std::vector<std::vector<std::wstring> > fields = dictionary_info.Properties.GetOtherData();
 			for (size_t i = 0; i < rects.fieldLabels.size() && i < fields.size(); i++) {
 				for (size_t j = 0; j < rects.fieldLabels[i].size() && j < fields[i].size(); j++) {
-					if (j) _TextOut(rects.fieldLabels[i][j], fields[i][j], m_style.hilited_comment_text_color, pDWR->pFieldValueTextFormat);
+					if (j) _TextOut(rects.fieldLabels[i][j], fields[i][j], m_style.hilited_candidate_text_color, pDWR->pFieldValueTextFormat);
 					else _TextOut(rects.fieldLabels[i][j], fields[i][j], m_style.hilited_hint_text_color, pDWR->pFieldKeyTextFormat);
 				}
 			}
 
-			if (definitions.size() > 1) _TextOut(rects.moreLanguagesHeadLabel, L"More Languages", m_style.hilited_comment_text_color, pDWR->pMoreLanguagesHeadTextFormat);
+			if (definitions.size() > 1) _TextOut(rects.moreLanguagesHeadLabel, L"More Languages", m_style.hilited_candidate_text_color, pDWR->pMoreLanguagesHeadTextFormat);
 			for (size_t i = 1; i <= rects.moreLanguageLabels.size() && i < definitions.size(); i++) {
 				_TextOut(rects.moreLanguageLabels[i - 1].first, definitions[i].Key, m_style.hilited_hint_text_color, pDWR->pFieldKeyTextFormat);
-				_TextOut(rects.moreLanguageLabels[i - 1].second, definitions[i].Value, m_style.hilited_comment_text_color, definitions[i].TextFormat);
+				_TextOut(rects.moreLanguageLabels[i - 1].second, definitions[i].Value, m_style.hilited_candidate_text_color, definitions[i].TextFormat);
 			}
 		}
 	}

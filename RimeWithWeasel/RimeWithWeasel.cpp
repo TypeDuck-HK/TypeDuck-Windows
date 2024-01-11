@@ -795,7 +795,7 @@ static void _UpdateUIStyle(RimeConfig* config, weasel::UI* ui, bool initialize)
 	processFontFaceConfig("style/page_mark_font_face", style.page_mark_font_face);
 
 	processFontFaceConfig("style/dictionary_panel/entry_font_face", style.dictionary_panel_style.entry_font_face);
-	processFontFaceConfig("style/dictionary_panel/pron_face", style.dictionary_panel_style.pron_face);
+	processFontFaceConfig("style/dictionary_panel/pron_font_face", style.dictionary_panel_style.pron_font_face);
 	processFontFaceConfig("style/dictionary_panel/pron_type_font_face", style.dictionary_panel_style.pron_type_font_face);
 	processFontFaceConfig("style/dictionary_panel/pos_font_face", style.dictionary_panel_style.pos_font_face);
 	processFontFaceConfig("style/dictionary_panel/register_font_face", style.dictionary_panel_style.register_font_face);
@@ -822,7 +822,7 @@ static void _UpdateUIStyle(RimeConfig* config, weasel::UI* ui, bool initialize)
 	processFontPointConfig("style/page_mark_font_point", &style.page_mark_font_point);
 
 	processFontPointConfig("style/dictionary_panel/entry_font_point", &style.dictionary_panel_style.entry_font_point);
-	processFontPointConfig("style/dictionary_panel/pron_point", &style.dictionary_panel_style.pron_point);
+	processFontPointConfig("style/dictionary_panel/pron_font_point", &style.dictionary_panel_style.pron_font_point);
 	processFontPointConfig("style/dictionary_panel/pron_type_font_point", &style.dictionary_panel_style.pron_type_font_point);
 	processFontPointConfig("style/dictionary_panel/pos_font_point", &style.dictionary_panel_style.pos_font_point);
 	processFontPointConfig("style/dictionary_panel/register_font_point", &style.dictionary_panel_style.register_font_point);
@@ -924,7 +924,8 @@ static void _UpdateUIStyle(RimeConfig* config, weasel::UI* ui, bool initialize)
 	else if (style.hilite_padding > -style.margin_y && style.margin_y < 0)
 		style.margin_y = -(style.hilite_padding);
 	// dictionary panel
-	RimeConfigGetInt(config, "style/dictionary_panel/layout/padding", &style.dictionary_panel_style.padding);
+	RimeConfigGetInt(config, "style/dictionary_panel/layout/padding_x", &style.dictionary_panel_style.padding_x);
+	RimeConfigGetInt(config, "style/dictionary_panel/layout/padding_y", &style.dictionary_panel_style.padding_y);
 	RimeConfigGetInt(config, "style/dictionary_panel/layout/title_gap", &style.dictionary_panel_style.title_gap);
 	RimeConfigGetInt(config, "style/dictionary_panel/layout/spacing", &style.dictionary_panel_style.spacing);
 	RimeConfigGetInt(config, "style/dictionary_panel/layout/pos_border_width", &style.dictionary_panel_style.pos_border_width);

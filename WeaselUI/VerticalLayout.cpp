@@ -47,12 +47,12 @@ void weasel::VerticalLayout::DoLayout(CDCHandle dc, DirectWriteResources* pDWR)
 		// icon size higher then preedit text
 		int yoffset = (STATUS_ICON_SIZE >= szy && ShouldDisplayStatusIcon()) ? (STATUS_ICON_SIZE - szy) / 2 : 0;
 		_preeditRect.SetRect(real_margin_x, height + yoffset, real_margin_x + size.cx, height + yoffset + size.cy);
-		height += szy + 2 * yoffset - _style.spacing + 1;
+		height += size.cy + 2 * yoffset + _style.spacing;
 		width = max(width, real_margin_x * 2 + size.cx + szx);
 		if(ShouldDisplayStatusIcon()) width += STATUS_ICON_SIZE;
 		_preeditRect.OffsetRect(offsetX, offsetY);
 	}
-	else if (_context.aux.str.empty()) height += _style.hilite_padding;
+	else if (_context.aux.str.empty() && candidates_count) height += _style.hilite_padding - 1;
 
 	/* Auxiliary */
 	if (!_context.aux.str.empty())
@@ -61,7 +61,7 @@ void weasel::VerticalLayout::DoLayout(CDCHandle dc, DirectWriteResources* pDWR)
 		// icon size higher then auxiliary text
 		int yoffset = (STATUS_ICON_SIZE >= size.cy && ShouldDisplayStatusIcon()) ? (STATUS_ICON_SIZE - size.cy) / 2 : 0;
 		_auxiliaryRect.SetRect(real_margin_x, height + yoffset, real_margin_x + size.cx, height + yoffset + size.cy);
-		height += size.cy + 2 * (yoffset + _style.spacing);
+		height += size.cy + 2 * yoffset + _style.spacing;
 		width = max(width, real_margin_x * 2 + size.cx);
 		_auxiliaryRect.OffsetRect(offsetX, offsetY);
 	}
@@ -217,7 +217,7 @@ void weasel::VerticalLayout::DoLayout(CDCHandle dc, DirectWriteResources* pDWR)
 			comment_group_3_height = urdSize[j].cy,
 			info_icon_height = infoIconSize.cy * isEntry[i],
 			currentTop = height;
-		height += max(label_height, max(ruby_height, max(comment_group_0_height, max(comment_group_1_height, max(comment_group_2_height, max(comment_group_3_height, info_icon_height)))))) - _style.hilite_padding;
+		height += max(label_height, max(ruby_height, max(comment_group_0_height, max(comment_group_1_height, max(comment_group_2_height, max(comment_group_3_height, info_icon_height))))));
 
 		rects.label.SetRect(w, height - label_height, w + labelSize[i].cx, height - label_height + labelSize[i].cy);
 		rects.label.OffsetRect(offsetX, offsetY);
@@ -287,14 +287,14 @@ void weasel::VerticalLayout::DoLayout(CDCHandle dc, DirectWriteResources* pDWR)
 		height += _style.hilite_padding;
 
 		if (j == entryEnds[i] - 1) {
-			_candidateRects[i].SetRect(real_margin_x + offsetX, top, width - real_margin_x + offsetX, height);
+			_candidateRects[i].SetRect(real_margin_x + offsetX, top + _style.border, width - real_margin_x + offsetX, height + _style.border);
 			top = height + _style.candidate_spacing;
 			i++;
 		}
 	}
 
 	/* Trim the last spacing if no candidates */
-	height += real_margin_y - (candidates_count ? _style.border : _style.spacing * 2);
+	height += real_margin_y - (candidates_count ? 0 : _style.spacing);
 
 	if (!_context.preedit.str.empty() && !candidates.empty())
 	{
@@ -326,9 +326,9 @@ void weasel::VerticalLayout::DoLayout(CDCHandle dc, DirectWriteResources* pDWR)
 #endif /*  USE_PAGER_MARK */
 
 	_dictionaryPanelRects.clear();
-	const int left = _contentSize.cx - real_margin_x;
-	const int minW = left + _style.dictionary_panel_style.padding;
-	int h = _style.dictionary_panel_style.padding;
+	const int left = _contentSize.cx - real_margin_x - _style.border;
+	const int minW = left + _style.dictionary_panel_style.padding_x;
+	int h = real_margin_y + _style.border + _style.dictionary_panel_style.padding_y;
 
 	for (InfoMultiHint& dictionary_info : dictionary_entries) {
 		DictionaryPanelRects rects;
@@ -347,7 +347,7 @@ void weasel::VerticalLayout::DoLayout(CDCHandle dc, DirectWriteResources* pDWR)
 		rects.pronLabel.SetRect(w, h - pronSize.cy, w + pronSize.cx, h);
 		w += pronSize.cx + _style.dictionary_panel_style.title_gap * !pronType.empty();
 		rects.pronTypeLabel.SetRect(w, h - pronTypeSize.cy, w + pronTypeSize.cx, h);
-		w += pronTypeSize.cx + _style.dictionary_panel_style.padding;
+		w += pronTypeSize.cx + _style.dictionary_panel_style.padding_x;
 		width = max(width, w);
 
 		// | -padding- [pos] -pos_gap- [pos] -definition_gap- [register] -definition_gap- [lbl] -lbl_gap- [lbl] -definition_gap- [definition] -padding- |
@@ -403,7 +403,7 @@ void weasel::VerticalLayout::DoLayout(CDCHandle dc, DirectWriteResources* pDWR)
 			if (!lblSizes.empty()) w += _style.dictionary_panel_style.definition_gap - _style.dictionary_panel_style.lbl_gap;
 
 			rects.definitionLabel.SetRect(w, h - definitionSize.cy, w + definitionSize.cx, h);
-			w += definitionSize.cx - _style.dictionary_panel_style.definition_gap * definitions.empty() + _style.dictionary_panel_style.padding;
+			w += definitionSize.cx - _style.dictionary_panel_style.definition_gap * definitions.empty() + _style.dictionary_panel_style.padding_x;
 			width = max(width, w);
 		}
 
@@ -442,7 +442,7 @@ void weasel::VerticalLayout::DoLayout(CDCHandle dc, DirectWriteResources* pDWR)
 				maxValueWidth = max(maxValueWidth, rowSizes[i].cx);
 			}
 			otherDataRects.push_back(rowRects);
-			w += maxValueWidth + _style.dictionary_panel_style.padding;
+			w += maxValueWidth + _style.dictionary_panel_style.padding_x;
 			width = max(width, w);
 		}
 		rects.fieldLabels = otherDataRects;
@@ -453,7 +453,7 @@ void weasel::VerticalLayout::DoLayout(CDCHandle dc, DirectWriteResources* pDWR)
 			GetTextSizeDW(L"More Languages", pDWR->pMoreLanguagesHeadTextFormat, pDWR, &size);
 			rects.moreLanguagesHeadLabel.SetRect(w, h, w + size.cx, h + size.cy);
 			h += size.cy;
-			w += size.cx + _style.dictionary_panel_style.padding;
+			w += size.cx + _style.dictionary_panel_style.padding_x;
 			width = max(width, w);
 
 			int maxKeyWidth = 0;
@@ -476,7 +476,7 @@ void weasel::VerticalLayout::DoLayout(CDCHandle dc, DirectWriteResources* pDWR)
 				const CRect keyRect = { w - languageSize.first.cx, h - languageSize.first.cy, w, h };
 				w += _style.dictionary_panel_style.field_gap;
 				languageRects.push_back({ keyRect, { w, h - languageSize.second.cy, w + languageSize.second.cx, h } });
-				w += languageSize.second.cx + _style.dictionary_panel_style.padding;
+				w += languageSize.second.cx + _style.dictionary_panel_style.padding_x;
 				width = max(width, w);
 			}
 			rects.moreLanguageLabels = languageRects;
@@ -488,11 +488,11 @@ void weasel::VerticalLayout::DoLayout(CDCHandle dc, DirectWriteResources* pDWR)
 	if (dictionary_entries.empty()) {
 		_dictionaryRect.SetRectEmpty();
 	} else {
-		h += _style.dictionary_panel_style.padding - _style.dictionary_panel_style.entry_spacing + real_margin_y;
-		_contentSize.cy = max(_contentSize.cy, h);
+		h += _style.dictionary_panel_style.padding_y - _style.dictionary_panel_style.entry_spacing + real_margin_y;
+		_contentSize.cy = max(_contentSize.cy, h + _style.border);
 
-		_dictionaryRect.SetRect(left, real_margin_y, width, _contentSize.cy - real_margin_y - 1);
-		_contentSize.cx = width + real_margin_x;
+		_dictionaryRect.SetRect(left, real_margin_y + _style.border - 1, width + 1, _contentSize.cy - real_margin_y - _style.border + 1);
+		_contentSize.cx = width + real_margin_x + _style.border;
 	}
 
 	// calc roundings start

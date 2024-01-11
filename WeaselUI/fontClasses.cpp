@@ -193,7 +193,7 @@ HRESULT DirectWriteResources::InitResources(UIStyle& style, UINT dpi, bool verti
 		| _SetupTextFormat(style.page_mark_font_face, style.page_mark_font_point, &pPageMarkFormat)
 
 		| _SetupTextFormat(style.dictionary_panel_style.entry_font_face, style.dictionary_panel_style.entry_font_point, &pEntryTextFormat)
-		| _SetupTextFormat(style.dictionary_panel_style.pron_face, style.dictionary_panel_style.pron_point, &pPronTextFormat)
+		| _SetupTextFormat(style.dictionary_panel_style.pron_font_face, style.dictionary_panel_style.pron_font_point, &pPronTextFormat)
 		| _SetupTextFormat(style.dictionary_panel_style.pron_type_font_face, style.dictionary_panel_style.pron_type_font_point, &pPronTypeTextFormat)
 		| _SetupTextFormat(style.dictionary_panel_style.pos_font_face, style.dictionary_panel_style.pos_font_point, &pPOSTextFormat)
 		| _SetupTextFormat(style.dictionary_panel_style.register_font_face, style.dictionary_panel_style.register_font_point, &pRegisterTextFormat)
