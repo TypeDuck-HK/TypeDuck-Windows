@@ -1,90 +1,86 @@
-# How to Rime with Weasel
+# TypeDuck for Windows Development
 
-## Preparation
+## Prerequisites
 
-  - Install **Visual Studio 2017** for *Desktop development in C++*
+  - **Visual Studio** for *Desktop development in C++*
     with components *ATL*, *MFC* and *Windows XP support*.
-    Visual Studio 2015 or later versions may work with additional configuration.
-
-  - Install dev tools: `git`, `cmake`
-
-  - Download third-party libraries: `boost(>=1.60.0)`
-
-Optional:
-
-  - install `bash` via *Git for Windows*, for installing data files with `plum`;
-  - install `python` for building OpenCC dictionaries;
-  - install [NSIS](http://nsis.sourceforge.net/Download) for creating installer.
+  - **[cmake](http://www.cmake.org/)**
+  - **[NSIS](http://nsis.sourceforge.net/Download)** for creating installer.
 
 ## Checkout source code
 
-Make sure all git submodules are checked out recursively.
-
 ```batch
-git clone --recursive https://github.com/rime/weasel.git
+git clone --recursive https://github.com/TypeDuck-HK/TypeDuck-Windows.git
+cd TypeDuck-Windows
 ```
 
-## Build and Install Weasel
+## Install Boost
 
-Locate `weasel` source directory.
+``` batch
+install-boost.bat
+```
 
 ### Setup build environment
 
-Edit your build environment settings in `env.bat`.
-You can create the file by copying `env.bat.template` in the source tree.
+Copy `env.bat.template` to `env.bat` and edit the file according to your setup.
+Specifically, make sure `BOOST_ROOT` is set to the root directory of Boost
+source tree; modify `BJAM_TOOLSET`, `CMAKE_GENERATOR` and `PLATFORM_TOOLSET` if
+using a different version of Visual Studio; also set `DEVTOOLS_PATH` for build
+tools installed to custom location.
 
-Make sure `BOOST_ROOT` is set to the existing path `X:\path\to\boost_<version>`.
+When prepared, do the following in a *Developer Command Prompt* window.
 
-When using a different version of Visual Studio or platform toolset, un-comment
-lines to set corresponding variables.
+## Build Boost
 
-Alternatively, start a *Developer Command Prompt* window and set environment
-variables directly in the console, before invocation of `build.bat`:
+This is already handled by `install-boost.bat`.
 
-```batch
-set BOOST_ROOT=X:\path\to\boost_N_NN_N
+``` batch
+build.bat boost
 ```
 
-### Build
+## Build librime
 
-```batch
-cd weasel
-build.bat all
+RIME is the input method engine that powers TypeDuck.
+
+``` batch
+build.bat librime
 ```
 
-Voila.
+See [this page](https://github.com/TypeDuck-HK/librime/blob/master/README-windows.md) for a more detailed instructions on building librime.
 
-Installer will be generated in `output\archives` directory.
+### Alternative: using prebuilt RIME binaries
 
-### Alternative: using prebuilt Rime binaries
+You may get a copy of prebuilt binaries of librime from the [release page of librime](https://github.com/TypeDuck-HK/librime/releases).
+Once downloaded, you can simply copy `.dll`s / `.lib`s into `weasel\output` / `weasel\lib` directories respectively.
 
-If you've already got a copy of prebuilt binaries of librime, you can simply
-copy `.dll`s / `.lib`s into `weasel\output` / `weasel\lib` directories
-respectively, then build Weasel without the `all` command line option.
-
-```batch
-build.bat boost data opencc
-build.bat weasel
-```
-
-### Install and try it live
+## Build the application
 
 ```batch
-cd output
-install.bat
+build.bat weasel hant
 ```
 
-### Optional: play with Rime command line tools
+Or, create a debug build:
 
-`librime` comes with a REPL application which can be used to test if the library
-is working.
+``` batch
+build.bat weasel hant debug
+```
+
+Rebuilding the application:
+
+``` batch
+build.bat weasel hant rebuild
+```
+
+Build with installer:
 
 ```batch
-cd librime
-copy /Y build\lib\Release\rime.dll build\bin
-cd build\bin
-echo zhongzhouyunshurufa | Release\rime_api_console.exe > output.txt
+build.bat weasel hant installer
 ```
 
-Instead of redirecting output to a file, you can set appropriate code page
-(`chcp 65001`) and font in the console to work with the REPL interactively.
+You may combine the arguments as many as you like, e.g.:
+
+```batch
+build.bat weasel hant debug rebuild installer
+```
+
+Installer will be generated in the `output\archives` directory.
