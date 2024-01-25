@@ -181,6 +181,7 @@ program_files:
 
   ; run as user...
   ${If} ${Silent}
+  ${AndIf} "$0" != "Upgrade"
     ExecWait "$INSTDIR\TypeDuckDeployer.exe /setdefault"
   ${Else}
     ExecWait "$INSTDIR\TypeDuckDeployer.exe /install"
@@ -197,6 +198,7 @@ program_files:
   WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Run" "TypeDuckServer" "$INSTDIR\TypeDuckServer.exe"
 
   ${If} ${Silent}
+  ${AndIf} "$0" != "Upgrade"
     WriteRegStr HKLM SOFTWARE\Rime\TypeDuck\Updates "CheckForUpdates" 0
   ${EndIf}
 
