@@ -130,6 +130,19 @@ const static std::map<std::wstring, std::wstring> partsOfSpeech = {
 	{ L"x", L"non-morpheme 非語素" },
 };
 
+const static std::map<std::wstring, std::wstring> labels = {
+	{ L"abbrev", L"abbreviation 簡稱" },
+	{ L"astro", L"astronomy 天文" },
+	{ L"ChinMeta", L"sexagenary cycle 干支" },
+	{ L"horo", L"horoscope 星座" },
+	{ L"org", L"organisation 機構" },
+	{ L"person", L"person 人名" },
+	{ L"place", L"place 地名" },
+	{ L"reli", L"religion 宗教" },
+	{ L"rare", L"rare 罕見" },
+	{ L"composition", L"compound 詞組" },
+};
+
 std::wstring InfoMultiHint::GetPronType() const {
 	std::wstring pronType = L"";
 	if (Sandhi == L"1") pronType += L"changed tone 變音, ";
@@ -158,11 +171,19 @@ std::wstring InfoProperties::GetRegister() const {
 }
 
 std::vector<std::wstring> InfoProperties::GetLabels() const {
-	std::vector<std::wstring> labelSplitted, labelFiltered;
+	std::vector<std::wstring> labelSplitted, labelFiltered, labelParts;
 	split(labelSplitted, Label, L" ");
 	for (const std::wstring label : labelSplitted) {
 		if (label.empty()) continue;
-		labelFiltered.push_back(L"(" + label + L")");
+		split(labelParts, label, L"_");
+		for (const std::wstring part : labelParts) {
+			if (part.empty()) continue;
+			auto it = labels.find(part);
+			if (it != labels.end()) {
+				labelFiltered.push_back(L"(" + it->second + L")");
+				break;
+			}
+		}
 	}
 	return labelFiltered;
 }
