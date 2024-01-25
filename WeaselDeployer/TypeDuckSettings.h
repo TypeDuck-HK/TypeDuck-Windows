@@ -45,8 +45,12 @@ public:
 	bool Save();
 
 	int showRomanization = 0;
-	Bool showReverseCode = true;
+	Bool inputCodeInWindow = true;
+	Bool enableCompletion = true;
 	Bool enableCorrection = false;
+	Bool enableSentence = true;
+	Bool enableLearning = true;
+	Bool showReverseCode = true;
 	Bool isCangjie5 = true;
 
 private:

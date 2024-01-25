@@ -2,6 +2,12 @@
 #include "TypeDuckSettingsDialog.h"
 
 LRESULT TypeDuckSettingsDialog::OnInitDiaLog(UINT, WPARAM, LPARAM, BOOL &) {
+    HFONT font = CreateFont(20, 0, 0, 0, FW_BOLD, FALSE, FALSE, FALSE, CHINESEBIG5_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_SWISS, L"Microsoft JhengHei UI");
+    display_languages_title_.Attach(GetDlgItem(IDC_DISPLAY_LANGUAGES_TITLE));
+    display_languages_title_.SetFont(font);
+    reverse_settings_title_.Attach(GetDlgItem(IDC_REVERSE_SETTINGS_TITLE));
+    reverse_settings_title_.SetFont(font);
+
     language_available_list_.Attach(GetDlgItem(IDC_HINT_LIST));
     language_available_list_.SetExtendedListViewStyle(LVS_EX_FULLROWSELECT | LVS_EX_CHECKBOXES, LVS_EX_FULLROWSELECT | LVS_EX_CHECKBOXES);
     language_available_list_.AddColumn(L"Available Languages", 0);
