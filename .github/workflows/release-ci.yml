@@ -3,6 +3,7 @@ name: Release CI
 on:
   push:
     tags:
+      - '**'
 
 jobs:
   windows:
