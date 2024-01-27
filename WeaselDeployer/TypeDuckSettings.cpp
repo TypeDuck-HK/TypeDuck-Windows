@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "TypeDuckSettings.h"
 
+#define PAGE_SIZE_KEY "menu/page_size"
 #define DISPLAY_LANGUAGES_KEY "typeduck/display_languages"
 #define SHOW_ROMANIZATION_KEY "typeduck/show_romanization"
 #define INLINE_PREEDIT_KEY "style/inline_preedit"
@@ -21,8 +22,9 @@
 
 TypeDuckSettings::TypeDuckSettings(RimeLeversApi* api) : api_(api)
 {
+	default_settings_ = api_->custom_settings_init("default", "Weasel::TypeDuckSettings");
 	settings_ = api_->custom_settings_init("weasel", "Weasel::TypeDuckSettings");
-	custom_settings_ = api_->custom_settings_init("common", "Weasel::TypeDuckSettings");
+	common_settings_ = api_->custom_settings_init("common", "Weasel::TypeDuckSettings");
 }
 
 std::vector<bool> TypeDuckSettings::GetActiveLanguages()
@@ -64,6 +66,7 @@ bool TypeDuckSettings::SetLanguageList(const std::vector<bool> result)
 
 bool TypeDuckSettings::Load()
 {
+	candidateCount = 6;
 	showRomanization = 0;
 	inputCodeInWindow = true;
 	enableCompletion = true;
@@ -74,9 +77,13 @@ bool TypeDuckSettings::Load()
 	isCangjie5 = true;
 
 	Bool success = true;
+	RimeConfig default_config = { 0 };
+	api_->settings_get_config(default_settings_, &default_config);
+	RimeApi* rime = rime_get_api();
+	success &= rime->config_get_int(&default_config, PAGE_SIZE_KEY, &candidateCount);
+
 	RimeConfig config = { 0 };
 	api_->settings_get_config(settings_, &config);
-	RimeApi* rime = rime_get_api();
 	char buffer[32];
 	success &= rime->config_get_string(&config, SHOW_ROMANIZATION_KEY, buffer, sizeof(buffer) - 1);
 	for (size_t i = 0; i < ShowRomanizationSize; ++i) {
@@ -102,6 +109,7 @@ bool TypeDuckSettings::Load()
 bool TypeDuckSettings::Save()
 {
 	Bool success = true;
+	success &= api_->customize_int(default_settings_, PAGE_SIZE_KEY, candidateCount);
 	success &= api_->customize_string(settings_, SHOW_ROMANIZATION_KEY, ShowRomanizationValues[showRomanization]);
 	success &= api_->customize_bool(settings_, INLINE_PREEDIT_KEY, !inputCodeInWindow);
 	success &= api_->customize_bool(settings_, ENABLE_COMPLETION_KEY, enableCompletion);
@@ -122,6 +130,6 @@ bool TypeDuckSettings::Save()
 	if (!enableLearning)   success &= rime->config_list_append_string(&config, "", DISABLE_LEARNING_VALUE);
 	if (!isCangjie5)       success &= rime->config_list_append_string(&config, "", USE_CANGJIE3_VALUE);
 	rime->config_set_item(&config, "", &config);
-	success &= api_->customize_item(custom_settings_, PATCH_DIRECTIVE, &config);
+	success &= api_->customize_item(common_settings_, PATCH_DIRECTIVE, &config);
 	return !!success;
 }

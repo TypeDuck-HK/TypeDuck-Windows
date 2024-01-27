@@ -65,9 +65,10 @@ static bool configure_ui(RimeLeversApi* api, UIStyleSettings* ui_style_settings,
 }
 
 static bool configure_typeduck(RimeLeversApi* api, TypeDuckSettings* typeduck_settings, bool setDefault, bool* reconfigured) {
+	RimeCustomSettings* default_settings = typeduck_settings->default_settings();
 	RimeCustomSettings* settings = typeduck_settings->settings();
-	RimeCustomSettings* custom_settings = typeduck_settings->custom_settings();
-	if (!api->load_settings(settings) || !api->load_settings(custom_settings))
+	RimeCustomSettings* common_settings = typeduck_settings->common_settings();
+	if (!api->load_settings(default_settings) || !api->load_settings(settings) || !api->load_settings(common_settings))
 		return false;
 	if (setDefault) {
 		typeduck_settings->SetLanguageList(DEFAULT_DISPLAY_LANGUAGES);
@@ -76,7 +77,7 @@ static bool configure_typeduck(RimeLeversApi* api, TypeDuckSettings* typeduck_se
 		TypeDuckSettingsDialog dialog(typeduck_settings);
 		dialog.DoModal();
 	}
-	if (api->save_settings(settings) | api->save_settings(custom_settings))
+	if (api->save_settings(default_settings) | api->save_settings(settings) | api->save_settings(common_settings))
 		*reconfigured = true;
 	return true;
 }
@@ -90,7 +91,7 @@ int Configurator::Run(bool installing, bool setDefault)
 
 	bool reconfigured = false;
 	TypeDuckSettings typeduck_settings(api);
-	if (!installing || api->is_first_run(typeduck_settings.settings()) || api->is_first_run(typeduck_settings.custom_settings()))
+	if (!installing || api->is_first_run(typeduck_settings.default_settings()) || api->is_first_run(typeduck_settings.settings()) || api->is_first_run(typeduck_settings.common_settings()))
 		configure_typeduck(api, &typeduck_settings, setDefault, &reconfigured);
 	
 	if (installing || reconfigured) {

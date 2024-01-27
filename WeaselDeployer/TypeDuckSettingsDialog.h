@@ -25,12 +25,14 @@ public:
 
 protected:
 	BEGIN_MSG_MAP(TypeDuckSettingsDialog)
-		MESSAGE_HANDLER(WM_INITDIALOG, OnInitDiaLog)
+		MESSAGE_HANDLER(WM_INITDIALOG, OnInitDialog)
+		MESSAGE_HANDLER(WM_PAINT, OnPaint)
 		COMMAND_ID_HANDLER(IDOK, OnOK)
 		MESSAGE_HANDLER(WM_CLOSE, OnClose)
 	END_MSG_MAP()
 
-	LRESULT OnInitDiaLog(UINT, WPARAM, LPARAM, BOOL&);
+	LRESULT OnInitDialog(UINT, WPARAM, LPARAM, BOOL&);
+	LRESULT OnPaint(UINT, WPARAM, LPARAM, BOOL&);
 	LRESULT OnOK(WORD, WORD, HWND, BOOL&);
 	LRESULT OnClose(UINT, WPARAM, LPARAM, BOOL&);
 
@@ -40,5 +42,6 @@ protected:
 	CStatic display_languages_title_;
 	CStatic reverse_settings_title_;
 	CCheckListViewCtrl language_available_list_;
+	CTrackBarCtrl candidate_count_;
 	TypeDuckSettings* settings_;
 };

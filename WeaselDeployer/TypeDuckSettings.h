@@ -37,13 +37,15 @@ class TypeDuckSettings
 public:
 	TypeDuckSettings(RimeLeversApi* api);
 	
+	RimeCustomSettings* default_settings() { return default_settings_; }
 	RimeCustomSettings* settings() { return settings_; }
-	RimeCustomSettings* custom_settings() { return custom_settings_; }
+	RimeCustomSettings* common_settings() { return common_settings_; }
 	std::vector<bool> GetActiveLanguages();
 	bool SetLanguageList(const std::vector<bool> result);
 	bool Load();
 	bool Save();
 
+	int candidateCount = 6;
 	int showRomanization = 0;
 	Bool inputCodeInWindow = true;
 	Bool enableCompletion = true;
@@ -55,6 +57,7 @@ public:
 
 private:
 	RimeLeversApi* api_;
+	RimeCustomSettings* default_settings_;
 	RimeCustomSettings* settings_;
-	RimeCustomSettings* custom_settings_;
+	RimeCustomSettings* common_settings_;
 };
