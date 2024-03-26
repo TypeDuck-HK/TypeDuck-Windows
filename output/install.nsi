@@ -56,7 +56,7 @@ $\r$\n\
 Should you have any enquiries, please email info@typeduck.hk or lchaakming@eduhk.hk.$\r$\n\
 $\r$\n\
 本輸入法由香港教育大學語言學及現代語言系開發。特別鳴謝「語文教育及研究常務委員會」資助本計劃。$\r$\n\
-This input method is developed by the Department of Linguistics and Modern Languages, the Education University of Hong Kong. Special thanks to the Standing Committee on Language Education and Research for funding this project."
+This input method is developed by the Department of Linguistics and Modern Language Studies, the Education University of Hong Kong. Special thanks to the Standing Committee on Language Education and Research for funding this project."
 Pop $0
 SetCtlColors $0 "000000" "FFFFFF"
 FunctionEnd

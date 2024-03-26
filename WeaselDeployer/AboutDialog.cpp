@@ -14,7 +14,7 @@ LRESULT AboutDialog::OnInitDialog(UINT, WPARAM, LPARAM, BOOL&) {
 		L"Should you have any enquiries, please email info@typeduck.hk or lchaakming@eduhk.hk.\n"
 		L"\n"
 		L"本輸入法由香港教育大學語言學及現代語言系開發。特別鳴謝「語文教育及研究常務委員會」資助本計劃。\n"
-		L"This input method is developed by the Department of Linguistics and Modern Languages, the Education University of Hong Kong. Special thanks to the Standing Committee on Language Education and Research for funding this project."
+		L"This input method is developed by the Department of Linguistics and Modern Language Studies, the Education University of Hong Kong. Special thanks to the Standing Committee on Language Education and Research for funding this project."
 	);
 
 	CenterWindow();
