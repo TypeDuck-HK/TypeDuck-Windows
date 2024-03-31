@@ -27,11 +27,11 @@ echo.
 
 if not defined BJAM_TOOLSET (
   rem the number actually means platform toolset, not %VisualStudioVersion%
-  set BJAM_TOOLSET=msvc-14.2
+  set BJAM_TOOLSET=msvc-14.3
 )
 
 if not defined PLATFORM_TOOLSET (
-  set PLATFORM_TOOLSET=v142
+  set PLATFORM_TOOLSET=v143
 )
 
 if defined DEVTOOLS_PATH set PATH=%DEVTOOLS_PATH%%PATH%
@@ -223,7 +223,9 @@ if errorlevel 1 goto error
 exit /b
 
 :error
+set exitcode=%errorlevel%
 echo error building weasel...
 
 :end
 cd %WEASEL_ROOT%
+exit /b %exitcode%
