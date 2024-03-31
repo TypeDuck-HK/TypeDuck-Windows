@@ -48,7 +48,7 @@ Click “Finish” to close this Setup."
 SetCompressor /SOLID lzma
 
 Function WelcomePageShowCallback
-${NSD_CreateLabel} 120u 38u 195u 150u "\
+${NSD_CreateLabel} 120u 36u 195u 154u "\
 歡迎使用 TypeDuck 打得 —— 設有少數族裔語言提示粵拼輸入法！有字想打？一裝即用，毋須再等，即刻打得！$\r$\n\
 Welcome to TypeDuck: a Cantonese input keyboard with minority language prompts! Got something you want to type? Have your fingers ready, get, set, TYPE DUCK!$\r$\n\
 $\r$\n\
