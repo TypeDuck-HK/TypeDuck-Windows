@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include <WeaselUI.h>
 #include "ctffunc.h"
 

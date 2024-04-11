@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #ifndef NTSTATUS
 typedef __success(return >= 0) LONG NTSTATUS;

@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include <WeaselCommon.h>
 #include <windows.h>
 #include <map>

@@ -1,4 +1,4 @@
-#include "stdafx.h"
+﻿#include "stdafx.h"
 #include "UIStyleSettingsDialog.h"
 #include "UIStyleSettings.h"
 #include "Configurator.h"

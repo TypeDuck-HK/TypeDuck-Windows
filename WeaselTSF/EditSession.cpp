@@ -1,4 +1,4 @@
-#include "stdafx.h"
+﻿#include "stdafx.h"
 #include "WeaselTSF.h"
 #include "CandidateList.h"
 #include "ResponseParser.h"

@@ -1,4 +1,4 @@
-#include "stdafx.h"
+﻿#include "stdafx.h"
 #include "WeaselDeployer.h"
 #include "Configurator.h"
 #include "SwitcherSettingsDialog.h"

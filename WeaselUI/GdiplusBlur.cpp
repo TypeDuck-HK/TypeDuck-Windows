@@ -1,4 +1,4 @@
-#include "stdafx.h"
+﻿#include "stdafx.h"
 #include "GdiplusBlur.h"
 
 /* start image gauss blur functions from https://github.com/kenjinote/DropShadow/  */

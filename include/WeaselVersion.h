@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #define WEASEL_VERSION_STR "1.1.0"
 #define WEASEL_VERSION_NUM 1,1,0,0

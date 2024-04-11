@@ -1,4 +1,4 @@
-#include "stdafx.h"
+﻿#include "stdafx.h"
 #include "TypeDuckSettingsDialog.h"
 
 #define GET_CORRECT(method, i, n) \

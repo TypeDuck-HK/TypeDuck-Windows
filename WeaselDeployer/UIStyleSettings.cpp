@@ -1,4 +1,4 @@
-#include "stdafx.h"
+﻿#include "stdafx.h"
 #include <WeaselUtility.h>
 #include "UIStyleSettings.h"
 

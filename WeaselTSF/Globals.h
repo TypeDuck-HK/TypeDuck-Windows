@@ -1,4 +1,4 @@
-/* Global definitions */
+﻿/* Global definitions */
 #pragma once
 
 #include "stdafx.h"

@@ -1,1 +1,1 @@
-// WeaselServer.h
+﻿// WeaselServer.h

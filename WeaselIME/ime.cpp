@@ -1,4 +1,4 @@
-#include "stdafx.h"
+﻿#include "stdafx.h"
 #include "WeaselIME.h"
 
 #pragma warning(disable: 4996)

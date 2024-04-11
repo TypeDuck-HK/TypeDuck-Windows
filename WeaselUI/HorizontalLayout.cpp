@@ -1,4 +1,4 @@
-#include "stdafx.h"
+﻿#include "stdafx.h"
 #include "HorizontalLayout.h"
 
 using namespace weasel;

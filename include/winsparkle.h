@@ -1,4 +1,4 @@
-/*
+﻿/*
  *  This file is part of WinSparkle (https://winsparkle.org)
  *
  *  Copyright (C) 2009-2018 Vaclav Slavik

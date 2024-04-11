@@ -1,4 +1,4 @@
-#ifndef RIME_NO_LOGGING_H_
+﻿#ifndef RIME_NO_LOGGING_H_
 #define RIME_NO_LOGGING_H_
 
 namespace rime {

@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include <msctf.h>
 
 class CLangBarItemButton : public ITfLangBarItemButton, public ITfSource
