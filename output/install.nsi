@@ -120,6 +120,7 @@ Section "TypeDuck"
 
 call_uninstaller:
   ExecWait '$R0 /S'
+  Sleep 500
 
 install:
   ; Write the new installation path into the registry
