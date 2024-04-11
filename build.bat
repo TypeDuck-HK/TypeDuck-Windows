@@ -6,7 +6,7 @@ if not exist env.bat copy env.bat.template env.bat
 
 if exist env.bat call env.bat
 
-if not defined WEASEL_VERSION set WEASEL_VERSION=1.1.0
+if not defined WEASEL_VERSION set WEASEL_VERSION=1.1.1
 if not defined WEASEL_BUILD set WEASEL_BUILD=0
 if not defined WEASEL_ROOT set WEASEL_ROOT=%CD%
 
@@ -119,7 +119,7 @@ if %build_rime% == 1 (
   call build.bat %rime_build_variant%
   if errorlevel 1 goto error
 
-cd %WEASEL_ROOT%
+  cd %WEASEL_ROOT%
   copy /Y librime\dist\include\rime_*.h include\
   if errorlevel 1 goto error
   copy /Y librime\dist\lib\rime.lib lib\
