@@ -28,22 +28,15 @@ VIAddVersionKey "FileVersion" "${WEASEL_VERSION}"
 !define MUI_UNWELCOMEFINISHPAGE_BITMAP ..\resource\Installer.bmp
 !define MUI_WELCOMEPAGE_TITLE "歡迎使用 TypeDuck$\r$\nWelcome to TypeDuck"
 !define MUI_DIRECTORYPAGE_TEXT_TOP "\
-安裝程式會將 TypeDuck 安裝至以下資料夾。按「安裝」以繼續。$\r$\n\
+安裝精靈會將 TypeDuck 安裝至以下資料夾。按「安裝」以繼續。$\r$\n\
 The Setup will install TypeDuck in the following folder. Click “Install” to continue.$\r$\n\
 $\r$\n\
 本程式乃根據 GNU 通用公眾特許條款第三版發佈。你可以前往 www.gnu.org/licenses/gpl，或於安裝後瀏覽以下安裝資料夾以閲覽其內容。$\r$\n\
 This program is distributed under the GNU General Public License v3, which can be found at www.gnu.org/licenses/gpl or in the following destination folder after the installation."
 !define MUI_TEXT_FINISH_INFO_TITLE "安裝完成$\r$\nInstallation Completed"
-!define MUI_TEXT_FINISH_INFO_TEXT "\
-你已成功安裝 TypeDuck 輸入法。$\r$\n\
-TypeDuck has been sucessfully installed on your computer.$\r$\n\
-$\r$\n\
-如「TypeDuck」於輸入法功能表多次出現，請選擇帶有圖示之項目，或嘗試重新啟動電腦。$\r$\n\
-If “TypeDuck” appears multiple times in the IME menu, please choose the one with an icon, or try restarting the computer.$\r$\n\
-$\r$\n\
-按「完成」以關閉安裝程式。$\r$\n\
-Click “Finish” to close this Setup."
-!define MUI_PAGE_CUSTOMFUNCTION_SHOW WelcomePageShowCallback
+!define MUI_FINISHPAGE_TEXT_LARGE
+!define MUI_TEXT_FINISH_REBOOTNOW "立即重新啟動 Reboot now"
+!define MUI_TEXT_FINISH_REBOOTLATER "稍後自行重新啟動 Manually reboot later"
 
 SetCompressor /SOLID lzma
 
@@ -57,6 +50,17 @@ Should you have any enquiries, please email info@typeduck.hk or lchaakming@eduhk
 $\r$\n\
 本輸入法由香港教育大學語言學及現代語言系開發。特別鳴謝「語文教育及研究常務委員會」資助本計劃。$\r$\n\
 This input method is developed by the Department of Linguistics and Modern Language Studies, the Education University of Hong Kong. Special thanks to the Standing Committee on Language Education and Research for funding this project."
+Pop $0
+SetCtlColors $0 "000000" "FFFFFF"
+FunctionEnd
+
+Function FinishPageShowCallback
+${NSD_CreateLabel} 120u 36u 195u 154u "\
+請開啟輸入法功能表，確認「TypeDuck」僅出現一次。若其多次出現，請重新啟動電腦。$\r$\n\
+Please open the IME menu and verify that “TypeDuck” appears only once. If this is not the case, restart your computer.$\r$\n\
+$\r$\n\
+選擇以下任一選項，並按「完成」以關閉安裝精靈。$\r$\n\
+Select one of the option below and click “Finish” to close this Setup."
 Pop $0
 SetCtlColors $0 "000000" "FFFFFF"
 FunctionEnd
@@ -75,10 +79,12 @@ RequestExecutionLevel admin
 
 ; Pages
 
+!define MUI_PAGE_CUSTOMFUNCTION_SHOW WelcomePageShowCallback
 !insertmacro MUI_PAGE_WELCOME
 ; !insertmacro MUI_PAGE_LICENSE "LICENSE.txt"
 !insertmacro MUI_PAGE_DIRECTORY
 !insertmacro MUI_PAGE_INSTFILES
+!define MUI_PAGE_CUSTOMFUNCTION_SHOW FinishPageShowCallback
 !insertmacro MUI_PAGE_FINISH
 
 !insertmacro MUI_UNPAGE_CONFIRM
@@ -205,6 +211,9 @@ program_files:
   ; Start TypeDuckServer
   Exec "$INSTDIR\TypeDuckServer.exe"
 
+  ; Prompt reboot
+  SetRebootFlag true
+
 SectionEnd
 
 ; Optional section (can be disabled by the user)
@@ -251,5 +260,8 @@ Section "Uninstall"
   SetShellVarContext all
   Delete /REBOOTOK "$SMPROGRAMS\TypeDuck\*.*"
   RMDir /REBOOTOK "$SMPROGRAMS\TypeDuck"
+
+  ; Prompt reboot
+  SetRebootFlag true
 
 SectionEnd
