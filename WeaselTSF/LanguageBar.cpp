@@ -106,7 +106,7 @@ STDAPI CLangBarItemButton::Show(BOOL fShow)
 
 STDAPI CLangBarItemButton::GetTooltipString(BSTR *pbstrToolTip)
 {
-	*pbstrToolTip = SysAllocString(L"Left-click to switch modes, right-click to open menu");
+	*pbstrToolTip = SysAllocString(L"按滑鼠左鍵以切換模式，按滑鼠右鍵以開啟功能表\r\nLeft-click to switch modes, right-click to open menu");
 	return (*pbstrToolTip == NULL)? E_OUTOFMEMORY: S_OK;
 }
 

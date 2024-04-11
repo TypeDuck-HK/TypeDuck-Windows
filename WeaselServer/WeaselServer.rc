@@ -108,19 +108,19 @@ IDR_MENU_POPUP MENU
 BEGIN
     POPUP "TypeDuck Tray"
     BEGIN
-        MENUITEM "IME Settings (&S)",           ID_WEASELTRAY_SETTINGS
-        MENUITEM "User Dictionary Management (&D)", ID_WEASELTRAY_DICT_MANAGEMENT
-        MENUITEM "User Data Sync (&N)",         ID_WEASELTRAY_SYNC
+        MENUITEM "輸入法設定 IME Settings (&S)", ID_WEASELTRAY_SETTINGS
+        MENUITEM "用户詞典管理 User Dictionary Management (&D)", ID_WEASELTRAY_DICT_MANAGEMENT
+        MENUITEM "用户資料同步 User Data Sync (&N)", ID_WEASELTRAY_SYNC
         MENUITEM SEPARATOR
-        MENUITEM "User Folder (&C)",            ID_WEASELTRAY_USERCONFIG
-        MENUITEM "Program Folder (&P)",         ID_WEASELTRAY_INSTALLDIR
+        MENUITEM "用户資料夾 User Folder (&C)", ID_WEASELTRAY_USERCONFIG
+        MENUITEM "程式資料夾 Program Folder (&P)", ID_WEASELTRAY_INSTALLDIR
         MENUITEM SEPARATOR
-        MENUITEM "About TypeDuck… (&A)",        ID_WEASELTRAY_ABOUT
-        MENUITEM "TypeDuck Website (&H)",       ID_WEASELTRAY_HOMEPAGE
-        MENUITEM "Check for Updates (&U)",      ID_WEASELTRAY_CHECKUPDATE
+        MENUITEM "關於 About TypeDuck… (&A)", ID_WEASELTRAY_ABOUT
+        MENUITEM "網站主頁 TypeDuck Website (&H)", ID_WEASELTRAY_HOMEPAGE
+        MENUITEM "檢查更新 Check for Updates (&U)", ID_WEASELTRAY_CHECKUPDATE
         MENUITEM SEPARATOR
-        MENUITEM "Redeploy (&R)",               ID_WEASELTRAY_DEPLOY
-        MENUITEM "Terminate IME (&Q)",          ID_WEASELTRAY_QUIT
+        MENUITEM "重新整理 Refresh (&R)", ID_WEASELTRAY_DEPLOY
+        MENUITEM "終止輸入法 Terminate IME (&Q)", ID_WEASELTRAY_QUIT
     END
 END
 
