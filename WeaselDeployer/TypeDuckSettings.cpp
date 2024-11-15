@@ -118,7 +118,6 @@ bool TypeDuckSettings::Save()
 	success &= api_->customize_bool(settings_, ENABLE_LEARNING_KEY, enableLearning);
 	success &= api_->customize_bool(settings_, SHOW_REVERSE_CODE_KEY, showReverseCode);
 	success &= api_->customize_bool(settings_, USE_CANGJIE5_KEY, isCangjie5);
-	size_t j = 0;
 	RimeApi* rime = rime_get_api();
 	RimeConfig config = { 0 };
 	success &= rime->config_init(&config);
