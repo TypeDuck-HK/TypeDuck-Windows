@@ -12,9 +12,6 @@ ReleaseHant/
 /output/*.ime
 /output/*.txt
 /output/*.bat
-/output/data/essay.txt
-/output/data/opencc/
-/output/data/*.yaml
 /output/archives
 /lib/*.lib
 /include/glog
