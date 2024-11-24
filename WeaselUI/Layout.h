@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include <WeaselIPCData.h>
 #include <WeaselUI.h>

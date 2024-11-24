@@ -1,4 +1,4 @@
-#include "stdafx.h"
+﻿#include "stdafx.h"
 #include "WeaselIPC.h"
 #include "WeaselTSF.h"
 #include "KeyEvent.h"

@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include "Deserializer.h"
 
 class Configurator : public weasel::Deserializer {

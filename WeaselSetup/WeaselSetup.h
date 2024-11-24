@@ -1,1 +1,1 @@
-// WeaselSetup.h
+﻿// WeaselSetup.h

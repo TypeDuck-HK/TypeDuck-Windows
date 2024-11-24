@@ -1,4 +1,4 @@
-// TrayIcon.h: interface for the CSystemTray class.
+﻿// TrayIcon.h: interface for the CSystemTray class.
 //
 // Written by Chris Maunder (cmaunder@mail.com)
 // Copyright (c) 1998.

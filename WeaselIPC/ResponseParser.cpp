@@ -1,4 +1,4 @@
-#include "stdafx.h"
+﻿#include "stdafx.h"
 #include <StringAlgorithm.hpp>
 #include <WeaselIPC.h>
 #include "Deserializer.h"

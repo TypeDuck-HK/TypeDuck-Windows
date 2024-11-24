@@ -1,4 +1,4 @@
-#include "stdafx.h"
+﻿#include "stdafx.h"
 #include "WeaselService.h"
 #include "WeaselServerApp.h"
 #include <boost/thread.hpp>

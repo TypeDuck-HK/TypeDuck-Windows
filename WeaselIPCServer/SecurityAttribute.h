@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include <winnt.h>   // for security attributes constants
 #include <aclapi.h>  // for ACL
 

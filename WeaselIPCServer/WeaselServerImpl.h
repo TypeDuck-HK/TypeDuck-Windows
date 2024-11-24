@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include <WeaselIPC.h>
 #include <map>
 #include <Winnt.h>   // for security attributes constants

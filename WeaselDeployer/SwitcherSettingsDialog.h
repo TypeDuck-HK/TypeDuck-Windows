@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include "resource.h"
 #include <rime_levers_api.h>

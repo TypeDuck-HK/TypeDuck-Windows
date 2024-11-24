@@ -1,4 +1,4 @@
-#include "stdafx.h"
+﻿#include "stdafx.h"
 #include <filesystem>
 #include <string>
 #include <WeaselUtility.h>
