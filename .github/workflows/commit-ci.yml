@@ -4,9 +4,7 @@ on:
   workflow_dispatch:
   push:
     branches:
-      - '*'
-    tags:
-      - '![0-9]+.*'
+      - '**'
     paths:
       - '**/**'
       - '!*.md'
@@ -68,6 +66,9 @@ jobs:
         run: |
           cp env.vs2019.bat env.bat
           echo git_ref_name="$(git describe --always)" >> $GITHUB_ENV
+          cd librime
+          git fetch origin "refs/tags/*:refs/tags/*"
+          echo rime_version="$(git describe --always)" >> $GITHUB_ENV
 
       - name: Cache Boost
         id: cache-boost
@@ -91,12 +92,8 @@ jobs:
         run: |
           .\github.install.bat
 
-      - name: Build data
-        run: |
-          .\build.bat data
-
-      - name: Build Weasel
-        id: build_weasel
+      - name: Build TypeDuck
+        id: build_typeduck
         run: |
           .\build.bat arm64 installer
 
@@ -108,7 +105,7 @@ jobs:
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: weasel-artifact-${{ env.git_ref_name }}
+          name: typeduck-artifact-${{ env.git_ref_name }}
           if-no-files-found: error
           path: |
             .\output\archives\weasel*.exe
@@ -136,6 +133,9 @@ jobs:
         run: |
           cp env.vs2019.bat env.bat
           echo git_ref_name="$(git describe --always)" >> $GITHUB_ENV
+          cd librime
+          git fetch origin "refs/tags/*:refs/tags/*"
+          echo rime_version="$(git describe --always)" >> $GITHUB_ENV
 
       - name: Cache Boost
         id: cache-boost
@@ -165,14 +165,8 @@ jobs:
         run: |
           .\github.install.bat
 
-      - name: Build data
-        run: |
-          $ErrorActionPreference = 'Stop'
-          .\build.bat data
-
-      - name: Build Weasel
-        id: build_weasel
+      - name: Build TypeDuck
+        id: build_typeduck
         shell: cmd
         run: |
           .\xbuild.bat arm64 installer
-
