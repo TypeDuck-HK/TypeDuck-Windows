@@ -1,15 +1,9 @@
 setlocal
 
-git submodule init
-git submodule update plum
-
-set rime_version=1.11.2
-set rime_hash=5b09f35
-
-set download_archive=rime-%rime_hash%-Windows-msvc-x86.7z
-set download_archive_deps=rime-deps-%rime_hash%-Windows-msvc-x86.7z
-set download_archive_x64=rime-%rime_hash%-Windows-msvc-x64.7z
-set download_archive_deps_x64=rime-deps-%rime_hash%-Windows-msvc-x64.7z
+set download_archive=rime-TypeDuck-%rime_version%-Windows-msvc-x86.7z
+set download_archive_deps=rime-deps-TypeDuck-%rime_version%-Windows-msvc-x86.7z
+set download_archive_x64=rime-TypeDuck-%rime_version%-Windows-msvc-x64.7z
+set download_archive_deps_x64=rime-deps-TypeDuck-%rime_version%-Windows-msvc-x64.7z
 
 curl -LO https://github.com/rime/librime/releases/download/%rime_version%/%download_archive%
 curl -LO https://github.com/rime/librime/releases/download/%rime_version%/%download_archive_deps%
