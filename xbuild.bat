@@ -193,6 +193,7 @@ if %build_arm64% == 1 (
   if errorlevel 1 goto error
 )
 if %build_installer% == 1 (
+  copy %WEASEL_ROOT%\LICENSE.txt output\
   "%ProgramFiles(x86)%"\NSIS\Bin\makensis.exe ^
   /DWEASEL_VERSION=%WEASEL_VERSION% ^
   /DWEASEL_BUILD=%WEASEL_BUILD% ^

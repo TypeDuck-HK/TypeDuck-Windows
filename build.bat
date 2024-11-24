@@ -214,6 +214,7 @@ if %build_arm64% == 1 (
 )
 
 if %build_installer% == 1 (
+  copy %WEASEL_ROOT%\LICENSE.txt output\
   "%ProgramFiles(x86)%"\NSIS\Bin\makensis.exe ^
   /DWEASEL_VERSION=%WEASEL_VERSION% ^
   /DWEASEL_BUILD=%WEASEL_BUILD% ^
@@ -277,7 +278,6 @@ rem build boost
 
 rem ---------------------------------------------------------------------------
 :build_data
-  copy %WEASEL_ROOT%\LICENSE.txt output\
   copy %WEASEL_ROOT%\README.md output\README.txt
   copy %WEASEL_ROOT%\plum\rime-install.bat output\
   set plum_dir=plum
