@@ -5,10 +5,10 @@ set download_archive_deps=rime-deps-TypeDuck-%rime_version%-Windows-msvc-x86.7z
 set download_archive_x64=rime-TypeDuck-%rime_version%-Windows-msvc-x64.7z
 set download_archive_deps_x64=rime-deps-TypeDuck-%rime_version%-Windows-msvc-x64.7z
 
-curl -LO https://github.com/rime/librime/releases/download/%rime_version%/%download_archive%
-curl -LO https://github.com/rime/librime/releases/download/%rime_version%/%download_archive_deps%
-curl -LO https://github.com/rime/librime/releases/download/%rime_version%/%download_archive_x64%
-curl -LO https://github.com/rime/librime/releases/download/%rime_version%/%download_archive_deps_x64%
+curl -LO https://github.com/TypeDuck-HK/librime/releases/download/%rime_version%/%download_archive%
+curl -LO https://github.com/TypeDuck-HK/librime/releases/download/%rime_version%/%download_archive_deps%
+curl -LO https://github.com/TypeDuck-HK/librime/releases/download/%rime_version%/%download_archive_x64%
+curl -LO https://github.com/TypeDuck-HK/librime/releases/download/%rime_version%/%download_archive_deps_x64%
 
 7z x %download_archive% * -olibrime\ -y
 7z x %download_archive_deps% * -olibrime\ -y
