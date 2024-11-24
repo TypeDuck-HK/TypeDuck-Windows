@@ -498,7 +498,7 @@
     <None Include="..\resource\en.ico" />
     <None Include="..\resource\reload.ico" />
     <None Include="..\resource\zh.ico" />
-    <None Include="..\resource\weasel.ico" />
+    <None Include="..\resource\TypeDuck_Small.ico" />
     <None Include="ReadMe.txt" />
     <None Include="WeaselTSF.def" />
   </ItemGroup>

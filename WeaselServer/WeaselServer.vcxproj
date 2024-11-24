@@ -530,7 +530,7 @@
     <None Include="..\resource\en.ico" />
     <None Include="..\resource\reload.ico" />
     <None Include="..\resource\zh.ico" />
-    <None Include="..\resource\weasel.ico" />
+    <None Include="..\resource\TypeDuck_Transparent.ico" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="..\resource\full.ico" />

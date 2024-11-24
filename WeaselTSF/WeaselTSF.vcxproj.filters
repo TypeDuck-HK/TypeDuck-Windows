@@ -122,7 +122,7 @@
     <None Include="WeaselTSF.def">
       <Filter>Source Files</Filter>
     </None>
-    <None Include="..\resource\weasel.ico">
+    <None Include="..\resource\TypeDuck_Small.ico">
       <Filter>Resource Files</Filter>
     </None>
     <None Include="..\resource\zh.ico">

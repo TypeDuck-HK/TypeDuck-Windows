@@ -69,7 +69,7 @@
     <None Include="..\resource\zh.ico">
       <Filter>Resource Files</Filter>
     </None>
-    <None Include="..\resource\weasel.ico">
+    <None Include="..\resource\TypeDuck_Transparent.ico">
       <Filter>Resource Files</Filter>
     </None>
   </ItemGroup>
