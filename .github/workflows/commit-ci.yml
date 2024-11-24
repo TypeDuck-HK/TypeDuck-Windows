@@ -108,7 +108,7 @@ jobs:
           name: typeduck-artifact-${{ env.git_ref_name }}
           if-no-files-found: error
           path: |
-            .\output\archives\weasel*.exe
+            .\output\archives\TypeDuck*.exe
             .\output\archives\debug_symbols.7z
 
   xbuild:

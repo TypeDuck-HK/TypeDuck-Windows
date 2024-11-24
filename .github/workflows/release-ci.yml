@@ -68,5 +68,5 @@ jobs:
         with:
           title: "TypeDuck for Windows: ${{ github.ref_name }}"
           files: |
-            ./output/archives/weasel*.exe
+            ./output/archives/TypeDuck*.exe
             ./output/archives/debug_symbols.7z
