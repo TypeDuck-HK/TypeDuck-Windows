@@ -369,8 +369,9 @@ rem %3 : target_path of rime.dll, base %WEASEL_ROOT% or abs path
 rem ---------------------------------------------------------------------------
 
 :error
-
+set exitcode=%errorlevel%
 echo error building weasel...
 
 :end
 cd %WEASEL_ROOT%
+exit /b %exitcode%
