@@ -21,7 +21,3 @@ copy /Y librime\dist\lib\rime.dll output\Win32\
 
 copy /Y librime_x64\dist\lib\rime.lib lib64\
 copy /Y librime_x64\dist\lib\rime.dll output\
-
-if not exist output\data\opencc mkdir output\data\opencc
-copy /Y librime\share\opencc\*.* output\data\opencc\
-
