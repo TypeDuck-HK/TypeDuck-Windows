@@ -7,7 +7,7 @@
 
 static UINT mode_icon[] = {IDI_ZH, IDI_ZH, IDI_EN, IDI_RELOAD};
 static const WCHAR* mode_label[] = {NULL, /*L"中文"*/ NULL, /*L"西文"*/ NULL,
-                                    L"Under maintenance"};
+                                    L"Refreshing…"};
 
 WeaselTrayIcon::WeaselTrayIcon(weasel::UI& ui)
     : m_style(ui.style()),

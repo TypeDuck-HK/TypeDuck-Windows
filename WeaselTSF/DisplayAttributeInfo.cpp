@@ -4,7 +4,7 @@
 #include "Globals.h"
 
 const WCHAR _daiInputName[] = L"DisplayAttributeInput";
-const WCHAR _daiDescription[] = L"Weasel Display Attribute Input";
+const WCHAR _daiDescription[] = L"TypeDuck Display Attribute Input";
 
 // change style only, leave color to app
 const TF_DISPLAYATTRIBUTE _daiDisplayAttribute = {

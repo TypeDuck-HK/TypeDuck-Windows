@@ -12,95 +12,11 @@
 /////////////////////////////////////////////////////////////////////////////
 #undef APSTUDIO_READONLY_SYMBOLS
 
-#ifndef APSTUDIO_INVOKED
-  #define STRZ2(x) #x
-  #define STRZ(x) STRZ2(x)
-#endif
-
 /////////////////////////////////////////////////////////////////////////////
-// Chinese (P.R.C.) resources
+// 中性 (預設值) resources
 
-#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_CHS)
-#ifdef _WIN32
-LANGUAGE LANG_CHINESE, SUBLANG_CHINESE_SIMPLIFIED
-#endif //_WIN32
-
-#ifdef APSTUDIO_INVOKED
-/////////////////////////////////////////////////////////////////////////////
-//
-// TEXTINCLUDE
-//
-
-1 TEXTINCLUDE
-BEGIN
-    "resource.h\0"
-END
-
-2 TEXTINCLUDE
-BEGIN
-    "#include ""afxres.h""\r\n"
-    "\0"
-END
-
-3 TEXTINCLUDE
-BEGIN
-    "\r\n"
-    "\0"
-END
-
-#endif    // APSTUDIO_INVOKED
-
-
-/////////////////////////////////////////////////////////////////////////////
-//
-// Version
-//
-#ifndef APSTUDIO_INVOKED
-VS_VERSION_INFO VERSIONINFO
- FILEVERSION VERSION_MAJOR,VERSION_MINOR,VERSION_PATCH,0
- PRODUCTVERSION VERSION_MAJOR,VERSION_MINOR,VERSION_PATCH,0
- FILEFLAGSMASK 0x17L
-#ifdef _DEBUG
- FILEFLAGS 0x1L
-#else
- FILEFLAGS 0x0L
-#endif
- FILEOS 0x4L
- FILETYPE 0x3L
- FILESUBTYPE 0xbL
-BEGIN
-    BLOCK "StringFileInfo"
-    BEGIN
-        BLOCK "040404b0"
-        BEGIN
-            VALUE "CompanyName", "式恕堂"
-            VALUE "FileDescription", "小狼毫輸入法"
-            VALUE "FileVersion", FILE_VERSION
-            VALUE "InternalName", "Weasel"
-            VALUE "LegalCopyright", "式恕堂 版權所無"
-            VALUE "OriginalFilename", "weasel.ime"
-            VALUE "ProductName", "小狼毫"
-            VALUE "ProductVersion", STRZ(PRODUCT_VERSION)
-        END
-        BLOCK "080404b0"
-        BEGIN
-            VALUE "CompanyName", "式恕堂"
-            VALUE "FileDescription", "小狼毫輸入法"
-            VALUE "FileVersion", FILE_VERSION
-            VALUE "InternalName", "Weasel"
-            VALUE "LegalCopyright", "式恕堂 版權所無"
-            VALUE "OriginalFilename", "weasel.ime"
-            VALUE "ProductName", "小狼毫"
-            VALUE "ProductVersion", STRZ(PRODUCT_VERSION)
-        END
-    END
-    BLOCK "VarFileInfo"
-    BEGIN
-        VALUE "Translation", 0x404, 1200
-        VALUE "Translation", 0x804, 1200
-    END
-END
-#endif  // not APSTUDIO_INVOKED
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_NEUD)
+LANGUAGE LANG_NEUTRAL, SUBLANG_DEFAULT
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -110,7 +26,43 @@ END
 // Icon with lowest ID value placed first to ensure application icon
 // remains consistent on all systems.
 IDI_WEASEL              ICON                    "..\\resource\\TypeDuck_Small.ico"
-#endif    // Chinese (P.R.C.) resources
+
+#endif    // 中性 (預設值) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+/////////////////////////////////////////////////////////////////////////////
+// 中文 (簡體，中國) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_CHS)
+LANGUAGE LANG_CHINESE, SUBLANG_CHINESE_SIMPLIFIED
+
+#ifdef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// TEXTINCLUDE
+//
+
+1 TEXTINCLUDE 
+BEGIN
+    "resource.h\0"
+END
+
+2 TEXTINCLUDE 
+BEGIN
+    "#include ""afxres.h""\r\n"
+    "\0"
+END
+
+3 TEXTINCLUDE 
+BEGIN
+    "\r\n"
+    "\0"
+END
+
+#endif    // APSTUDIO_INVOKED
+
+#endif    // 中文 (簡體，中國) resources
 /////////////////////////////////////////////////////////////////////////////
 
 

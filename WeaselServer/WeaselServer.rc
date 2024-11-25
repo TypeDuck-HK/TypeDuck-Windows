@@ -1,11 +1,6 @@
 // Microsoft Visual C++ generated resource script.
 //
 #include "resource.h"
-#ifndef APSTUDIO_INVOKED
-#include "../include/resource.h"
- #define STRZ2(x) #x
- #define STRZ(x) STRZ2(x)
-#endif
 
 #define APSTUDIO_READONLY_SYMBOLS
 /////////////////////////////////////////////////////////////////////////////
@@ -18,36 +13,10 @@
 #undef APSTUDIO_READONLY_SYMBOLS
 
 /////////////////////////////////////////////////////////////////////////////
-// Chinese (Simplified, China) resources
+// 中性 (預設值) resources
 
-#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_CHS)
-LANGUAGE LANG_CHINESE, SUBLANG_CHINESE_SIMPLIFIED
-
-#ifdef APSTUDIO_INVOKED
-/////////////////////////////////////////////////////////////////////////////
-//
-// TEXTINCLUDE
-//
-
-1 TEXTINCLUDE 
-BEGIN
-    "resource.h\0"
-END
-
-2 TEXTINCLUDE 
-BEGIN
-    "#include ""afxres.h""\r\n"
-    "\0"
-END
-
-3 TEXTINCLUDE 
-BEGIN
-    "\r\n"
-    "\0"
-END
-
-#endif    // APSTUDIO_INVOKED
-
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_NEUD)
+LANGUAGE LANG_NEUTRAL, SUBLANG_DEFAULT
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -56,71 +25,31 @@ END
 
 FEEDURL APPCAST 
 BEGIN
-    0x7468, 0x7074, 0x2f3a, 0x722f, 0x6d69, 0x2e65, 0x6967, 0x6874, 0x6275, 
-    0x692e, 0x2f6f, 0x6572, 0x656c, 0x7361, 0x2f65, 0x6577, 0x7361, 0x6c65, 
-    0x612f, 0x7070, 0x6163, 0x7473, 0x782e, 0x6c6d
+    0x7468, 0x7074, 0x3a73, 0x2f2f, 0x7777, 0x2e77, 0x7974, 0x6570, 0x7564, 
+    0x6b63, 0x682e, 0x2f6b, 0x7075, 0x6164, 0x6574, 0x2f73, 0x6977, 0x646e, 
+    0x776f, 0x2e73, 0x6d78, "\154" 
 END
 
 MANUALUPDATEFEEDURL APPCAST 
 BEGIN
-    0x7468, 0x7074, 0x2f3a, 0x722f, 0x6d69, 0x2e65, 0x6967, 0x6874, 0x6275, 
-    0x692e, 0x2f6f, 0x6572, 0x656c, 0x7361, 0x2f65, 0x6577, 0x7361, 0x6c65, 
-    0x612f, 0x7070, 0x6163, 0x7473, 0x782e, 0x6c6d
+    0x7468, 0x7074, 0x3a73, 0x2f2f, 0x7777, 0x2e77, 0x7974, 0x6570, 0x7564, 
+    0x6b63, 0x682e, 0x2f6b, 0x7075, 0x6164, 0x6574, 0x2f73, 0x6977, 0x646e, 
+    0x776f, 0x2e73, 0x6d78, "\154" 
 END
 
-TESTINGFEEDURL APPCAST
-BEGIN 
-    0x7468, 0x7074, 0x2f3a, 0x722f, 0x6d69, 0x2e65, 0x6967, 0x6874, 0x6275,
-    0x692e, 0x2f6f, 0x6574, 0x7473, 0x6e69, 0x2f67, 0x6577, 0x7361, 0x6c65,
-    0x612f, 0x7070, 0x6163, 0x7473, 0x782e, 0x6c6d
+TESTINGFEEDURL APPCAST 
+BEGIN
+    0x7468, 0x7074, 0x3a73, 0x2f2f, 0x7777, 0x2e77, 0x7974, 0x6570, 0x7564, 
+    0x6b63, 0x682e, 0x2f6b, 0x7075, 0x6164, 0x6574, 0x2f73, 0x6977, 0x646e, 
+    0x776f, 0x2e73, 0x6d78, "\154" 
 END
 
 TESTINGMANUALUPDATEFEEDURL APPCAST 
-BEGIN 
-    0x7468, 0x7074, 0x2f3a, 0x722f, 0x6d69, 0x2e65, 0x6967, 0x6874, 0x6275,
-    0x692e, 0x2f6f, 0x6574, 0x7473, 0x6e69, 0x2f67, 0x6577, 0x7361, 0x6c65,
-    0x612f, 0x7070, 0x6163, 0x7473, 0x782e, 0x6c6d
-END
-
-/////////////////////////////////////////////////////////////////////////////
-//
-// Version
-//
-#ifndef APSTUDIO_INVOKED
-VS_VERSION_INFO VERSIONINFO
- FILEVERSION VERSION_MAJOR,VERSION_MINOR,VERSION_PATCH,0
- PRODUCTVERSION VERSION_MAJOR,VERSION_MINOR,VERSION_PATCH,0
- FILEFLAGSMASK 0x17L
-#ifdef _DEBUG
- FILEFLAGS 0x1L
-#else
- FILEFLAGS 0x0L
-#endif
- FILEOS 0x4L
- FILETYPE 0x1L
- FILESUBTYPE 0x0L
 BEGIN
-    BLOCK "StringFileInfo"
-    BEGIN
-        BLOCK "080404b0"
-        BEGIN
-            VALUE "Comments", "Powered by RIME | 中州韵输入法引擎"
-            VALUE "CompanyName", "式恕堂"
-            VALUE "FileDescription", "小狼毫算法服务"
-            VALUE "FileVersion", FILE_VERSION
-            VALUE "InternalName", "WeaselServer"
-            VALUE "LegalCopyright", "式恕堂 版权所无"
-            VALUE "OriginalFilename", "WeaselServer.exe"
-            VALUE "ProductName", "小狼毫"
-            VALUE "ProductVersion", STRZ(PRODUCT_VERSION)
-        END
-    END
-    BLOCK "VarFileInfo"
-    BEGIN
-        VALUE "Translation", 0x804, 1200
-    END
+    0x7468, 0x7074, 0x3a73, 0x2f2f, 0x7777, 0x2e77, 0x7974, 0x6570, 0x7564, 
+    0x6b63, 0x682e, 0x2f6b, 0x7075, 0x6164, 0x6574, 0x2f73, 0x6977, 0x646e, 
+    0x776f, 0x2e73, 0x6d78, "\154" 
 END
-#endif /* APSTUDIO_INVOKED */
 
 
 /////////////////////////////////////////////////////////////////////////////
@@ -141,186 +70,6 @@ IDI_RELOAD              ICON                    "..\\resource\\reload.ico"
 IDI_FULL_SHAPE          ICON                    "..\\resource\\full.ico"
 
 IDI_HALF_SHAPE          ICON                    "..\\resource\\half.ico"
-
-
-/////////////////////////////////////////////////////////////////////////////
-//
-// Menu
-//
-
-IDR_MENU_POPUP MENU
-BEGIN
-    POPUP "WeaselTray"
-    BEGIN
-        MENUITEM "输入法设定 (&S)",                  ID_WEASELTRAY_SETTINGS
-        MENUITEM "用户词典管理 (&D)",                 ID_WEASELTRAY_DICT_MANAGEMENT
-        MENUITEM "用户资料同步 (&N)",                 ID_WEASELTRAY_SYNC
-        MENUITEM SEPARATOR
-        MENUITEM "用户文件夹 (&C)",                  ID_WEASELTRAY_USERCONFIG
-        MENUITEM "程序文件夹(&P)",                   ID_WEASELTRAY_INSTALLDIR
-        MENUITEM "日志文件夹 (&L)",                  ID_WEASELTRAY_LOGDIR
-        MENUITEM SEPARATOR
-        MENUITEM "帮助文档 (&H)",                   ID_WEASELTRAY_WIKI
-        MENUITEM "参加讨论 (&J)",                   ID_WEASELTRAY_FORUM
-        MENUITEM SEPARATOR
-        MENUITEM "检查新版本 (&U)",                  ID_WEASELTRAY_CHECKUPDATE
-        MENUITEM "重新部署 (&R)",                   ID_WEASELTRAY_DEPLOY
-        MENUITEM "退出 (&Q)",                     ID_WEASELTRAY_QUIT
-    END
-END
-
-
-/////////////////////////////////////////////////////////////////////////////
-//
-// String Table
-//
-
-STRINGTABLE
-BEGIN
-    IDS_STR_SYSTEM_VERSION_WARNING_CAPTION "系统版本过低"
-    IDS_STR_SYSTEM_VERSION_WARNING "仅支持Windows 8.1或更高版本系统"
-    IDS_STR_UNDER_MAINTENANCE "维护中"
-END
-
-#endif    // Chinese (Simplified, China) resources
-/////////////////////////////////////////////////////////////////////////////
-
-
-/////////////////////////////////////////////////////////////////////////////
-// Chinese (Traditional, Taiwan) resources
-
-#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_CHT)
-LANGUAGE LANG_CHINESE, SUBLANG_CHINESE_TRADITIONAL
-
-/////////////////////////////////////////////////////////////////////////////
-//
-// Version
-//
-#ifndef APSTUDIO_INVOKED
-VS_VERSION_INFO VERSIONINFO
- FILEVERSION VERSION_MAJOR,VERSION_MINOR,VERSION_PATCH,0
- PRODUCTVERSION VERSION_MAJOR,VERSION_MINOR,VERSION_PATCH,0
- FILEFLAGSMASK 0x17L
-#ifdef _DEBUG
- FILEFLAGS 0x1L
-#else
- FILEFLAGS 0x0L
-#endif
- FILEOS 0x4L
- FILETYPE 0x1L
- FILESUBTYPE 0x0L
-BEGIN
-    BLOCK "StringFileInfo"
-    BEGIN
-        BLOCK "040404b0"
-        BEGIN
-            VALUE "Comments", "Powered by RIME | 中州韻輸入法引擎"
-            VALUE "CompanyName", "式恕堂"
-            VALUE "FileDescription", "小狼毫算法服務"
-            VALUE "FileVersion", FILE_VERSION
-            VALUE "InternalName", "WeaselServer"
-            VALUE "LegalCopyright", "式恕堂 版權所無"
-            VALUE "OriginalFilename", "WeaselServer.exe"
-            VALUE "ProductName", "小狼毫"
-            VALUE "ProductVersion", STRZ(PRODUCT_VERSION)
-        END
-    END
-    BLOCK "VarFileInfo"
-    BEGIN
-        VALUE "Translation", 0x404, 1200
-    END
-END
-#endif /* APSTUDIO_INVOKED */
-
-
-/////////////////////////////////////////////////////////////////////////////
-//
-// Menu
-//
-
-IDR_MENU_POPUP MENU
-BEGIN
-    POPUP "WeaselTray"
-    BEGIN
-        MENUITEM "輸入法設定 (&S)",                  ID_WEASELTRAY_SETTINGS
-        MENUITEM "用戶詞典管理 (&D)",                 ID_WEASELTRAY_DICT_MANAGEMENT
-        MENUITEM "用戶資料同步 (&N)",                 ID_WEASELTRAY_SYNC
-        MENUITEM SEPARATOR
-        MENUITEM "用戶文件夾 (&C)",                  ID_WEASELTRAY_USERCONFIG
-        MENUITEM "程序文件夾 (&P)",                  ID_WEASELTRAY_INSTALLDIR
-        MENUITEM "日誌文件夾 (&L)",                  ID_WEASELTRAY_LOGDIR
-        MENUITEM SEPARATOR
-        MENUITEM "幫助文檔 (&H)",                   ID_WEASELTRAY_WIKI
-        MENUITEM "參加討論 (&J)",                   ID_WEASELTRAY_FORUM
-        MENUITEM SEPARATOR
-        MENUITEM "檢查新版本 (&U)",                  ID_WEASELTRAY_CHECKUPDATE
-        MENUITEM "重新部署 (&R)",                   ID_WEASELTRAY_DEPLOY
-        MENUITEM "退出 (&Q)",                     ID_WEASELTRAY_QUIT
-    END
-END
-
-
-/////////////////////////////////////////////////////////////////////////////
-//
-// String Table
-//
-
-STRINGTABLE
-BEGIN
-    IDS_STR_SYSTEM_VERSION_WARNING_CAPTION "系統版本過低"
-    IDS_STR_SYSTEM_VERSION_WARNING "僅支持Windows 8.1或更高版本系統"
-    IDS_STR_UNDER_MAINTENANCE "維護中"
-END
-
-#endif    // Chinese (Traditional, Taiwan) resources
-/////////////////////////////////////////////////////////////////////////////
-
-
-/////////////////////////////////////////////////////////////////////////////
-// English (United States) resources
-
-#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
-LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
-
-/////////////////////////////////////////////////////////////////////////////
-//
-// Version
-//
-#ifndef APSTUDIO_INVOKED
-VS_VERSION_INFO VERSIONINFO
- FILEVERSION VERSION_MAJOR,VERSION_MINOR,VERSION_PATCH,0
- PRODUCTVERSION VERSION_MAJOR,VERSION_MINOR,VERSION_PATCH,0
- FILEFLAGSMASK 0x17L
-#ifdef _DEBUG
- FILEFLAGS 0x1L
-#else
- FILEFLAGS 0x0L
-#endif
- FILEOS 0x4L
- FILETYPE 0x1L
- FILESUBTYPE 0x0L
-BEGIN
-    BLOCK "StringFileInfo"
-    BEGIN
-        BLOCK "040404b0"
-        BEGIN
-            VALUE "Comments", "Powered by RIME | Rime Input Method Engine"
-            VALUE "CompanyName", "Shishutang"
-            VALUE "FileDescription", "Weasel Server"
-            VALUE "FileVersion", FILE_VERSION
-            VALUE "InternalName", "WeaselServer"
-            VALUE "LegalCopyright", "Copyleft RIME Developers"
-            VALUE "OriginalFilename", "WeaselServer.exe"
-            VALUE "ProductName", "Weasel"
-            VALUE "ProductVersion", STRZ(PRODUCT_VERSION)
-        END
-    END
-    BLOCK "VarFileInfo"
-    BEGIN
-        VALUE "Translation", 0x404, 1200
-    END
-END
-#endif /* APSTUDIO_INVOKED */
 
 
 /////////////////////////////////////////////////////////////////////////////
@@ -357,13 +106,71 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_STR_SYSTEM_VERSION_WARNING_CAPTION "The system version is too low"
+    IDS_STR_SYSTEM_VERSION_WARNING_CAPTION 
+                            "Inadequate Operating System Version"
     IDS_STR_SYSTEM_VERSION_WARNING 
-                            "Only supports Windows 8.1 or higher systems"
-    IDS_STR_UNDER_MAINTENANCE "Under maintenance"
+                            "TypeDuck is only supported on Windows 8.1 or above."
+    IDS_STR_UNDER_MAINTENANCE "Refreshing…"
 END
 
-#endif    // English (United States) resources
+#endif    // 中性 (預設值) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+/////////////////////////////////////////////////////////////////////////////
+// 中文 (簡體，中國) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_CHS)
+LANGUAGE LANG_CHINESE, SUBLANG_CHINESE_SIMPLIFIED
+
+#ifdef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// TEXTINCLUDE
+//
+
+1 TEXTINCLUDE 
+BEGIN
+    "resource.h\0"
+END
+
+2 TEXTINCLUDE 
+BEGIN
+    "#include ""afxres.h""\r\n"
+    "\0"
+END
+
+3 TEXTINCLUDE 
+BEGIN
+    "\r\n"
+    "\0"
+END
+
+#endif    // APSTUDIO_INVOKED
+
+#endif    // 中文 (簡體，中國) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+/////////////////////////////////////////////////////////////////////////////
+// 中文 (繁體，台灣) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_CHT)
+LANGUAGE LANG_CHINESE, SUBLANG_CHINESE_TRADITIONAL
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// String Table
+//
+
+STRINGTABLE
+BEGIN
+    IDS_STR_SYSTEM_VERSION_WARNING_CAPTION "系統版本過低"
+    IDS_STR_SYSTEM_VERSION_WARNING "TypeDuck 僅支援 Windows 8.1 或以上系統。"
+    IDS_STR_UNDER_MAINTENANCE "重新整理中……"
+END
+
+#endif    // 中文 (繁體，台灣) resources
 /////////////////////////////////////////////////////////////////////////////
 
 

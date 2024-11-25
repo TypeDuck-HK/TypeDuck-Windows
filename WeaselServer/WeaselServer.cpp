@@ -67,7 +67,7 @@ int WINAPI _tWinMain(HINSTANCE hInstance,
     WeaselServerApp::explore(WeaselUserDataPath());
     return 0;
   }
-  if (!wcscmp(L"/weaseldir", lpstrCmdLine)) {
+  if (!wcscmp(L"/typeduckdir", lpstrCmdLine)) {
     WeaselServerApp::explore(WeaselServerApp::install_dir());
     return 0;
   }

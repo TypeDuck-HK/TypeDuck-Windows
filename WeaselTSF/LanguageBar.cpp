@@ -37,9 +37,9 @@ static void HMENU2ITfMenu(HMENU hMenu, ITfMenu* pTfMenu) {
 static LPCWSTR GetWeaselRegName() {
   LPCWSTR WEASEL_REG_NAME_;
   if (is_wow64())
-    WEASEL_REG_NAME_ = L"Software\\WOW6432Node\\Rime\\Weasel";
+    WEASEL_REG_NAME_ = L"Software\\WOW6432Node\\Rime\\TypeDuck";
   else
-    WEASEL_REG_NAME_ = L"Software\\Rime\\Weasel";
+    WEASEL_REG_NAME_ = L"Software\\Rime\\TypeDuck";
 
   return WEASEL_REG_NAME_;
 }
@@ -111,7 +111,7 @@ STDAPI CLangBarItemButton::GetInfo(TF_LANGBARITEMINFO* pInfo) {
   pInfo->dwStyle = TF_LBI_STYLE_BTN_BUTTON | TF_LBI_STYLE_BTN_MENU |
                    TF_LBI_STYLE_SHOWNINTRAY;
   pInfo->ulSort = 1;
-  lstrcpyW(pInfo->szDescription, L"WeaselTSF Button");
+  lstrcpyW(pInfo->szDescription, L"TypeDuckTSF Button");
   return S_OK;
 }
 
@@ -227,7 +227,7 @@ STDAPI CLangBarItemButton::GetIcon(HICON* phIcon) {
 }
 
 STDAPI CLangBarItemButton::GetText(BSTR* pbstrText) {
-  *pbstrText = SysAllocString(L"WeaselTSF Button");
+  *pbstrText = SysAllocString(L"TypeDuckTSF Button");
   return (*pbstrText == NULL) ? E_OUTOFMEMORY : S_OK;
 }
 
@@ -294,7 +294,7 @@ void CLangBarItemButton::SetLangbarStatus(DWORD dwStatus, BOOL fSet) {
 
 std::wstring WeaselTSF::_GetRootDir() {
   std::wstring dir{};
-  RegGetStringValue(HKEY_LOCAL_MACHINE, GetWeaselRegName(), L"WeaselRoot", dir);
+  RegGetStringValue(HKEY_LOCAL_MACHINE, GetWeaselRegName(), L"TypeDuckRoot", dir);
   return dir;
 }
 
@@ -304,7 +304,7 @@ void WeaselTSF::_HandleLangBarMenuSelect(UINT wID) {
     case ID_WEASELTRAY_RERUN_SERVICE:
     case ID_WEASELTRAY_INSTALLDIR:
       if (RegGetStringValue(HKEY_LOCAL_MACHINE, GetWeaselRegName(),
-                            L"WeaselRoot", dir) == ERROR_SUCCESS) {
+                            L"TypeDuckRoot", dir) == ERROR_SUCCESS) {
         if (wID == ID_WEASELTRAY_RERUN_SERVICE) {
           std::thread th([dir]() {
             ShellExecuteW(NULL, L"open", (dir + L"\\start_service.bat").c_str(),
@@ -316,7 +316,7 @@ void WeaselTSF::_HandleLangBarMenuSelect(UINT wID) {
       }
       break;
     case ID_WEASELTRAY_USERCONFIG:
-      if (RegGetStringValue(HKEY_CURRENT_USER, L"Software\\Rime\\Weasel",
+      if (RegGetStringValue(HKEY_CURRENT_USER, L"Software\\Rime\\TypeDuck",
                             L"RimeUserDir", dir) == ERROR_SUCCESS) {
         if (dir.empty()) {
           TCHAR _path[MAX_PATH];

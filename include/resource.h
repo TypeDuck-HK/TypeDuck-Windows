@@ -11,7 +11,6 @@
 #define IDI_HALF_SHAPE                  107
 #define IDR_MENU_POPUP_HANT             108
 #define IDR_MENU_POPUP_HANS             109
-#define IDS_STR_UNDER_MAINTENANCE       302
 #define ID_WEASELTRAY_QUIT              40001
 #define ID_WEASELTRAY_DEPLOY            40002
 #define ID_WEASELTRAY_CHECKUPDATE       40003
