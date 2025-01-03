@@ -165,24 +165,19 @@ program_files:
   File "rime.dll"
   File "WinSparkle.dll"
   ; shared data files
-  SetOutPath $INSTDIR\data
-  File \
-    /x "user.yaml" \
-    /x "installation.yaml" \
-    /x "trime.yaml" \
-    /x "squirrel.yaml" \
-    /x "jyut6ping3_mobile*.yaml" \
-    /x "*_longpress*.yaml" \
-    /x "*.custom.yaml" \
-    "data\*.yaml"
-  File /nonfatal "data\*.txt"
-  File /nonfatal "data\*.gram"
-  ; opencc data files
-  SetOutPath $INSTDIR\data\opencc
-  File "data\opencc\*.json"
-  File "data\opencc\*.ocd*"
-
-  SetOutPath $INSTDIR
+  File "curl-ca-bundle.crt"
+  File "curl.exe"
+  File "7z.dll"
+  File "7z.exe"
+  ExecShellWait "" "$INSTDIR\curl.exe" '-L -o "$INSTDIR\data.zip" https://github.com/TypeDuck-HK/schema/archive/refs/heads/windows.zip' SW_HIDE
+  ExecShellWait "" "$INSTDIR\7z.exe" 'x "$INSTDIR\data.zip" -o"$INSTDIR"' SW_HIDE
+  Rename "$INSTDIR\schema-windows" "$INSTDIR\data"
+  Delete "$INSTDIR\data.zip"
+  Delete "$INSTDIR\data\.gitignore"
+  Delete "$INSTDIR\curl-ca-bundle.crt"
+  Delete "$INSTDIR\curl.exe"
+  Delete "$INSTDIR\7z.dll"
+  Delete "$INSTDIR\7z.exe"
 
   ExecWait "$INSTDIR\TypeDuckSetup.exe /t"
 
