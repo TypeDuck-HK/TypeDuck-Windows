@@ -28,7 +28,7 @@ static void error_message(const WCHAR* msg) {
 /*
 static bool launch_server()
 {
-        EZDBGONLYLOGGERPRINT("Launching weasel server.");
+        EZDBGONLYLOGGERPRINT("Launching TypeDuck server.");
 
         // 從註冊表取得server位置
         HKEY hKey;
@@ -42,10 +42,10 @@ KEY_READ | KEY_WOW64_32KEY, &hKey); if (ret != ERROR_SUCCESS)
         WCHAR value[MAX_PATH];
         DWORD len = sizeof(value);
         DWORD type = 0;
-        ret = RegQueryValueEx(hKey, L"WeaselRoot", NULL, &type, (LPBYTE)value,
+        ret = RegQueryValueEx(hKey, L"TypeDuckRoot", NULL, &type, (LPBYTE)value,
 &len); if (ret != ERROR_SUCCESS)
         {
-                error_message(L"未設置 WeaselRoot");
+                error_message(L"未設置 TypeDuckRoot");
                 RegCloseKey(hKey);
                 return false;
         }
@@ -75,7 +75,7 @@ KEY_READ | KEY_WOW64_32KEY, &hKey); if (ret != ERROR_SUCCESS)
         if (!CreateProcess(exe.c_str(), NULL, NULL, NULL, FALSE, 0, NULL,
 dir.c_str(), &startup_info, &process_info))
         {
-                EZDBGONLYLOGGERPRINT("ERROR: failed to launch weasel server.");
+                EZDBGONLYLOGGERPRINT("ERROR: failed to launch TypeDuck server.");
                 error_message(L"服務進程啓動不起來 :(");
                 return false;
         }
@@ -144,7 +144,7 @@ HRESULT WeaselIME::UnregisterUIClass() {
 }
 
 LPCWSTR WeaselIME::GetUIClassName() {
-  return L"WeaselUIClass";
+  return L"TypeDuckUIClass";
 }
 
 LRESULT WINAPI WeaselIME::UIWndProc(HWND hWnd,

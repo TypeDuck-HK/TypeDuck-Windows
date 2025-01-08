@@ -28,6 +28,6 @@ target("WeaselSetup")
   end)
 
   after_build(function(target)
-      os.cp(path.join(target:targetdir(), "WeaselSetup.exe"), "$(projectdir)/output")
-      os.cp(path.join(target:targetdir(), "WeaselSetup.pdb"), "$(projectdir)/output")
+      os.cp(path.join(target:targetdir(), "TypeDuckSetup.exe"), "$(projectdir)/output")
+      os.cp(path.join(target:targetdir(), "TypeDuckSetup.pdb"), "$(projectdir)/output")
   end)

@@ -18,12 +18,10 @@
 #endif
 
 /////////////////////////////////////////////////////////////////////////////
-// Chinese (P.R.C.) resources
+// 中性 (預設值) resources
 
-#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_CHS)
-#ifdef _WIN32
-LANGUAGE LANG_CHINESE, SUBLANG_CHINESE_SIMPLIFIED
-#endif //_WIN32
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_NEUD)
+LANGUAGE LANG_NEUTRAL, SUBLANG_DEFAULT
 
 #ifdef APSTUDIO_INVOKED
 /////////////////////////////////////////////////////////////////////////////
@@ -31,18 +29,18 @@ LANGUAGE LANG_CHINESE, SUBLANG_CHINESE_SIMPLIFIED
 // TEXTINCLUDE
 //
 
-1 TEXTINCLUDE
+1 TEXTINCLUDE 
 BEGIN
     "resource.h\0"
 END
 
-2 TEXTINCLUDE
+2 TEXTINCLUDE 
 BEGIN
     "#include ""afxres.h""\r\n"
     "\0"
 END
 
-3 TEXTINCLUDE
+3 TEXTINCLUDE 
 BEGIN
     "\r\n"
     "\0"
@@ -73,24 +71,38 @@ BEGIN
     BEGIN
         BLOCK "040404b0"
         BEGIN
-            VALUE "CompanyName", "式恕堂"
-            VALUE "FileDescription", "小狼毫輸入法"
+            VALUE "Comments", "Driven by Weasel"
+            VALUE "CompanyName", "香港教育大學"
+            VALUE "FileDescription", "TypeDuck IME"
             VALUE "FileVersion", FILE_VERSION
-            VALUE "InternalName", "Weasel"
-            VALUE "LegalCopyright", "式恕堂 版權所無"
-            VALUE "OriginalFilename", "weasel.ime"
-            VALUE "ProductName", "小狼毫"
+            VALUE "InternalName", "TypeDuck"
+            VALUE "LegalCopyright", "© 香港教育大學"
+            VALUE "OriginalFilename", "TypeDuck.ime"
+            VALUE "ProductName", "TypeDuck"
             VALUE "ProductVersion", STRZ(PRODUCT_VERSION)
         END
         BLOCK "080404b0"
         BEGIN
-            VALUE "CompanyName", "式恕堂"
-            VALUE "FileDescription", "小狼毫輸入法"
+            VALUE "Comments", "Driven by Weasel"
+            VALUE "CompanyName", "香港教育大學"
+            VALUE "FileDescription", "TypeDuck IME"
             VALUE "FileVersion", FILE_VERSION
-            VALUE "InternalName", "Weasel"
-            VALUE "LegalCopyright", "式恕堂 版權所無"
-            VALUE "OriginalFilename", "weasel.ime"
-            VALUE "ProductName", "小狼毫"
+            VALUE "InternalName", "TypeDuck"
+            VALUE "LegalCopyright", "© 香港教育大學"
+            VALUE "OriginalFilename", "TypeDuck.ime"
+            VALUE "ProductName", "TypeDuck"
+            VALUE "ProductVersion", STRZ(PRODUCT_VERSION)
+        END
+        BLOCK "040004b0"
+        BEGIN
+            VALUE "Comments", "Driven by Weasel"
+            VALUE "CompanyName", "The Education University of Hong Kong"
+            VALUE "FileDescription", "TypeDuck IME"
+            VALUE "FileVersion", FILE_VERSION
+            VALUE "InternalName", "TypeDuck"
+            VALUE "LegalCopyright", "© The Education University of Hong Kong"
+            VALUE "OriginalFilename", "TypeDuck.ime"
+            VALUE "ProductName", "TypeDuck"
             VALUE "ProductVersion", STRZ(PRODUCT_VERSION)
         END
     END
@@ -98,6 +110,7 @@ BEGIN
     BEGIN
         VALUE "Translation", 0x404, 1200
         VALUE "Translation", 0x804, 1200
+        VALUE "Translation", 0x400, 1200
     END
 END
 #endif  // not APSTUDIO_INVOKED
@@ -110,7 +123,8 @@ END
 // Icon with lowest ID value placed first to ensure application icon
 // remains consistent on all systems.
 IDI_WEASEL              ICON                    "..\\resource\\TypeDuck_Small.ico"
-#endif    // Chinese (P.R.C.) resources
+
+#endif    // 中性 (預設值) resources
 /////////////////////////////////////////////////////////////////////////////
 
 

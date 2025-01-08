@@ -39,7 +39,7 @@ LONG WINAPI _UnhandledExceptionFilter(EXCEPTION_POINTERS* pExceptionPointers) {
   }
   WCHAR _path[MAX_PATH] = {0};
   // default location
-  ExpandEnvironmentStringsW(L"%TEMP%\\rime.weasel", _path, _countof(_path));
+  ExpandEnvironmentStringsW(L"%TEMP%\\rime.TypeDuck", _path, _countof(_path));
   // 构造 dump 文件名：应用程序名称-DLL名称-时间.进程号.dmp
   _stprintf_s(szFileName, MAX_PATH, _T("%s\\%s-%s-%s.%lu.dmp"), _path,
               pszBaseName, pszDllBaseName, szDateTime, dwProcessId);

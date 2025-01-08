@@ -36,8 +36,9 @@
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{26930622-CFA2-43DF-A9F3-4AA4A313B2A4}</ProjectGuid>
-    <RootNamespace>WeaselIPCServer</RootNamespace>
     <Keyword>Win32Proj</Keyword>
+    <RootNamespace>TypeDuckIPCServer</RootNamespace>
+    <ProjectName>TypeDuckIPCServer</ProjectName>
   </PropertyGroup>
   <Import Project="..\weasel.props" />
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />

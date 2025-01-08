@@ -17,7 +17,7 @@ int console_main();
 int client_main();
 int server_main();
 
-// usage: TestWeaselIPC.exe [/start | /stop | /console]
+// usage: TestTypeDuckIPC.exe [/start | /stop | /console]
 
 int _tmain(int argc, _TCHAR* argv[]) {
   if (argc == 1)  // no args
@@ -42,7 +42,7 @@ int _tmain(int argc, _TCHAR* argv[]) {
 }
 
 bool launch_server() {
-  int ret = (int)ShellExecute(NULL, L"open", L"TestWeaselIPC.exe", L"/start",
+  int ret = (int)ShellExecute(NULL, L"open", L"TestTypeDuckIPC.exe", L"/start",
                               NULL, SW_NORMAL);
   if (ret <= 32) {
     std::cerr << "failed to launch server." << std::endl;
@@ -154,7 +154,7 @@ class TestRequestHandler : public weasel::RequestHandler {
     std::cerr << "ProcessKeyEvent: " << session_id
               << " keycode: " << keyEvent.keycode << " mask: " << keyEvent.mask
               << std::endl;
-    eat(std::wstring(L"Greeting=Hello, 小狼毫.\n"));
+    eat(std::wstring(L"Greeting=Hello, TypeDuck.\n"));
     return TRUE;
   }
 

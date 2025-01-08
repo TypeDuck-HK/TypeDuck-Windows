@@ -35,7 +35,7 @@ typedef HRESULT(WINAPI* PTF_INSTALLLAYOUTORTIP)(LPCWSTR psz, DWORD dwFlags);
 
 #define WEASEL_WER_KEY                            \
   L"SOFTWARE\\Microsoft\\Windows\\Windows Error " \
-  L"Reporting\\LocalDumps\\WeaselServer.exe"
+  L"Reporting\\LocalDumps\\TypeDuckServer.exe"
 
 BOOL copy_file(const std::wstring& src, const std::wstring& dest) {
   BOOL ret = CopyFile(src.c_str(), dest.c_str(), FALSE);
@@ -126,7 +126,7 @@ int install_ime_file(std::wstring& srcPath,
   WCHAR path[MAX_PATH];
   GetModuleFileNameW(GetModuleHandle(NULL), path, _countof(path));
 
-  std::wstring srcFileName = L"weasel";
+  std::wstring srcFileName = L"TypeDuck";
 
   srcFileName += ext;
   WCHAR drive[_MAX_DRIVE];
@@ -136,7 +136,7 @@ int install_ime_file(std::wstring& srcPath,
   srcPath = std::wstring(drive) + dir + srcFileName;
 
   GetSystemDirectoryW(path, _countof(path));
-  std::wstring destPath = std::wstring(path) + L"\\weasel" + ext;
+  std::wstring destPath = std::wstring(path) + L"\\TypeDuck" + ext;
 
   int retval = 0;
   // 复制 .dll/.ime 到系统目录
@@ -168,7 +168,7 @@ int install_ime_file(std::wstring& srcPath,
         std::wstring srcPathARM32 = srcPath;
         ireplace_last(srcPathARM32, ext, L"ARM" + ext);
 
-        std::wstring destPathARM32 = std::wstring(sysarm32) + L"\\weasel" + ext;
+        std::wstring destPathARM32 = std::wstring(sysarm32) + L"\\TypeDuck" + ext;
         if (!copy_file(srcPathARM32, destPathARM32)) {
           MSG_NOT_SILENT_ID_CAP(silent, destPathARM32.c_str(),
                                 IDS_STR_INSTALL_FAILED, MB_ICONERROR | MB_OK);
@@ -178,9 +178,9 @@ int install_ime_file(std::wstring& srcPath,
       }
 
       // Then install the ARM64 (and x64) version.
-      // On ARM64 weasel.dll(ime) is an ARM64X redirection DLL (weaselARM64X).
-      // When loaded, it will be redirected to weaselARM64.dll(ime) on ARM64
-      // processes, and weaselx64.dll(ime) on x64 processes. So we need a total
+      // On ARM64 TypeDuck.dll(ime) is an ARM64X redirection DLL (TypeDuckARM64X).
+      // When loaded, it will be redirected to TypeDuckARM64.dll(ime) on ARM64
+      // processes, and TypeDuckx64.dll(ime) on x64 processes. So we need a total
       // of three files.
 
       std::wstring srcPathX64 = srcPath;
@@ -203,9 +203,9 @@ int install_ime_file(std::wstring& srcPath,
         return 1;
       }
 
-      // Since weaselARM64X is just a redirector we don't have separate
+      // Since TypeDuckARM64X is just a redirector we don't have separate
       // HANS and HANT variants.
-      srcPath = std::wstring(drive) + dir + L"weaselARM64X" + ext;
+      srcPath = std::wstring(drive) + dir + L"TypeDuckARM64X" + ext;
     } else {
       ireplace_last(srcPath, ext, L"x64" + ext);
     }
@@ -232,7 +232,7 @@ int uninstall_ime_file(const std::wstring& ext,
   WCHAR path[MAX_PATH];
   GetSystemDirectoryW(path, _countof(path));
   std::wstring imePath(path);
-  imePath += L"\\weasel" + ext;
+  imePath += L"\\TypeDuck" + ext;
   retval += func(imePath, false, false, false, false, silent);
   delete_file(imePath);
   if (is_wow64()) {
@@ -247,7 +247,7 @@ int uninstall_ime_file(const std::wstring& ext,
     if (is_arm64_machine()) {
       WCHAR sysarm32[MAX_PATH];
       if (get_wow_arm32_system_dir(sysarm32, _countof(sysarm32)) > 0) {
-        std::wstring imePathARM32 = std::wstring(sysarm32) + L"\\weasel" + ext;
+        std::wstring imePathARM32 = std::wstring(sysarm32) + L"\\TypeDuck" + ext;
         retval += func(imePathARM32, false, true, true, false, silent);
         delete_file(imePathARM32);
       }
@@ -306,7 +306,7 @@ int register_ime(const std::wstring& ime_path,
             ret = RegQueryValueEx(hSubKey, L"Ime File", NULL, &type,
                                   (LPBYTE)imeFile, &len);
             if (ret = ERROR_SUCCESS) {
-              if (_wcsicmp(imeFile, L"weasel.ime") == 0) {
+              if (_wcsicmp(imeFile, L"TypeDuck.ime") == 0) {
                 hKL = (HKL)k;  // already there
               }
             }
@@ -315,7 +315,7 @@ int register_ime(const std::wstring& ime_path,
             // found a spare number to register
             ret = RegCreateKey(hKey, hkl_str, &hSubKey);
             if (ret == ERROR_SUCCESS) {
-              const WCHAR ime_file[] = L"weasel.ime";
+              const WCHAR ime_file[] = L"TypeDuck.ime";
               RegSetValueEx(hSubKey, L"Ime File", 0, REG_SZ, (LPBYTE)ime_file,
                             sizeof(ime_file));
               const WCHAR layout_file[] = L"kbdus.dll";
@@ -357,10 +357,13 @@ int register_ime(const std::wstring& ime_path,
     }
     if (!hKL) {
       DWORD dwErr = GetLastError();
+      WCHAR errMsg[100];
+      StringCchPrintfW(errMsg, _countof(errMsg),
+                       L"ImmInstallIME: HKL=%x Err=%x", hKL, dwErr);
       WCHAR msg[100];
       CString str;
       str.LoadStringW(IDS_STR_ERRREGIME);
-      StringCchPrintfW(msg, _countof(msg), str, hKL, dwErr);
+      StringCchPrintfW(msg, _countof(msg), str, errMsg);
       MSG_NOT_SILENT_ID_CAP(silent, msg, IDS_STR_INSTALL_FAILED,
                             MB_ICONERROR | MB_OK);
       return 1;
@@ -401,7 +404,7 @@ int register_ime(const std::wstring& ime_path,
         continue;
 
       // 小狼毫?
-      if (_wcsicmp(imeFile, L"weasel.ime") == 0) {
+      if (_wcsicmp(imeFile, L"TypeDuck.ime") == 0) {
         DWORD value;
         swscanf_s(subKey, L"%x", &value);
         UnloadKeyboardLayout((HKL)value);
@@ -525,10 +528,13 @@ int register_text_service(const std::wstring& tsf_path,
     WaitForSingleObject(shExInfo.hProcess, INFINITE);
     CloseHandle(shExInfo.hProcess);
   } else {
+    WCHAR errMsg[100];
+    StringCchPrintfW(errMsg, _countof(errMsg), L"regsvr32.exe %s",
+                     params.c_str());
     WCHAR msg[100];
     CString str;
-    str.LoadStringW(IDS_STR_ERRREGTSF);
-    StringCchPrintfW(msg, _countof(msg), str, params.c_str());
+    str.LoadStringW(IDS_STR_ERRREGIME);
+    StringCchPrintfW(msg, _countof(msg), str, errMsg);
     // StringCchPrintfW(msg, _countof(msg), L"註冊輸入法錯誤 regsvr32.exe %s",
     // params.c_str()); if (!silent) MessageBoxW(NULL, msg, L"安装/卸載失败",
     // MB_ICONERROR | MB_OK);
@@ -560,20 +566,28 @@ int install(bool hant, bool silent, bool old_ime_support) {
                 _countof(dir), NULL, 0, NULL, 0);
   std::wstring rootDir = std::wstring(drive) + dir;
   rootDir.pop_back();
-  auto ret = SetRegKeyValue(HKEY_LOCAL_MACHINE, WEASEL_REG_KEY, L"WeaselRoot",
+  auto ret = SetRegKeyValue(HKEY_LOCAL_MACHINE, WEASEL_REG_KEY, L"TypeDuckRoot",
                             rootDir.c_str(), REG_SZ);
   if (FAILED(HRESULT_FROM_WIN32(ret))) {
-    MSG_NOT_SILENT_BY_IDS(silent, IDS_STR_ERRWRITEWEASELROOT,
-                          IDS_STR_INSTALL_FAILED, MB_ICONERROR | MB_OK);
+    WCHAR msg[100];
+    CString str;
+    str.LoadStringW(IDS_STR_ERRWRITEREG);
+    StringCchPrintfW(msg, _countof(msg), str, L"TypeDuckRoot");
+    MSG_NOT_SILENT_ID_CAP(silent, msg, IDS_STR_INSTALL_FAILED,
+                          MB_ICONERROR | MB_OK);
     return 1;
   }
 
-  const std::wstring executable = L"WeaselServer.exe";
+  const std::wstring executable = L"TypeDuckServer.exe";
   ret = SetRegKeyValue(HKEY_LOCAL_MACHINE, WEASEL_REG_KEY, L"ServerExecutable",
                        executable.c_str(), REG_SZ);
   if (FAILED(HRESULT_FROM_WIN32(ret))) {
-    MSG_NOT_SILENT_BY_IDS(silent, IDS_STR_ERRREGIMEWRITESVREXE,
-                          IDS_STR_INSTALL_FAILED, MB_ICONERROR | MB_OK);
+    WCHAR msg[100];
+    CString str;
+    str.LoadStringW(IDS_STR_ERRWRITEREG);
+    StringCchPrintfW(msg, _countof(msg), str, L"ServerExecutable");
+    MSG_NOT_SILENT_ID_CAP(silent, msg, IDS_STR_INSTALL_FAILED,
+                          MB_ICONERROR | MB_OK);
     return 1;
   }
 
@@ -623,7 +637,7 @@ int uninstall(bool silent) {
   // 注销输入法
   int retval = 0;
 
-  const WCHAR KEY[] = L"Software\\Rime\\Weasel";
+  const WCHAR KEY[] = L"Software\\Rime\\TypeDuck";
   HKEY hKey;
   LSTATUS ret = RegOpenKey(HKEY_CURRENT_USER, KEY, &hKey);
   if (ret == ERROR_SUCCESS) {
@@ -658,7 +672,7 @@ int uninstall(bool silent) {
 
   // delete WER register,
   // "HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Windows\\Windows Error
-  // Reporting\\LocalDumps\\WeaselServer.exe" no WOW64 redirect
+  // Reporting\\LocalDumps\\TypeDuckServer.exe" no WOW64 redirect
 
   auto flag_wow64 = is_wow64() ? KEY_WOW64_64KEY : 0;
   RegDeleteKeyEx(HKEY_LOCAL_MACHINE, WEASEL_WER_KEY, flag_wow64, 0);
@@ -675,7 +689,7 @@ bool has_installed() {
   WCHAR path[MAX_PATH];
   GetSystemDirectory(path, _countof(path));
   std::wstring sysPath(path);
-  DWORD attr = GetFileAttributesW((sysPath + L"\\weasel.dll").c_str());
+  DWORD attr = GetFileAttributesW((sysPath + L"\\TypeDuck.dll").c_str());
   return (attr != INVALID_FILE_ATTRIBUTES &&
           !(attr & FILE_ATTRIBUTE_DIRECTORY));
 }

@@ -1,5 +1,5 @@
 -- 工作区的xmake.lua
-set_project("weasel")
+set_project("TypeDuck")
 
 -- 定义全局变量
 set_xmakever("2.9.4")

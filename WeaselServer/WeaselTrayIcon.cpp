@@ -7,7 +7,7 @@
 
 static UINT mode_icon[] = {IDI_ZH, IDI_ZH, IDI_EN, IDI_RELOAD};
 static const WCHAR* mode_label[] = {NULL, /*L"中文"*/ NULL, /*L"西文"*/ NULL,
-                                    L"Under maintenance"};
+                                    L"Refreshing…"};
 
 WeaselTrayIcon::WeaselTrayIcon(weasel::UI& ui)
     : m_style(ui.style()),
@@ -23,9 +23,9 @@ BOOL WeaselTrayIcon::Create(HWND hTargetWnd) {
   HMODULE hModule = GetModuleHandle(NULL);
   CIcon icon;
   icon.LoadIconW(IDI_ZH);
-  BOOL bRet =
-      CSystemTray::Create(hModule, NULL, WM_WEASEL_TRAY_NOTIFY,
-                          get_weasel_ime_name().c_str(), icon, IDR_MENU_POPUP);
+  BOOL bRet = CSystemTray::Create(
+      hModule, NULL, WM_WEASEL_TRAY_NOTIFY, get_weasel_ime_name().c_str(), icon,
+      isChinese() ? IDR_MENU_POPUP_HANT : IDR_MENU_POPUP);
   if (hTargetWnd) {
     SetTargetWnd(hTargetWnd);
   }

@@ -1,7 +1,7 @@
 @echo off
 setlocal enabledelayedexpansion
 if not defined include (
-  echo You should run this inside Developer Command Promt!
+  echo You should run this inside Developer Command Prompt!
   exit /b
 )
 for %%a in ("%include:;=" "%") do (
@@ -120,14 +120,14 @@ if %build_rime% == 0 (
 if %build_commands% == 0 (
   set build_weasel=1
 ))))))
-rem 
-rem quit WeaselServer.exe before building
+
+rem quit TypeDuckServer.exe before building
 cd /d %WEASEL_ROOT%
-if exist output\weaselserver.exe (
-  output\weaselserver.exe /q
+if exist output\TypeDuckServer.exe (
+  output\TypeDuckServer.exe /q
 )
 
-rem build booost
+rem build boost
 if %build_boost% == 1 (
   if %build_arm64% == 1 (
     call build.bat boost arm64
@@ -187,9 +187,9 @@ if %build_arm64% == 1 (
   if errorlevel 1 goto error
   popd
 
-  copy arm64x_wrapper\weaselARM64X.dll output
+  copy arm64x_wrapper\TypeDuckARM64X.dll output
   if errorlevel 1 goto error
-  copy arm64x_wrapper\weaselARM64X.ime output
+  copy arm64x_wrapper\TypeDuckARM64X.ime output
   if errorlevel 1 goto error
 )
 if %build_installer% == 1 (

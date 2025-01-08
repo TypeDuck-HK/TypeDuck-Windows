@@ -100,7 +100,7 @@ LRESULT DictManagementDialog::OnClose(UINT, WPARAM, LPARAM, BOOL&) {
 LRESULT DictManagementDialog::OnBackup(WORD, WORD code, HWND, BOOL&) {
   int sel = user_dict_list_.GetCurSel();
   if (sel < 0 || sel >= user_dict_list_.GetCount()) {
-    MSG_BY_IDS(IDS_STR_SEL_EXPORT_DICT_NAME, IDS_STR_SAD,
+    MSG_BY_IDS(IDS_STR_SEL_EXPORT_DICT_NAME, IDS_STR_EMPTY_SELECTION,
                MB_OK | MB_ICONINFORMATION);
     return 0;
   }
@@ -115,7 +115,7 @@ LRESULT DictManagementDialog::OnBackup(WORD, WORD code, HWND, BOOL&) {
   if (_waccess_s(path.c_str(), 0) != 0 &&
       !CreateDirectoryW(path.c_str(), NULL) &&
       GetLastError() == ERROR_PATH_NOT_FOUND) {
-    MSG_BY_IDS(IDS_STR_ERREXPORT_SYNC_UV, IDS_STR_SAD, MB_OK | MB_ICONERROR);
+    MSG_BY_IDS(IDS_STR_ERR_EXPORT_SYNC_UV, IDS_STR_EXPORT_FAILED, MB_OK | MB_ICONERROR);
     return 0;
   }
   WCHAR dict_name[100] = {0};
@@ -123,10 +123,12 @@ LRESULT DictManagementDialog::OnBackup(WORD, WORD code, HWND, BOOL&) {
   path += std::wstring(L"\\") + dict_name + L".userdb.txt";
   std::string dict_name_str = wstring_to_string(dict_name, CP_UTF8);
   if (!api_->backup_user_dict(dict_name_str.c_str())) {
-    MSG_BY_IDS(IDS_STR_ERR_EXPORT_UNKNOWN, IDS_STR_SAD, MB_OK | MB_ICONERROR);
+    MSG_BY_IDS(IDS_STR_ERR_EXPORT_UNKNOWN, IDS_STR_EXPORT_FAILED,
+               MB_OK | MB_ICONERROR);
     return 0;
   } else if (_waccess(path.c_str(), 0) != 0) {
-    MSG_BY_IDS(IDS_STR_ERR_EXPORT_SNAP_LOST, IDS_STR_SAD, MB_OK | MB_ICONERROR);
+    MSG_BY_IDS(IDS_STR_ERR_EXPORT_FILE_LOST, IDS_STR_EXPORT_FAILED,
+               MB_OK | MB_ICONERROR);
     return 0;
   }
   OpenFolderAndSelectItem(path);
@@ -158,9 +160,10 @@ LRESULT DictManagementDialog::OnRestore(WORD, WORD code, HWND, BOOL&) {
     WideCharToMultiByte(CP_UTF8, 0, selected_path.c_str(), -1, path,
                         _countof(path), NULL, NULL);
     if (!api_->restore_user_dict(path)) {
-      MSG_BY_IDS(IDS_STR_ERR_UNKNOWN, IDS_STR_SAD, MB_OK | MB_ICONERROR);
+      MSG_BY_IDS(IDS_STR_ERR_IMPORT_UNKNOWN, IDS_STR_IMPORT_FAILED,
+                 MB_OK | MB_ICONERROR);
     } else {
-      MSG_BY_IDS(IDS_STR_ERR_SUCCESS, IDS_STR_HAPPY,
+      MSG_BY_IDS(IDS_STR_IMPORT_SUCCESS, IDS_STR_IMPORT_COMPLETED,
                  MB_OK | MB_ICONINFORMATION);
     }
   }
@@ -180,7 +183,7 @@ LRESULT DictManagementDialog::OnExport(WORD, WORD code, HWND, BOOL&) {
 
   int sel = user_dict_list_.GetCurSel();
   if (sel < 0 || sel >= user_dict_list_.GetCount()) {
-    MSG_BY_IDS(IDS_STR_SEL_EXPORT_DICT_NAME, IDS_STR_SAD,
+    MSG_BY_IDS(IDS_STR_SEL_EXPORT_DICT_NAME, IDS_STR_EMPTY_SELECTION,
                MB_OK | MB_ICONINFORMATION);
     return 0;
   }
@@ -203,15 +206,17 @@ LRESULT DictManagementDialog::OnExport(WORD, WORD code, HWND, BOOL&) {
     std::string dict_name_str = wstring_to_string(dict_name, CP_UTF8);
     int result = api_->export_user_dict(dict_name_str.c_str(), path);
     if (result < 0) {
-      MSG_BY_IDS(IDS_STR_ERR_UNKNOWN, IDS_STR_SAD, MB_OK | MB_ICONERROR);
+      MSG_BY_IDS(IDS_STR_ERR_EXPORT_UNKNOWN, IDS_STR_EXPORT_FAILED,
+                 MB_OK | MB_ICONERROR);
     } else if (_waccess(selected_path.c_str(), 0) != 0) {
-      MSG_BY_IDS(IDS_STR_ERR_EXPORT_FILE_LOST, IDS_STR_SAD,
+      MSG_BY_IDS(IDS_STR_ERR_EXPORT_FILE_LOST, IDS_STR_EXPORT_FAILED,
                  MB_OK | MB_ICONERROR);
     } else {
       std::wstring report(std::wstring(exported_str) + L" " +
                           std::to_wstring(result) + L" " +
                           std::wstring(record_count_str));
-      MSG_ID_CAP(report.c_str(), IDS_STR_HAPPY, MB_OK | MB_ICONINFORMATION);
+      MSG_ID_CAP(report.c_str(), IDS_STR_EXPORT_COMPLETED,
+                 MB_OK | MB_ICONINFORMATION);
       OpenFolderAndSelectItem(selected_path);
     }
   }
@@ -231,7 +236,7 @@ LRESULT DictManagementDialog::OnImport(WORD, WORD code, HWND, BOOL&) {
 
   int sel = user_dict_list_.GetCurSel();
   if (sel < 0 || sel >= user_dict_list_.GetCount()) {
-    MSG_BY_IDS(IDS_STR_SEL_IMPORT_DICT_NAME, IDS_STR_SAD,
+    MSG_BY_IDS(IDS_STR_SEL_IMPORT_DICT_NAME, IDS_STR_EMPTY_SELECTION,
                MB_OK | MB_ICONINFORMATION);
     return 0;
   }
@@ -253,12 +258,14 @@ LRESULT DictManagementDialog::OnImport(WORD, WORD code, HWND, BOOL&) {
     int result = api_->import_user_dict(
         wstring_to_string(dict_name, CP_UTF8).c_str(), path);
     if (result < 0) {
-      MSG_BY_IDS(IDS_STR_ERR_UNKNOWN, IDS_STR_SAD, MB_OK | MB_ICONERROR);
+      MSG_BY_IDS(IDS_STR_ERR_IMPORT_UNKNOWN, IDS_STR_IMPORT_FAILED,
+                 MB_OK | MB_ICONERROR);
     } else {
       std::wstring report(std::wstring(imported_str) + L" " +
                           std::to_wstring(result) + L" " +
                           std::wstring(record_count_str));
-      MSG_ID_CAP(report.c_str(), IDS_STR_HAPPY, MB_OK | MB_ICONINFORMATION);
+      MSG_ID_CAP(report.c_str(), IDS_STR_IMPORT_COMPLETED,
+                 MB_OK | MB_ICONINFORMATION);
     }
   }
   return 0;

@@ -13,7 +13,7 @@
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>
     <ProjectGuid>{39F6E3F5-8F0B-4023-BC40-A66AE6C37095}</ProjectGuid>
-    <ProjectName>WeaselSetup</ProjectName>
+    <ProjectName>TypeDuckSetup</ProjectName>
   </PropertyGroup>
   <Import Project="..\weasel.props" />
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />

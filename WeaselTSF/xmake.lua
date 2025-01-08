@@ -5,13 +5,13 @@ target("WeaselTSF")
   add_deps("WeaselIPC", "WeaselUI")
   local fname = ''
   if is_arch("x86") then
-    fname = "weasel.dll"
+    fname = "TypeDuck.dll"
   elseif is_arch("x64") then
-    fname = "weaselx64.dll"
+    fname = "TypeDuckx64.dll"
   elseif is_arch("arm") then
-    fname = "weaselARM.dll"
+    fname = "TypeDuckARM.dll"
   elseif is_arch("arm64") then
-    fname = "weaselARM64.dll"
+    fname = "TypeDuckARM64.dll"
   end
   set_filename(fname)
 
@@ -26,6 +26,6 @@ target("WeaselTSF")
   end)
 
   after_build(function(target)
-    os.cp(path.join(target:targetdir(), "weasel*.dll"), "$(projectdir)/output")
-    os.cp(path.join(target:targetdir(), "weasel*.pdb"), "$(projectdir)/output")
+    os.cp(path.join(target:targetdir(), "TypeDuck*.dll"), "$(projectdir)/output")
+    os.cp(path.join(target:targetdir(), "TypeDuck*.pdb"), "$(projectdir)/output")
   end)

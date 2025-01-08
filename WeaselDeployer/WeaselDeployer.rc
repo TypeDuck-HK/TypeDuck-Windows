@@ -23,538 +23,10 @@
 #undef APSTUDIO_READONLY_SYMBOLS
 
 /////////////////////////////////////////////////////////////////////////////
-// Chinese (Simplified) resources
+// 中性 (預設值) resources
 
-#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_CHS)
-LANGUAGE LANG_CHINESE, SUBLANG_NEUTRAL
-
-/////////////////////////////////////////////////////////////////////////////
-//
-// String Table
-//
-
-STRINGTABLE
-BEGIN
-    IDS_STR_WEASEL          "【小狼毫】"
-    IDS_STR_SAD             ":-("
-    IDS_STR_HAPPY           ":-)"
-    IDS_STR_NOT_REGULAR     "小狼毫不是这般用法"
-    IDS_STR_DEPLOYING_RESTARTREQ "正在执行另一项部署任务，方才所做的修改将在输入法再次启动后生效。"
-    IDS_STR_DEPLOYING_WAIT  "正在执行另一项部署任务，请稍候再试。"
-    IDS_STR_SEL_EXPORT_DICT_NAME "请在左列选择要导出的词典名称。"
-    IDS_STR_ERREXPORT_SYNC_UV "未能完成导出操作。会不会是同步文件夹无法访问？"
-    IDS_STR_ERR_EXPORT_UNKNOWN "不知哪里出错了，未能完成导出操作。"
-    IDS_STR_ERR_EXPORT_SNAP_LOST "咦，输出的快照文件找不着了。"
-    IDS_STR_ERR_UNKNOWN     "不知哪里出错了，未能完成操作。"
-END
-
-STRINGTABLE
-BEGIN
-    IDS_STR_ERR_SUCCESS     "完成了。"
-    IDS_STR_ERR_EXPORT_FILE_LOST "咦，导出的文件找不着了。"
-    IDS_STR_SEL_IMPORT_DICT_NAME "请在左列选择要导入的词典名称。"
-    IDS_STR_ERR_AT_LEAST_ONE_SEL "至少要选用一项吧。"
-    IDS_STR_SCHEMA_NAME     "方案名称"
-    IDS_STR_OPEN            "打开"
-    IDS_STR_SAVE_AS         "另存为"
-    IDS_STR_ALL_FILES       "所有文件"
-    IDS_STR_TXT_FILES       "文本文档"
-    IDS_STR_IMPORTED        "导入了"
-    IDS_STR_EXPORTED        "导出了"
-    IDS_STR_RECORD_COUNT    "条记录。"
-    IDS_STR_DICT_SNAPSHOT   "词典快照"
-    IDS_STR_KCSS_DICT_SNAPSHOT "KCSS格式词典快照"
-END
-
-#endif    // Chinese (Simplified) resources
-/////////////////////////////////////////////////////////////////////////////
-
-
-/////////////////////////////////////////////////////////////////////////////
-// Chinese (Simplified, China) resources
-
-#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_CHS)
-LANGUAGE LANG_CHINESE, SUBLANG_CHINESE_SIMPLIFIED
-
-/////////////////////////////////////////////////////////////////////////////
-//
-// Dialog
-//
-
-IDD_SWITCHER_SETTING DIALOGEX 0, 0, 316, 190
-STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "【小狼毫】方案选单设定"
-FONT 9, "MS Shell Dlg", 400, 0, 0x1
-BEGIN
-    LTEXT           "请勾选所需的输入方案：",IDC_STATIC1,7,7,89,8
-    CONTROL         "",IDC_SCHEMA_LIST,"SysListView32",LVS_REPORT | LVS_ALIGNLEFT | WS_BORDER | WS_TABSTOP,7,21,126,103
-    LTEXT           "选中列表中的输入方案以查看简介",IDC_SCHEMA_DESCRIPTION,144,21,165,103
-    LTEXT           " 在小狼毫里,以下快捷键可唤出方案菜单,以切换模式或选用其他输入方案。",IDC_STATIC1,7,132,273,8
-    EDITTEXT        IDC_HOTKEYS,7,147,126,14,ES_AUTOHSCROLL
-    PUSHBUTTON      "获取更多输入方案...",IDC_GET_SCHEMATA,7,169,90,14
-    DEFPUSHBUTTON   "中",IDOK,133,169,50,14
-END
-
-IDD_STYLE_SETTING DIALOGEX 0, 0, 316, 190
-STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "【小狼毫】界面风格设定"
-FONT 9, "MS Shell Dlg", 400, 0, 0x1
-BEGIN
-    LTEXT           "请选取你最喜欢的配色：",IDC_STATIC1,7,7,81,8
-    LISTBOX         IDC_COLOR_SCHEME,7,21,147,138,LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP
-    CONTROL         "",IDC_PREVIEW,"Static",SS_BITMAP | SS_CENTERIMAGE,162,21,147,138
-    PUSHBUTTON      "设定字体...",IDC_SELECT_FONT,7,169,53,14
-    DEFPUSHBUTTON   "中",IDOK,131,169,53,14
-END
-
-IDD_DICT_MANAGEMENT DIALOGEX 0, 0, 316, 185
-STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "【小狼毫】用户词典管理"
-FONT 9, "MS Shell Dlg", 400, 0, 0x1
-BEGIN
-    LTEXT           "用户词典列表：",IDC_STATIC1,7,7,57,8
-    LISTBOX         IDC_USER_DICT_LIST,7,23,108,155,LBS_SORT | LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP
-    LTEXT           " 当你需要将包含输入习惯的用户词典迁移到另一份配备了Rime输入法的系统,请在左列选中词典名称,“输出词典快照”,将快照文件传到另一系统上,“合入词典快照”。快照文件中的词条将合并到其所属的词典中。",IDC_STATIC1,128,23,181,45
-    PUSHBUTTON      "输出词典快照",IDC_BACKUP,128,73,84,14
-    PUSHBUTTON      "合入词典快照",IDC_RESTORE,225,73,84,14
-    LTEXT           "「导出文本码表」，是为输入方案制作者设计的功能，将使用期间新造的词组以Rime词典中的码表格式导出，以便查看、编辑。「导入文本码表」可用于将其他来源的词库整理成TSV格式后导入到Rime。在Rime输入法之间转移数据，请使用词典快照。",IDC_STATIC1,128,98,181,44
-    PUSHBUTTON      "导出文本码表",IDC_EXPORT,128,148,84,14
-    PUSHBUTTON      "导入文本码表",IDC_IMPORT,225,148,84,14
-END
-
-
-/////////////////////////////////////////////////////////////////////////////
-//
-// DESIGNINFO
-//
-
-#ifdef APSTUDIO_INVOKED
-GUIDELINES DESIGNINFO
-BEGIN
-    IDD_SWITCHER_SETTING, DIALOG
-    BEGIN
-        LEFTMARGIN, 7
-        RIGHTMARGIN, 309
-        TOPMARGIN, 7
-        BOTTOMMARGIN, 183
-    END
-
-    IDD_STYLE_SETTING, DIALOG
-    BEGIN
-        LEFTMARGIN, 7
-        RIGHTMARGIN, 309
-        TOPMARGIN, 7
-        BOTTOMMARGIN, 183
-    END
-
-    IDD_DICT_MANAGEMENT, DIALOG
-    BEGIN
-        LEFTMARGIN, 7
-        RIGHTMARGIN, 309
-        TOPMARGIN, 7
-        BOTTOMMARGIN, 178
-    END
-END
-#endif    // APSTUDIO_INVOKED
-
-
-/////////////////////////////////////////////////////////////////////////////
-//
-// Icon
-//
-
-// Icon with lowest ID value placed first to ensure application icon
-// remains consistent on all systems.
-IDI_DEPLOY              ICON                    "..\\resource\\TypeDuck_Transparent.ico"
-
-
-/////////////////////////////////////////////////////////////////////////////
-//
-// Version
-//
-#ifndef APSTUDIO_INVOKED
-VS_VERSION_INFO VERSIONINFO
- FILEVERSION VERSION_MAJOR,VERSION_MINOR,VERSION_PATCH,0
- PRODUCTVERSION VERSION_MAJOR,VERSION_MINOR,VERSION_PATCH,0
- FILEFLAGSMASK 0x17L
-#ifdef _DEBUG
- FILEFLAGS 0x1L
-#else
- FILEFLAGS 0x0L
-#endif
- FILEOS 0x40004L
- FILETYPE 0x1L
- FILESUBTYPE 0x0L
-BEGIN
-    BLOCK "StringFileInfo"
-    BEGIN
-        BLOCK "080404b0"
-        BEGIN
-            VALUE "Comments", "Powered by RIME | 中州韵输入法引擎"
-            VALUE "CompanyName", "式恕堂"
-            VALUE "FileDescription", "小狼毫部署应用"
-            VALUE "FileVersion", FILE_VERSION
-            VALUE "InternalName", "WeaselDeployer"
-            VALUE "LegalCopyright", "式恕堂 版权所无"
-            VALUE "OriginalFilename", "WeaselDeployer"
-            VALUE "ProductName", "小狼毫"
-            VALUE "ProductVersion", STRZ(PRODUCT_VERSION)
-        END
-    END
-    BLOCK "VarFileInfo"
-    BEGIN
-        VALUE "Translation", 0x804, 1200
-    END
-END
-#endif /* APSTUDIO_INVOKED */
-
-#endif    // Chinese (Simplified, China) resources
-/////////////////////////////////////////////////////////////////////////////
-
-
-/////////////////////////////////////////////////////////////////////////////
-// Chinese (Traditional, Taiwan) resources
-
-#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_CHT)
-LANGUAGE LANG_CHINESE, SUBLANG_CHINESE_TRADITIONAL
-
-/////////////////////////////////////////////////////////////////////////////
-//
-// Dialog
-//
-
-IDD_STYLE_SETTING DIALOGEX 0, 0, 316, 190
-STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "【小狼毫】介面風格設定"
-FONT 9, "MS Shell Dlg", 400, 0, 0x1
-BEGIN
-    LTEXT           "請選取你喜歡的配色：",IDC_STATIC1,7,7,81,8
-    LISTBOX         IDC_COLOR_SCHEME,7,21,147,138,LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP
-    CONTROL         "",IDC_PREVIEW,"Static",SS_BITMAP | SS_CENTERIMAGE,162,21,147,138
-    PUSHBUTTON      "設定字體...",IDC_SELECT_FONT,7,169,53,14
-    DEFPUSHBUTTON   "中",IDOK,131,169,53,14
-END
-
-IDD_SWITCHER_SETTING DIALOGEX 0, 0, 316, 190
-STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "【小狼毫】方案選單設定"
-FONT 9, "MS Shell Dlg", 400, 0, 0x1
-BEGIN
-    LTEXT           "請勾選所需的輸入方案：",IDC_STATIC1,7,7,89,8
-    CONTROL         "",IDC_SCHEMA_LIST,"SysListView32",LVS_REPORT | LVS_ALIGNLEFT | WS_BORDER | WS_TABSTOP,7,21,126,103
-    LTEXT           "選中列表中的輸入方案以查看簡介",IDC_SCHEMA_DESCRIPTION,144,21,165,103
-    LTEXT           "在小狼毫裏，以下快捷鍵可喚出方案選單，以切換模式或選用其他輸入方案。",IDC_STATIC1,7,132,273,8
-    EDITTEXT        IDC_HOTKEYS,7,147,126,14,ES_AUTOHSCROLL
-    PUSHBUTTON      "獲取更多輸入方案...",IDC_GET_SCHEMATA,7,169,90,14
-    DEFPUSHBUTTON   "中",IDOK,133,169,50,14
-END
-
-IDD_DICT_MANAGEMENT DIALOGEX 0, 0, 316, 185
-STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "【小狼毫】用戶詞典管理"
-FONT 9, "MS Shell Dlg", 400, 0, 0x1
-BEGIN
-    LTEXT           "用戶詞典列表：",IDC_STATIC1,7,7,57,8
-    LISTBOX         IDC_USER_DICT_LIST,7,23,108,155,LBS_SORT | LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP
-    LTEXT           "當你需要將包含輸入習慣的用戶詞典遷移到另一份配備了Rime輸入法的系統，請在左列選中詞典名稱，「輸出詞典快照」，將快照文件傳到另一系統上，「合入詞典快照」。快照文件中的詞條將合併到其所屬的詞典中。",IDC_STATIC1,128,23,181,45
-    PUSHBUTTON      "輸出詞典快照",IDC_BACKUP,128,73,84,14
-    PUSHBUTTON      "合入詞典快照",IDC_RESTORE,225,73,84,14
-    LTEXT           "「導出文本碼表」，是爲輸入方案製作者設計的功能，將使用期間新造的詞組以Rime詞典中的碼表格式導出，以便查看、編輯。「導入文本碼表」可用於將其他來源的詞庫整理成TSV格式後導入到Rime。在Rime輸入法之間轉移數據，請用詞典快照。",IDC_STATIC1,128,98,181,44
-    PUSHBUTTON      "導出文本碼表",IDC_EXPORT,128,148,84,14
-    PUSHBUTTON      "導入文本碼表",IDC_IMPORT,225,148,84,14
-END
-
-
-/////////////////////////////////////////////////////////////////////////////
-//
-// DESIGNINFO
-//
-
-#ifdef APSTUDIO_INVOKED
-GUIDELINES DESIGNINFO
-BEGIN
-    IDD_STYLE_SETTING, DIALOG
-    BEGIN
-        LEFTMARGIN, 7
-        RIGHTMARGIN, 309
-        TOPMARGIN, 7
-        BOTTOMMARGIN, 183
-    END
-
-    IDD_SWITCHER_SETTING, DIALOG
-    BEGIN
-        LEFTMARGIN, 7
-        RIGHTMARGIN, 309
-        TOPMARGIN, 7
-        BOTTOMMARGIN, 183
-    END
-
-    IDD_DICT_MANAGEMENT, DIALOG
-    BEGIN
-        LEFTMARGIN, 7
-        RIGHTMARGIN, 309
-        TOPMARGIN, 7
-        BOTTOMMARGIN, 178
-    END
-END
-#endif    // APSTUDIO_INVOKED
-
-
-/////////////////////////////////////////////////////////////////////////////
-//
-// Version
-//
-
-#ifndef APSTUDIO_INVOKED
-VS_VERSION_INFO VERSIONINFO
- FILEVERSION VERSION_MAJOR,VERSION_MINOR,VERSION_PATCH,0
- PRODUCTVERSION VERSION_MAJOR,VERSION_MINOR,VERSION_PATCH,0
- FILEFLAGSMASK 0x17L
-#ifdef _DEBUG
- FILEFLAGS 0x1L
-#else
- FILEFLAGS 0x0L
-#endif
- FILEOS 0x40004L
- FILETYPE 0x1L
- FILESUBTYPE 0x0L
-BEGIN
-    BLOCK "StringFileInfo"
-    BEGIN
-        BLOCK "040404b0"
-        BEGIN
-            VALUE "Comments", "Powered by RIME | 中州韻輸入法引擎"
-            VALUE "CompanyName", "式恕堂"
-            VALUE "FileDescription", "小狼毫部署應用"
-            VALUE "FileVersion", FILE_VERSION
-            VALUE "InternalName", "WeaselDeployer"
-            VALUE "LegalCopyright", "式恕堂 版權所無"
-            VALUE "OriginalFilename", "WeaselDeployer"
-            VALUE "ProductName", "小狼毫"
-            VALUE "ProductVersion", STRZ(PRODUCT_VERSION)
-        END
-    END
-    BLOCK "VarFileInfo"
-    BEGIN
-        VALUE "Translation", 0x404, 1200
-    END
-END
-#endif /* APSTUDIO_INVOKED */
-
-
-/////////////////////////////////////////////////////////////////////////////
-//
-// String Table
-//
-
-STRINGTABLE
-BEGIN
-    IDS_STR_WEASEL          "【小狼毫】"
-    IDS_STR_SAD             ":-("
-    IDS_STR_HAPPY           ":-)"
-    IDS_STR_NOT_REGULAR     "小狼毫不是這般用法"
-    IDS_STR_DEPLOYING_RESTARTREQ "正在執行另一項部署任務，方纔所做的修改將在輸入法再次啓動後生效。"
-    IDS_STR_DEPLOYING_WAIT  "正在執行另一項部署任務，請稍候再試。"
-    IDS_STR_SEL_EXPORT_DICT_NAME "請在左列選擇要導出的詞典名稱。"
-    IDS_STR_ERREXPORT_SYNC_UV "未能完成導出操作。會不會是同步文件夾無法訪問？"
-    IDS_STR_ERR_EXPORT_UNKNOWN "不知道哪裏出錯了，未能完成導出操作。"
-    IDS_STR_ERR_EXPORT_SNAP_LOST "啛，輸出的快照文件找不着了。"
-    IDS_STR_ERR_UNKNOWN     "不知道哪裏出錯了，未能完成操作。"
-END
-
-STRINGTABLE
-BEGIN
-    IDS_STR_ERR_SUCCESS     "完成了。"
-    IDS_STR_ERR_EXPORT_FILE_LOST "啛，導出的文件找不着了。"
-    IDS_STR_SEL_IMPORT_DICT_NAME "請在左列選擇要導入的詞典名稱。"
-    IDS_STR_ERR_AT_LEAST_ONE_SEL "至少要選用一項吧。"
-    IDS_STR_SCHEMA_NAME     "方案名稱"
-    IDS_STR_OPEN            "開啓"
-    IDS_STR_SAVE_AS         "另存新檔"
-    IDS_STR_ALL_FILES       "所有檔案"
-    IDS_STR_TXT_FILES       "文字文件"
-    IDS_STR_IMPORTED        "導入了"
-    IDS_STR_EXPORTED        "導出了"
-    IDS_STR_RECORD_COUNT    "條記錄。"
-    IDS_STR_DICT_SNAPSHOT   "詞典快照"
-    IDS_STR_KCSS_DICT_SNAPSHOT "KCSS格式詞典快照"
-END
-
-#endif    // Chinese (Traditional, Taiwan) resources
-/////////////////////////////////////////////////////////////////////////////
-
-
-/////////////////////////////////////////////////////////////////////////////
-// English (United States) resources
-
-#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
-LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
-
-/////////////////////////////////////////////////////////////////////////////
-//
-// Dialog
-//
-
-IDD_STYLE_SETTING DIALOGEX 0, 0, 316, 190
-STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "Select a Theme"
-FONT 9, "MS Shell Dlg", 400, 0, 0x1
-BEGIN
-    LTEXT           "Themes: ",IDC_STATIC1,7,7,81,8
-    LISTBOX         IDC_COLOR_SCHEME,7,21,147,138,LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP
-    CONTROL         "",IDC_PREVIEW,"Static",SS_BITMAP | SS_CENTERIMAGE,162,21,147,138
-    PUSHBUTTON      "Set font...",IDC_SELECT_FONT,7,169,53,14
-    DEFPUSHBUTTON   "OK",IDOK,255,169,53,14
-END
-
-IDD_SWITCHER_SETTING DIALOGEX 0, 0, 316, 190
-STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "Select Schemas"
-FONT 9, "MS Shell Dlg", 400, 0, 0x1
-BEGIN
-    LTEXT           "Schemas: ",IDC_STATIC1,7,7,89,8
-    CONTROL         "",IDC_SCHEMA_LIST,"SysListView32",LVS_REPORT | LVS_ALIGNLEFT | WS_BORDER | WS_TABSTOP,7,21,136,103
-    LTEXT           "Select a schema in the list to view an introduction",IDC_SCHEMA_DESCRIPTION,148,21,165,103
-    LTEXT           "The following shortcut keys can call up the schema menu",IDC_STATIC1,7,132,273,8
-    EDITTEXT        IDC_HOTKEYS,7,147,136,14,ES_AUTOHSCROLL
-    PUSHBUTTON      "Get more input schemas...",IDC_GET_SCHEMATA,7,169,90,14
-    DEFPUSHBUTTON   "OK",IDOK,255,169,53,14
-END
-
-IDD_DICT_MANAGEMENT DIALOGEX 0, 0, 417, 265
-STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "Dictionary Manager"
-FONT 9, "MS Shell Dlg", 400, 0, 0x1
-BEGIN
-    LTEXT           "Dictionary List: ",IDC_STATIC1,7,7,57,8
-    LISTBOX         IDC_USER_DICT_LIST,7,23,108,214,LBS_SORT | LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP
-    LTEXT           "When you need to migrate a user dictionary containing input habits to another system equipped with Rime input method, please select the dictionary name in the left column.",IDC_STATIC1,128,27,281,20
-    LTEXT           "[Output Snapshot] It transfers snapshot files to another system.",IDC_STATIC1,128,55,281,15
-    LTEXT           "[Merge Snapshot] It merges the entries from the snapshot file into the dictionary where they belong.",IDC_STATIC1,128,75,281,18
-    PUSHBUTTON      "Output Snapshot",IDC_BACKUP,128,105,84,16
-    PUSHBUTTON      "Merge Snapshot",IDC_RESTORE,280,105,84,16
-    LTEXT           "[Export Text Table] It is a function designed for input schema makers. It can export the newly created phrases during use in the table format of the Rime dictionary for easy viewing and editing.",IDC_STATIC1,128,146,281,45
-    LTEXT           "[Import Text Table] It can be used to organize lexicon from other sources into TSV format and then import it into Rime. To transfer data between Rime input methods, use a Dictionary Snapshot.",IDC_STATIC1,128,180,281,45
-    PUSHBUTTON      "Export Text Table",IDC_EXPORT,128,220,84,16
-    PUSHBUTTON      "Import Text Table",IDC_IMPORT,280,220,84,16
-END
-
-
-/////////////////////////////////////////////////////////////////////////////
-//
-// DESIGNINFO
-//
-
-#ifdef APSTUDIO_INVOKED
-GUIDELINES DESIGNINFO
-BEGIN
-    IDD_DICT_MANAGEMENT, DIALOG
-    BEGIN
-        LEFTMARGIN, 7
-        RIGHTMARGIN, 309
-        TOPMARGIN, 7
-        BOTTOMMARGIN, 178
-    END
-
-    IDD_STYLE_SETTING, DIALOG
-    BEGIN
-        LEFTMARGIN, 7
-        RIGHTMARGIN, 309
-        TOPMARGIN, 7
-        BOTTOMMARGIN, 183
-    END
-
-    IDD_SWITCHER_SETTING, DIALOG
-    BEGIN
-        LEFTMARGIN, 7
-        RIGHTMARGIN, 310
-        TOPMARGIN, 7
-        BOTTOMMARGIN, 183
-    END
-END
-#endif    // APSTUDIO_INVOKED
-
-
-/////////////////////////////////////////////////////////////////////////////
-//
-// Version
-//
-
-#ifndef APSTUDIO_INVOKED
-VS_VERSION_INFO VERSIONINFO
- FILEVERSION VERSION_MAJOR,VERSION_MINOR,VERSION_PATCH,0
- PRODUCTVERSION VERSION_MAJOR,VERSION_MINOR,VERSION_PATCH,0
- FILEFLAGSMASK 0x17L
-#ifdef _DEBUG
- FILEFLAGS 0x1L
-#else
- FILEFLAGS 0x0L
-#endif
- FILEOS 0x40004L
- FILETYPE 0x1L
- FILESUBTYPE 0x0L
-BEGIN
-    BLOCK "StringFileInfo"
-    BEGIN
-        BLOCK "040404b0"
-        BEGIN
-            VALUE "Comments", "Powered by RIME | Rime Input Method Engine"
-            VALUE "CompanyName", "Shishutang"
-            VALUE "FileDescription", "Weasel Deployer"
-            VALUE "FileVersion", FILE_VERSION
-            VALUE "InternalName", "WeaselDeployer"
-            VALUE "LegalCopyright", "Copyleft RIME Developers"
-            VALUE "OriginalFilename", "WeaselDeployer"
-            VALUE "ProductName", "Weasel"
-            VALUE "ProductVersion", STRZ(PRODUCT_VERSION)
-        END
-    END
-    BLOCK "VarFileInfo"
-    BEGIN
-        VALUE "Translation", 0x404, 1200
-    END
-END
-#endif /* APSTUDIO_INVOKED */
-
-
-/////////////////////////////////////////////////////////////////////////////
-//
-// String Table
-//
-
-STRINGTABLE
-BEGIN
-    IDS_STR_WEASEL          "Weasel"
-    IDS_STR_SAD             ":-("
-    IDS_STR_HAPPY           ":-)"
-    IDS_STR_NOT_REGULAR     "Weasel is not used in this way."
-    IDS_STR_DEPLOYING_RESTARTREQ "Another deployment task is in progress, the changes will take effect after the input method is restarted."
-    IDS_STR_DEPLOYING_WAIT  "Another deployment task is in progress, please try again later."
-    IDS_STR_SEL_EXPORT_DICT_NAME "Please select the dictionary name to export in the left column."
-    IDS_STR_ERREXPORT_SYNC_UV "Failed to complete the export operation. Could the sync folder be inaccessible?"
-    IDS_STR_ERR_EXPORT_UNKNOWN "Something went wrong and failed to complete the export operation."
-    IDS_STR_ERR_EXPORT_SNAP_LOST "The exported snapshot file cannot be found."
-    IDS_STR_ERR_UNKNOWN     "Something went wrong and failed to complete the operation."
-END
-
-STRINGTABLE
-BEGIN
-    IDS_STR_ERR_SUCCESS     "Completed"
-    IDS_STR_ERR_EXPORT_FILE_LOST "The exported file cannot be found."
-    IDS_STR_SEL_IMPORT_DICT_NAME "Please select the dictionary name to import in the left column."
-    IDS_STR_ERR_AT_LEAST_ONE_SEL "Please choose at least one option."
-    IDS_STR_SCHEMA_NAME     "Schema Name"
-    IDS_STR_OPEN            "Open"
-    IDS_STR_SAVE_AS         "Save As"
-    IDS_STR_ALL_FILES       "All files"
-    IDS_STR_TXT_FILES       "Text documents"
-    IDS_STR_IMPORTED        "Imported"
-    IDS_STR_EXPORTED        "Exported"
-    IDS_STR_RECORD_COUNT    "records"
-    IDS_STR_DICT_SNAPSHOT   "Snapshot text file"
-    IDS_STR_KCSS_DICT_SNAPSHOT "KCSS snapshot file"
-END
-
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_NEUD)
+LANGUAGE LANG_NEUTRAL, SUBLANG_DEFAULT
 
 #ifdef APSTUDIO_INVOKED
 /////////////////////////////////////////////////////////////////////////////
@@ -586,7 +58,342 @@ END
 
 #endif    // APSTUDIO_INVOKED
 
-#endif    // English (United States) resources
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+IDD_STYLE_SETTING DIALOGEX 0, 0, 316, 190
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "TypeDuck UI Style Settings"
+FONT 9, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    DEFPUSHBUTTON   "OK",IDOK,256,169,53,14
+    LTEXT           "Select a theme:",IDC_STATIC1,7,7,81,8
+    LISTBOX         IDC_COLOR_SCHEME,7,21,147,138,LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP
+    CONTROL         "",IDC_PREVIEW,"Static",SS_BITMAP | SS_CENTERIMAGE,162,21,147,138
+    PUSHBUTTON      "Set font...",IDC_SELECT_FONT,7,169,53,14
+END
+
+IDD_SWITCHER_SETTING DIALOGEX 0, 0, 316, 190
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "TypeDuck Input Schema Manager"
+FONT 9, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    DEFPUSHBUTTON   "OK",IDOK,257,169,53,14
+    LTEXT           "Check the desired input schemas:",IDC_STATIC1,7,7,125,8
+    CONTROL         "",IDC_SCHEMA_LIST,"SysListView32",LVS_REPORT | LVS_ALIGNLEFT | WS_BORDER | WS_TABSTOP,7,21,136,103
+    LTEXT           "Select a schema in the list to view an introduction",IDC_SCHEMA_DESCRIPTION,148,21,165,103
+    LTEXT           "To open Options Menu in TypeDuck, use the following shortcut:",IDC_STATIC1,7,132,273,8
+    EDITTEXT        IDC_HOTKEYS,7,147,136,14,ES_AUTOHSCROLL
+    PUSHBUTTON      "Get more input schemas...",IDC_GET_SCHEMATA,7,169,90,14
+END
+
+IDD_DICT_MANAGEMENT DIALOGEX 0, 0, 417, 265
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "TypeDuck Dictionary Manager"
+FONT 9, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    LTEXT           "Dictionary List: ",IDC_STATIC1,7,7,57,8
+    LISTBOX         IDC_USER_DICT_LIST,7,23,108,214,LBS_SORT | LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP
+    LTEXT           "To migrate a user dictionary containing your typing practices to another system equipped with TypeDuck, select the name of the dictionary to export in the left column and press [Export Snapshot].",IDC_STATIC1,128,27,281,31
+    LTEXT           "On another device, load the exported snapshot file by [Import Snapshot], which merges the entries from the snapshot file into the dictionary where they belong.",IDC_STATIC1,128,70,281,23
+    PUSHBUTTON      "Export Snapshot",IDC_BACKUP,128,105,84,16
+    PUSHBUTTON      "Import Snapshot",IDC_RESTORE,280,105,84,16
+    LTEXT           "[Export Lexicon] exports new phrases created during typing in TSV format for viewing and editing, facilitating the supplementation of missing vocabulary in a dictionary.",IDC_STATIC1,128,146,281,32
+    LTEXT           "[Import Lexicon] imports vocabulary from other sources in TSV format into TypeDuck. To transfer and recover data between TypeDuck, use the Dictionary Snapshot feature.",IDC_STATIC1,128,185,281,28
+    PUSHBUTTON      "Export Lexicon",IDC_EXPORT,128,220,84,16
+    PUSHBUTTON      "Import Lexicon",IDC_IMPORT,280,220,84,16
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO
+BEGIN
+    IDD_STYLE_SETTING, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 309
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 183
+    END
+
+    IDD_SWITCHER_SETTING, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 309
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 183
+    END
+
+    IDD_DICT_MANAGEMENT, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 309
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 178
+    END
+END
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Icon
+//
+
+// Icon with lowest ID value placed first to ensure application icon
+// remains consistent on all systems.
+IDI_DEPLOY              ICON                    "..\\resource\\TypeDuck_Transparent.ico"
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// String Table
+//
+
+STRINGTABLE
+BEGIN
+    IDS_STR_WEASEL          "TypeDuck"
+    IDS_STR_EMPTY_SELECTION "Empty Selection"
+    IDS_STR_DEPLOY_RESTART_REQUIRED 
+                            "Another deployment task is in progress. TypeDuck needs to be restarted for changes to take effect."
+    IDS_STR_DEPLOY_TRY_LATER 
+                            "Another deployment task is in progress. Please try again later."
+    IDS_STR_SEL_EXPORT_DICT_NAME 
+                            "Please select the name of the dictionary to export in the left column."
+    IDS_STR_ERR_EXPORT_SYNC_UV 
+                            "Unable to export user dictionary. Please ensure that the folder is accessible by TypeDuck."
+    IDS_STR_ERR_EXPORT_UNKNOWN 
+                            "Unable to export user dictionary. An unknown error has occurred."
+    IDS_STR_ERR_IMPORT_UNKNOWN 
+                            "Unable to import user dictionary. An unknown error has occurred."
+    IDS_STR_ERR_EXPORT_FILE_LOST 
+                            "Unable to export user dictionary. The exported file cannot be found."
+    IDS_STR_SEL_IMPORT_DICT_NAME 
+                            "Please select the name of the dictionary to import in the left column."
+    IDS_STR_ERR_AT_LEAST_ONE_SEL 
+                            "You must select at least one schema from the schema list."
+    IDS_STR_SCHEMA_NAME     "Schema Name"
+    IDS_STR_OPEN            "Open"
+    IDS_STR_SAVE_AS         "Save As"
+    IDS_STR_ALL_FILES       "All files"
+    IDS_STR_TXT_FILES       "Text documents"
+    IDS_STR_IMPORTED        "Successfully imported"
+    IDS_STR_EXPORTED        "Successfully exported"
+    IDS_STR_RECORD_COUNT    "entries from user dictionary."
+    IDS_STR_DICT_SNAPSHOT   "Snapshot files"
+    IDS_STR_KCSS_DICT_SNAPSHOT "KCSS snapshot files"
+    IDS_STR_DEPLOY_FAILED   "TypeDuck Deployment Failed"
+    IDS_STR_EXPORT_FAILED   "Export Failed"
+    IDS_STR_IMPORT_FAILED   "Import Failed"
+    IDS_STR_EXPORT_COMPLETED "Export Completed"
+    IDS_STR_IMPORT_COMPLETED "Import Completed"
+    IDS_STR_IMPORT_SUCCESS  "Successfully imported user dictionary."
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Version
+//
+#ifndef APSTUDIO_INVOKED
+VS_VERSION_INFO VERSIONINFO
+ FILEVERSION VERSION_MAJOR,VERSION_MINOR,VERSION_PATCH,0
+ PRODUCTVERSION VERSION_MAJOR,VERSION_MINOR,VERSION_PATCH,0
+ FILEFLAGSMASK 0x17L
+#ifdef _DEBUG
+ FILEFLAGS 0x1L
+#else
+ FILEFLAGS 0x0L
+#endif
+ FILEOS 0x40004L
+ FILETYPE 0x1L
+ FILESUBTYPE 0x0L
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "040404b0"
+        BEGIN
+            VALUE "Comments", "Driven by Weasel"
+            VALUE "CompanyName", "香港教育大學"
+            VALUE "FileDescription", "TypeDuck Deployer"
+            VALUE "FileVersion", FILE_VERSION
+            VALUE "InternalName", "TypeDuckDeployer"
+            VALUE "LegalCopyright", "© 香港教育大學"
+            VALUE "OriginalFilename", "TypeDuckDeployer.exe"
+            VALUE "ProductName", "TypeDuck"
+            VALUE "ProductVersion", STRZ(PRODUCT_VERSION)
+        END
+        BLOCK "080404b0"
+        BEGIN
+            VALUE "Comments", "Driven by Weasel"
+            VALUE "CompanyName", "香港教育大學"
+            VALUE "FileDescription", "TypeDuck Deployer"
+            VALUE "FileVersion", FILE_VERSION
+            VALUE "InternalName", "TypeDuckDeployer"
+            VALUE "LegalCopyright", "© 香港教育大學"
+            VALUE "OriginalFilename", "TypeDuckDeployer.exe"
+            VALUE "ProductName", "TypeDuck"
+            VALUE "ProductVersion", STRZ(PRODUCT_VERSION)
+        END
+        BLOCK "040004b0"
+        BEGIN
+            VALUE "Comments", "Driven by Weasel"
+            VALUE "CompanyName", "The Education University of Hong Kong"
+            VALUE "FileDescription", "TypeDuck Deployer"
+            VALUE "FileVersion", FILE_VERSION
+            VALUE "InternalName", "TypeDuckDeployer"
+            VALUE "LegalCopyright", "© The Education University of Hong Kong"
+            VALUE "OriginalFilename", "TypeDuckDeployer.exe"
+            VALUE "ProductName", "TypeDuck"
+            VALUE "ProductVersion", STRZ(PRODUCT_VERSION)
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x404, 1200
+        VALUE "Translation", 0x804, 1200
+        VALUE "Translation", 0x400, 1200
+    END
+END
+#endif /* APSTUDIO_INVOKED */
+
+#endif    // 中性 (預設值) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+/////////////////////////////////////////////////////////////////////////////
+// 中文 (繁體，台灣) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_CHT)
+LANGUAGE LANG_CHINESE, SUBLANG_CHINESE_TRADITIONAL
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+IDD_STYLE_SETTING DIALOGEX 0, 0, 316, 190
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "TypeDuck 介面風格設定"
+FONT 9, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    DEFPUSHBUTTON   "確認",IDOK,256,169,53,14
+    LTEXT           "選取佈景主題：",IDC_STATIC1,7,7,81,8
+    LISTBOX         IDC_COLOR_SCHEME,7,21,147,138,LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP
+    CONTROL         "",IDC_PREVIEW,"Static",SS_BITMAP | SS_CENTERIMAGE,162,21,147,138
+    PUSHBUTTON      "設定字體...",IDC_SELECT_FONT,7,169,53,14
+END
+
+IDD_SWITCHER_SETTING DIALOGEX 0, 0, 316, 190
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "TypeDuck 輸入方案管理"
+FONT 9, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    DEFPUSHBUTTON   "確認",IDOK,259,169,50,14
+    LTEXT           "請勾選所需的輸入方案：",IDC_STATIC1,7,7,89,8
+    CONTROL         "",IDC_SCHEMA_LIST,"SysListView32",LVS_REPORT | LVS_ALIGNLEFT | WS_BORDER | WS_TABSTOP,7,21,126,103
+    LTEXT           "選取列表中的輸入方案以查看簡介",IDC_SCHEMA_DESCRIPTION,144,21,165,103
+    LTEXT           "要於 TypeDuck 打開快捷選項功能表，請使用以下快速鍵：",IDC_STATIC1,7,132,273,8
+    EDITTEXT        IDC_HOTKEYS,7,147,126,14,ES_AUTOHSCROLL
+    PUSHBUTTON      "獲取更多輸入方案...",IDC_GET_SCHEMATA,7,169,90,14
+END
+
+IDD_DICT_MANAGEMENT DIALOGEX 0, 0, 316, 185
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "TypeDuck 用户詞典管理"
+FONT 9, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    LTEXT           "用户詞典列表：",IDC_STATIC1,7,7,57,8
+    LISTBOX         IDC_USER_DICT_LIST,7,23,108,155,LBS_SORT | LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP
+    LTEXT           "要將包含輸入習慣的用户詞典移至裝有 TypeDuck 的裝置，請於左側選擇詞典名稱，按「匯出詞典快照」，並於另一裝置以「匯入詞典快照」載入已匯出的快照檔案。快照檔案中的詞條會自動合併至其所屬詞典。",IDC_STATIC1,128,23,181,45
+    PUSHBUTTON      "匯出詞典快照",IDC_BACKUP,128,73,84,14
+    PUSHBUTTON      "匯入詞典快照",IDC_RESTORE,225,73,84,14
+    LTEXT           "「匯出詞庫」以 TSV 格式匯出輸入期間新造的詞組，以供檢視、編輯，方便補遺詞典缺漏的詞彙。「匯入詞庫」以 TSV 格式從其他來源匯入詞彙至 TypeDuck。要於 TypeDuck 之間傳輸及復原數據，請使用詞典快照功能。",IDC_STATIC1,128,98,181,44
+    PUSHBUTTON      "匯出詞庫",IDC_EXPORT,128,148,84,14
+    PUSHBUTTON      "匯入詞庫",IDC_IMPORT,225,148,84,14
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO
+BEGIN
+    IDD_STYLE_SETTING, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 309
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 183
+    END
+
+    IDD_SWITCHER_SETTING, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 309
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 183
+    END
+
+    IDD_DICT_MANAGEMENT, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 309
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 178
+    END
+END
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// String Table
+//
+
+STRINGTABLE
+BEGIN
+    IDS_STR_WEASEL          "TypeDuck"
+    IDS_STR_EMPTY_SELECTION "選擇為空"
+    IDS_STR_DEPLOY_RESTART_REQUIRED "另一項部署任務正在進行中，TypeDuck 需要重新啟動以使變更生效。"
+    IDS_STR_DEPLOY_TRY_LATER "另一項部署任務正在進行中，請稍候再試。"
+    IDS_STR_SEL_EXPORT_DICT_NAME "請在左欄選擇要匯出的詞典名稱。"
+    IDS_STR_ERR_EXPORT_SYNC_UV "無法匯出用户詞典，請確保資料夾可以被 TypeDuck 存取。"
+    IDS_STR_ERR_EXPORT_UNKNOWN "發生未知錯誤，無法匯出用户詞典。"
+    IDS_STR_ERR_IMPORT_UNKNOWN "發生未知錯誤，無法匯入用户詞典。"
+    IDS_STR_ERR_EXPORT_FILE_LOST "無法匯出用户詞典，找不到匯出的檔案。"
+    IDS_STR_SEL_IMPORT_DICT_NAME "請在左欄選擇要匯入的詞典名稱。"
+    IDS_STR_ERR_AT_LEAST_ONE_SEL "請從方案列表中選擇至少一個方案。"
+    IDS_STR_SCHEMA_NAME     "方案名稱"
+    IDS_STR_OPEN            "開啓"
+    IDS_STR_SAVE_AS         "另存新檔"
+    IDS_STR_ALL_FILES       "所有檔案"
+    IDS_STR_TXT_FILES       "文字文件"
+    IDS_STR_IMPORTED        "已從用户詞典匯入"
+    IDS_STR_EXPORTED        "已從用户詞典匯出"
+    IDS_STR_RECORD_COUNT    "個項目。"
+    IDS_STR_DICT_SNAPSHOT   "詞典快照"
+    IDS_STR_KCSS_DICT_SNAPSHOT "KCSS 格式詞典快照"
+    IDS_STR_DEPLOY_FAILED   "TypeDuck 部署失敗"
+    IDS_STR_EXPORT_FAILED   "匯出失敗"
+    IDS_STR_IMPORT_FAILED   "匯入失敗"
+    IDS_STR_EXPORT_COMPLETED "匯出完成"
+    IDS_STR_IMPORT_COMPLETED "匯入完成"
+    IDS_STR_IMPORT_SUCCESS  "已匯出用户詞典。"
+END
+
+#endif    // 中文 (繁體，台灣) resources
 /////////////////////////////////////////////////////////////////////////////
 
 

@@ -8,7 +8,7 @@
     CString info, cap;                             \
     info.LoadStringW(idInfo);                      \
     cap.LoadStringW(idCap);                        \
-    LANGID langID = GetThreadUILanguage();         \
+    LANGID langID = get_language_id();             \
     MessageBoxExW(NULL, info, cap, uType, langID); \
   }
 
@@ -16,7 +16,7 @@
   {                                                \
     CString cap;                                   \
     cap.LoadStringW(idCap);                        \
-    LANGID langID = GetThreadUILanguage();         \
+    LANGID langID = get_language_id();             \
     MessageBoxExW(NULL, info, cap, uType, langID); \
   }
 
@@ -75,7 +75,6 @@ class InstallOptionsDialog : public CDialogImpl<InstallOptionsDialog> {
   ~InstallOptionsDialog();
 
   bool installed;
-  bool hant;
   bool old_ime_support;
   std::wstring user_dir;
 
@@ -97,8 +96,6 @@ class InstallOptionsDialog : public CDialogImpl<InstallOptionsDialog> {
   LRESULT OnUseDefaultDir(WORD, WORD code, HWND, BOOL&);
   LRESULT OnUseCustomDir(WORD, WORD code, HWND, BOOL&);
 
-  CButton cn_;
-  CButton tw_;
   CButton remove_;
   CButton default_dir_;
   CButton custom_dir_;

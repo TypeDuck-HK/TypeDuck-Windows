@@ -11,7 +11,7 @@
     CString info, cap;                             \
     info.LoadStringW(idInfo);                      \
     cap.LoadStringW(idCap);                        \
-    LANGID langID = GetThreadUILanguage();         \
+    LANGID langID = get_language_id();             \
     MessageBoxExW(NULL, info, cap, uType, langID); \
   }
 
@@ -19,6 +19,6 @@
   {                                                \
     CString cap;                                   \
     cap.LoadStringW(idCap);                        \
-    LANGID langID = GetThreadUILanguage();         \
+    LANGID langID = get_language_id();             \
     MessageBoxExW(NULL, info, cap, uType, langID); \
   }

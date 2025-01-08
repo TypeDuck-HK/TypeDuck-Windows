@@ -38,7 +38,11 @@ BOOL WINAPI ImeConfigure(HKL hKL, HWND hWnd, DWORD dwMode, LPVOID lpData) {
     return TRUE;
 
   // TODO:
-  MessageBox(hWnd, L"本品無設定介面 :)", L"輸入法設定", MB_OK);
+  if (isChinese())
+    MessageBox(hWnd, L"請於輸入法功能表開啟設定。", L"設定不在此處", MB_OK);
+  else
+    MessageBox(hWnd, L"Please open Settings in the IME menu.",
+               L"Settings are not located here", MB_OK);
   return TRUE;
 }
 

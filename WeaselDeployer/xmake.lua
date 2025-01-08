@@ -15,10 +15,10 @@ target("WeaselDeployer")
   end)
   after_build(function(target)
     if is_arch("x86") then
-      os.cp(path.join(target:targetdir(), "WeaselDeployer.exe"), "$(projectdir)/output/Win32")
-      os.cp(path.join(target:targetdir(), "WeaselDeployer.pdb"), "$(projectdir)/output/Win32")
+      os.cp(path.join(target:targetdir(), "TypeDuckDeployer.exe"), "$(projectdir)/output/Win32")
+      os.cp(path.join(target:targetdir(), "TypeDuckDeployer.pdb"), "$(projectdir)/output/Win32")
     else
-      os.cp(path.join(target:targetdir(), "WeaselDeployer.exe"), "$(projectdir)/output")
-      os.cp(path.join(target:targetdir(), "WeaselDeployer.pdb"), "$(projectdir)/output")
+      os.cp(path.join(target:targetdir(), "TypeDuckDeployer.exe"), "$(projectdir)/output")
+      os.cp(path.join(target:targetdir(), "TypeDuckDeployer.pdb"), "$(projectdir)/output")
     end
   end)

@@ -46,19 +46,9 @@ echo WEASEL_BUNDLED_RECIPES=%WEASEL_BUNDLED_RECIPES%
 echo.
 
 if defined GITHUB_ENV (
-	setlocal enabledelayedexpansion
-	echo git_ref_name=%PRODUCT_VERSION%>>!GITHUB_ENV!
+  setlocal enabledelayedexpansion
+  echo git_ref_name=%PRODUCT_VERSION%>>!GITHUB_ENV!
 )
-
-if defined BOOST_ROOT (
-  if exist "%BOOST_ROOT%\boost" goto boost_found
-)
-echo Error: Boost not found! Please set BOOST_ROOT in env.bat.
-exit /b 1
-
-:boost_found
-echo BOOST_ROOT=%BOOST_ROOT%
-echo.
 
 if not defined BJAM_TOOLSET (
   rem the number actually means platform toolset, not %VisualStudioVersion%
@@ -126,20 +116,30 @@ if %build_rime% == 0 (
   set build_weasel=1
 )))))
 
-rem quit WeaselServer.exe before building
-cd /d %WEASEL_ROOT%
-if exist output\weaselserver.exe (
-  output\weaselserver.exe /q
-)
-
-rem build booost
+rem build boost
 if %build_boost% == 1 (
   call :build_boost
   if errorlevel 1 exit /b 1
   cd /d %WEASEL_ROOT%
 )
 
+if defined BOOST_ROOT (
+  if exist "%BOOST_ROOT%\boost" goto boost_found
+)
+echo Error: Boost not found! Please set BOOST_ROOT in env.bat.
+exit /b 1
+
+:boost_found
+echo BOOST_ROOT=%BOOST_ROOT%
+echo.
+
 rem -------------------------------------------------------------------------
+rem quit TypeDuckServer.exe before building
+cd /d %WEASEL_ROOT%
+if exist output\TypeDuckServer.exe (
+  output\TypeDuckServer.exe /q
+)
+
 rem build librime x64 and Win32
 if %build_rime% == 1 (
   if not exist librime\build.bat (
@@ -189,7 +189,6 @@ cscript.exe render.js weasel.props %WEASEL_PROJECT_PROPERTIES%
 del msbuild*.log
 
 if %build_arm64% == 1 (
-
   msbuild.exe weasel.sln %build_option% /p:Configuration=%build_config% /p:Platform="ARM" /fl6
   if errorlevel 1 goto error
   msbuild.exe weasel.sln %build_option% /p:Configuration=%build_config% /p:Platform="ARM64" /fl5
@@ -207,9 +206,9 @@ if %build_arm64% == 1 (
   if errorlevel 1 goto error
   popd
 
-  copy arm64x_wrapper\weaselARM64X.dll output
+  copy arm64x_wrapper\TypeDuckARM64X.dll output
   if errorlevel 1 goto error
-  copy arm64x_wrapper\weaselARM64X.ime output
+  copy arm64x_wrapper\TypeDuckARM64X.ime output
   if errorlevel 1 goto error
 )
 

@@ -46,7 +46,7 @@ static void CleanOldLogs() {
   time_t now = time(NULL);
   strftime(ymd, sizeof(ymd), ".%Y%m%d", localtime(&now));
   std::string today(ymd);
-  const std::string app_name = "rime.weasel";
+  const std::string app_name = "rime.TypeDuck";
   std::string dir = WeaselLogPath().string();
   if (!fs::exists(fs::path(dir)))
     return;
@@ -140,7 +140,7 @@ void RimeWithWeaselHandler::_Setup() {
   weasel_traits.distribution_name = distribution_name.c_str();
   weasel_traits.distribution_code_name = WEASEL_CODE_NAME;
   weasel_traits.distribution_version = WEASEL_VERSION;
-  weasel_traits.app_name = "rime.weasel";
+  weasel_traits.app_name = "rime.TypeDuck";
   std::string log_dir = WeaselLogPath().u8string();
   weasel_traits.log_dir = log_dir.c_str();
   rime_api->setup(&weasel_traits);
@@ -570,7 +570,7 @@ void RimeWithWeaselHandler::OnUpdateUI(std::function<void()> const& cb) {
 }
 
 bool RimeWithWeaselHandler::_IsDeployerRunning() {
-  HANDLE hMutex = CreateMutex(NULL, TRUE, L"WeaselDeployerMutex");
+  HANDLE hMutex = CreateMutex(NULL, TRUE, L"TypeDuckDeployerMutex");
   bool deployer_detected = hMutex && GetLastError() == ERROR_ALREADY_EXISTS;
   if (hMutex) {
     CloseHandle(hMutex);
@@ -764,29 +764,21 @@ bool RimeWithWeaselHandler::_ShowMessage(Context& ctx, Status& status) {
   // show as auxiliary string
   std::wstring& tips(ctx.aux.str);
   bool show_icon = false;
+  const bool is_chinese = isChinese();
   if (m_message_type == "deploy") {
     if (m_message_value == "start")
-      if (GetThreadUILanguage() == MAKELANGID(LANG_ENGLISH, SUBLANG_ENGLISH_US))
-        tips = L"Deploying RIME";
-      else
-        tips = L"正在部署 RIME";
+      tips = is_chinese ? L"重新整理中……" : L"Refreshing…";
     else if (m_message_value == "success")
-      if (GetThreadUILanguage() == MAKELANGID(LANG_ENGLISH, SUBLANG_ENGLISH_US))
-        tips = L"Deployed";
-      else
-        tips = L"部署完成";
-    else if (m_message_value == "failure") {
-      if (GetThreadUILanguage() ==
-          MAKELANGID(LANG_CHINESE, SUBLANG_CHINESE_TRADITIONAL))
-        tips = L"有錯誤，請查看日誌 %TEMP%\\rime.weasel\\rime.weasel.*.INFO";
-      else if (GetThreadUILanguage() ==
-               MAKELANGID(LANG_CHINESE, SUBLANG_CHINESE_SIMPLIFIED))
-        tips = L"有错误，请查看日志 %TEMP%\\rime.weasel\\rime.weasel.*.INFO";
-      else
-        tips =
-            L"There is an error, please check the logs "
-            L"%TEMP%\\rime.weasel\\rime.weasel.*.INFO";
-    }
+      tips = is_chinese
+                 ? L"重新整理完成。TypeDuck 現已可供使用。"
+                 : L"Refresh completed. TypeDuck is now available for use.";
+    else if (m_message_value == "failure")
+      tips = is_chinese
+                 ? L"重新整理時發生錯誤，請查看記錄檔 "
+                   L"\n%TEMP%\\rime.TypeDuck\\rime.TypeDuck.*.INFO 以了解詳情。"
+                 : L"An error occurred while refreshing. Please check the log "
+                   L"files \n%TEMP%\\rime.TypeDuck\\rime.TypeDuck.*.INFO for "
+                   L"more information.";
   } else if (m_message_type == "schema") {
     tips = /*L"【" + */ status.schema_name /* + L"】"*/;
   } else if (m_message_type == "option") {

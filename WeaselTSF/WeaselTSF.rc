@@ -15,22 +15,23 @@
 #ifndef APSTUDIO_INVOKED
 #include <../include/resource.h>
   #ifdef WIN64
-      #define FILE_NAME "weaselx64.dll"
+      #define FILE_NAME "TypeDuckx64.dll"
   #elif defined(ARM64)
-      #define FILE_NAME "weaselARM64.dll"
+      #define FILE_NAME "TypeDuckARM64.dll"
   #elif defined(ARM)
-      #define FILE_NAME "weaselARM.dll"
+      #define FILE_NAME "TypeDuckARM.dll"
   #else
-      #define FILE_NAME "weasel.dll"
+      #define FILE_NAME "TypeDuck.dll"
   #endif
   #define STRZ2(x) #x
   #define STRZ(x) STRZ2(x)
 #endif
 
 /////////////////////////////////////////////////////////////////////////////
-// Chinese (Simplified, China) resources
+// 中性 (預設值) resources
 
-#if (!defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_CHS))
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_NEUD)
+LANGUAGE LANG_NEUTRAL, SUBLANG_DEFAULT
 
 #ifdef APSTUDIO_INVOKED
 /////////////////////////////////////////////////////////////////////////////
@@ -67,22 +68,22 @@ IDR_MENU_POPUP MENU
 BEGIN
     POPUP "WeaselTray"
     BEGIN
-        MENUITEM "Settings (&S)",                  ID_WEASELTRAY_SETTINGS
-        MENUITEM "Dictionary manager (&D)",        ID_WEASELTRAY_DICT_MANAGEMENT
-        MENUITEM "User data sync (&N)",            ID_WEASELTRAY_SYNC
+        MENUITEM "Settings (&S)",               ID_WEASELTRAY_SETTINGS
+        MENUITEM "Dictionary Manager (&D)",     ID_WEASELTRAY_DICT_MANAGEMENT
+        MENUITEM "User Data Sync (&N)",         ID_WEASELTRAY_SYNC
         MENUITEM SEPARATOR
-        MENUITEM "User folder (&C)",               ID_WEASELTRAY_USERCONFIG
-        MENUITEM "Program folder (&P)",            ID_WEASELTRAY_INSTALLDIR
-        MENUITEM "Log folder (&L)",                ID_WEASELTRAY_LOGDIR
+        MENUITEM "User Folder (&C)",            ID_WEASELTRAY_USERDIR
+        MENUITEM "Program Folder (&P)",         ID_WEASELTRAY_INSTALLDIR
+        MENUITEM "Log Folder (&L)",             ID_WEASELTRAY_LOGDIR
         MENUITEM SEPARATOR
-        MENUITEM "Help (&H)",                      ID_WEASELTRAY_WIKI
-        MENUITEM "Forum (&J)",                     ID_WEASELTRAY_FORUM
+        MENUITEM "TypeDuck Website (&W)",       ID_WEASELTRAY_WEBSITE
+        MENUITEM "About TypeDuck… (&A)",        ID_WEASELTRAY_ABOUT
         MENUITEM SEPARATOR
-        MENUITEM "Check for updates (&U)",         ID_WEASELTRAY_CHECKUPDATE
-        MENUITEM "Deploy (&R)",                    ID_WEASELTRAY_DEPLOY
+        MENUITEM "Check for Updates (&U)",      ID_WEASELTRAY_CHECKUPDATE
+        MENUITEM "Refresh (&R)",                ID_WEASELTRAY_DEPLOY
         MENUITEM SEPARATOR
-        MENUITEM "Restart (&E)",                   ID_WEASELTRAY_RERUN_SERVICE
-        MENUITEM "Exit (&Q)",                      ID_WEASELTRAY_QUIT
+        MENUITEM "Restart IME (&E)",            ID_WEASELTRAY_RERUN_SERVICE
+        MENUITEM "Terminate IME (&Q)",          ID_WEASELTRAY_QUIT
     END
 END
 
@@ -91,44 +92,21 @@ BEGIN
     POPUP "WeaselTray"
     BEGIN
         MENUITEM "輸入法設定 (&S)",                  ID_WEASELTRAY_SETTINGS
-        MENUITEM "用戶詞典管理 (&D)",                 ID_WEASELTRAY_DICT_MANAGEMENT
-        MENUITEM "用戶資料同步 (&N)",                 ID_WEASELTRAY_SYNC
+        MENUITEM "用户詞典管理 (&D)",                 ID_WEASELTRAY_DICT_MANAGEMENT
+        MENUITEM "用户資料同步 (&N)",                 ID_WEASELTRAY_SYNC
         MENUITEM SEPARATOR
-        MENUITEM "用戶文件夾 (&C)",                  ID_WEASELTRAY_USERCONFIG
-        MENUITEM "程序文件夾 (&P)",                  ID_WEASELTRAY_INSTALLDIR
-        MENUITEM "日誌文件夾 (&L)",                  ID_WEASELTRAY_LOGDIR
+        MENUITEM "用户資料夾 (&C)",                  ID_WEASELTRAY_USERDIR
+        MENUITEM "程式資料夾 (&P)",                  ID_WEASELTRAY_INSTALLDIR
+        MENUITEM "記錄檔資料夾 (&L)",                 ID_WEASELTRAY_LOGDIR
         MENUITEM SEPARATOR
-        MENUITEM "幫助文檔 (&H)",                   ID_WEASELTRAY_WIKI
-        MENUITEM "參加討論 (&J)",                   ID_WEASELTRAY_FORUM
+        MENUITEM "TypeDuck 網站 (&W)",            ID_WEASELTRAY_WEBSITE
+        MENUITEM "關於 TypeDuck… (&A)",           ID_WEASELTRAY_ABOUT
         MENUITEM SEPARATOR
-        MENUITEM "檢查新版本 (&U)",                  ID_WEASELTRAY_CHECKUPDATE
-        MENUITEM "重新部署 (&R)",                   ID_WEASELTRAY_DEPLOY
+        MENUITEM "檢查更新 (&U)",                   ID_WEASELTRAY_CHECKUPDATE
+        MENUITEM "重新整理 (&R)",                   ID_WEASELTRAY_DEPLOY
         MENUITEM SEPARATOR
-        MENUITEM "重啓算法服務 (&E)",                 ID_WEASELTRAY_RERUN_SERVICE
-        MENUITEM "退出算法服務 (&Q)",                 ID_WEASELTRAY_QUIT
-    END
-END
-
-IDR_MENU_POPUP_HANS MENU
-BEGIN
-    POPUP "WeaselTray"
-    BEGIN
-        MENUITEM "输入法设定 (&S)",                  ID_WEASELTRAY_SETTINGS
-        MENUITEM "用户词典管理 (&D)",                 ID_WEASELTRAY_DICT_MANAGEMENT
-        MENUITEM "用户资料同步 (&N)",                 ID_WEASELTRAY_SYNC
-        MENUITEM SEPARATOR
-        MENUITEM "用户文件夹 (&C)",                  ID_WEASELTRAY_USERCONFIG
-        MENUITEM "程序文件夹 (&P)",                  ID_WEASELTRAY_INSTALLDIR
-        MENUITEM "日志文件夹 (&L)",                  ID_WEASELTRAY_LOGDIR
-        MENUITEM SEPARATOR
-        MENUITEM "帮助文档 (&H)",                   ID_WEASELTRAY_WIKI
-        MENUITEM "参加讨论 (&J)",                   ID_WEASELTRAY_FORUM
-        MENUITEM SEPARATOR
-        MENUITEM "检查新版本 (&U)",                  ID_WEASELTRAY_CHECKUPDATE
-        MENUITEM "重新部署 (&R)",                   ID_WEASELTRAY_DEPLOY
-        MENUITEM SEPARATOR
-        MENUITEM "重启算法服务 (&E)",                 ID_WEASELTRAY_RERUN_SERVICE
-        MENUITEM "退出算法服务 (&Q)",                 ID_WEASELTRAY_QUIT
+        MENUITEM "重新啟動輸入法 (&E)",                ID_WEASELTRAY_RERUN_SERVICE
+        MENUITEM "終止輸入法 (&Q)",                  ID_WEASELTRAY_QUIT
     END
 END
 
@@ -148,40 +126,40 @@ VS_VERSION_INFO VERSIONINFO
 BEGIN
     BLOCK "StringFileInfo"
     BEGIN
-        BLOCK "080404b0"
-        BEGIN
-            VALUE "Comments", "Powered by RIME | 中州韵输入法引擎"
-            VALUE "CompanyName", "式恕堂"
-            VALUE "FileDescription", "小狼毫TSF"
-            VALUE "FileVersion", FILE_VERSION
-            VALUE "InternalName", "WeaselTSF"
-            VALUE "LegalCopyright", "式恕堂 版权所无"
-            VALUE "OriginalFilename", FILE_NAME
-            VALUE "ProductName", "小狼毫"
-            VALUE "ProductVersion", STRZ(PRODUCT_VERSION)
-        END
         BLOCK "040404b0"
         BEGIN
-            VALUE "Comments", "Powered by RIME | 中州韻輸入法引擎"
-            VALUE "CompanyName", "式恕堂"
-            VALUE "FileDescription", "小狼毫TSF"
+            VALUE "Comments", "Driven by Weasel"
+            VALUE "CompanyName", "香港教育大學"
+            VALUE "FileDescription", "TypeDuck TSF"
             VALUE "FileVersion", FILE_VERSION
-            VALUE "InternalName", "WeaselTSF"
-            VALUE "LegalCopyright", "式恕堂 版權所無"
+            VALUE "InternalName", "TypeDuckTSF"
+            VALUE "LegalCopyright", "© 香港教育大學"
             VALUE "OriginalFilename", FILE_NAME
-            VALUE "ProductName", "小狼毫"
+            VALUE "ProductName", "TypeDuck"
             VALUE "ProductVersion", STRZ(PRODUCT_VERSION)
         END
-        BLOCK "040904b0"
+        BLOCK "080404b0"
         BEGIN
-            VALUE "Comments", "Powered by RIME | Rime Input Method Engine"
-            VALUE "CompanyName", "Shishutang"
-            VALUE "FileDescription", "Weasel TSF"
+            VALUE "Comments", "Driven by Weasel"
+            VALUE "CompanyName", "香港教育大學"
+            VALUE "FileDescription", "TypeDuck TSF"
             VALUE "FileVersion", FILE_VERSION
-            VALUE "InternalName", "WeaselTSF"
-            VALUE "LegalCopyright", "Copyleft RIME Developers"
+            VALUE "InternalName", "TypeDuckTSF"
+            VALUE "LegalCopyright", "© 香港教育大學"
             VALUE "OriginalFilename", FILE_NAME
-            VALUE "ProductName", "Weasel"
+            VALUE "ProductName", "TypeDuck"
+            VALUE "ProductVersion", STRZ(PRODUCT_VERSION)
+        END
+        BLOCK "040004b0"
+        BEGIN
+            VALUE "Comments", "Driven by Weasel"
+            VALUE "CompanyName", "The Education University of Hong Kong"
+            VALUE "FileDescription", "TypeDuck TSF"
+            VALUE "FileVersion", FILE_VERSION
+            VALUE "InternalName", "TypeDuckTSF"
+            VALUE "LegalCopyright", "© The Education University of Hong Kong"
+            VALUE "OriginalFilename", FILE_NAME
+            VALUE "ProductName", "TypeDuck"
             VALUE "ProductVersion", STRZ(PRODUCT_VERSION)
         END
     END
@@ -189,19 +167,10 @@ BEGIN
     BEGIN
         VALUE "Translation", 0x804, 1200
         VALUE "Translation", 0x404, 1200
-        VALUE "Translation", 0x409, 1200
+        VALUE "Translation", 0x400, 1200
     END
 END
 #endif /* APSTUDIO_INVOKED */
-#endif    // Chinese (Simplified, China) resources
-/////////////////////////////////////////////////////////////////////////////
-
-
-/////////////////////////////////////////////////////////////////////////////
-// English (United States) resources
-
-#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
-LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -218,7 +187,7 @@ IDI_ZH                  ICON                    "..\\resource\\zh.ico"
 
 IDI_RELOAD              ICON                    "..\\resource\\reload.ico"
 
-#endif    // English (United States) resources
+#endif    // 中性 (預設值) resources
 /////////////////////////////////////////////////////////////////////////////
 
 

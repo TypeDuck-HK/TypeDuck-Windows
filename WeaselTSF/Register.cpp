@@ -31,7 +31,7 @@ HKL FindIME(LANGID langid) {
         ret = RegQueryValueExW(hSubKey, L"Ime File", NULL, &type, (LPBYTE)data,
                                &size);
         if (ret == ERROR_SUCCESS && type == REG_SZ &&
-            _wcsicmp(data, L"weasel.ime") == 0)
+            _wcsicmp(data, L"TypeDuck.ime") == 0)
           hKL = (HKL)id;
       }
       RegCloseKey(hSubKey);
@@ -263,14 +263,14 @@ BOOL RegisterServer() {
 #ifdef _M_ARM64
       {
         // On ARM64 we use ARM64X redirection DLL.
-        // When loaded, weasel.dll will be redirected to weaselARM64.dll on
-        // ARM64 processes, and weaselx64.dll on x64 processes.
+        // When loaded, TypeDuck.dll will be redirected to TypeDuckARM64.dll on
+        // ARM64 processes, and TypeDuckx64.dll on x64 processes.
         //
         // But GetModuleFileNameA will return the actual loaded DLL name aka
-        // weaselARM64.dll Rewrite the path to point to the redirector.
+        // TypeDuckARM64.dll Rewrite the path to point to the redirector.
 
         char wrapperPath[MAX_PATH];
-        StringCbCatA(achFileName, MAX_PATH, "\\..\\weasel.dll");
+        StringCbCatA(achFileName, MAX_PATH, "\\..\\TypeDuck.dll");
         GetFullPathNameA(achFileName, MAX_PATH, wrapperPath, NULL);
         memcpy(achFileName, wrapperPath, MAX_PATH);
       }

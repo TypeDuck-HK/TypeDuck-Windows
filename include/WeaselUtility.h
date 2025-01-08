@@ -34,7 +34,7 @@ std::filesystem::path WeaselUserDataPath();
 inline fs::path WeaselLogPath() {
   WCHAR _path[MAX_PATH] = {0};
   // default location
-  ExpandEnvironmentStringsW(L"%TEMP%\\rime.weasel", _path, _countof(_path));
+  ExpandEnvironmentStringsW(L"%TEMP%\\rime.TypeDuck", _path, _countof(_path));
   fs::path path = fs::path(_path);
   if (!fs::exists(path)) {
     fs::create_directories(path);
@@ -184,17 +184,7 @@ inline std::basic_string<CharT> unescape_string(
 std::string GetCustomResource(const char* name, const char* type);
 
 inline std::wstring get_weasel_ime_name() {
-  LANGID langId = GetUserDefaultUILanguage();
-
-  if (langId == MAKELANGID(LANG_CHINESE, SUBLANG_CHINESE_TRADITIONAL) ||
-      langId == MAKELANGID(LANG_CHINESE, SUBLANG_CHINESE_SIMPLIFIED) ||
-      langId == MAKELANGID(LANG_CHINESE, SUBLANG_CHINESE_HONGKONG) ||
-      langId == MAKELANGID(LANG_CHINESE, SUBLANG_CHINESE_SINGAPORE) ||
-      langId == MAKELANGID(LANG_CHINESE, SUBLANG_CHINESE_MACAU)) {
-    return L"小狼毫";
-  } else {
-    return L"Weasel";
-  }
+  return L"TypeDuck";
 }
 
 inline LONG RegGetStringValue(HKEY key,
@@ -212,27 +202,23 @@ inline LONG RegGetStringValue(HKEY key,
   return lRes;
 }
 
-inline LANGID get_language_id() {
+inline bool isChinese() {
   std::wstring lang{};
-  if (RegGetStringValue(HKEY_CURRENT_USER, L"Software\\Rime\\Weasel",
+  if (RegGetStringValue(HKEY_CURRENT_USER, L"Software\\Rime\\TypeDuck",
                         L"Language", lang) == ERROR_SUCCESS) {
-    if (lang == L"chs")
-      return MAKELANGID(LANG_CHINESE, SUBLANG_CHINESE_SIMPLIFIED);
-    else if (lang == L"cht")
-      return MAKELANGID(LANG_CHINESE, SUBLANG_CHINESE_TRADITIONAL);
-    else if (lang == L"eng")
-      return MAKELANGID(LANG_ENGLISH, SUBLANG_ENGLISH_US);
+    if (lang == L"zh")
+      return true;
+    else if (lang == L"en")
+      return false;
   }
-  LANGID langId = GetUserDefaultUILanguage();
-  if (langId == MAKELANGID(LANG_CHINESE, SUBLANG_CHINESE_SIMPLIFIED) ||
-      langId == MAKELANGID(LANG_CHINESE, SUBLANG_CHINESE_SINGAPORE)) {
-    langId = MAKELANGID(LANG_CHINESE, SUBLANG_CHINESE_SIMPLIFIED);
-  } else if (langId == MAKELANGID(LANG_CHINESE, SUBLANG_CHINESE_TRADITIONAL) ||
-             langId == MAKELANGID(LANG_CHINESE, SUBLANG_CHINESE_HONGKONG) ||
-             langId == MAKELANGID(LANG_CHINESE, SUBLANG_CHINESE_MACAU)) {
-    langId = MAKELANGID(LANG_CHINESE, SUBLANG_CHINESE_TRADITIONAL);
-  } else {
-    langId = MAKELANGID(LANG_ENGLISH, SUBLANG_ENGLISH_US);
-  }
-  return langId;
+  return PRIMARYLANGID(GetThreadUILanguage()) == LANG_CHINESE ||
+         PRIMARYLANGID(GetUserDefaultUILanguage()) == LANG_CHINESE ||
+         PRIMARYLANGID(GetSystemDefaultUILanguage()) == LANG_CHINESE;
+}
+
+inline LANGID get_language_id() {
+  if (isChinese())
+    return MAKELANGID(LANG_CHINESE, SUBLANG_CHINESE_TRADITIONAL);
+  else
+    return MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT);
 }

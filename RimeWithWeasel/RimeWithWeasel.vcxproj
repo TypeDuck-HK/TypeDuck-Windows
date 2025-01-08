@@ -36,8 +36,9 @@
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{1C497821-BD63-4F02-9094-32B185B62F23}</ProjectGuid>
-    <RootNamespace>RimeWithWeasel</RootNamespace>
     <Keyword>Win32Proj</Keyword>
+    <RootNamespace>RimeWithTypeDuck</RootNamespace>
+    <ProjectName>RimeWithTypeDuck</ProjectName>
   </PropertyGroup>
   <Import Project="..\weasel.props" />
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />

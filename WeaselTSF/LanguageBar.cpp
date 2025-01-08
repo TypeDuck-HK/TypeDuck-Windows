@@ -37,9 +37,9 @@ static void HMENU2ITfMenu(HMENU hMenu, ITfMenu* pTfMenu) {
 static LPCWSTR GetWeaselRegName() {
   LPCWSTR WEASEL_REG_NAME_;
   if (is_wow64())
-    WEASEL_REG_NAME_ = L"Software\\WOW6432Node\\Rime\\Weasel";
+    WEASEL_REG_NAME_ = L"Software\\WOW6432Node\\Rime\\TypeDuck";
   else
-    WEASEL_REG_NAME_ = L"Software\\Rime\\Weasel";
+    WEASEL_REG_NAME_ = L"Software\\Rime\\TypeDuck";
 
   return WEASEL_REG_NAME_;
 }
@@ -111,7 +111,7 @@ STDAPI CLangBarItemButton::GetInfo(TF_LANGBARITEMINFO* pInfo) {
   pInfo->dwStyle = TF_LBI_STYLE_BTN_BUTTON | TF_LBI_STYLE_BTN_MENU |
                    TF_LBI_STYLE_SHOWNINTRAY;
   pInfo->ulSort = 1;
-  lstrcpyW(pInfo->szDescription, L"WeaselTSF Button");
+  lstrcpyW(pInfo->szDescription, L"TypeDuckTSF Button");
   return S_OK;
 }
 
@@ -130,27 +130,21 @@ static LANGID GetActiveProfileLangId() {
   HRESULT hr = pInputProcessorProfileMgr.CoCreateInstance(
       CLSID_TF_InputProcessorProfiles, NULL, CLSCTX_ALL);
   if (FAILED(hr))
-    return MAKELANGID(LANG_CHINESE, SUBLANG_CHINESE_SIMPLIFIED);
+    return get_language_id();
 
   TF_INPUTPROCESSORPROFILE profile;
   hr = pInputProcessorProfileMgr->GetActiveProfile(GUID_TFCAT_TIP_KEYBOARD,
                                                    &profile);
   if (FAILED(hr))
-    return MAKELANGID(LANG_CHINESE, SUBLANG_CHINESE_SIMPLIFIED);
+    return get_language_id();
   return profile.langid;
 }
 
 STDAPI CLangBarItemButton::GetTooltipString(BSTR* pbstrToolTip) {
-  LANGID langid = get_language_id();
-  if (langid == TEXTSERVICE_LANGID_HANS) {
-    *pbstrToolTip = SysAllocString(L"左键切换模式，右键打开菜单");
-  } else if (langid == TEXTSERVICE_LANGID_HANT) {
-    *pbstrToolTip = SysAllocString(L"左鍵切換模式，右鍵打開菜單");
-  } else {
-    *pbstrToolTip = SysAllocString(
-        L"Left-click to switch modes\n\nRight-click for more options");
-  }
-
+  *pbstrToolTip = SysAllocString(
+      isChinese() ? L"按滑鼠左鍵以切換中英文輸入\r\n按滑鼠右鍵以顯示更多選項"
+                  : L"Left-click to switch between Chinese and English "
+                    L"input\r\nRight-click for more options");
   return (*pbstrToolTip == NULL) ? E_OUTOFMEMORY : S_OK;
 }
 
@@ -168,15 +162,9 @@ STDAPI CLangBarItemButton::OnClick(TfLBIClick click,
     /* Open menu */
     HWND hwnd = _pTextService->_GetFocusedContextWindow();
     if (hwnd != NULL) {
-      LANGID langid = get_language_id();
-      HMENU menu;
-      if (langid == TEXTSERVICE_LANGID_HANS) {
-        menu = LoadMenuW(g_hInst, MAKEINTRESOURCE(IDR_MENU_POPUP_HANS));
-      } else if (langid == TEXTSERVICE_LANGID_HANT) {
-        menu = LoadMenuW(g_hInst, MAKEINTRESOURCE(IDR_MENU_POPUP_HANT));
-      } else {
-        menu = LoadMenuW(g_hInst, MAKEINTRESOURCE(IDR_MENU_POPUP));
-      }
+      HMENU menu = LoadMenuW(
+          g_hInst,
+          MAKEINTRESOURCE(isChinese() ? IDR_MENU_POPUP_HANT : IDR_MENU_POPUP));
       HMENU popupMenu = GetSubMenu(menu, 0);
       UINT wID = TrackPopupMenuEx(
           popupMenu, TPM_NONOTIFY | TPM_RETURNCMD | TPM_HORPOSANIMATION, pt.x,
@@ -189,7 +177,9 @@ STDAPI CLangBarItemButton::OnClick(TfLBIClick click,
 }
 
 STDAPI CLangBarItemButton::InitMenu(ITfMenu* pMenu) {
-  HMENU menu = LoadMenuW(g_hInst, MAKEINTRESOURCE(IDR_MENU_POPUP));
+  HMENU menu = LoadMenuW(
+      g_hInst,
+      MAKEINTRESOURCE(isChinese() ? IDR_MENU_POPUP_HANT : IDR_MENU_POPUP));
   HMENU popupMenu = GetSubMenu(menu, 0);
   HMENU2ITfMenu(popupMenu, pMenu);
   DestroyMenu(menu);
@@ -227,7 +217,7 @@ STDAPI CLangBarItemButton::GetIcon(HICON* phIcon) {
 }
 
 STDAPI CLangBarItemButton::GetText(BSTR* pbstrText) {
-  *pbstrText = SysAllocString(L"WeaselTSF Button");
+  *pbstrText = SysAllocString(L"TypeDuckTSF Button");
   return (*pbstrText == NULL) ? E_OUTOFMEMORY : S_OK;
 }
 
@@ -294,7 +284,7 @@ void CLangBarItemButton::SetLangbarStatus(DWORD dwStatus, BOOL fSet) {
 
 std::wstring WeaselTSF::_GetRootDir() {
   std::wstring dir{};
-  RegGetStringValue(HKEY_LOCAL_MACHINE, GetWeaselRegName(), L"WeaselRoot", dir);
+  RegGetStringValue(HKEY_LOCAL_MACHINE, GetWeaselRegName(), L"TypeDuckRoot", dir);
   return dir;
 }
 
@@ -304,7 +294,7 @@ void WeaselTSF::_HandleLangBarMenuSelect(UINT wID) {
     case ID_WEASELTRAY_RERUN_SERVICE:
     case ID_WEASELTRAY_INSTALLDIR:
       if (RegGetStringValue(HKEY_LOCAL_MACHINE, GetWeaselRegName(),
-                            L"WeaselRoot", dir) == ERROR_SUCCESS) {
+                            L"TypeDuckRoot", dir) == ERROR_SUCCESS) {
         if (wID == ID_WEASELTRAY_RERUN_SERVICE) {
           std::thread th([dir]() {
             ShellExecuteW(NULL, L"open", (dir + L"\\start_service.bat").c_str(),
@@ -315,8 +305,8 @@ void WeaselTSF::_HandleLangBarMenuSelect(UINT wID) {
           explore(dir);
       }
       break;
-    case ID_WEASELTRAY_USERCONFIG:
-      if (RegGetStringValue(HKEY_CURRENT_USER, L"Software\\Rime\\Weasel",
+    case ID_WEASELTRAY_USERDIR:
+      if (RegGetStringValue(HKEY_CURRENT_USER, L"Software\\Rime\\TypeDuck",
                             L"RimeUserDir", dir) == ERROR_SUCCESS) {
         if (dir.empty()) {
           TCHAR _path[MAX_PATH];
@@ -329,11 +319,12 @@ void WeaselTSF::_HandleLangBarMenuSelect(UINT wID) {
     case ID_WEASELTRAY_LOGDIR:
       explore(WeaselLogPath().wstring());
       break;
-    case ID_WEASELTRAY_WIKI:
-      open(L"https://rime.im/docs/");
+    case ID_WEASELTRAY_WEBSITE:
+      open(L"https://www.typeduck.hk");
       break;
-    case ID_WEASELTRAY_FORUM:
-      open(L"https://rime.im/discuss/");
+    case ID_WEASELTRAY_ABOUT:
+      // TODO
+      open(L"https://www.typeduck.hk/about/");
       break;
     default:
       m_client.TrayCommand(wID);

@@ -11,6 +11,7 @@ Unicode true
 ; General
 
 !define WEASEL_ROOT $INSTDIR\TypeDuck-${WEASEL_VERSION}
+!define REG_UNINST_KEY "Software\Microsoft\Windows\CurrentVersion\Uninstall\TypeDuck"
 
 ; The name of the installer
 Name "TypeDuck ${WEASEL_VERSION}"
@@ -25,6 +26,26 @@ VIAddVersionKey "CompanyName" "The Education University of Hong Kong"
 VIAddVersionKey "LegalCopyright" "© The Education University of Hong Kong"
 VIAddVersionKey "FileDescription" "TypeDuck IME"
 VIAddVersionKey "FileVersion" "${WEASEL_VERSION}"
+VIAddVersionKey "InternalName" "TypeDuck-Windows-${WEASEL_VERSION}-installer"
+VIAddVersionKey "OriginalFilename" "TypeDuck-Windows-${WEASEL_VERSION}-installer.exe"
+
+VIAddVersionKey /LANG=1028 "ProductName" "TypeDuck"
+VIAddVersionKey /LANG=1028 "Comments" "Driven by Weasel"
+VIAddVersionKey /LANG=1028 "CompanyName" "香港教育大學"
+VIAddVersionKey /LANG=1028 "LegalCopyright" "© 香港教育大學"
+VIAddVersionKey /LANG=1028 "FileDescription" "TypeDuck IME"
+VIAddVersionKey /LANG=1028 "FileVersion" "${WEASEL_VERSION}"
+VIAddVersionKey /LANG=1028 "InternalName" "TypeDuck-Windows-${WEASEL_VERSION}-installer"
+VIAddVersionKey /LANG=1028 "OriginalFilename" "TypeDuck-Windows-${WEASEL_VERSION}-installer.exe"
+
+VIAddVersionKey /LANG=2052 "ProductName" "TypeDuck"
+VIAddVersionKey /LANG=2052 "Comments" "Driven by Weasel"
+VIAddVersionKey /LANG=2052 "CompanyName" "香港教育大學"
+VIAddVersionKey /LANG=2052 "LegalCopyright" "© 香港教育大學"
+VIAddVersionKey /LANG=2052 "FileDescription" "TypeDuck IME"
+VIAddVersionKey /LANG=2052 "FileVersion" "${WEASEL_VERSION}"
+VIAddVersionKey /LANG=2052 "InternalName" "TypeDuck-Windows-${WEASEL_VERSION}-installer"
+VIAddVersionKey /LANG=2052 "OriginalFilename" "TypeDuck-Windows-${WEASEL_VERSION}-installer.exe"
 
 !define MUI_ICON ..\resource\TypeDuck.ico
 !define MUI_UNICON ..\resource\TypeDuck.ico
