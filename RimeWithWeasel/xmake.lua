@@ -1,4 +1,4 @@
-target("RimeWithWeasel")
+target("RimeWithTypeDuck")
   set_kind("static")
   add_files("./*.cpp")
   add_rules("use_weaselconstants")

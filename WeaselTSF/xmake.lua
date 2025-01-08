@@ -1,8 +1,8 @@
-target("WeaselTSF")
+target("TypeDuckTSF")
   set_kind("shared")
   add_files("./*.cpp", "WeaselTSF.def")
   add_rules("add_rcfiles", "use_weaselconstants")
-  add_deps("WeaselIPC", "WeaselUI")
+  add_deps("TypeDuckIPC", "TypeDuckUI")
   local fname = ''
   if is_arch("x86") then
     fname = "TypeDuck.dll"

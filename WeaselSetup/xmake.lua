@@ -1,4 +1,4 @@
-target("WeaselSetup")
+target("TypeDuckSetup")
   set_kind("binary")
   add_files("./*.cpp")
   add_rules("add_rcfiles", "use_weaselconstants", "subwin")

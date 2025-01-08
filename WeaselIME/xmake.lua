@@ -1,9 +1,9 @@
-target("WeaselIME")
+target("TypeDuckIME")
   set_kind("shared")
   add_files("./*.cpp")
   add_rules("add_rcfiles")
   add_links("advapi32", "imm32", "user32", "gdi32")
-  add_deps("WeaselIPC", "WeaselUI")
+  add_deps("TypeDuckIPC", "TypeDuckUI")
   local fname = ''
 
   before_build(function(target)

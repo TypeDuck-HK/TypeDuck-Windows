@@ -1,7 +1,7 @@
 target("TestResponseParser")
   set_kind("binary")
   add_files("./*.cpp")
-  add_deps("WeaselIPC", "WeaselIPCServer")
+  add_deps("TypeDuckIPC", "TypeDuckIPCServer")
   add_rules("subcmd")
   before_build(function(target)
     local target_dir = path.join(target:targetdir(), target:name())

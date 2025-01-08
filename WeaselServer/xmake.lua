@@ -1,9 +1,9 @@
-target("WeaselServer")
+target("TypeDuckServer")
   set_kind("binary")
   add_files("./*.cpp")
   add_rules("add_rcfiles", "subwin")
   add_links("imm32", "kernel32", "rime")
-  add_deps("WeaselUI", "WeaselIPC", "RimeWithWeasel", "WeaselIPCServer")
+  add_deps("TypeDuckUI", "TypeDuckIPC", "RimeWithTypeDuck", "TypeDuckIPCServer")
 
   add_files("$(projectdir)/PerMonitorHighDPIAware.manifest")
   add_ldflags("/DEBUG /OPT:REF /OPT:ICF /LARGEADDRESSAWARE /ERRORREPORT:QUEUE")
