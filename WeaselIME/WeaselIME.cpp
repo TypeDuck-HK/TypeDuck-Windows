@@ -75,9 +75,8 @@ KEY_READ | KEY_WOW64_32KEY, &hKey); if (ret != ERROR_SUCCESS)
         if (!CreateProcess(exe.c_str(), NULL, NULL, NULL, FALSE, 0, NULL,
 dir.c_str(), &startup_info, &process_info))
         {
-                EZDBGONLYLOGGERPRINT("ERROR: failed to launch TypeDuck server.");
-                error_message(L"服務進程啓動不起來 :(");
-                return false;
+                EZDBGONLYLOGGERPRINT("ERROR: failed to launch TypeDuck
+server."); error_message(L"服務進程啓動不起來 :("); return false;
         }
 
         if (!WaitForInputIdle(process_info.hProcess, 1500))

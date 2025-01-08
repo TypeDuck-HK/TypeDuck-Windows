@@ -284,7 +284,8 @@ void CLangBarItemButton::SetLangbarStatus(DWORD dwStatus, BOOL fSet) {
 
 std::wstring WeaselTSF::_GetRootDir() {
   std::wstring dir{};
-  RegGetStringValue(HKEY_LOCAL_MACHINE, GetWeaselRegName(), L"TypeDuckRoot", dir);
+  RegGetStringValue(HKEY_LOCAL_MACHINE, GetWeaselRegName(), L"TypeDuckRoot",
+                    dir);
   return dir;
 }
 

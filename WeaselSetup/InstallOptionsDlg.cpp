@@ -6,8 +6,7 @@
 
 int uninstall(bool silent);
 
-InstallOptionsDialog::InstallOptionsDialog()
-    : installed(false), user_dir() {}
+InstallOptionsDialog::InstallOptionsDialog() : installed(false), user_dir() {}
 
 InstallOptionsDialog::~InstallOptionsDialog() {}
 

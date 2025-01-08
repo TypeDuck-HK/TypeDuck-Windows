@@ -168,7 +168,8 @@ int install_ime_file(std::wstring& srcPath,
         std::wstring srcPathARM32 = srcPath;
         ireplace_last(srcPathARM32, ext, L"ARM" + ext);
 
-        std::wstring destPathARM32 = std::wstring(sysarm32) + L"\\TypeDuck" + ext;
+        std::wstring destPathARM32 =
+            std::wstring(sysarm32) + L"\\TypeDuck" + ext;
         if (!copy_file(srcPathARM32, destPathARM32)) {
           MSG_NOT_SILENT_ID_CAP(silent, destPathARM32.c_str(),
                                 IDS_STR_INSTALL_FAILED, MB_ICONERROR | MB_OK);
@@ -178,10 +179,10 @@ int install_ime_file(std::wstring& srcPath,
       }
 
       // Then install the ARM64 (and x64) version.
-      // On ARM64 TypeDuck.dll(ime) is an ARM64X redirection DLL (TypeDuckARM64X).
-      // When loaded, it will be redirected to TypeDuckARM64.dll(ime) on ARM64
-      // processes, and TypeDuckx64.dll(ime) on x64 processes. So we need a total
-      // of three files.
+      // On ARM64 TypeDuck.dll(ime) is an ARM64X redirection DLL
+      // (TypeDuckARM64X). When loaded, it will be redirected to
+      // TypeDuckARM64.dll(ime) on ARM64 processes, and TypeDuckx64.dll(ime) on
+      // x64 processes. So we need a total of three files.
 
       std::wstring srcPathX64 = srcPath;
       std::wstring destPathX64 = destPath;
@@ -247,7 +248,8 @@ int uninstall_ime_file(const std::wstring& ext,
     if (is_arm64_machine()) {
       WCHAR sysarm32[MAX_PATH];
       if (get_wow_arm32_system_dir(sysarm32, _countof(sysarm32)) > 0) {
-        std::wstring imePathARM32 = std::wstring(sysarm32) + L"\\TypeDuck" + ext;
+        std::wstring imePathARM32 =
+            std::wstring(sysarm32) + L"\\TypeDuck" + ext;
         retval += func(imePathARM32, false, true, true, false, silent);
         delete_file(imePathARM32);
       }

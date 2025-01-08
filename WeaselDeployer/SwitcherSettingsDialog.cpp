@@ -120,8 +120,8 @@ LRESULT SwitcherSettingsDialog::OnGetSchemata(WORD, WORD, HWND hWndCtl, BOOL&) {
     DWORD len = sizeof(value);
     DWORD type = 0;
     DWORD data = 0;
-    ret =
-        RegQueryValueExW(hKey, L"TypeDuckRoot", NULL, &type, (LPBYTE)value, &len);
+    ret = RegQueryValueExW(hKey, L"TypeDuckRoot", NULL, &type, (LPBYTE)value,
+                           &len);
     if (ret == ERROR_SUCCESS && type == REG_SZ) {
       WCHAR parameters[MAX_PATH + 37];
       wcscpy_s<_countof(parameters)>(

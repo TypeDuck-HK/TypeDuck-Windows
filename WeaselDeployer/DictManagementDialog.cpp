@@ -115,7 +115,8 @@ LRESULT DictManagementDialog::OnBackup(WORD, WORD code, HWND, BOOL&) {
   if (_waccess_s(path.c_str(), 0) != 0 &&
       !CreateDirectoryW(path.c_str(), NULL) &&
       GetLastError() == ERROR_PATH_NOT_FOUND) {
-    MSG_BY_IDS(IDS_STR_ERR_EXPORT_SYNC_UV, IDS_STR_EXPORT_FAILED, MB_OK | MB_ICONERROR);
+    MSG_BY_IDS(IDS_STR_ERR_EXPORT_SYNC_UV, IDS_STR_EXPORT_FAILED,
+               MB_OK | MB_ICONERROR);
     return 0;
   }
   WCHAR dict_name[100] = {0};

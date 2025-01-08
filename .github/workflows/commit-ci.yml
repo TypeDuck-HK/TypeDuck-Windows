@@ -29,16 +29,16 @@ jobs:
             }
           }
           if ($version -ne "") {
-            Write-Host "clang-format version：$version"
-            if ([version]$version -ge [version]"18.1.6") {
+            Write-Host "clang-format version: $version"
+            if ($version -eq "18.1.8") {
               Write-Host "clang-format OK"
             } else {
               Write-Host "clang-format vesion does not meet"
-              choco install llvm --version=18.1.6
+              choco install llvm --version=18.1.8
             }
           } else {
-            Write-Host "clang-format not installed"
-            choco install llvm --version=18.1.6
+            Write-Host "clang-format is not installed"
+            choco install llvm --version=18.1.8
           }
       - name: Code style lint
         shell: bash
