@@ -22,7 +22,7 @@ jobs:
 
       - name: Cache Boost
         id: cache-boost
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: |
             ${{ env.BOOST_ROOT }}
@@ -37,14 +37,14 @@ jobs:
 
       - name: Cache dependencies
         id: cache-deps
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: |
             librime
           key: ${{ runner.os }}-deps-${{ hashFiles('submodule-status') }}
 
       - name: Add msbuild to PATH
-        uses: microsoft/setup-msbuild@v1.3.1
+        uses: microsoft/setup-msbuild@v2
 
       - name: Copy Rime files
         run: .\github.install.bat
@@ -55,7 +55,7 @@ jobs:
           .\build.bat weasel hant installer
 
       - name: Upload artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           if-no-files-found: error
           path: |
