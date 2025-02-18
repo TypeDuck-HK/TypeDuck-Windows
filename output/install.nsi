@@ -164,6 +164,9 @@ program_files:
   File "TypeDuckSetup.exe"
   File "rime.dll"
   File "WinSparkle.dll"
+  ; remove previous schema-windows folder as we forgot to do so in 1.1.4
+  IfFileExists "$INSTDIR\schema-windows\*.*" 0 +2
+  RMDir /r "$INSTDIR\schema-windows"
   ; shared data files
   File "curl-ca-bundle.crt"
   File "curl.exe"
@@ -171,7 +174,9 @@ program_files:
   File "7z.exe"
   ExecWait '"$INSTDIR\curl.exe" -L -o "$INSTDIR\data.zip" https://github.com/TypeDuck-HK/schema/archive/refs/heads/windows.zip'
   ExecWait '"$INSTDIR\7z.exe" x "$INSTDIR\data.zip" -o"$INSTDIR"'
-  Rename "$INSTDIR\schema-windows" "$INSTDIR\data"
+  CreateDirectory "$INSTDIR\data"
+  CopyFiles "$INSTDIR\schema-windows\*.*" "$INSTDIR\data"
+  RMDir /r "$INSTDIR\schema-windows"
   Delete "$INSTDIR\data.zip"
   Delete "$INSTDIR\data\.gitignore"
   Delete "$INSTDIR\curl-ca-bundle.crt"
