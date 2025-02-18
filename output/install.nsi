@@ -132,7 +132,7 @@ install:
   IfFileExists "$INSTDIR\TypeDuckServer.exe" 0 +2
   ExecWait '"$INSTDIR\TypeDuckServer.exe" /quit'
 
-  SetOverwrite try
+  AllowSkipFiles off
   ; Set output path to the installation directory.
   SetOutPath $INSTDIR
 
