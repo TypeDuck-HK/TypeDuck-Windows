@@ -75,6 +75,13 @@ InstallDirRegKey HKLM "Software\Rime\TypeDuck" "InstallDir"
 ; Request application privileges for Windows Vista
 RequestExecutionLevel admin
 
+Function .onInstFailed
+  SetOutPath $TEMP
+  RMDir /r /REBOOTOK "$INSTDIR"
+  SetShellVarContext all
+  RMDir /r /REBOOTOK "$SMPROGRAMS\TypeDuck"
+FunctionEnd
+
 ;--------------------------------
 
 ; Pages
@@ -252,15 +259,9 @@ Section "Uninstall"
 
   ; Remove files and uninstaller
   SetOutPath $TEMP
-  Delete /REBOOTOK "$INSTDIR\data\opencc\*.*"
-  Delete /REBOOTOK "$INSTDIR\data\*.*"
-  Delete /REBOOTOK "$INSTDIR\*.*"
-  RMDir /REBOOTOK "$INSTDIR\data\opencc"
-  RMDir /REBOOTOK "$INSTDIR\data"
-  RMDir /REBOOTOK "$INSTDIR"
+  RMDir /r /REBOOTOK "$INSTDIR"
   SetShellVarContext all
-  Delete /REBOOTOK "$SMPROGRAMS\TypeDuck\*.*"
-  RMDir /REBOOTOK "$SMPROGRAMS\TypeDuck"
+  RMDir /r /REBOOTOK "$SMPROGRAMS\TypeDuck"
 
   ; Prompt reboot
   SetRebootFlag true
