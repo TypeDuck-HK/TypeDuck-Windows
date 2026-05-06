@@ -83,6 +83,9 @@ private:
     void onPaint();
     void paintItem(HDC hdc, int index, int x, int y);
     void itemRect(int index, RECT& rect) const;
+    int itemWidth(int index) const;
+    int itemTextWidth(int index) const;
+    int itemCommentWidth(int index) const;
     int hitTestCandidate(POINT pt) const;
     void onLButtonDown(WPARAM wp, LPARAM lp);
     void onLButtonUp(WPARAM wp, LPARAM lp);
@@ -123,6 +126,9 @@ private:
     HFONT commentFont_;
     std::vector<wchar_t> selKeys_;
     std::vector<CandidateUiItem> items_;
+    std::vector<int> itemTextWidths_;
+    std::vector<int> itemCommentWidths_;
+    std::vector<int> itemWidths_;
     int currentSel_;
     int pressedSel_;
     bool draggingWindow_;

@@ -394,6 +394,9 @@ void CandidateWindow::add(CandidateUiItem item, wchar_t selKey) {
 void CandidateWindow::clear() {
     items_.clear();
     selKeys_.clear();
+    itemTextWidths_.clear();
+    itemCommentWidths_.clear();
+    itemWidths_.clear();
     if (::GetCapture() != hwnd_) {
         pressedSel_ = -1;
     }
@@ -602,6 +605,10 @@ void CandidateWindow::recalculateSize() {
     commentWidth_ = 0;
     itemHeight_ = 0;
     preeditHeight_ = 0;
+    itemTextWidths_.assign(items_.size(), 0);
+    itemCommentWidths_.assign(items_.size(), 0);
+    itemWidths_.assign(items_.size(), 0);
+    int preeditWidth = 0;
 
     HGDIOBJ oldFont = ::SelectObject(hdc, font_);
     TEXTMETRICW metrics = {};
@@ -616,6 +623,7 @@ void CandidateWindow::recalculateSize() {
         SIZE candidateSize = {};
         const CandidateUiItem& item = items_[i];
         ::GetTextExtentPoint32W(hdc, item.text.c_str(), static_cast<int>(item.text.length()), &candidateSize);
+        itemTextWidths_[i] = static_cast<int>(candidateSize.cx);
         textWidth_ = (std::max)(textWidth_, static_cast<int>(candidateSize.cx));
         int candidateHeight = static_cast<int>(candidateSize.cy);
         if (!item.comment.empty() && commentFont_) {
@@ -623,6 +631,7 @@ void CandidateWindow::recalculateSize() {
             ::SelectObject(hdc, commentFont_);
             ::GetTextExtentPoint32W(hdc, item.comment.c_str(), static_cast<int>(item.comment.length()), &commentSize);
             ::SelectObject(hdc, font_);
+            itemCommentWidths_[i] = static_cast<int>(commentSize.cx);
             commentWidth_ = (std::max)(commentWidth_, static_cast<int>(commentSize.cx));
             candidateHeight = (std::max)(candidateHeight, static_cast<int>(commentSize.cy));
         }
@@ -631,6 +640,7 @@ void CandidateWindow::recalculateSize() {
     if (!preedit_.empty()) {
         SIZE preeditSize = {};
         ::GetTextExtentPoint32W(hdc, preedit_.c_str(), static_cast<int>(preedit_.length()), &preeditSize);
+        preeditWidth = static_cast<int>(preeditSize.cx);
         textWidth_ = (std::max)(textWidth_, static_cast<int>(preeditSize.cx));
         preeditHeight_ = static_cast<int>(preeditSize.cy);
     }
@@ -652,13 +662,29 @@ void CandidateWindow::recalculateSize() {
                          ? 0
                          : (std::max)(preeditHeight_, static_cast<int>(metrics.tmHeight + metrics.tmExternalLeading));
 
-    const int commentSectionWidth = commentWidth_ > 0 ? commentGap_ + commentWidth_ : 0;
-    const int trailingGap = candPerRow_ > 1 && commentWidth_ == 0 ? candSpacing_ : 0;
-    const int itemWidth = selKeyWidth_ + labelGap_ + textWidth_ + commentSectionWidth + trailingGap;
-    const int columns = (std::min)(itemsPerRow, static_cast<int>(items_.size()));
+    for (int i = 0, n = static_cast<int>(items_.size()); i < n; ++i) {
+        const int commentSectionWidth =
+            itemCommentWidths_[i] > 0 ? commentGap_ + itemCommentWidths_[i] : 0;
+        const int trailingGap = candPerRow_ > 1 ? candSpacing_ : 0;
+        itemWidths_[i] = selKeyWidth_ + labelGap_ + itemTextWidths_[i] +
+                         commentSectionWidth + trailingGap;
+    }
+
     const int rows = (static_cast<int>(items_.size()) + itemsPerRow - 1) / itemsPerRow;
-    const int candidateContentWidth = columns * itemWidth + (std::max)(0, columns - 1) * colSpacing_;
-    const int contentWidth = (std::max)(candidateContentWidth, textWidth_);
+    int candidateContentWidth = 0;
+    for (int row = 0; row < rows; ++row) {
+        const int rowStart = row * itemsPerRow;
+        const int rowEnd = (std::min)(rowStart + itemsPerRow, static_cast<int>(items_.size()));
+        int rowWidth = 0;
+        for (int i = rowStart; i < rowEnd; ++i) {
+            if (i > rowStart) {
+                rowWidth += colSpacing_;
+            }
+            rowWidth += itemWidth(i);
+        }
+        candidateContentWidth = (std::max)(candidateContentWidth, rowWidth);
+    }
+    const int contentWidth = (std::max)(candidateContentWidth, preeditWidth);
     const int width = (std::max)(minWidth_, padX_ * 2 + contentWidth) + borderWidth_ * 2;
     int contentHeight = rows * itemHeight_ + (std::max)(0, rows - 1) * rowSpacing_;
     if (!preedit_.empty()) {
@@ -753,9 +779,6 @@ void CandidateWindow::onPaint() {
     int col = 0;
     int x = borderWidth_ + padX_;
     y = contentTop_;
-    const int trailingGap = candPerRow_ > 1 && commentWidth_ == 0 ? candSpacing_ : 0;
-    const int itemWidth = selKeyWidth_ + labelGap_ + textWidth_ +
-                          (commentWidth_ > 0 ? commentGap_ + commentWidth_ : 0) + trailingGap;
     for (int i = 0, n = static_cast<int>(items_.size()); i < n; ++i) {
         paintItem(memdc, i, x, y);
         ++col;
@@ -764,7 +787,7 @@ void CandidateWindow::onPaint() {
             x = borderWidth_ + padX_;
             y += itemHeight_ + rowSpacing_;
         } else {
-            x += colSpacing_ + itemWidth;
+            x += colSpacing_ + itemWidth(i);
         }
     }
 
@@ -783,19 +806,16 @@ void CandidateWindow::onPaint() {
 void CandidateWindow::paintItem(HDC hdc, int index, int x, int y) {
     const bool selected = useCursor_ && index == currentSel_;
 
-    RECT itemRc = {x, y, x + selKeyWidth_ + labelGap_ + textWidth_, y + itemHeight_};
-    if (commentWidth_ > 0) {
-        itemRc.right += commentGap_ + commentWidth_;
-    }
+    RECT itemRc = {x, y, x + itemWidth(index), y + itemHeight_};
     RECT highlightRc = itemRc;
     RECT selRc = itemRc;
     selRc.right = selRc.left + selKeyWidth_;
     RECT textRc = itemRc;
     textRc.left += selKeyWidth_ + labelGap_;
-    textRc.right = textRc.left + textWidth_;
+    textRc.right = textRc.left + itemTextWidth(index);
     RECT commentRc = textRc;
     commentRc.left = textRc.right + commentGap_;
-    commentRc.right = commentRc.left + commentWidth_;
+    commentRc.right = commentRc.left + itemCommentWidth(index);
 
     const COLORREF bgColor = selected ? highlightColor_ : backgroundColor_;
     const COLORREF textColor = selected ? highlightTextColor_ : textColor_;
@@ -948,14 +968,38 @@ void CandidateWindow::onMouseWheel(WPARAM wp, LPARAM) {
 
 void CandidateWindow::itemRect(int index, RECT& rect) const {
     const int row = index / candPerRow_;
-    const int col = index % candPerRow_;
-    const int trailingGap = candPerRow_ > 1 && commentWidth_ == 0 ? candSpacing_ : 0;
-    const int itemWidth = selKeyWidth_ + labelGap_ + textWidth_ +
-                          (commentWidth_ > 0 ? commentGap_ + commentWidth_ : 0) + trailingGap;
-    rect.left = borderWidth_ + padX_ + col * (itemWidth + colSpacing_);
+    int x = borderWidth_ + padX_;
+    const int rowStart = row * candPerRow_;
+    for (int i = rowStart; i < index; ++i) {
+        x += itemWidth(i) + colSpacing_;
+    }
+    rect.left = x;
     rect.top = contentTop_ + row * (itemHeight_ + rowSpacing_);
-    rect.right = rect.left + itemWidth;
+    rect.right = rect.left + itemWidth(index);
     rect.bottom = rect.top + itemHeight_;
+}
+
+int CandidateWindow::itemWidth(int index) const {
+    if (index >= 0 && index < static_cast<int>(itemWidths_.size())) {
+        return itemWidths_[index];
+    }
+    const int commentSectionWidth = commentWidth_ > 0 ? commentGap_ + commentWidth_ : 0;
+    const int trailingGap = candPerRow_ > 1 ? candSpacing_ : 0;
+    return selKeyWidth_ + labelGap_ + textWidth_ + commentSectionWidth + trailingGap;
+}
+
+int CandidateWindow::itemTextWidth(int index) const {
+    if (index >= 0 && index < static_cast<int>(itemTextWidths_.size())) {
+        return itemTextWidths_[index];
+    }
+    return textWidth_;
+}
+
+int CandidateWindow::itemCommentWidth(int index) const {
+    if (index >= 0 && index < static_cast<int>(itemCommentWidths_.size())) {
+        return itemCommentWidths_[index];
+    }
+    return commentWidth_;
 }
 
 void CandidateWindow::applyWindowShape() {

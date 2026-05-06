@@ -999,23 +999,22 @@ void TextService::updateLangButtons() {
 }
 
 int TextService::candFontHeight() {
-	int candFontHeight_ = candFontSize_;
+	int candFontHeight_ = -candFontSize_;
 	HDC hdc = GetDC(NULL);
 	if (hdc)
 	{
-		// Match fcitx5-windows: treat configured size as px at 96 DPI.
-		candFontHeight_ = -MulDiv(candFontSize_, GetDeviceCaps(hdc, LOGPIXELSY), 96);
+		candFontHeight_ = -MulDiv(candFontSize_, GetDeviceCaps(hdc, LOGPIXELSY), 72);
 		ReleaseDC(NULL, hdc);
 	}
 	return candFontHeight_;
 }
 
 int TextService::candCommentFontHeight() {
-	int candFontHeight_ = candCommentFontSize_;
+	int candFontHeight_ = -candCommentFontSize_;
 	HDC hdc = GetDC(NULL);
 	if (hdc)
 	{
-		candFontHeight_ = -MulDiv(candCommentFontSize_, GetDeviceCaps(hdc, LOGPIXELSY), 96);
+		candFontHeight_ = -MulDiv(candCommentFontSize_, GetDeviceCaps(hdc, LOGPIXELSY), 72);
 		ReleaseDC(NULL, hdc);
 	}
 	return candFontHeight_;
