@@ -47,11 +47,6 @@ std::wstring formatDebugLogLine(const std::wstring& message);
 constexpr wchar_t kDefaultCommentFontFace[] = L"Consolas";
 constexpr ULONGLONG kCandidateWindowMoveThrottleMs = 50;
 
-// {3FCBE4CC-CC03-4BD4-B39F-3B6B0BEA5D90}
-const GUID kToggleUiLessOverrideGuid = {
-	0x3fcbe4cc, 0xcc03, 0x4bd4, { 0xb3, 0x9f, 0x3b, 0x6b, 0x0b, 0xea, 0x5d, 0x90 }
-};
-
 void appendCandidateWindowLog(const std::wstring& message) {
 	if (!Ime::isTraceLoggingEnabled()) {
 		return;
@@ -304,7 +299,6 @@ TextService::TextService(ImeModule* module):
 	autoPairQuotes_(false),
 	suppressNextCompositionTerminatedNotification_(false),
 	candidatePreeditCursor_(0) {
-	addPreservedKey('P', TF_MOD_CONTROL | TF_MOD_SHIFT, kToggleUiLessOverrideGuid);
 	shouldShowCandidateWindowUI_ = !effectiveUiLess();
 
 	// font for candidate and mesasge windows
@@ -479,12 +473,6 @@ bool TextService::changeCandidatePage(bool backward) {
 
 // virtual
 bool TextService::onPreservedKey(const GUID& guid) {
-	if (::IsEqualGUID(guid, kToggleUiLessOverrideGuid)) {
-		manualUiLessOverride_ = !manualUiLessOverride_;
-		applyUiLessOverrideState();
-		logDebug(L"[onPreservedKey] toggle_uiless manual_ui_less=" + boolText(manualUiLessOverride_));
-		return true;
-	}
 	if(!client_)
 		return false;
 	// some preserved keys registered in ctor are pressed

@@ -26,6 +26,7 @@
 #include "MoqiLangBarButton.h"
 
 #include <deque>
+#include <atomic>
 #include <unordered_map>
 #include <string>
 #include <vector>
@@ -96,6 +97,7 @@ private:
     bool isPipeCreatedByMoqiServer(HANDLE pipe);
     bool waitForRpcConnection();
     bool callRpcPipe(HANDLE pipe, const std::string& serializedRequest, std::string& serializedReply);
+	bool waitForRpcIdle(int timeoutMs) const;
 	bool readPendingPipeMessage(std::string& serializedReply);
 	void refreshAsyncPollTimer();
 	void pollAsyncResponses();
@@ -129,6 +131,8 @@ private:
 	TextService* textService_;
 	std::string guid_;
 	HANDLE pipe_;
+	std::atomic<int> rpcInProgress_;
+	std::atomic<bool> activationInProgress_;
 	std::unordered_map<std::string, Ime::ComPtr<Moqi::LangBarButton>> buttons_; // map buttons to string IDs
 	unsigned int nextSeqNum_;
 	bool isActivated_;

@@ -46,8 +46,67 @@ using namespace std;
 namespace Moqi {
 
 static constexpr UINT ASYNC_RPC_POLL_INTERVAL_MS = 50;
+static constexpr int FIRST_PRINTABLE_KEY_RPC_WAIT_MS = 200;
+static constexpr DWORD RPC_BUSY_POLL_INTERVAL_MS = 5;
 
 namespace {
+
+bool isOrdinaryPrintableKey(Ime::KeyEvent &keyEvent) {
+  const UINT charCode = keyEvent.charCode();
+  if (charCode < 0x20) {
+    return false;
+  }
+  if ((::GetKeyState(VK_CONTROL) & 0x8000) != 0 ||
+      (::GetKeyState(VK_MENU) & 0x8000) != 0) {
+    return false;
+  }
+  return true;
+}
+
+std::wstring rpcGuardLogPath() {
+  const wchar_t *localAppData = _wgetenv(L"LOCALAPPDATA");
+  if (!localAppData || !*localAppData) {
+    return L"";
+  }
+  return std::wstring(localAppData) + L"\\MoqiIM\\Log\\tsf-debug.log";
+}
+
+void appendRpcGuardLog(const std::wstring &message) {
+  if (!Ime::isTraceLoggingEnabled()) {
+    return;
+  }
+  const std::wstring logPath = rpcGuardLogPath();
+  if (logPath.empty()) {
+    return;
+  }
+
+  SYSTEMTIME now{};
+  ::GetLocalTime(&now);
+  wchar_t timestamp[32] = {};
+  swprintf_s(timestamp, L"%04d-%02d-%02d %02d:%02d:%02d.%03d", now.wYear,
+             now.wMonth, now.wDay, now.wHour, now.wMinute, now.wSecond,
+             now.wMilliseconds);
+
+  std::wofstream stream(logPath, std::ios::app);
+  if (!stream.is_open()) {
+    return;
+  }
+  stream << L"[" << timestamp << L"] " << message << L"\n";
+}
+
+class ScopedRpcInProgress {
+public:
+  explicit ScopedRpcInProgress(std::atomic<int> &counter) : counter_(counter) {
+    counter_.fetch_add(1, std::memory_order_acq_rel);
+  }
+
+  ~ScopedRpcInProgress() {
+    counter_.fetch_sub(1, std::memory_order_acq_rel);
+  }
+
+private:
+  std::atomic<int> &counter_;
+};
 
 std::wstring quotePairLogPath() {
   const wchar_t *localAppData = _wgetenv(L"LOCALAPPDATA");
@@ -456,8 +515,9 @@ bool parseHexColor(const std::string &text, COLORREF &result) {
 }
 
 Client::Client(TextService *service, REFIID langProfileGuid)
-    : textService_(service), pipe_(INVALID_HANDLE_VALUE), nextSeqNum_(0),
-      isActivated_(false), guid_{uuidToString(langProfileGuid)},
+    : textService_(service), guid_{uuidToString(langProfileGuid)},
+      pipe_(INVALID_HANDLE_VALUE), rpcInProgress_(0),
+      activationInProgress_(false), nextSeqNum_(0), isActivated_(false),
       shouldWaitConnection_{true}, launcherStartAttempted_{false},
       asyncPollTimerWindow_(nullptr),
       asyncPollTimerId_(0), autoPairRules_(defaultAutoPairRules()) {}
@@ -955,6 +1015,7 @@ void Client::updateCandidateList(Json::Value &msg, Ime::EditSession *session) {
 
 // handlers for the text service
 void Client::onActivate() {
+  activationInProgress_.store(true, std::memory_order_release);
   auto req = createRpcRequest("onActivate");
   req.set_is_keyboard_open(textService_->isKeyboardOpened());
 
@@ -962,6 +1023,7 @@ void Client::onActivate() {
   callRpcMethod(req, ret);
   if (handleRpcResponse(ret)) {
   }
+  activationInProgress_.store(false, std::memory_order_release);
   isActivated_ = true;
 }
 
@@ -976,6 +1038,21 @@ void Client::onDeactivate() {
 }
 
 bool Client::filterKeyDown(Ime::KeyEvent &keyEvent) {
+  if (isOrdinaryPrintableKey(keyEvent) &&
+      !waitForRpcIdle(FIRST_PRINTABLE_KEY_RPC_WAIT_MS)) {
+    std::wostringstream log;
+    log << L"[filterKeyDown] RPC busy timeout; consume printable key"
+        << L" vk=" << keyEvent.keyCode()
+        << L" char=" << keyEvent.charCode()
+        << L" wait_ms=" << FIRST_PRINTABLE_KEY_RPC_WAIT_MS
+        << L" activation_in_progress="
+        << (activationInProgress_.load(std::memory_order_acquire) ? L"true" : L"false")
+        << L" rpc_in_progress="
+        << rpcInProgress_.load(std::memory_order_acquire);
+    appendRpcGuardLog(log.str());
+    return true;
+  }
+
   auto req = createRpcRequest("filterKeyDown");
   addKeyEventToRpcRequest(req, keyEvent);
 
@@ -1268,6 +1345,23 @@ void Client::refreshAsyncPollTimer() {
   }
 }
 
+bool Client::waitForRpcIdle(int timeoutMs) const {
+  const ULONGLONG deadline =
+      ::GetTickCount64() + static_cast<ULONGLONG>(timeoutMs);
+  while (activationInProgress_.load(std::memory_order_acquire) ||
+         rpcInProgress_.load(std::memory_order_acquire) > 0) {
+    const ULONGLONG now = ::GetTickCount64();
+    if (now >= deadline) {
+      return false;
+    }
+    const DWORD sleepMs = static_cast<DWORD>(
+        (std::min)(static_cast<ULONGLONG>(RPC_BUSY_POLL_INTERVAL_MS),
+                   deadline - now));
+    ::Sleep(sleepMs == 0 ? 1 : sleepMs);
+  }
+  return true;
+}
+
 bool Client::readPendingPipeMessage(std::string &serializedReply) {
   serializedReply.clear();
   if (pipe_ == INVALID_HANDLE_VALUE) {
@@ -1394,6 +1488,7 @@ bool Client::callRpcPipe(HANDLE pipe, const std::string &serializedRequest,
 // a sequence number will be added to the req object automatically.
 bool Client::callRpcMethod(moqi::protocol::ClientRequest &request,
                            Json::Value &response) {
+  ScopedRpcInProgress rpcGuard(rpcInProgress_);
   if (shouldWaitConnection_ && !waitForRpcConnection()) {
     return false;
   }
