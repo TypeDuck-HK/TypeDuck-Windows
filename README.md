@@ -29,6 +29,7 @@ Windows 端的输入法前端，负责把 `moqi-ime` 后端接入 **Microsoft Te
 - 修改了librime的组句算法，支持输出多条整句候选，正确率大大提升
 - 置顶短语、超级简拼
 - 输入设置：自动插入成对符号、分号键次选
+- 同步设置：设置WebDAV后，支持跨设备同步用户词库（WebDAV）
 - **云剪贴板（WebDAV）**：与 Android 版互通，默认关闭。在输入法「设置」菜单 →「云剪贴板」中配置 WebDAV 地址与账号；开启后 PC 任意应用复制纯文本会自动上传到 `{墨奇设置目录}/clip/`（默认 `moqi-input-method/clip/`）。按 `Ctrl+0`（可在设置中修改）将云端条目显示为候选列表并上屏。配置保存在 `%APPDATA%\Moqi\cloud_clipboard.json`，密码经 DPAPI 加密存于 `cloud_clipboard.pw`。
 - 原生ai功能：支持整句优化、翻译、问答等，只有想不到没有做不到。编辑C:\Users\用户名\AppData\Roaming\Moqi\Rime\ai_config.json 可以接入ai大模型以及自定义提示词、快捷键。为了方便体验，已在安装包里加了默认配置，可以替换成用户自己的apikey
 
@@ -74,6 +75,10 @@ ai功能演示：<https://github.com/gaboolic/moqi-im-windows/issues/4>
 ![菜单主题](others/imgs/caidan-zhuti.png)
 ![菜单方案集](others/imgs/caidan-schemas.png)
 ![菜单方案](others/imgs/caidan-schema.png)
+
+同步设置
+![同步设置](others/imgs/caidan-tongbu.png)
+![webdav](others/imgs/caidan-webdav.png)
 
 多整句、句中任意辅助码演示
 ![输入整句组句](others/imgs/input-zuju.png)
