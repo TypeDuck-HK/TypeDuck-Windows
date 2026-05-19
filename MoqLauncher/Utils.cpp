@@ -45,6 +45,16 @@ std::wstring getAppLocalDir() {
     return result;
 }
 
+std::wstring getMoqiAppDataDir() {
+    wchar_t* appDataDirPath = nullptr;
+    if (FAILED(::SHGetKnownFolderPath(FOLDERID_RoamingAppData, 0, nullptr, &appDataDirPath))) {
+        return L"";
+    }
+    std::wstring result = std::wstring(appDataDirPath) + L"\\Moqi";
+    ::CoTaskMemFree(appDataDirPath);
+    return result;
+}
+
 bool makeDirs(const std::wstring& path) {
     return ::SHCreateDirectoryEx(nullptr, path.c_str(), nullptr) == ERROR_SUCCESS;
 }

@@ -120,6 +120,30 @@ void BackendServer::handleClientMessage(PipeClient *client,
   stdinPipe_->write(std::move(framedMessage));
 }
 
+void BackendServer::uploadCloudClipboardText(const std::string& utf8Text) {
+  if (utf8Text.empty()) {
+    return;
+  }
+  if (!isProcessRunning()) {
+    startProcess();
+  }
+  if (stdinPipe_ == nullptr) {
+    logger()->warn("Skip cloud clipboard upload: backend stdin is unavailable");
+    return;
+  }
+
+  moqi::protocol::ClientRequest request;
+  request.set_method(moqi::protocol::METHOD_CLOUD_CLIPBOARD_UPLOAD);
+  request.set_client_id("clipboard");
+  request.set_cloud_clipboard_text(utf8Text);
+  std::string framedMessage;
+  if (!Proto::serializeMessage(request, framedMessage)) {
+    logger()->error("Failed to serialize cloud clipboard upload");
+    return;
+  }
+  stdinPipe_->write(std::move(framedMessage));
+}
+
 uv::Pipe *BackendServer::createStdinPipe() {
   auto stdinPipe = new uv::Pipe();
   stdinPipe->setCloseCallback([stdinPipe]() { delete stdinPipe; });
@@ -284,6 +308,10 @@ void BackendServer::handleBackendReply() {
 
     if (response.client_id().empty()) {
       logger()->warn("Ignoring backend response without client_id from {}", name_);
+      continue;
+    }
+
+    if (response.client_id() == "clipboard") {
       continue;
     }
 

@@ -39,6 +39,7 @@
 #include <iomanip>
 #include <memory>
 #include <sstream>
+#include <exception>
 #include <thread>
 
 using namespace std;
@@ -520,7 +521,8 @@ Client::Client(TextService *service, REFIID langProfileGuid)
       activationInProgress_(false), nextSeqNum_(0), isActivated_(false),
       shouldWaitConnection_{true}, launcherStartAttempted_{false},
       asyncPollTimerWindow_(nullptr),
-      asyncPollTimerId_(0), autoPairRules_(defaultAutoPairRules()) {}
+      asyncPollTimerId_(0), asyncFlushInProgress_(false),
+      autoPairRules_(defaultAutoPairRules()) {}
 
 Client::~Client(void) {
   if (asyncPollTimerId_ != 0) {
@@ -851,6 +853,18 @@ void Client::updateLanguageButtons(Json::Value &msg) {
 }
 
 void Client::updatePreservedKeys(Json::Value &msg) {
+  const auto &removePreservedKeyVal = msg["removePreservedKey"];
+  if (removePreservedKeyVal.isArray()) {
+    for (auto &item : removePreservedKeyVal) {
+      if (item.isString()) {
+        UUID guid = {0};
+        if (uuidFromString(item.asCString(), guid)) {
+          textService_->removePreservedKey(guid);
+        }
+      }
+    }
+  }
+
   const auto &addPreservedKeyVal = msg["addPreservedKey"];
   if (addPreservedKeyVal.isArray()) {
     // preserved keys
@@ -861,18 +875,6 @@ void Client::updatePreservedKeys(Json::Value &msg) {
         UUID guid = {0};
         if (uuidFromString(key["guid"].asCString(), guid)) {
           textService_->addPreservedKey(keyCode, modifiers, guid);
-        }
-      }
-    }
-  }
-
-  const auto &removePreservedKeyVal = msg["removePreservedKey"];
-  if (removePreservedKeyVal.isArray()) {
-    for (auto &item : removePreservedKeyVal) {
-      if (item.isString()) {
-        UUID guid = {0};
-        if (uuidFromString(item.asCString(), guid)) {
-          textService_->removePreservedKey(guid);
         }
       }
     }
@@ -898,9 +900,10 @@ void Client::updateStatus(Json::Value &msg, Ime::EditSession *session) {
   if (customizeUIVal.isObject()) {
     updateUI(customizeUIVal);
   }
-  updateMessageWindow(msg, session, endComposition);
 
   if (session != nullptr) { // if an edit session is available
+    updateMessageWindow(msg, session, endComposition);
+
     const bool hasCommitString =
         msg["commitString"].isString() &&
         !utf8ToUtf16(msg["commitString"].asCString()).empty();
@@ -1138,6 +1141,10 @@ bool Client::changePage(bool backward) {
 }
 
 bool Client::onPreservedKey(const GUID &guid) {
+  return onPreservedKey(guid, nullptr);
+}
+
+bool Client::onPreservedKey(const GUID &guid, Ime::EditSession *session) {
   auto guidStr = uuidToString(guid);
   if (!guidStr.empty()) {
     auto req = createRpcRequest("onPreservedKey");
@@ -1145,7 +1152,7 @@ bool Client::onPreservedKey(const GUID &guid) {
 
     Json::Value ret;
     callRpcMethod(req, ret);
-    if (handleRpcResponse(ret)) {
+    if (session != nullptr ? handleRpcResponse(ret, session) : handleRpcResponse(ret)) {
       return ret["return"].asBool();
     }
   }
@@ -1406,22 +1413,7 @@ bool Client::applyAsyncResponse(Json::Value &msg, Ime::EditSession *session) {
     return handleRpcResponse(msg, session);
   }
 
-  auto context = textService_->currentContext();
-  if (!context) {
-    return false;
-  }
-
-  Json::Value responseCopy = msg;
-  auto *editSession = new Ime::EditSession(
-      context, [this, responseCopy](Ime::EditSession *editSession, TfEditCookie) mutable {
-        handleRpcResponse(responseCopy, editSession);
-      });
-  HRESULT sessionHr = E_FAIL;
-  const HRESULT hr = context->RequestEditSession(
-      textService_->clientId(), editSession, TF_ES_ASYNC | TF_ES_READWRITE,
-      &sessionHr);
-  editSession->Release();
-  return SUCCEEDED(hr) && SUCCEEDED(sessionHr);
+  return handleRpcResponse(msg);
 }
 
 void Client::flushPendingAsyncResponses(Ime::EditSession *session) {
@@ -1431,6 +1423,39 @@ void Client::flushPendingAsyncResponses(Ime::EditSession *session) {
       break;
     }
     pendingAsyncResponses_.pop_front();
+  }
+}
+
+void Client::flushPendingAsyncResponsesWithCurrentContext() {
+  if (pendingAsyncResponses_.empty() || asyncFlushInProgress_) {
+    return;
+  }
+  if (textService_ == nullptr) {
+    flushPendingAsyncResponses();
+    return;
+  }
+
+  auto context = textService_->currentContext();
+  if (!context) {
+    appendRpcGuardLog(L"async response pending but current context is unavailable");
+    return;
+  }
+
+  HRESULT sessionResult = E_FAIL;
+  asyncFlushInProgress_ = true;
+  auto editSession = Ime::ComPtr<Ime::EditSession>::make(
+      context,
+      [this](Ime::EditSession *session, TfEditCookie) {
+        flushPendingAsyncResponses(session);
+        asyncFlushInProgress_ = false;
+      });
+  context->RequestEditSession(textService_->clientId(), editSession,
+                              TF_ES_ASYNCDONTCARE | TF_ES_READWRITE,
+                              &sessionResult);
+  if (FAILED(sessionResult)) {
+    asyncFlushInProgress_ = false;
+    appendRpcGuardLog(L"async response RequestEditSession failed hr=" +
+                      std::to_wstring(static_cast<long>(sessionResult)));
   }
 }
 
@@ -1454,7 +1479,7 @@ void Client::pollAsyncResponses() {
     }
   }
 
-  flushPendingAsyncResponses();
+  flushPendingAsyncResponsesWithCurrentContext();
 }
 
 bool Client::callRpcPipe(HANDLE pipe, const std::string &serializedRequest,
@@ -1488,59 +1513,68 @@ bool Client::callRpcPipe(HANDLE pipe, const std::string &serializedRequest,
 // a sequence number will be added to the req object automatically.
 bool Client::callRpcMethod(moqi::protocol::ClientRequest &request,
                            Json::Value &response) {
-  ScopedRpcInProgress rpcGuard(rpcInProgress_);
-  if (shouldWaitConnection_ && !waitForRpcConnection()) {
-    return false;
-  }
-
-  pollAsyncResponses();
-
-  // Add a sequence number for the request.
-  auto seqNum = nextSeqNum_++;
-  request.set_seq_num(seqNum);
-
-  std::string serializedRequest;
-  if (!Proto::serializeMessage(request, serializedRequest)) {
-    return false;
-  }
-
-  std::string serializedResponse;
-  bool success = false;
-  if (callRpcPipe(pipe_, serializedRequest, serializedResponse)) {
-    while (true) {
-      Proto::FrameBuffer responseBuffer;
-      responseBuffer.append(serializedResponse.data(), serializedResponse.size());
-      std::string payload;
-      moqi::protocol::ServerResponse protoResponse;
-      success = responseBuffer.nextFrame(payload) &&
-                Proto::parsePayload(payload, protoResponse);
-      if (!success) {
-        break;
-      }
-      if (protoResponse.seq_num() == seqNum) {
-        response = responseToJson(protoResponse);
-        break;
-      }
-
-      enqueueAsyncResponse(protoResponse);
-      serializedResponse.clear();
-      if (!readPendingPipeMessage(serializedResponse)) {
-        success = false;
-        break;
-      }
+  try {
+    ScopedRpcInProgress rpcGuard(rpcInProgress_);
+    if (shouldWaitConnection_ && !waitForRpcConnection()) {
+      return false;
     }
-  } else {
-    success = false;
-  }
 
-  flushPendingAsyncResponses();
+    pollAsyncResponses();
 
-  if (!success) {            // fail to send the request to the server
-    closeRpcConnection();    // close the pipe connection since it's broken
-    resetTextServiceState(); // since we lost the connection, the state is
-                             // unknonw so we reset.
+    // Add a sequence number for the request.
+    auto seqNum = nextSeqNum_++;
+    request.set_seq_num(seqNum);
+
+    std::string serializedRequest;
+    if (!Proto::serializeMessage(request, serializedRequest)) {
+      return false;
+    }
+
+    std::string serializedResponse;
+    bool success = false;
+    if (callRpcPipe(pipe_, serializedRequest, serializedResponse)) {
+      while (true) {
+        Proto::FrameBuffer responseBuffer;
+        responseBuffer.append(serializedResponse.data(), serializedResponse.size());
+        std::string payload;
+        moqi::protocol::ServerResponse protoResponse;
+        success = responseBuffer.nextFrame(payload) &&
+                  Proto::parsePayload(payload, protoResponse);
+        if (!success) {
+          break;
+        }
+        if (protoResponse.seq_num() == seqNum) {
+          response = responseToJson(protoResponse);
+          break;
+        }
+
+        enqueueAsyncResponse(protoResponse);
+        serializedResponse.clear();
+        if (!readPendingPipeMessage(serializedResponse)) {
+          success = false;
+          break;
+        }
+      }
+    } else {
+      success = false;
+    }
+
+    flushPendingAsyncResponses();
+
+    if (!success) {            // fail to send the request to the server
+      closeRpcConnection();    // close the pipe connection since it's broken
+      resetTextServiceState(); // since we lost the connection, the state is
+                               // unknonw so we reset.
+    }
+    return success;
+  } catch (const std::exception &) {
+    appendRpcGuardLog(L"[callRpcMethod] caught std::exception; closing RPC connection");
+  } catch (...) {
+    appendRpcGuardLog(L"[callRpcMethod] caught unknown exception; closing RPC connection");
   }
-  return success;
+  closeRpcConnection();
+  resetTextServiceState();
+  return false;
 }
 
 bool Client::isPipeCreatedByMoqiServer(HANDLE pipe) {

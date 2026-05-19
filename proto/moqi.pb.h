@@ -143,6 +143,7 @@ enum Method : int {
   METHOD_HIGHLIGHT_CANDIDATE = 16,
   METHOD_SELECT_CANDIDATE = 17,
   METHOD_CHANGE_PAGE = 18,
+  METHOD_CLOUD_CLIPBOARD_UPLOAD = 19,
   Method_INT_MIN_SENTINEL_DO_NOT_USE_ =
       ::std::numeric_limits<::int32_t>::min(),
   Method_INT_MAX_SENTINEL_DO_NOT_USE_ =
@@ -153,11 +154,11 @@ extern const uint32_t Method_internal_data_[];
 inline constexpr Method Method_MIN =
     static_cast<Method>(0);
 inline constexpr Method Method_MAX =
-    static_cast<Method>(18);
+    static_cast<Method>(19);
 inline bool Method_IsValid(int value) {
-  return 0 <= value && value <= 18;
+  return 0 <= value && value <= 19;
 }
-inline constexpr int Method_ARRAYSIZE = 18 + 1;
+inline constexpr int Method_ARRAYSIZE = 19 + 1;
 const ::google::protobuf::EnumDescriptor* PROTOBUF_NONNULL Method_descriptor();
 template <typename T>
 const ::std::string& Method_Name(T value) {
@@ -168,7 +169,7 @@ const ::std::string& Method_Name(T value) {
 }
 template <>
 inline const ::std::string& Method_Name(Method value) {
-  return ::google::protobuf::internal::NameOfDenseEnum<Method_descriptor, 0, 18>(
+  return ::google::protobuf::internal::NameOfDenseEnum<Method_descriptor, 0, 19>(
       static_cast<int>(value));
 }
 inline bool Method_Parse(
@@ -2754,6 +2755,7 @@ class ClientRequest final : public ::google::protobuf::Message
     kPreservedKeyGuidFieldNumber = 20,
     kCompartmentGuidFieldNumber = 21,
     kClientIdFieldNumber = 23,
+    kCloudClipboardTextFieldNumber = 26,
     kKeyEventFieldNumber = 11,
     kSeqNumFieldNumber = 1,
     kMethodFieldNumber = 2,
@@ -2888,6 +2890,22 @@ class ClientRequest final : public ::google::protobuf::Message
   const ::std::string& _internal_client_id() const;
   PROTOBUF_ALWAYS_INLINE void _internal_set_client_id(const ::std::string& value);
   ::std::string* PROTOBUF_NONNULL _internal_mutable_client_id();
+
+  public:
+  // optional string cloud_clipboard_text = 26;
+  bool has_cloud_clipboard_text() const;
+  void clear_cloud_clipboard_text() ;
+  const ::std::string& cloud_clipboard_text() const;
+  template <typename Arg_ = const ::std::string&, typename... Args_>
+  void set_cloud_clipboard_text(Arg_&& arg, Args_... args);
+  ::std::string* PROTOBUF_NONNULL mutable_cloud_clipboard_text();
+  [[nodiscard]] ::std::string* PROTOBUF_NULLABLE release_cloud_clipboard_text();
+  void set_allocated_cloud_clipboard_text(::std::string* PROTOBUF_NULLABLE value);
+
+  private:
+  const ::std::string& _internal_cloud_clipboard_text() const;
+  PROTOBUF_ALWAYS_INLINE void _internal_set_cloud_clipboard_text(const ::std::string& value);
+  ::std::string* PROTOBUF_NONNULL _internal_mutable_cloud_clipboard_text();
 
   public:
   // .moqi.protocol.KeyEvent key_event = 11;
@@ -3082,8 +3100,8 @@ class ClientRequest final : public ::google::protobuf::Message
  private:
   class _Internal;
   friend class ::google::protobuf::internal::TcParser;
-  static const ::google::protobuf::internal::TcParseTable<5, 25,
-                                   1, 148,
+  static const ::google::protobuf::internal::TcParseTable<5, 26,
+                                   1, 168,
                                    2>
       _table_;
 
@@ -3111,6 +3129,7 @@ class ClientRequest final : public ::google::protobuf::Message
     ::google::protobuf::internal::ArenaStringPtr preserved_key_guid_;
     ::google::protobuf::internal::ArenaStringPtr compartment_guid_;
     ::google::protobuf::internal::ArenaStringPtr client_id_;
+    ::google::protobuf::internal::ArenaStringPtr cloud_clipboard_text_;
     ::moqi::protocol::KeyEvent* PROTOBUF_NULLABLE key_event_;
     ::uint32_t seq_num_;
     int method_;
@@ -6054,7 +6073,7 @@ inline void ClientRequest::clear_seq_num() {
   ::google::protobuf::internal::TSanWrite(&_impl_);
   _impl_.seq_num_ = 0u;
   ClearHasBit(_impl_._has_bits_[0],
-                  0x00000100U);
+                  0x00000200U);
 }
 inline ::uint32_t ClientRequest::seq_num() const {
   // @@protoc_insertion_point(field_get:moqi.protocol.ClientRequest.seq_num)
@@ -6062,7 +6081,7 @@ inline ::uint32_t ClientRequest::seq_num() const {
 }
 inline void ClientRequest::set_seq_num(::uint32_t value) {
   _internal_set_seq_num(value);
-  SetHasBit(_impl_._has_bits_[0], 0x00000100U);
+  SetHasBit(_impl_._has_bits_[0], 0x00000200U);
   // @@protoc_insertion_point(field_set:moqi.protocol.ClientRequest.seq_num)
 }
 inline ::uint32_t ClientRequest::_internal_seq_num() const {
@@ -6079,7 +6098,7 @@ inline void ClientRequest::clear_method() {
   ::google::protobuf::internal::TSanWrite(&_impl_);
   _impl_.method_ = 0;
   ClearHasBit(_impl_._has_bits_[0],
-                  0x00000200U);
+                  0x00000400U);
 }
 inline ::moqi::protocol::Method ClientRequest::method() const {
   // @@protoc_insertion_point(field_get:moqi.protocol.ClientRequest.method)
@@ -6087,7 +6106,7 @@ inline ::moqi::protocol::Method ClientRequest::method() const {
 }
 inline void ClientRequest::set_method(::moqi::protocol::Method value) {
   _internal_set_method(value);
-  SetHasBit(_impl_._has_bits_[0], 0x00000200U);
+  SetHasBit(_impl_._has_bits_[0], 0x00000400U);
   // @@protoc_insertion_point(field_set:moqi.protocol.ClientRequest.method)
 }
 inline ::moqi::protocol::Method ClientRequest::_internal_method() const {
@@ -6173,7 +6192,7 @@ inline void ClientRequest::clear_is_windows8_above() {
   ::google::protobuf::internal::TSanWrite(&_impl_);
   _impl_.is_windows8_above_ = false;
   ClearHasBit(_impl_._has_bits_[0],
-                  0x00000400U);
+                  0x00000800U);
 }
 inline bool ClientRequest::is_windows8_above() const {
   // @@protoc_insertion_point(field_get:moqi.protocol.ClientRequest.is_windows8_above)
@@ -6181,7 +6200,7 @@ inline bool ClientRequest::is_windows8_above() const {
 }
 inline void ClientRequest::set_is_windows8_above(bool value) {
   _internal_set_is_windows8_above(value);
-  SetHasBit(_impl_._has_bits_[0], 0x00000400U);
+  SetHasBit(_impl_._has_bits_[0], 0x00000800U);
   // @@protoc_insertion_point(field_set:moqi.protocol.ClientRequest.is_windows8_above)
 }
 inline bool ClientRequest::_internal_is_windows8_above() const {
@@ -6198,7 +6217,7 @@ inline void ClientRequest::clear_is_metro_app() {
   ::google::protobuf::internal::TSanWrite(&_impl_);
   _impl_.is_metro_app_ = false;
   ClearHasBit(_impl_._has_bits_[0],
-                  0x00000800U);
+                  0x00001000U);
 }
 inline bool ClientRequest::is_metro_app() const {
   // @@protoc_insertion_point(field_get:moqi.protocol.ClientRequest.is_metro_app)
@@ -6206,7 +6225,7 @@ inline bool ClientRequest::is_metro_app() const {
 }
 inline void ClientRequest::set_is_metro_app(bool value) {
   _internal_set_is_metro_app(value);
-  SetHasBit(_impl_._has_bits_[0], 0x00000800U);
+  SetHasBit(_impl_._has_bits_[0], 0x00001000U);
   // @@protoc_insertion_point(field_set:moqi.protocol.ClientRequest.is_metro_app)
 }
 inline bool ClientRequest::_internal_is_metro_app() const {
@@ -6223,7 +6242,7 @@ inline void ClientRequest::clear_is_ui_less() {
   ::google::protobuf::internal::TSanWrite(&_impl_);
   _impl_.is_ui_less_ = false;
   ClearHasBit(_impl_._has_bits_[0],
-                  0x00001000U);
+                  0x00002000U);
 }
 inline bool ClientRequest::is_ui_less() const {
   // @@protoc_insertion_point(field_get:moqi.protocol.ClientRequest.is_ui_less)
@@ -6231,7 +6250,7 @@ inline bool ClientRequest::is_ui_less() const {
 }
 inline void ClientRequest::set_is_ui_less(bool value) {
   _internal_set_is_ui_less(value);
-  SetHasBit(_impl_._has_bits_[0], 0x00001000U);
+  SetHasBit(_impl_._has_bits_[0], 0x00002000U);
   // @@protoc_insertion_point(field_set:moqi.protocol.ClientRequest.is_ui_less)
 }
 inline bool ClientRequest::_internal_is_ui_less() const {
@@ -6248,7 +6267,7 @@ inline void ClientRequest::clear_is_console() {
   ::google::protobuf::internal::TSanWrite(&_impl_);
   _impl_.is_console_ = false;
   ClearHasBit(_impl_._has_bits_[0],
-                  0x00002000U);
+                  0x00004000U);
 }
 inline bool ClientRequest::is_console() const {
   // @@protoc_insertion_point(field_get:moqi.protocol.ClientRequest.is_console)
@@ -6256,7 +6275,7 @@ inline bool ClientRequest::is_console() const {
 }
 inline void ClientRequest::set_is_console(bool value) {
   _internal_set_is_console(value);
-  SetHasBit(_impl_._has_bits_[0], 0x00002000U);
+  SetHasBit(_impl_._has_bits_[0], 0x00004000U);
   // @@protoc_insertion_point(field_set:moqi.protocol.ClientRequest.is_console)
 }
 inline bool ClientRequest::_internal_is_console() const {
@@ -6273,7 +6292,7 @@ inline void ClientRequest::clear_opened() {
   ::google::protobuf::internal::TSanWrite(&_impl_);
   _impl_.opened_ = false;
   ClearHasBit(_impl_._has_bits_[0],
-                  0x00008000U);
+                  0x00010000U);
 }
 inline bool ClientRequest::opened() const {
   // @@protoc_insertion_point(field_get:moqi.protocol.ClientRequest.opened)
@@ -6281,7 +6300,7 @@ inline bool ClientRequest::opened() const {
 }
 inline void ClientRequest::set_opened(bool value) {
   _internal_set_opened(value);
-  SetHasBit(_impl_._has_bits_[0], 0x00008000U);
+  SetHasBit(_impl_._has_bits_[0], 0x00010000U);
   // @@protoc_insertion_point(field_set:moqi.protocol.ClientRequest.opened)
 }
 inline bool ClientRequest::_internal_opened() const {
@@ -6298,7 +6317,7 @@ inline void ClientRequest::clear_forced() {
   ::google::protobuf::internal::TSanWrite(&_impl_);
   _impl_.forced_ = false;
   ClearHasBit(_impl_._has_bits_[0],
-                  0x00010000U);
+                  0x00020000U);
 }
 inline bool ClientRequest::forced() const {
   // @@protoc_insertion_point(field_get:moqi.protocol.ClientRequest.forced)
@@ -6306,7 +6325,7 @@ inline bool ClientRequest::forced() const {
 }
 inline void ClientRequest::set_forced(bool value) {
   _internal_set_forced(value);
-  SetHasBit(_impl_._has_bits_[0], 0x00010000U);
+  SetHasBit(_impl_._has_bits_[0], 0x00020000U);
   // @@protoc_insertion_point(field_set:moqi.protocol.ClientRequest.forced)
 }
 inline bool ClientRequest::_internal_forced() const {
@@ -6323,7 +6342,7 @@ inline void ClientRequest::clear_command_type() {
   ::google::protobuf::internal::TSanWrite(&_impl_);
   _impl_.command_type_ = 0u;
   ClearHasBit(_impl_._has_bits_[0],
-                  0x00004000U);
+                  0x00008000U);
 }
 inline ::uint32_t ClientRequest::command_type() const {
   // @@protoc_insertion_point(field_get:moqi.protocol.ClientRequest.command_type)
@@ -6331,7 +6350,7 @@ inline ::uint32_t ClientRequest::command_type() const {
 }
 inline void ClientRequest::set_command_type(::uint32_t value) {
   _internal_set_command_type(value);
-  SetHasBit(_impl_._has_bits_[0], 0x00004000U);
+  SetHasBit(_impl_._has_bits_[0], 0x00008000U);
   // @@protoc_insertion_point(field_set:moqi.protocol.ClientRequest.command_type)
 }
 inline ::uint32_t ClientRequest::_internal_command_type() const {
@@ -6345,7 +6364,7 @@ inline void ClientRequest::_internal_set_command_type(::uint32_t value) {
 
 // .moqi.protocol.KeyEvent key_event = 11;
 inline bool ClientRequest::has_key_event() const {
-  bool value = CheckHasBit(_impl_._has_bits_[0], 0x00000080U);
+  bool value = CheckHasBit(_impl_._has_bits_[0], 0x00000100U);
   PROTOBUF_ASSUME(!value || _impl_.key_event_ != nullptr);
   return value;
 }
@@ -6353,7 +6372,7 @@ inline void ClientRequest::clear_key_event() {
   ::google::protobuf::internal::TSanWrite(&_impl_);
   if (_impl_.key_event_ != nullptr) _impl_.key_event_->Clear();
   ClearHasBit(_impl_._has_bits_[0],
-                  0x00000080U);
+                  0x00000100U);
 }
 inline const ::moqi::protocol::KeyEvent& ClientRequest::_internal_key_event() const {
   ::google::protobuf::internal::TSanRead(&_impl_);
@@ -6372,16 +6391,16 @@ inline void ClientRequest::unsafe_arena_set_allocated_key_event(
   }
   _impl_.key_event_ = reinterpret_cast<::moqi::protocol::KeyEvent*>(value);
   if (value != nullptr) {
-    SetHasBit(_impl_._has_bits_[0], 0x00000080U);
+    SetHasBit(_impl_._has_bits_[0], 0x00000100U);
   } else {
-    ClearHasBit(_impl_._has_bits_[0], 0x00000080U);
+    ClearHasBit(_impl_._has_bits_[0], 0x00000100U);
   }
   // @@protoc_insertion_point(field_unsafe_arena_set_allocated:moqi.protocol.ClientRequest.key_event)
 }
 inline ::moqi::protocol::KeyEvent* PROTOBUF_NULLABLE ClientRequest::release_key_event() {
   ::google::protobuf::internal::TSanWrite(&_impl_);
 
-  ClearHasBit(_impl_._has_bits_[0], 0x00000080U);
+  ClearHasBit(_impl_._has_bits_[0], 0x00000100U);
   ::moqi::protocol::KeyEvent* released = _impl_.key_event_;
   _impl_.key_event_ = nullptr;
   if (::google::protobuf::internal::DebugHardenForceCopyInRelease()) {
@@ -6401,7 +6420,7 @@ inline ::moqi::protocol::KeyEvent* PROTOBUF_NULLABLE ClientRequest::unsafe_arena
   ::google::protobuf::internal::TSanWrite(&_impl_);
   // @@protoc_insertion_point(field_release:moqi.protocol.ClientRequest.key_event)
 
-  ClearHasBit(_impl_._has_bits_[0], 0x00000080U);
+  ClearHasBit(_impl_._has_bits_[0], 0x00000100U);
   ::moqi::protocol::KeyEvent* temp = _impl_.key_event_;
   _impl_.key_event_ = nullptr;
   return temp;
@@ -6416,7 +6435,7 @@ inline ::moqi::protocol::KeyEvent* PROTOBUF_NONNULL ClientRequest::_internal_mut
 }
 inline ::moqi::protocol::KeyEvent* PROTOBUF_NONNULL ClientRequest::mutable_key_event()
     ABSL_ATTRIBUTE_LIFETIME_BOUND {
-  SetHasBit(_impl_._has_bits_[0], 0x00000080U);
+  SetHasBit(_impl_._has_bits_[0], 0x00000100U);
   ::moqi::protocol::KeyEvent* _msg = _internal_mutable_key_event();
   // @@protoc_insertion_point(field_mutable:moqi.protocol.ClientRequest.key_event)
   return _msg;
@@ -6433,9 +6452,9 @@ inline void ClientRequest::set_allocated_key_event(::moqi::protocol::KeyEvent* P
     if (message_arena != submessage_arena) {
       value = ::google::protobuf::internal::GetOwnedMessage(message_arena, value, submessage_arena);
     }
-    SetHasBit(_impl_._has_bits_[0], 0x00000080U);
+    SetHasBit(_impl_._has_bits_[0], 0x00000100U);
   } else {
-    ClearHasBit(_impl_._has_bits_[0], 0x00000080U);
+    ClearHasBit(_impl_._has_bits_[0], 0x00000100U);
   }
 
   _impl_.key_event_ = reinterpret_cast<::moqi::protocol::KeyEvent*>(value);
@@ -6584,7 +6603,7 @@ inline void ClientRequest::clear_show_candidates() {
   ::google::protobuf::internal::TSanWrite(&_impl_);
   _impl_.show_candidates_ = false;
   ClearHasBit(_impl_._has_bits_[0],
-                  0x00020000U);
+                  0x00040000U);
 }
 inline bool ClientRequest::show_candidates() const {
   // @@protoc_insertion_point(field_get:moqi.protocol.ClientRequest.show_candidates)
@@ -6592,7 +6611,7 @@ inline bool ClientRequest::show_candidates() const {
 }
 inline void ClientRequest::set_show_candidates(bool value) {
   _internal_set_show_candidates(value);
-  SetHasBit(_impl_._has_bits_[0], 0x00020000U);
+  SetHasBit(_impl_._has_bits_[0], 0x00040000U);
   // @@protoc_insertion_point(field_set:moqi.protocol.ClientRequest.show_candidates)
 }
 inline bool ClientRequest::_internal_show_candidates() const {
@@ -6609,7 +6628,7 @@ inline void ClientRequest::clear_cursor_pos() {
   ::google::protobuf::internal::TSanWrite(&_impl_);
   _impl_.cursor_pos_ = 0;
   ClearHasBit(_impl_._has_bits_[0],
-                  0x00080000U);
+                  0x00100000U);
 }
 inline ::int32_t ClientRequest::cursor_pos() const {
   // @@protoc_insertion_point(field_get:moqi.protocol.ClientRequest.cursor_pos)
@@ -6617,7 +6636,7 @@ inline ::int32_t ClientRequest::cursor_pos() const {
 }
 inline void ClientRequest::set_cursor_pos(::int32_t value) {
   _internal_set_cursor_pos(value);
-  SetHasBit(_impl_._has_bits_[0], 0x00080000U);
+  SetHasBit(_impl_._has_bits_[0], 0x00100000U);
   // @@protoc_insertion_point(field_set:moqi.protocol.ClientRequest.cursor_pos)
 }
 inline ::int32_t ClientRequest::_internal_cursor_pos() const {
@@ -6634,7 +6653,7 @@ inline void ClientRequest::clear_sel_start() {
   ::google::protobuf::internal::TSanWrite(&_impl_);
   _impl_.sel_start_ = 0;
   ClearHasBit(_impl_._has_bits_[0],
-                  0x00100000U);
+                  0x00200000U);
 }
 inline ::int32_t ClientRequest::sel_start() const {
   // @@protoc_insertion_point(field_get:moqi.protocol.ClientRequest.sel_start)
@@ -6642,7 +6661,7 @@ inline ::int32_t ClientRequest::sel_start() const {
 }
 inline void ClientRequest::set_sel_start(::int32_t value) {
   _internal_set_sel_start(value);
-  SetHasBit(_impl_._has_bits_[0], 0x00100000U);
+  SetHasBit(_impl_._has_bits_[0], 0x00200000U);
   // @@protoc_insertion_point(field_set:moqi.protocol.ClientRequest.sel_start)
 }
 inline ::int32_t ClientRequest::_internal_sel_start() const {
@@ -6659,7 +6678,7 @@ inline void ClientRequest::clear_sel_end() {
   ::google::protobuf::internal::TSanWrite(&_impl_);
   _impl_.sel_end_ = 0;
   ClearHasBit(_impl_._has_bits_[0],
-                  0x00200000U);
+                  0x00400000U);
 }
 inline ::int32_t ClientRequest::sel_end() const {
   // @@protoc_insertion_point(field_get:moqi.protocol.ClientRequest.sel_end)
@@ -6667,7 +6686,7 @@ inline ::int32_t ClientRequest::sel_end() const {
 }
 inline void ClientRequest::set_sel_end(::int32_t value) {
   _internal_set_sel_end(value);
-  SetHasBit(_impl_._has_bits_[0], 0x00200000U);
+  SetHasBit(_impl_._has_bits_[0], 0x00400000U);
   // @@protoc_insertion_point(field_set:moqi.protocol.ClientRequest.sel_end)
 }
 inline ::int32_t ClientRequest::_internal_sel_end() const {
@@ -6750,14 +6769,14 @@ inline void ClientRequest::set_allocated_button_id(::std::string* PROTOBUF_NULLA
 
 // optional uint32 command_id = 19;
 inline bool ClientRequest::has_command_id() const {
-  bool value = CheckHasBit(_impl_._has_bits_[0], 0x00400000U);
+  bool value = CheckHasBit(_impl_._has_bits_[0], 0x00800000U);
   return value;
 }
 inline void ClientRequest::clear_command_id() {
   ::google::protobuf::internal::TSanWrite(&_impl_);
   _impl_.command_id_ = 0u;
   ClearHasBit(_impl_._has_bits_[0],
-                  0x00400000U);
+                  0x00800000U);
 }
 inline ::uint32_t ClientRequest::command_id() const {
   // @@protoc_insertion_point(field_get:moqi.protocol.ClientRequest.command_id)
@@ -6765,7 +6784,7 @@ inline ::uint32_t ClientRequest::command_id() const {
 }
 inline void ClientRequest::set_command_id(::uint32_t value) {
   _internal_set_command_id(value);
-  SetHasBit(_impl_._has_bits_[0], 0x00400000U);
+  SetHasBit(_impl_._has_bits_[0], 0x00800000U);
   // @@protoc_insertion_point(field_set:moqi.protocol.ClientRequest.command_id)
 }
 inline ::uint32_t ClientRequest::_internal_command_id() const {
@@ -6920,7 +6939,7 @@ inline void ClientRequest::clear_is_keyboard_open() {
   ::google::protobuf::internal::TSanWrite(&_impl_);
   _impl_.is_keyboard_open_ = false;
   ClearHasBit(_impl_._has_bits_[0],
-                  0x00040000U);
+                  0x00080000U);
 }
 inline bool ClientRequest::is_keyboard_open() const {
   // @@protoc_insertion_point(field_get:moqi.protocol.ClientRequest.is_keyboard_open)
@@ -6928,7 +6947,7 @@ inline bool ClientRequest::is_keyboard_open() const {
 }
 inline void ClientRequest::set_is_keyboard_open(bool value) {
   _internal_set_is_keyboard_open(value);
-  SetHasBit(_impl_._has_bits_[0], 0x00040000U);
+  SetHasBit(_impl_._has_bits_[0], 0x00080000U);
   // @@protoc_insertion_point(field_set:moqi.protocol.ClientRequest.is_keyboard_open)
 }
 inline bool ClientRequest::_internal_is_keyboard_open() const {
@@ -7011,14 +7030,14 @@ inline void ClientRequest::set_allocated_client_id(::std::string* PROTOBUF_NULLA
 
 // optional int32 candidate_index = 24;
 inline bool ClientRequest::has_candidate_index() const {
-  bool value = CheckHasBit(_impl_._has_bits_[0], 0x00800000U);
+  bool value = CheckHasBit(_impl_._has_bits_[0], 0x01000000U);
   return value;
 }
 inline void ClientRequest::clear_candidate_index() {
   ::google::protobuf::internal::TSanWrite(&_impl_);
   _impl_.candidate_index_ = 0;
   ClearHasBit(_impl_._has_bits_[0],
-                  0x00800000U);
+                  0x01000000U);
 }
 inline ::int32_t ClientRequest::candidate_index() const {
   // @@protoc_insertion_point(field_get:moqi.protocol.ClientRequest.candidate_index)
@@ -7026,7 +7045,7 @@ inline ::int32_t ClientRequest::candidate_index() const {
 }
 inline void ClientRequest::set_candidate_index(::int32_t value) {
   _internal_set_candidate_index(value);
-  SetHasBit(_impl_._has_bits_[0], 0x00800000U);
+  SetHasBit(_impl_._has_bits_[0], 0x01000000U);
   // @@protoc_insertion_point(field_set:moqi.protocol.ClientRequest.candidate_index)
 }
 inline ::int32_t ClientRequest::_internal_candidate_index() const {
@@ -7040,14 +7059,14 @@ inline void ClientRequest::_internal_set_candidate_index(::int32_t value) {
 
 // optional bool page_backward = 25;
 inline bool ClientRequest::has_page_backward() const {
-  bool value = CheckHasBit(_impl_._has_bits_[0], 0x01000000U);
+  bool value = CheckHasBit(_impl_._has_bits_[0], 0x02000000U);
   return value;
 }
 inline void ClientRequest::clear_page_backward() {
   ::google::protobuf::internal::TSanWrite(&_impl_);
   _impl_.page_backward_ = false;
   ClearHasBit(_impl_._has_bits_[0],
-                  0x01000000U);
+                  0x02000000U);
 }
 inline bool ClientRequest::page_backward() const {
   // @@protoc_insertion_point(field_get:moqi.protocol.ClientRequest.page_backward)
@@ -7055,7 +7074,7 @@ inline bool ClientRequest::page_backward() const {
 }
 inline void ClientRequest::set_page_backward(bool value) {
   _internal_set_page_backward(value);
-  SetHasBit(_impl_._has_bits_[0], 0x01000000U);
+  SetHasBit(_impl_._has_bits_[0], 0x02000000U);
   // @@protoc_insertion_point(field_set:moqi.protocol.ClientRequest.page_backward)
 }
 inline bool ClientRequest::_internal_page_backward() const {
@@ -7065,6 +7084,75 @@ inline bool ClientRequest::_internal_page_backward() const {
 inline void ClientRequest::_internal_set_page_backward(bool value) {
   ::google::protobuf::internal::TSanWrite(&_impl_);
   _impl_.page_backward_ = value;
+}
+
+// optional string cloud_clipboard_text = 26;
+inline bool ClientRequest::has_cloud_clipboard_text() const {
+  bool value = CheckHasBit(_impl_._has_bits_[0], 0x00000080U);
+  return value;
+}
+inline void ClientRequest::clear_cloud_clipboard_text() {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.cloud_clipboard_text_.ClearToEmpty();
+  ClearHasBit(_impl_._has_bits_[0],
+                  0x00000080U);
+}
+inline const ::std::string& ClientRequest::cloud_clipboard_text() const
+    ABSL_ATTRIBUTE_LIFETIME_BOUND {
+  // @@protoc_insertion_point(field_get:moqi.protocol.ClientRequest.cloud_clipboard_text)
+  return _internal_cloud_clipboard_text();
+}
+template <typename Arg_, typename... Args_>
+PROTOBUF_ALWAYS_INLINE void ClientRequest::set_cloud_clipboard_text(Arg_&& arg, Args_... args) {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  SetHasBit(_impl_._has_bits_[0], 0x00000080U);
+  _impl_.cloud_clipboard_text_.Set(static_cast<Arg_&&>(arg), args..., GetArena());
+  // @@protoc_insertion_point(field_set:moqi.protocol.ClientRequest.cloud_clipboard_text)
+}
+inline ::std::string* PROTOBUF_NONNULL ClientRequest::mutable_cloud_clipboard_text()
+    ABSL_ATTRIBUTE_LIFETIME_BOUND {
+  SetHasBit(_impl_._has_bits_[0], 0x00000080U);
+  ::std::string* _s = _internal_mutable_cloud_clipboard_text();
+  // @@protoc_insertion_point(field_mutable:moqi.protocol.ClientRequest.cloud_clipboard_text)
+  return _s;
+}
+inline const ::std::string& ClientRequest::_internal_cloud_clipboard_text() const {
+  ::google::protobuf::internal::TSanRead(&_impl_);
+  return _impl_.cloud_clipboard_text_.Get();
+}
+inline void ClientRequest::_internal_set_cloud_clipboard_text(const ::std::string& value) {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.cloud_clipboard_text_.Set(value, GetArena());
+}
+inline ::std::string* PROTOBUF_NONNULL ClientRequest::_internal_mutable_cloud_clipboard_text() {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  return _impl_.cloud_clipboard_text_.Mutable( GetArena());
+}
+inline ::std::string* PROTOBUF_NULLABLE ClientRequest::release_cloud_clipboard_text() {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  // @@protoc_insertion_point(field_release:moqi.protocol.ClientRequest.cloud_clipboard_text)
+  if (!CheckHasBit(_impl_._has_bits_[0], 0x00000080U)) {
+    return nullptr;
+  }
+  ClearHasBit(_impl_._has_bits_[0], 0x00000080U);
+  auto* released = _impl_.cloud_clipboard_text_.Release();
+  if (::google::protobuf::internal::DebugHardenForceCopyDefaultString()) {
+    _impl_.cloud_clipboard_text_.Set("", GetArena());
+  }
+  return released;
+}
+inline void ClientRequest::set_allocated_cloud_clipboard_text(::std::string* PROTOBUF_NULLABLE value) {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  if (value != nullptr) {
+    SetHasBit(_impl_._has_bits_[0], 0x00000080U);
+  } else {
+    ClearHasBit(_impl_._has_bits_[0], 0x00000080U);
+  }
+  _impl_.cloud_clipboard_text_.SetAllocated(value, GetArena());
+  if (::google::protobuf::internal::DebugHardenForceCopyDefaultString() && _impl_.cloud_clipboard_text_.IsDefault()) {
+    _impl_.cloud_clipboard_text_.Set("", GetArena());
+  }
+  // @@protoc_insertion_point(field_set_allocated:moqi.protocol.ClientRequest.cloud_clipboard_text)
 }
 
 // -------------------------------------------------------------------

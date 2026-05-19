@@ -63,6 +63,9 @@ static wstring_convert<codecvt_utf8<wchar_t>> utf8Codec;
 
 static constexpr UINT WM_SHELL_NOTIFY_ICON = WM_APP + 1;
 static constexpr UINT WM_SHOW_TRAY_NOTIFICATION = WM_APP + 2;
+static constexpr UINT WM_FLUSH_CLIPBOARD_UPLOAD = WM_APP + 3;
+static constexpr UINT ID_CLIPBOARD_DEBOUNCE_TIMER = 2001;
+static constexpr UINT CLIPBOARD_DEBOUNCE_MS = 400;
 static constexpr UINT MAIN_SHELL_NOTIFY_ICON_ID = 1;
 static constexpr UINT TRAY_NOTIFICATION_TIMEOUT_MS = 5000;
 
@@ -88,6 +91,8 @@ PipeServer::PipeServer()
     : quitExistingLauncher_(false), hwnd_(nullptr),
       singleInstanceMutex_(nullptr),
       shutdownRequested_(false),
+      clipboardAsync_(nullptr),
+      clipboardListenerRegistered_(false),
       logLevel_{spdlog::level::err} {
 
   // this can only be assigned once
@@ -518,6 +523,19 @@ LRESULT PipeServer::wndProc(UINT msg, WPARAM wp, LPARAM lp) {
   case WM_SHOW_TRAY_NOTIFICATION:
     flushTrayNotifications();
     return 0;
+  case WM_CLIPBOARDUPDATE_MSG:
+    onClipboardUpdate();
+    return 0;
+  case WM_TIMER:
+    if (wp == ID_CLIPBOARD_DEBOUNCE_TIMER) {
+      ::KillTimer(hwnd_, ID_CLIPBOARD_DEBOUNCE_TIMER);
+      flushDebouncedClipboardUpload();
+      return 0;
+    }
+    break;
+  case WM_FLUSH_CLIPBOARD_UPLOAD:
+    flushDebouncedClipboardUpload();
+    return 0;
   case WM_COMMAND:
     switch (LOWORD(wp)) {
     case ID_RESTART_Moqi_BACKENDS:
@@ -656,6 +674,94 @@ void PipeServer::showPopupMenu() const {
   ::DestroyMenu(hmenu);
 }
 
+bool PipeServer::isCloudClipboardEnabled() const {
+  const auto configPath = getMoqiAppDataDir() + L"\\cloud_clipboard.json";
+  Json::Value config;
+  if (!loadJsonFile(configPath, config)) {
+    return false;
+  }
+  return config.get("enabled", false).asBool();
+}
+
+std::string PipeServer::readClipboardUtf8() const {
+  if (hwnd_ == nullptr || !::OpenClipboard(hwnd_)) {
+    return {};
+  }
+  std::string result;
+  if (HANDLE data = ::GetClipboardData(CF_UNICODETEXT)) {
+    const auto* text = static_cast<const wchar_t*>(::GlobalLock(data));
+    if (text != nullptr) {
+      result = utf8Codec.to_bytes(text);
+      ::GlobalUnlock(data);
+    }
+  }
+  ::CloseClipboard();
+  return result;
+}
+
+void PipeServer::initClipboardAsync() {
+  if (clipboardAsync_ != nullptr) {
+    return;
+  }
+  auto callback = [](uv_async_t *asyncTask) {
+    auto *server = reinterpret_cast<PipeServer *>(asyncTask->data);
+    if (server != nullptr) {
+      server->processClipboardUploadOnUvThread();
+    }
+  };
+  clipboardAsync_ = new uv_async_t{};
+  clipboardAsync_->data = this;
+  uv_async_init(uv_default_loop(), clipboardAsync_, callback);
+}
+
+void PipeServer::scheduleClipboardUpload(std::string utf8Text) {
+  if (utf8Text.empty()) {
+    return;
+  }
+  {
+    std::lock_guard<std::mutex> lock(clipboardMutex_);
+    pendingClipboardText_ = std::move(utf8Text);
+  }
+  if (clipboardAsync_ == nullptr) {
+    initClipboardAsync();
+  }
+  uv_async_send(clipboardAsync_);
+}
+
+void PipeServer::processClipboardUploadOnUvThread() {
+  std::string text;
+  {
+    std::lock_guard<std::mutex> lock(clipboardMutex_);
+    text = std::move(pendingClipboardText_);
+  }
+  if (text.empty() || !isCloudClipboardEnabled()) {
+    return;
+  }
+  BackendServer *backend = backendFromName("moqi-ime");
+  if (backend == nullptr) {
+    return;
+  }
+  backend->uploadCloudClipboardText(text);
+}
+
+void PipeServer::flushDebouncedClipboardUpload() {
+  if (!isCloudClipboardEnabled()) {
+    return;
+  }
+  std::string text = readClipboardUtf8();
+  if (text.empty()) {
+    return;
+  }
+  scheduleClipboardUpload(std::move(text));
+}
+
+void PipeServer::onClipboardUpdate() {
+  if (!clipboardListenerRegistered_ || hwnd_ == nullptr) {
+    return;
+  }
+  ::SetTimer(hwnd_, ID_CLIPBOARD_DEBOUNCE_TIMER, CLIPBOARD_DEBOUNCE_MS, nullptr);
+}
+
 // Main Windows UI message loop
 void PipeServer::runGuiThread() {
   // this method is called from an worker thread other than the main thread
@@ -666,6 +772,16 @@ void PipeServer::runGuiThread() {
   hwnd_ = ::CreateWindowEx(0, LPCTSTR(wndClassAtom), L"墨奇输入法", 0, 0, 0, 0, 0,
                            HWND_DESKTOP, NULL, wndClass.hInstance, this);
 
+  if (hwnd_ != nullptr) {
+    if (::AddClipboardFormatListener(hwnd_)) {
+      clipboardListenerRegistered_ = true;
+      initClipboardAsync();
+      logger_->info("Cloud clipboard listener enabled");
+    } else {
+      logger_->warn("Failed to register cloud clipboard listener");
+    }
+  }
+
   createShellNotifyIcon();
 
   MSG msg;
@@ -674,6 +790,17 @@ void PipeServer::runGuiThread() {
     ::DispatchMessage(&msg);
   }
 
+  if (hwnd_ != nullptr && clipboardListenerRegistered_) {
+    ::RemoveClipboardFormatListener(hwnd_);
+    clipboardListenerRegistered_ = false;
+  }
+  if (clipboardAsync_ != nullptr) {
+    uv_close(reinterpret_cast<uv_handle_t *>(clipboardAsync_),
+             [](uv_handle_t *handle) {
+               delete reinterpret_cast<uv_async_t *>(handle);
+             });
+    clipboardAsync_ = nullptr;
+  }
   destroyShellNotifyIcon();
 }
 

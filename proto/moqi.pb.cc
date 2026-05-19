@@ -358,6 +358,9 @@ inline constexpr ClientRequest::Impl_::Impl_(
         client_id_(
             &::google::protobuf::internal::fixed_address_empty_string,
             ::_pbi::ConstantInitialized()),
+        cloud_clipboard_text_(
+            &::google::protobuf::internal::fixed_address_empty_string,
+            ::_pbi::ConstantInitialized()),
         key_event_{nullptr},
         seq_num_{0u},
         method_{static_cast< ::moqi::protocol::Method >(0)},
@@ -595,7 +598,7 @@ const ::uint32_t
         2,
         0x081, // bitmap
         PROTOBUF_FIELD_OFFSET(::moqi::protocol::ClientRequest, _impl_._has_bits_),
-        28, // hasbit index offset
+        29, // hasbit index offset
         PROTOBUF_FIELD_OFFSET(::moqi::protocol::ClientRequest, _impl_.seq_num_),
         PROTOBUF_FIELD_OFFSET(::moqi::protocol::ClientRequest, _impl_.method_),
         PROTOBUF_FIELD_OFFSET(::moqi::protocol::ClientRequest, _impl_.guid_),
@@ -621,31 +624,33 @@ const ::uint32_t
         PROTOBUF_FIELD_OFFSET(::moqi::protocol::ClientRequest, _impl_.client_id_),
         PROTOBUF_FIELD_OFFSET(::moqi::protocol::ClientRequest, _impl_.candidate_index_),
         PROTOBUF_FIELD_OFFSET(::moqi::protocol::ClientRequest, _impl_.page_backward_),
-        8,
+        PROTOBUF_FIELD_OFFSET(::moqi::protocol::ClientRequest, _impl_.cloud_clipboard_text_),
         9,
-        1,
         10,
+        1,
         11,
         12,
         13,
-        15,
-        16,
         14,
-        7,
+        16,
+        17,
+        15,
+        8,
         2,
         0,
-        17,
-        19,
+        18,
         20,
         21,
-        3,
         22,
+        3,
+        23,
         4,
         5,
-        18,
+        19,
         6,
-        23,
         24,
+        25,
+        7,
         0x081, // bitmap
         PROTOBUF_FIELD_OFFSET(::moqi::protocol::ServerResponse, _impl_._has_bits_),
         30, // hasbit index offset
@@ -717,7 +722,7 @@ static const ::_pbi::MigrationSchema
         {111, sizeof(::moqi::protocol::MessageWindow)},
         {118, sizeof(::moqi::protocol::TrayNotification)},
         {127, sizeof(::moqi::protocol::ClientRequest)},
-        {180, sizeof(::moqi::protocol::ServerResponse)},
+        {182, sizeof(::moqi::protocol::ServerResponse)},
 };
 static const ::_pb::Message* PROTOBUF_NONNULL const file_default_instances[] = {
     &::moqi::protocol::_KeyEvent_default_instance_._instance,
@@ -778,7 +783,7 @@ const char descriptor_table_protodef_proto_2fmoqi_2eproto[] ABSL_ATTRIBUTE_SECTI
     "indow\022\017\n\007message\030\001 \001(\t\022\020\n\010duration\030\002 \001(\005"
     "\"e\n\020TrayNotification\022\r\n\005title\030\001 \001(\t\022\017\n\007m"
     "essage\030\002 \001(\t\0221\n\004icon\030\003 \001(\0162#.moqi.protoc"
-    "ol.TrayNotificationIcon\"\375\005\n\rClientReques"
+    "ol.TrayNotificationIcon\"\271\006\n\rClientReques"
     "t\022\017\n\007seq_num\030\001 \001(\r\022%\n\006method\030\002 \001(\0162\025.moq"
     "i.protocol.Method\022\021\n\004guid\030\003 \001(\tH\000\210\001\001\022\031\n\021"
     "is_windows8_above\030\004 \001(\010\022\024\n\014is_metro_app\030"
@@ -794,62 +799,64 @@ const char descriptor_table_protodef_proto_2fmoqi_2eproto[] ABSL_ATTRIBUTE_SECTI
     "\n\020compartment_guid\030\025 \001(\tH\004\210\001\001\022\030\n\020is_keyb"
     "oard_open\030\026 \001(\010\022\026\n\tclient_id\030\027 \001(\tH\005\210\001\001\022"
     "\034\n\017candidate_index\030\030 \001(\005H\006\210\001\001\022\032\n\rpage_ba"
-    "ckward\030\031 \001(\010H\007\210\001\001B\007\n\005_guidB\014\n\n_button_id"
-    "B\r\n\013_command_idB\025\n\023_preserved_key_guidB\023"
-    "\n\021_compartment_guidB\014\n\n_client_idB\022\n\020_ca"
-    "ndidate_indexB\020\n\016_page_backward\"\312\007\n\016Serv"
-    "erResponse\022\026\n\tclient_id\030\001 \001(\tH\000\210\001\001\022\017\n\007se"
-    "q_num\030\002 \001(\r\022\017\n\007success\030\003 \001(\010\022\024\n\014return_v"
-    "alue\030\004 \001(\005\022+\n\nmenu_items\030\005 \003(\0132\027.moqi.pr"
-    "otocol.MenuItem\022\032\n\022composition_string\030\006 "
-    "\001(\t\022\025\n\rcommit_string\030\007 \001(\t\022\026\n\016candidate_"
-    "list\030\010 \003(\t\022\027\n\017show_candidates\030\t \001(\010\022\022\n\nc"
-    "ursor_pos\030\n \001(\005\022\032\n\022composition_cursor\030\013 "
-    "\001(\005\022\035\n\020candidate_cursor\030\014 \001(\005H\001\210\001\001\022\021\n\tse"
-    "l_start\030\r \001(\005\022\017\n\007sel_end\030\016 \001(\005\022\024\n\014set_se"
-    "l_keys\030\017 \001(\t\0225\n\014customize_ui\030\020 \001(\0132\032.moq"
-    "i.protocol.CustomizeUiH\002\210\001\001\022-\n\nadd_butto"
-    "n\030\021 \003(\0132\031.moqi.protocol.ButtonInfo\022\025\n\rre"
-    "move_button\030\022 \003(\t\0220\n\rchange_button\030\023 \003(\013"
-    "2\031.moqi.protocol.ButtonInfo\0227\n\014show_mess"
-    "age\030\024 \001(\0132\034.moqi.protocol.MessageWindowH"
-    "\003\210\001\001\022\024\n\014hide_message\030\025 \001(\010\022\025\n\ropen_keybo"
-    "ard\030\026 \001(\010\0226\n\021add_preserved_key\030\027 \003(\0132\033.m"
-    "oqi.protocol.PreservedKey\022\034\n\024remove_pres"
-    "erved_key\030\030 \003(\t\022\r\n\005error\030\031 \001(\t\022\?\n\021tray_n"
-    "otification\030\032 \001(\0132\037.moqi.protocol.TrayNo"
-    "tificationH\004\210\001\001\0228\n\021candidate_entries\030\033 \003"
-    "(\0132\035.moqi.protocol.CandidateEntryB\014\n\n_cl"
-    "ient_idB\023\n\021_candidate_cursorB\017\n\r_customi"
-    "ze_uiB\017\n\r_show_messageB\024\n\022_tray_notifica"
-    "tion*\214\004\n\006Method\022\026\n\022METHOD_UNSPECIFIED\020\000\022"
-    "\017\n\013METHOD_INIT\020\001\022\020\n\014METHOD_CLOSE\020\002\022\026\n\022ME"
-    "THOD_ON_ACTIVATE\020\003\022\030\n\024METHOD_ON_DEACTIVA"
-    "TE\020\004\022\032\n\026METHOD_FILTER_KEY_DOWN\020\005\022\026\n\022METH"
-    "OD_ON_KEY_DOWN\020\006\022\030\n\024METHOD_FILTER_KEY_UP"
-    "\020\007\022\024\n\020METHOD_ON_KEY_UP\020\010\022\033\n\027METHOD_ON_PR"
-    "ESERVED_KEY\020\t\022\025\n\021METHOD_ON_COMMAND\020\n\022\022\n\016"
-    "METHOD_ON_MENU\020\013\022!\n\035METHOD_ON_COMPARTMEN"
-    "T_CHANGED\020\014\022%\n!METHOD_ON_KEYBOARD_STATUS"
-    "_CHANGED\020\r\022$\n METHOD_ON_COMPOSITION_TERM"
-    "INATED\020\016\022$\n METHOD_ON_LANG_PROFILE_ACTIV"
-    "ATED\020\017\022\036\n\032METHOD_HIGHLIGHT_CANDIDATE\020\020\022\033"
-    "\n\027METHOD_SELECT_CANDIDATE\020\021\022\026\n\022METHOD_CH"
-    "ANGE_PAGE\020\022*o\n\nButtonType\022\033\n\027BUTTON_TYPE"
-    "_UNSPECIFIED\020\000\022\026\n\022BUTTON_TYPE_BUTTON\020\001\022\026"
-    "\n\022BUTTON_TYPE_TOGGLE\020\002\022\024\n\020BUTTON_TYPE_ME"
-    "NU\020\003*\245\001\n\024TrayNotificationIcon\022&\n\"TRAY_NO"
-    "TIFICATION_ICON_UNSPECIFIED\020\000\022\037\n\033TRAY_NO"
-    "TIFICATION_ICON_INFO\020\001\022\"\n\036TRAY_NOTIFICAT"
-    "ION_ICON_WARNING\020\002\022 \n\034TRAY_NOTIFICATION_"
-    "ICON_ERROR\020\003B+Z)github.com/gaboolic/moqi"
-    "-ime/proto;moqipbb\006proto3"
+    "ckward\030\031 \001(\010H\007\210\001\001\022!\n\024cloud_clipboard_tex"
+    "t\030\032 \001(\tH\010\210\001\001B\007\n\005_guidB\014\n\n_button_idB\r\n\013_"
+    "command_idB\025\n\023_preserved_key_guidB\023\n\021_co"
+    "mpartment_guidB\014\n\n_client_idB\022\n\020_candida"
+    "te_indexB\020\n\016_page_backwardB\027\n\025_cloud_cli"
+    "pboard_text\"\312\007\n\016ServerResponse\022\026\n\tclient"
+    "_id\030\001 \001(\tH\000\210\001\001\022\017\n\007seq_num\030\002 \001(\r\022\017\n\007succe"
+    "ss\030\003 \001(\010\022\024\n\014return_value\030\004 \001(\005\022+\n\nmenu_i"
+    "tems\030\005 \003(\0132\027.moqi.protocol.MenuItem\022\032\n\022c"
+    "omposition_string\030\006 \001(\t\022\025\n\rcommit_string"
+    "\030\007 \001(\t\022\026\n\016candidate_list\030\010 \003(\t\022\027\n\017show_c"
+    "andidates\030\t \001(\010\022\022\n\ncursor_pos\030\n \001(\005\022\032\n\022c"
+    "omposition_cursor\030\013 \001(\005\022\035\n\020candidate_cur"
+    "sor\030\014 \001(\005H\001\210\001\001\022\021\n\tsel_start\030\r \001(\005\022\017\n\007sel"
+    "_end\030\016 \001(\005\022\024\n\014set_sel_keys\030\017 \001(\t\0225\n\014cust"
+    "omize_ui\030\020 \001(\0132\032.moqi.protocol.Customize"
+    "UiH\002\210\001\001\022-\n\nadd_button\030\021 \003(\0132\031.moqi.proto"
+    "col.ButtonInfo\022\025\n\rremove_button\030\022 \003(\t\0220\n"
+    "\rchange_button\030\023 \003(\0132\031.moqi.protocol.But"
+    "tonInfo\0227\n\014show_message\030\024 \001(\0132\034.moqi.pro"
+    "tocol.MessageWindowH\003\210\001\001\022\024\n\014hide_message"
+    "\030\025 \001(\010\022\025\n\ropen_keyboard\030\026 \001(\010\0226\n\021add_pre"
+    "served_key\030\027 \003(\0132\033.moqi.protocol.Preserv"
+    "edKey\022\034\n\024remove_preserved_key\030\030 \003(\t\022\r\n\005e"
+    "rror\030\031 \001(\t\022\?\n\021tray_notification\030\032 \001(\0132\037."
+    "moqi.protocol.TrayNotificationH\004\210\001\001\0228\n\021c"
+    "andidate_entries\030\033 \003(\0132\035.moqi.protocol.C"
+    "andidateEntryB\014\n\n_client_idB\023\n\021_candidat"
+    "e_cursorB\017\n\r_customize_uiB\017\n\r_show_messa"
+    "geB\024\n\022_tray_notification*\257\004\n\006Method\022\026\n\022M"
+    "ETHOD_UNSPECIFIED\020\000\022\017\n\013METHOD_INIT\020\001\022\020\n\014"
+    "METHOD_CLOSE\020\002\022\026\n\022METHOD_ON_ACTIVATE\020\003\022\030"
+    "\n\024METHOD_ON_DEACTIVATE\020\004\022\032\n\026METHOD_FILTE"
+    "R_KEY_DOWN\020\005\022\026\n\022METHOD_ON_KEY_DOWN\020\006\022\030\n\024"
+    "METHOD_FILTER_KEY_UP\020\007\022\024\n\020METHOD_ON_KEY_"
+    "UP\020\010\022\033\n\027METHOD_ON_PRESERVED_KEY\020\t\022\025\n\021MET"
+    "HOD_ON_COMMAND\020\n\022\022\n\016METHOD_ON_MENU\020\013\022!\n\035"
+    "METHOD_ON_COMPARTMENT_CHANGED\020\014\022%\n!METHO"
+    "D_ON_KEYBOARD_STATUS_CHANGED\020\r\022$\n METHOD"
+    "_ON_COMPOSITION_TERMINATED\020\016\022$\n METHOD_O"
+    "N_LANG_PROFILE_ACTIVATED\020\017\022\036\n\032METHOD_HIG"
+    "HLIGHT_CANDIDATE\020\020\022\033\n\027METHOD_SELECT_CAND"
+    "IDATE\020\021\022\026\n\022METHOD_CHANGE_PAGE\020\022\022!\n\035METHO"
+    "D_CLOUD_CLIPBOARD_UPLOAD\020\023*o\n\nButtonType"
+    "\022\033\n\027BUTTON_TYPE_UNSPECIFIED\020\000\022\026\n\022BUTTON_"
+    "TYPE_BUTTON\020\001\022\026\n\022BUTTON_TYPE_TOGGLE\020\002\022\024\n"
+    "\020BUTTON_TYPE_MENU\020\003*\245\001\n\024TrayNotification"
+    "Icon\022&\n\"TRAY_NOTIFICATION_ICON_UNSPECIFI"
+    "ED\020\000\022\037\n\033TRAY_NOTIFICATION_ICON_INFO\020\001\022\"\n"
+    "\036TRAY_NOTIFICATION_ICON_WARNING\020\002\022 \n\034TRA"
+    "Y_NOTIFICATION_ICON_ERROR\020\003B+Z)github.co"
+    "m/gaboolic/moqi-ime/proto;moqipbb\006proto3"
 };
 static ::absl::once_flag descriptor_table_proto_2fmoqi_2eproto_once;
 PROTOBUF_CONSTINIT const ::_pbi::DescriptorTable descriptor_table_proto_2fmoqi_2eproto = {
     false,
     false,
-    4385,
+    4480,
     descriptor_table_protodef_proto_2fmoqi_2eproto,
     "proto/moqi.proto",
     &descriptor_table_proto_2fmoqi_2eproto_once,
@@ -869,7 +876,7 @@ const ::google::protobuf::EnumDescriptor* PROTOBUF_NONNULL Method_descriptor() {
   return file_level_enum_descriptors_proto_2fmoqi_2eproto[0];
 }
 PROTOBUF_CONSTINIT const uint32_t Method_internal_data_[] = {
-    1245184u, 0u, };
+    1310720u, 0u, };
 const ::google::protobuf::EnumDescriptor* PROTOBUF_NONNULL ButtonType_descriptor() {
   ::google::protobuf::internal::AssignDescriptors(&descriptor_table_proto_2fmoqi_2eproto);
   return file_level_enum_descriptors_proto_2fmoqi_2eproto[1];
@@ -4763,7 +4770,8 @@ PROTOBUF_NDEBUG_INLINE ClientRequest::Impl_::Impl_(
         button_id_(arena, from.button_id_),
         preserved_key_guid_(arena, from.preserved_key_guid_),
         compartment_guid_(arena, from.compartment_guid_),
-        client_id_(arena, from.client_id_) {}
+        client_id_(arena, from.client_id_),
+        cloud_clipboard_text_(arena, from.cloud_clipboard_text_) {}
 
 ClientRequest::ClientRequest(
     ::google::protobuf::Arena* PROTOBUF_NULLABLE arena,
@@ -4779,7 +4787,7 @@ ClientRequest::ClientRequest(
       from._internal_metadata_);
   new (&_impl_) Impl_(internal_visibility(), arena, from._impl_, from);
   ::uint32_t cached_has_bits = _impl_._has_bits_[0];
-  _impl_.key_event_ = (CheckHasBit(cached_has_bits, 0x00000080U))
+  _impl_.key_event_ = (CheckHasBit(cached_has_bits, 0x00000100U))
                 ? ::google::protobuf::Message::CopyConstruct(arena, *from._impl_.key_event_)
                 : nullptr;
   ::memcpy(reinterpret_cast<char*>(&_impl_) +
@@ -4802,7 +4810,8 @@ PROTOBUF_NDEBUG_INLINE ClientRequest::Impl_::Impl_(
         button_id_(arena),
         preserved_key_guid_(arena),
         compartment_guid_(arena),
-        client_id_(arena) {}
+        client_id_(arena),
+        cloud_clipboard_text_(arena) {}
 
 inline void ClientRequest::SharedCtor(::_pb::Arena* PROTOBUF_NULLABLE arena) {
   new (&_impl_) Impl_(internal_visibility(), arena);
@@ -4830,6 +4839,7 @@ inline void ClientRequest::SharedDtor(MessageLite& self) {
   this_._impl_.preserved_key_guid_.Destroy();
   this_._impl_.compartment_guid_.Destroy();
   this_._impl_.client_id_.Destroy();
+  this_._impl_.cloud_clipboard_text_.Destroy();
   delete this_._impl_.key_event_;
   this_._impl_.~Impl_();
 }
@@ -4889,16 +4899,16 @@ ClientRequest::GetClassData() const {
   return ClientRequest_class_data_.base();
 }
 PROTOBUF_CONSTINIT PROTOBUF_ATTRIBUTE_INIT_PRIORITY1
-const ::_pbi::TcParseTable<5, 25, 1, 148, 2>
+const ::_pbi::TcParseTable<5, 26, 1, 168, 2>
 ClientRequest::_table_ = {
   {
     PROTOBUF_FIELD_OFFSET(ClientRequest, _impl_._has_bits_),
     0, // no _extensions_
-    25, 248,  // max_field_number, fast_idx_mask
+    26, 248,  // max_field_number, fast_idx_mask
     offsetof(decltype(_table_), field_lookup_table),
-    4261412864,  // skipmap
+    4227858432,  // skipmap
     offsetof(decltype(_table_), field_entries),
-    25,  // num_field_entries
+    26,  // num_field_entries
     1,  // num_aux_entries
     offsetof(decltype(_table_), aux_entries),
     ClientRequest_class_data_.base(),
@@ -4910,48 +4920,48 @@ ClientRequest::_table_ = {
   }, {{
     {::_pbi::TcParser::MiniParse, {}},
     // uint32 seq_num = 1;
-    {::_pbi::TcParser::SingularVarintNoZag1<::uint32_t, offsetof(ClientRequest, _impl_.seq_num_), 8>(),
-     {8, 8, 0,
+    {::_pbi::TcParser::SingularVarintNoZag1<::uint32_t, offsetof(ClientRequest, _impl_.seq_num_), 9>(),
+     {8, 9, 0,
       PROTOBUF_FIELD_OFFSET(ClientRequest, _impl_.seq_num_)}},
     // .moqi.protocol.Method method = 2;
-    {::_pbi::TcParser::SingularVarintNoZag1<::uint32_t, offsetof(ClientRequest, _impl_.method_), 9>(),
-     {16, 9, 0,
+    {::_pbi::TcParser::SingularVarintNoZag1<::uint32_t, offsetof(ClientRequest, _impl_.method_), 10>(),
+     {16, 10, 0,
       PROTOBUF_FIELD_OFFSET(ClientRequest, _impl_.method_)}},
     // optional string guid = 3;
     {::_pbi::TcParser::FastUS1,
      {26, 1, 0,
       PROTOBUF_FIELD_OFFSET(ClientRequest, _impl_.guid_)}},
     // bool is_windows8_above = 4;
-    {::_pbi::TcParser::SingularVarintNoZag1<bool, offsetof(ClientRequest, _impl_.is_windows8_above_), 10>(),
-     {32, 10, 0,
+    {::_pbi::TcParser::SingularVarintNoZag1<bool, offsetof(ClientRequest, _impl_.is_windows8_above_), 11>(),
+     {32, 11, 0,
       PROTOBUF_FIELD_OFFSET(ClientRequest, _impl_.is_windows8_above_)}},
     // bool is_metro_app = 5;
-    {::_pbi::TcParser::SingularVarintNoZag1<bool, offsetof(ClientRequest, _impl_.is_metro_app_), 11>(),
-     {40, 11, 0,
+    {::_pbi::TcParser::SingularVarintNoZag1<bool, offsetof(ClientRequest, _impl_.is_metro_app_), 12>(),
+     {40, 12, 0,
       PROTOBUF_FIELD_OFFSET(ClientRequest, _impl_.is_metro_app_)}},
     // bool is_ui_less = 6;
-    {::_pbi::TcParser::SingularVarintNoZag1<bool, offsetof(ClientRequest, _impl_.is_ui_less_), 12>(),
-     {48, 12, 0,
+    {::_pbi::TcParser::SingularVarintNoZag1<bool, offsetof(ClientRequest, _impl_.is_ui_less_), 13>(),
+     {48, 13, 0,
       PROTOBUF_FIELD_OFFSET(ClientRequest, _impl_.is_ui_less_)}},
     // bool is_console = 7;
-    {::_pbi::TcParser::SingularVarintNoZag1<bool, offsetof(ClientRequest, _impl_.is_console_), 13>(),
-     {56, 13, 0,
+    {::_pbi::TcParser::SingularVarintNoZag1<bool, offsetof(ClientRequest, _impl_.is_console_), 14>(),
+     {56, 14, 0,
       PROTOBUF_FIELD_OFFSET(ClientRequest, _impl_.is_console_)}},
     // bool opened = 8;
-    {::_pbi::TcParser::SingularVarintNoZag1<bool, offsetof(ClientRequest, _impl_.opened_), 15>(),
-     {64, 15, 0,
+    {::_pbi::TcParser::SingularVarintNoZag1<bool, offsetof(ClientRequest, _impl_.opened_), 16>(),
+     {64, 16, 0,
       PROTOBUF_FIELD_OFFSET(ClientRequest, _impl_.opened_)}},
     // bool forced = 9;
-    {::_pbi::TcParser::SingularVarintNoZag1<bool, offsetof(ClientRequest, _impl_.forced_), 16>(),
-     {72, 16, 0,
+    {::_pbi::TcParser::SingularVarintNoZag1<bool, offsetof(ClientRequest, _impl_.forced_), 17>(),
+     {72, 17, 0,
       PROTOBUF_FIELD_OFFSET(ClientRequest, _impl_.forced_)}},
     // uint32 command_type = 10;
-    {::_pbi::TcParser::SingularVarintNoZag1<::uint32_t, offsetof(ClientRequest, _impl_.command_type_), 14>(),
-     {80, 14, 0,
+    {::_pbi::TcParser::SingularVarintNoZag1<::uint32_t, offsetof(ClientRequest, _impl_.command_type_), 15>(),
+     {80, 15, 0,
       PROTOBUF_FIELD_OFFSET(ClientRequest, _impl_.command_type_)}},
     // .moqi.protocol.KeyEvent key_event = 11;
     {::_pbi::TcParser::FastMtS1,
-     {90, 7, 0,
+     {90, 8, 0,
       PROTOBUF_FIELD_OFFSET(ClientRequest, _impl_.key_event_)}},
     // string composition_string = 12;
     {::_pbi::TcParser::FastUS1,
@@ -4962,20 +4972,20 @@ ClientRequest::_table_ = {
      {106, 0, 0,
       PROTOBUF_FIELD_OFFSET(ClientRequest, _impl_.candidate_list_)}},
     // bool show_candidates = 14;
-    {::_pbi::TcParser::SingularVarintNoZag1<bool, offsetof(ClientRequest, _impl_.show_candidates_), 17>(),
-     {112, 17, 0,
+    {::_pbi::TcParser::SingularVarintNoZag1<bool, offsetof(ClientRequest, _impl_.show_candidates_), 18>(),
+     {112, 18, 0,
       PROTOBUF_FIELD_OFFSET(ClientRequest, _impl_.show_candidates_)}},
     // int32 cursor_pos = 15;
-    {::_pbi::TcParser::SingularVarintNoZag1<::uint32_t, offsetof(ClientRequest, _impl_.cursor_pos_), 19>(),
-     {120, 19, 0,
+    {::_pbi::TcParser::SingularVarintNoZag1<::uint32_t, offsetof(ClientRequest, _impl_.cursor_pos_), 20>(),
+     {120, 20, 0,
       PROTOBUF_FIELD_OFFSET(ClientRequest, _impl_.cursor_pos_)}},
     // int32 sel_start = 16;
     {::_pbi::TcParser::FastV32S2,
-     {384, 20, 0,
+     {384, 21, 0,
       PROTOBUF_FIELD_OFFSET(ClientRequest, _impl_.sel_start_)}},
     // int32 sel_end = 17;
     {::_pbi::TcParser::FastV32S2,
-     {392, 21, 0,
+     {392, 22, 0,
       PROTOBUF_FIELD_OFFSET(ClientRequest, _impl_.sel_end_)}},
     // optional string button_id = 18;
     {::_pbi::TcParser::FastUS2,
@@ -4983,7 +4993,7 @@ ClientRequest::_table_ = {
       PROTOBUF_FIELD_OFFSET(ClientRequest, _impl_.button_id_)}},
     // optional uint32 command_id = 19;
     {::_pbi::TcParser::FastV32S2,
-     {408, 22, 0,
+     {408, 23, 0,
       PROTOBUF_FIELD_OFFSET(ClientRequest, _impl_.command_id_)}},
     // optional string preserved_key_guid = 20;
     {::_pbi::TcParser::FastUS2,
@@ -4995,7 +5005,7 @@ ClientRequest::_table_ = {
       PROTOBUF_FIELD_OFFSET(ClientRequest, _impl_.compartment_guid_)}},
     // bool is_keyboard_open = 22;
     {::_pbi::TcParser::FastV8S2,
-     {432, 18, 0,
+     {432, 19, 0,
       PROTOBUF_FIELD_OFFSET(ClientRequest, _impl_.is_keyboard_open_)}},
     // optional string client_id = 23;
     {::_pbi::TcParser::FastUS2,
@@ -5003,13 +5013,16 @@ ClientRequest::_table_ = {
       PROTOBUF_FIELD_OFFSET(ClientRequest, _impl_.client_id_)}},
     // optional int32 candidate_index = 24;
     {::_pbi::TcParser::FastV32S2,
-     {448, 23, 0,
+     {448, 24, 0,
       PROTOBUF_FIELD_OFFSET(ClientRequest, _impl_.candidate_index_)}},
     // optional bool page_backward = 25;
     {::_pbi::TcParser::FastV8S2,
-     {456, 24, 0,
+     {456, 25, 0,
       PROTOBUF_FIELD_OFFSET(ClientRequest, _impl_.page_backward_)}},
-    {::_pbi::TcParser::MiniParse, {}},
+    // optional string cloud_clipboard_text = 26;
+    {::_pbi::TcParser::FastUS2,
+     {466, 7, 0,
+      PROTOBUF_FIELD_OFFSET(ClientRequest, _impl_.cloud_clipboard_text_)}},
     {::_pbi::TcParser::MiniParse, {}},
     {::_pbi::TcParser::MiniParse, {}},
     {::_pbi::TcParser::MiniParse, {}},
@@ -5019,61 +5032,63 @@ ClientRequest::_table_ = {
     65535, 65535
   }}, {{
     // uint32 seq_num = 1;
-    {PROTOBUF_FIELD_OFFSET(ClientRequest, _impl_.seq_num_), _Internal::kHasBitsOffset + 8, 0, (0 | ::_fl::kFcOptional | ::_fl::kUInt32)},
+    {PROTOBUF_FIELD_OFFSET(ClientRequest, _impl_.seq_num_), _Internal::kHasBitsOffset + 9, 0, (0 | ::_fl::kFcOptional | ::_fl::kUInt32)},
     // .moqi.protocol.Method method = 2;
-    {PROTOBUF_FIELD_OFFSET(ClientRequest, _impl_.method_), _Internal::kHasBitsOffset + 9, 0, (0 | ::_fl::kFcOptional | ::_fl::kOpenEnum)},
+    {PROTOBUF_FIELD_OFFSET(ClientRequest, _impl_.method_), _Internal::kHasBitsOffset + 10, 0, (0 | ::_fl::kFcOptional | ::_fl::kOpenEnum)},
     // optional string guid = 3;
     {PROTOBUF_FIELD_OFFSET(ClientRequest, _impl_.guid_), _Internal::kHasBitsOffset + 1, 0, (0 | ::_fl::kFcOptional | ::_fl::kUtf8String | ::_fl::kRepAString)},
     // bool is_windows8_above = 4;
-    {PROTOBUF_FIELD_OFFSET(ClientRequest, _impl_.is_windows8_above_), _Internal::kHasBitsOffset + 10, 0, (0 | ::_fl::kFcOptional | ::_fl::kBool)},
+    {PROTOBUF_FIELD_OFFSET(ClientRequest, _impl_.is_windows8_above_), _Internal::kHasBitsOffset + 11, 0, (0 | ::_fl::kFcOptional | ::_fl::kBool)},
     // bool is_metro_app = 5;
-    {PROTOBUF_FIELD_OFFSET(ClientRequest, _impl_.is_metro_app_), _Internal::kHasBitsOffset + 11, 0, (0 | ::_fl::kFcOptional | ::_fl::kBool)},
+    {PROTOBUF_FIELD_OFFSET(ClientRequest, _impl_.is_metro_app_), _Internal::kHasBitsOffset + 12, 0, (0 | ::_fl::kFcOptional | ::_fl::kBool)},
     // bool is_ui_less = 6;
-    {PROTOBUF_FIELD_OFFSET(ClientRequest, _impl_.is_ui_less_), _Internal::kHasBitsOffset + 12, 0, (0 | ::_fl::kFcOptional | ::_fl::kBool)},
+    {PROTOBUF_FIELD_OFFSET(ClientRequest, _impl_.is_ui_less_), _Internal::kHasBitsOffset + 13, 0, (0 | ::_fl::kFcOptional | ::_fl::kBool)},
     // bool is_console = 7;
-    {PROTOBUF_FIELD_OFFSET(ClientRequest, _impl_.is_console_), _Internal::kHasBitsOffset + 13, 0, (0 | ::_fl::kFcOptional | ::_fl::kBool)},
+    {PROTOBUF_FIELD_OFFSET(ClientRequest, _impl_.is_console_), _Internal::kHasBitsOffset + 14, 0, (0 | ::_fl::kFcOptional | ::_fl::kBool)},
     // bool opened = 8;
-    {PROTOBUF_FIELD_OFFSET(ClientRequest, _impl_.opened_), _Internal::kHasBitsOffset + 15, 0, (0 | ::_fl::kFcOptional | ::_fl::kBool)},
+    {PROTOBUF_FIELD_OFFSET(ClientRequest, _impl_.opened_), _Internal::kHasBitsOffset + 16, 0, (0 | ::_fl::kFcOptional | ::_fl::kBool)},
     // bool forced = 9;
-    {PROTOBUF_FIELD_OFFSET(ClientRequest, _impl_.forced_), _Internal::kHasBitsOffset + 16, 0, (0 | ::_fl::kFcOptional | ::_fl::kBool)},
+    {PROTOBUF_FIELD_OFFSET(ClientRequest, _impl_.forced_), _Internal::kHasBitsOffset + 17, 0, (0 | ::_fl::kFcOptional | ::_fl::kBool)},
     // uint32 command_type = 10;
-    {PROTOBUF_FIELD_OFFSET(ClientRequest, _impl_.command_type_), _Internal::kHasBitsOffset + 14, 0, (0 | ::_fl::kFcOptional | ::_fl::kUInt32)},
+    {PROTOBUF_FIELD_OFFSET(ClientRequest, _impl_.command_type_), _Internal::kHasBitsOffset + 15, 0, (0 | ::_fl::kFcOptional | ::_fl::kUInt32)},
     // .moqi.protocol.KeyEvent key_event = 11;
-    {PROTOBUF_FIELD_OFFSET(ClientRequest, _impl_.key_event_), _Internal::kHasBitsOffset + 7, 0, (0 | ::_fl::kFcOptional | ::_fl::kMessage | ::_fl::kTvTable)},
+    {PROTOBUF_FIELD_OFFSET(ClientRequest, _impl_.key_event_), _Internal::kHasBitsOffset + 8, 0, (0 | ::_fl::kFcOptional | ::_fl::kMessage | ::_fl::kTvTable)},
     // string composition_string = 12;
     {PROTOBUF_FIELD_OFFSET(ClientRequest, _impl_.composition_string_), _Internal::kHasBitsOffset + 2, 0, (0 | ::_fl::kFcOptional | ::_fl::kUtf8String | ::_fl::kRepAString)},
     // repeated string candidate_list = 13;
     {PROTOBUF_FIELD_OFFSET(ClientRequest, _impl_.candidate_list_), _Internal::kHasBitsOffset + 0, 0, (0 | ::_fl::kFcRepeated | ::_fl::kUtf8String | ::_fl::kRepSString)},
     // bool show_candidates = 14;
-    {PROTOBUF_FIELD_OFFSET(ClientRequest, _impl_.show_candidates_), _Internal::kHasBitsOffset + 17, 0, (0 | ::_fl::kFcOptional | ::_fl::kBool)},
+    {PROTOBUF_FIELD_OFFSET(ClientRequest, _impl_.show_candidates_), _Internal::kHasBitsOffset + 18, 0, (0 | ::_fl::kFcOptional | ::_fl::kBool)},
     // int32 cursor_pos = 15;
-    {PROTOBUF_FIELD_OFFSET(ClientRequest, _impl_.cursor_pos_), _Internal::kHasBitsOffset + 19, 0, (0 | ::_fl::kFcOptional | ::_fl::kInt32)},
+    {PROTOBUF_FIELD_OFFSET(ClientRequest, _impl_.cursor_pos_), _Internal::kHasBitsOffset + 20, 0, (0 | ::_fl::kFcOptional | ::_fl::kInt32)},
     // int32 sel_start = 16;
-    {PROTOBUF_FIELD_OFFSET(ClientRequest, _impl_.sel_start_), _Internal::kHasBitsOffset + 20, 0, (0 | ::_fl::kFcOptional | ::_fl::kInt32)},
+    {PROTOBUF_FIELD_OFFSET(ClientRequest, _impl_.sel_start_), _Internal::kHasBitsOffset + 21, 0, (0 | ::_fl::kFcOptional | ::_fl::kInt32)},
     // int32 sel_end = 17;
-    {PROTOBUF_FIELD_OFFSET(ClientRequest, _impl_.sel_end_), _Internal::kHasBitsOffset + 21, 0, (0 | ::_fl::kFcOptional | ::_fl::kInt32)},
+    {PROTOBUF_FIELD_OFFSET(ClientRequest, _impl_.sel_end_), _Internal::kHasBitsOffset + 22, 0, (0 | ::_fl::kFcOptional | ::_fl::kInt32)},
     // optional string button_id = 18;
     {PROTOBUF_FIELD_OFFSET(ClientRequest, _impl_.button_id_), _Internal::kHasBitsOffset + 3, 0, (0 | ::_fl::kFcOptional | ::_fl::kUtf8String | ::_fl::kRepAString)},
     // optional uint32 command_id = 19;
-    {PROTOBUF_FIELD_OFFSET(ClientRequest, _impl_.command_id_), _Internal::kHasBitsOffset + 22, 0, (0 | ::_fl::kFcOptional | ::_fl::kUInt32)},
+    {PROTOBUF_FIELD_OFFSET(ClientRequest, _impl_.command_id_), _Internal::kHasBitsOffset + 23, 0, (0 | ::_fl::kFcOptional | ::_fl::kUInt32)},
     // optional string preserved_key_guid = 20;
     {PROTOBUF_FIELD_OFFSET(ClientRequest, _impl_.preserved_key_guid_), _Internal::kHasBitsOffset + 4, 0, (0 | ::_fl::kFcOptional | ::_fl::kUtf8String | ::_fl::kRepAString)},
     // optional string compartment_guid = 21;
     {PROTOBUF_FIELD_OFFSET(ClientRequest, _impl_.compartment_guid_), _Internal::kHasBitsOffset + 5, 0, (0 | ::_fl::kFcOptional | ::_fl::kUtf8String | ::_fl::kRepAString)},
     // bool is_keyboard_open = 22;
-    {PROTOBUF_FIELD_OFFSET(ClientRequest, _impl_.is_keyboard_open_), _Internal::kHasBitsOffset + 18, 0, (0 | ::_fl::kFcOptional | ::_fl::kBool)},
+    {PROTOBUF_FIELD_OFFSET(ClientRequest, _impl_.is_keyboard_open_), _Internal::kHasBitsOffset + 19, 0, (0 | ::_fl::kFcOptional | ::_fl::kBool)},
     // optional string client_id = 23;
     {PROTOBUF_FIELD_OFFSET(ClientRequest, _impl_.client_id_), _Internal::kHasBitsOffset + 6, 0, (0 | ::_fl::kFcOptional | ::_fl::kUtf8String | ::_fl::kRepAString)},
     // optional int32 candidate_index = 24;
-    {PROTOBUF_FIELD_OFFSET(ClientRequest, _impl_.candidate_index_), _Internal::kHasBitsOffset + 23, 0, (0 | ::_fl::kFcOptional | ::_fl::kInt32)},
+    {PROTOBUF_FIELD_OFFSET(ClientRequest, _impl_.candidate_index_), _Internal::kHasBitsOffset + 24, 0, (0 | ::_fl::kFcOptional | ::_fl::kInt32)},
     // optional bool page_backward = 25;
-    {PROTOBUF_FIELD_OFFSET(ClientRequest, _impl_.page_backward_), _Internal::kHasBitsOffset + 24, 0, (0 | ::_fl::kFcOptional | ::_fl::kBool)},
+    {PROTOBUF_FIELD_OFFSET(ClientRequest, _impl_.page_backward_), _Internal::kHasBitsOffset + 25, 0, (0 | ::_fl::kFcOptional | ::_fl::kBool)},
+    // optional string cloud_clipboard_text = 26;
+    {PROTOBUF_FIELD_OFFSET(ClientRequest, _impl_.cloud_clipboard_text_), _Internal::kHasBitsOffset + 7, 0, (0 | ::_fl::kFcOptional | ::_fl::kUtf8String | ::_fl::kRepAString)},
   }},
   {{
       {::_pbi::TcParser::GetTable<::moqi::protocol::KeyEvent>()},
   }},
   {{
-    "\33\0\0\4\0\0\0\0\0\0\0\0\22\16\0\0\0\0\11\0\22\20\0\11\0\0\0\0\0\0\0\0"
+    "\33\0\0\4\0\0\0\0\0\0\0\0\22\16\0\0\0\0\11\0\22\20\0\11\0\0\24\0\0\0\0\0"
     "moqi.protocol.ClientRequest"
     "guid"
     "composition_string"
@@ -5082,6 +5097,7 @@ ClientRequest::_table_ = {
     "preserved_key_guid"
     "compartment_guid"
     "client_id"
+    "cloud_clipboard_text"
   }},
 };
 PROTOBUF_NOINLINE void ClientRequest::Clear() {
@@ -5115,21 +5131,28 @@ PROTOBUF_NOINLINE void ClientRequest::Clear() {
       _impl_.client_id_.ClearNonDefaultToEmpty();
     }
     if (CheckHasBit(cached_has_bits, 0x00000080U)) {
-      ABSL_DCHECK(_impl_.key_event_ != nullptr);
-      _impl_.key_event_->Clear();
+      _impl_.cloud_clipboard_text_.ClearNonDefaultToEmpty();
     }
   }
-  if (BatchCheckHasBit(cached_has_bits, 0x0000ff00U)) {
+  if (CheckHasBit(cached_has_bits, 0x00000100U)) {
+    ABSL_DCHECK(_impl_.key_event_ != nullptr);
+    _impl_.key_event_->Clear();
+  }
+  if (BatchCheckHasBit(cached_has_bits, 0x0000fe00U)) {
     ::memset(&_impl_.seq_num_, 0, static_cast<::size_t>(
-        reinterpret_cast<char*>(&_impl_.opened_) -
-        reinterpret_cast<char*>(&_impl_.seq_num_)) + sizeof(_impl_.opened_));
+        reinterpret_cast<char*>(&_impl_.command_type_) -
+        reinterpret_cast<char*>(&_impl_.seq_num_)) + sizeof(_impl_.command_type_));
   }
   if (BatchCheckHasBit(cached_has_bits, 0x00ff0000U)) {
-    ::memset(&_impl_.forced_, 0, static_cast<::size_t>(
-        reinterpret_cast<char*>(&_impl_.candidate_index_) -
-        reinterpret_cast<char*>(&_impl_.forced_)) + sizeof(_impl_.candidate_index_));
+    ::memset(&_impl_.opened_, 0, static_cast<::size_t>(
+        reinterpret_cast<char*>(&_impl_.command_id_) -
+        reinterpret_cast<char*>(&_impl_.opened_)) + sizeof(_impl_.command_id_));
   }
-  _impl_.page_backward_ = false;
+  if (BatchCheckHasBit(cached_has_bits, 0x03000000U)) {
+    ::memset(&_impl_.candidate_index_, 0, static_cast<::size_t>(
+        reinterpret_cast<char*>(&_impl_.page_backward_) -
+        reinterpret_cast<char*>(&_impl_.candidate_index_)) + sizeof(_impl_.page_backward_));
+  }
   _impl_._has_bits_.Clear();
   _internal_metadata_.Clear<::google::protobuf::UnknownFieldSet>();
 }
@@ -5154,7 +5177,7 @@ PROTOBUF_NOINLINE void ClientRequest::Clear() {
 
   cached_has_bits = this_._impl_._has_bits_[0];
   // uint32 seq_num = 1;
-  if (CheckHasBit(cached_has_bits, 0x00000100U)) {
+  if (CheckHasBit(cached_has_bits, 0x00000200U)) {
     if (this_._internal_seq_num() != 0) {
       target = stream->EnsureSpace(target);
       target = ::_pbi::WireFormatLite::WriteUInt32ToArray(
@@ -5163,7 +5186,7 @@ PROTOBUF_NOINLINE void ClientRequest::Clear() {
   }
 
   // .moqi.protocol.Method method = 2;
-  if (CheckHasBit(cached_has_bits, 0x00000200U)) {
+  if (CheckHasBit(cached_has_bits, 0x00000400U)) {
     if (this_._internal_method() != 0) {
       target = stream->EnsureSpace(target);
       target = ::_pbi::WireFormatLite::WriteEnumToArray(
@@ -5180,7 +5203,7 @@ PROTOBUF_NOINLINE void ClientRequest::Clear() {
   }
 
   // bool is_windows8_above = 4;
-  if (CheckHasBit(cached_has_bits, 0x00000400U)) {
+  if (CheckHasBit(cached_has_bits, 0x00000800U)) {
     if (this_._internal_is_windows8_above() != 0) {
       target = stream->EnsureSpace(target);
       target = ::_pbi::WireFormatLite::WriteBoolToArray(
@@ -5189,7 +5212,7 @@ PROTOBUF_NOINLINE void ClientRequest::Clear() {
   }
 
   // bool is_metro_app = 5;
-  if (CheckHasBit(cached_has_bits, 0x00000800U)) {
+  if (CheckHasBit(cached_has_bits, 0x00001000U)) {
     if (this_._internal_is_metro_app() != 0) {
       target = stream->EnsureSpace(target);
       target = ::_pbi::WireFormatLite::WriteBoolToArray(
@@ -5198,7 +5221,7 @@ PROTOBUF_NOINLINE void ClientRequest::Clear() {
   }
 
   // bool is_ui_less = 6;
-  if (CheckHasBit(cached_has_bits, 0x00001000U)) {
+  if (CheckHasBit(cached_has_bits, 0x00002000U)) {
     if (this_._internal_is_ui_less() != 0) {
       target = stream->EnsureSpace(target);
       target = ::_pbi::WireFormatLite::WriteBoolToArray(
@@ -5207,7 +5230,7 @@ PROTOBUF_NOINLINE void ClientRequest::Clear() {
   }
 
   // bool is_console = 7;
-  if (CheckHasBit(cached_has_bits, 0x00002000U)) {
+  if (CheckHasBit(cached_has_bits, 0x00004000U)) {
     if (this_._internal_is_console() != 0) {
       target = stream->EnsureSpace(target);
       target = ::_pbi::WireFormatLite::WriteBoolToArray(
@@ -5216,7 +5239,7 @@ PROTOBUF_NOINLINE void ClientRequest::Clear() {
   }
 
   // bool opened = 8;
-  if (CheckHasBit(cached_has_bits, 0x00008000U)) {
+  if (CheckHasBit(cached_has_bits, 0x00010000U)) {
     if (this_._internal_opened() != 0) {
       target = stream->EnsureSpace(target);
       target = ::_pbi::WireFormatLite::WriteBoolToArray(
@@ -5225,7 +5248,7 @@ PROTOBUF_NOINLINE void ClientRequest::Clear() {
   }
 
   // bool forced = 9;
-  if (CheckHasBit(cached_has_bits, 0x00010000U)) {
+  if (CheckHasBit(cached_has_bits, 0x00020000U)) {
     if (this_._internal_forced() != 0) {
       target = stream->EnsureSpace(target);
       target = ::_pbi::WireFormatLite::WriteBoolToArray(
@@ -5234,7 +5257,7 @@ PROTOBUF_NOINLINE void ClientRequest::Clear() {
   }
 
   // uint32 command_type = 10;
-  if (CheckHasBit(cached_has_bits, 0x00004000U)) {
+  if (CheckHasBit(cached_has_bits, 0x00008000U)) {
     if (this_._internal_command_type() != 0) {
       target = stream->EnsureSpace(target);
       target = ::_pbi::WireFormatLite::WriteUInt32ToArray(
@@ -5243,7 +5266,7 @@ PROTOBUF_NOINLINE void ClientRequest::Clear() {
   }
 
   // .moqi.protocol.KeyEvent key_event = 11;
-  if (CheckHasBit(cached_has_bits, 0x00000080U)) {
+  if (CheckHasBit(cached_has_bits, 0x00000100U)) {
     target = ::google::protobuf::internal::WireFormatLite::InternalWriteMessage(
         11, *this_._impl_.key_event_, this_._impl_.key_event_->GetCachedSize(), target,
         stream);
@@ -5270,7 +5293,7 @@ PROTOBUF_NOINLINE void ClientRequest::Clear() {
   }
 
   // bool show_candidates = 14;
-  if (CheckHasBit(cached_has_bits, 0x00020000U)) {
+  if (CheckHasBit(cached_has_bits, 0x00040000U)) {
     if (this_._internal_show_candidates() != 0) {
       target = stream->EnsureSpace(target);
       target = ::_pbi::WireFormatLite::WriteBoolToArray(
@@ -5279,7 +5302,7 @@ PROTOBUF_NOINLINE void ClientRequest::Clear() {
   }
 
   // int32 cursor_pos = 15;
-  if (CheckHasBit(cached_has_bits, 0x00080000U)) {
+  if (CheckHasBit(cached_has_bits, 0x00100000U)) {
     if (this_._internal_cursor_pos() != 0) {
       target =
           ::google::protobuf::internal::WireFormatLite::WriteInt32ToArrayWithField<15>(
@@ -5288,7 +5311,7 @@ PROTOBUF_NOINLINE void ClientRequest::Clear() {
   }
 
   // int32 sel_start = 16;
-  if (CheckHasBit(cached_has_bits, 0x00100000U)) {
+  if (CheckHasBit(cached_has_bits, 0x00200000U)) {
     if (this_._internal_sel_start() != 0) {
       target = stream->EnsureSpace(target);
       target = ::_pbi::WireFormatLite::WriteInt32ToArray(
@@ -5297,7 +5320,7 @@ PROTOBUF_NOINLINE void ClientRequest::Clear() {
   }
 
   // int32 sel_end = 17;
-  if (CheckHasBit(cached_has_bits, 0x00200000U)) {
+  if (CheckHasBit(cached_has_bits, 0x00400000U)) {
     if (this_._internal_sel_end() != 0) {
       target = stream->EnsureSpace(target);
       target = ::_pbi::WireFormatLite::WriteInt32ToArray(
@@ -5314,7 +5337,7 @@ PROTOBUF_NOINLINE void ClientRequest::Clear() {
   }
 
   // optional uint32 command_id = 19;
-  if (CheckHasBit(cached_has_bits, 0x00400000U)) {
+  if (CheckHasBit(cached_has_bits, 0x00800000U)) {
     target = stream->EnsureSpace(target);
     target = ::_pbi::WireFormatLite::WriteUInt32ToArray(
         19, this_._internal_command_id(), target);
@@ -5337,7 +5360,7 @@ PROTOBUF_NOINLINE void ClientRequest::Clear() {
   }
 
   // bool is_keyboard_open = 22;
-  if (CheckHasBit(cached_has_bits, 0x00040000U)) {
+  if (CheckHasBit(cached_has_bits, 0x00080000U)) {
     if (this_._internal_is_keyboard_open() != 0) {
       target = stream->EnsureSpace(target);
       target = ::_pbi::WireFormatLite::WriteBoolToArray(
@@ -5354,17 +5377,25 @@ PROTOBUF_NOINLINE void ClientRequest::Clear() {
   }
 
   // optional int32 candidate_index = 24;
-  if (CheckHasBit(cached_has_bits, 0x00800000U)) {
+  if (CheckHasBit(cached_has_bits, 0x01000000U)) {
     target = stream->EnsureSpace(target);
     target = ::_pbi::WireFormatLite::WriteInt32ToArray(
         24, this_._internal_candidate_index(), target);
   }
 
   // optional bool page_backward = 25;
-  if (CheckHasBit(cached_has_bits, 0x01000000U)) {
+  if (CheckHasBit(cached_has_bits, 0x02000000U)) {
     target = stream->EnsureSpace(target);
     target = ::_pbi::WireFormatLite::WriteBoolToArray(
         25, this_._internal_page_backward(), target);
+  }
+
+  // optional string cloud_clipboard_text = 26;
+  if (CheckHasBit(cached_has_bits, 0x00000080U)) {
+    const ::std::string& _s = this_._internal_cloud_clipboard_text();
+    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+        _s.data(), static_cast<int>(_s.length()), ::google::protobuf::internal::WireFormatLite::SERIALIZE, "moqi.protocol.ClientRequest.cloud_clipboard_text");
+    target = stream->WriteStringMaybeAliased(26, _s, target);
   }
 
   if (ABSL_PREDICT_FALSE(this_._internal_metadata_.have_unknown_fields())) {
@@ -5392,7 +5423,7 @@ PROTOBUF_NOINLINE void ClientRequest::Clear() {
 
   ::_pbi::Prefetch5LinesFrom7Lines(&this_);
   cached_has_bits = this_._impl_._has_bits_[0];
-  total_size += static_cast<bool>(0x01000000U & cached_has_bits) * 3;
+  total_size += static_cast<bool>(0x02000000U & cached_has_bits) * 3;
   if (BatchCheckHasBit(cached_has_bits, 0x000000ffU)) {
     // repeated string candidate_list = 13;
     if (CheckHasBitForRepeated(cached_has_bits, 0x00000001U)) {
@@ -5435,112 +5466,119 @@ PROTOBUF_NOINLINE void ClientRequest::Clear() {
       total_size += 2 + ::google::protobuf::internal::WireFormatLite::StringSize(
                                       this_._internal_client_id());
     }
-    // .moqi.protocol.KeyEvent key_event = 11;
+    // optional string cloud_clipboard_text = 26;
     if (CheckHasBit(cached_has_bits, 0x00000080U)) {
-      total_size += 1 +
-                    ::google::protobuf::internal::WireFormatLite::MessageSize(*this_._impl_.key_event_);
+      total_size += 2 + ::google::protobuf::internal::WireFormatLite::StringSize(
+                                      this_._internal_cloud_clipboard_text());
     }
   }
   if (BatchCheckHasBit(cached_has_bits, 0x0000ff00U)) {
-    // uint32 seq_num = 1;
+    // .moqi.protocol.KeyEvent key_event = 11;
     if (CheckHasBit(cached_has_bits, 0x00000100U)) {
+      total_size += 1 +
+                    ::google::protobuf::internal::WireFormatLite::MessageSize(*this_._impl_.key_event_);
+    }
+    // uint32 seq_num = 1;
+    if (CheckHasBit(cached_has_bits, 0x00000200U)) {
       if (this_._internal_seq_num() != 0) {
         total_size += ::_pbi::WireFormatLite::UInt32SizePlusOne(
             this_._internal_seq_num());
       }
     }
     // .moqi.protocol.Method method = 2;
-    if (CheckHasBit(cached_has_bits, 0x00000200U)) {
+    if (CheckHasBit(cached_has_bits, 0x00000400U)) {
       if (this_._internal_method() != 0) {
         total_size += 1 +
                       ::_pbi::WireFormatLite::EnumSize(this_._internal_method());
       }
     }
     // bool is_windows8_above = 4;
-    if (CheckHasBit(cached_has_bits, 0x00000400U)) {
+    if (CheckHasBit(cached_has_bits, 0x00000800U)) {
       if (this_._internal_is_windows8_above() != 0) {
         total_size += 2;
       }
     }
     // bool is_metro_app = 5;
-    if (CheckHasBit(cached_has_bits, 0x00000800U)) {
+    if (CheckHasBit(cached_has_bits, 0x00001000U)) {
       if (this_._internal_is_metro_app() != 0) {
         total_size += 2;
       }
     }
     // bool is_ui_less = 6;
-    if (CheckHasBit(cached_has_bits, 0x00001000U)) {
+    if (CheckHasBit(cached_has_bits, 0x00002000U)) {
       if (this_._internal_is_ui_less() != 0) {
         total_size += 2;
       }
     }
     // bool is_console = 7;
-    if (CheckHasBit(cached_has_bits, 0x00002000U)) {
+    if (CheckHasBit(cached_has_bits, 0x00004000U)) {
       if (this_._internal_is_console() != 0) {
         total_size += 2;
       }
     }
     // uint32 command_type = 10;
-    if (CheckHasBit(cached_has_bits, 0x00004000U)) {
+    if (CheckHasBit(cached_has_bits, 0x00008000U)) {
       if (this_._internal_command_type() != 0) {
         total_size += ::_pbi::WireFormatLite::UInt32SizePlusOne(
             this_._internal_command_type());
       }
     }
+  }
+  if (BatchCheckHasBit(cached_has_bits, 0x00ff0000U)) {
     // bool opened = 8;
-    if (CheckHasBit(cached_has_bits, 0x00008000U)) {
+    if (CheckHasBit(cached_has_bits, 0x00010000U)) {
       if (this_._internal_opened() != 0) {
         total_size += 2;
       }
     }
-  }
-  if (BatchCheckHasBit(cached_has_bits, 0x00ff0000U)) {
     // bool forced = 9;
-    if (CheckHasBit(cached_has_bits, 0x00010000U)) {
+    if (CheckHasBit(cached_has_bits, 0x00020000U)) {
       if (this_._internal_forced() != 0) {
         total_size += 2;
       }
     }
     // bool show_candidates = 14;
-    if (CheckHasBit(cached_has_bits, 0x00020000U)) {
+    if (CheckHasBit(cached_has_bits, 0x00040000U)) {
       if (this_._internal_show_candidates() != 0) {
         total_size += 2;
       }
     }
     // bool is_keyboard_open = 22;
-    if (CheckHasBit(cached_has_bits, 0x00040000U)) {
+    if (CheckHasBit(cached_has_bits, 0x00080000U)) {
       if (this_._internal_is_keyboard_open() != 0) {
         total_size += 3;
       }
     }
     // int32 cursor_pos = 15;
-    if (CheckHasBit(cached_has_bits, 0x00080000U)) {
+    if (CheckHasBit(cached_has_bits, 0x00100000U)) {
       if (this_._internal_cursor_pos() != 0) {
         total_size += ::_pbi::WireFormatLite::Int32SizePlusOne(
             this_._internal_cursor_pos());
       }
     }
     // int32 sel_start = 16;
-    if (CheckHasBit(cached_has_bits, 0x00100000U)) {
+    if (CheckHasBit(cached_has_bits, 0x00200000U)) {
       if (this_._internal_sel_start() != 0) {
         total_size += 2 + ::_pbi::WireFormatLite::Int32Size(
                                         this_._internal_sel_start());
       }
     }
     // int32 sel_end = 17;
-    if (CheckHasBit(cached_has_bits, 0x00200000U)) {
+    if (CheckHasBit(cached_has_bits, 0x00400000U)) {
       if (this_._internal_sel_end() != 0) {
         total_size += 2 + ::_pbi::WireFormatLite::Int32Size(
                                         this_._internal_sel_end());
       }
     }
     // optional uint32 command_id = 19;
-    if (CheckHasBit(cached_has_bits, 0x00400000U)) {
+    if (CheckHasBit(cached_has_bits, 0x00800000U)) {
       total_size += 2 + ::_pbi::WireFormatLite::UInt32Size(
                                       this_._internal_command_id());
     }
+  }
+   {
     // optional int32 candidate_index = 24;
-    if (CheckHasBit(cached_has_bits, 0x00800000U)) {
+    if (CheckHasBit(cached_has_bits, 0x01000000U)) {
       total_size += 2 + ::_pbi::WireFormatLite::Int32Size(
                                       this_._internal_candidate_index());
     }
@@ -5595,6 +5633,11 @@ void ClientRequest::MergeImpl(::google::protobuf::MessageLite& to_msg,
       _this->_internal_set_client_id(from._internal_client_id());
     }
     if (CheckHasBit(cached_has_bits, 0x00000080U)) {
+      _this->_internal_set_cloud_clipboard_text(from._internal_cloud_clipboard_text());
+    }
+  }
+  if (BatchCheckHasBit(cached_has_bits, 0x0000ff00U)) {
+    if (CheckHasBit(cached_has_bits, 0x00000100U)) {
       ABSL_DCHECK(from._impl_.key_event_ != nullptr);
       if (_this->_impl_.key_event_ == nullptr) {
         _this->_impl_.key_event_ = ::google::protobuf::Message::CopyConstruct(arena, *from._impl_.key_event_);
@@ -5602,89 +5645,89 @@ void ClientRequest::MergeImpl(::google::protobuf::MessageLite& to_msg,
         _this->_impl_.key_event_->MergeFrom(*from._impl_.key_event_);
       }
     }
-  }
-  if (BatchCheckHasBit(cached_has_bits, 0x0000ff00U)) {
-    if (CheckHasBit(cached_has_bits, 0x00000100U)) {
+    if (CheckHasBit(cached_has_bits, 0x00000200U)) {
       if (from._internal_seq_num() != 0) {
         _this->_impl_.seq_num_ = from._impl_.seq_num_;
       }
     }
-    if (CheckHasBit(cached_has_bits, 0x00000200U)) {
+    if (CheckHasBit(cached_has_bits, 0x00000400U)) {
       if (from._internal_method() != 0) {
         _this->_impl_.method_ = from._impl_.method_;
       }
     }
-    if (CheckHasBit(cached_has_bits, 0x00000400U)) {
+    if (CheckHasBit(cached_has_bits, 0x00000800U)) {
       if (from._internal_is_windows8_above() != 0) {
         _this->_impl_.is_windows8_above_ = from._impl_.is_windows8_above_;
       }
     }
-    if (CheckHasBit(cached_has_bits, 0x00000800U)) {
+    if (CheckHasBit(cached_has_bits, 0x00001000U)) {
       if (from._internal_is_metro_app() != 0) {
         _this->_impl_.is_metro_app_ = from._impl_.is_metro_app_;
       }
     }
-    if (CheckHasBit(cached_has_bits, 0x00001000U)) {
+    if (CheckHasBit(cached_has_bits, 0x00002000U)) {
       if (from._internal_is_ui_less() != 0) {
         _this->_impl_.is_ui_less_ = from._impl_.is_ui_less_;
       }
     }
-    if (CheckHasBit(cached_has_bits, 0x00002000U)) {
+    if (CheckHasBit(cached_has_bits, 0x00004000U)) {
       if (from._internal_is_console() != 0) {
         _this->_impl_.is_console_ = from._impl_.is_console_;
       }
     }
-    if (CheckHasBit(cached_has_bits, 0x00004000U)) {
+    if (CheckHasBit(cached_has_bits, 0x00008000U)) {
       if (from._internal_command_type() != 0) {
         _this->_impl_.command_type_ = from._impl_.command_type_;
-      }
-    }
-    if (CheckHasBit(cached_has_bits, 0x00008000U)) {
-      if (from._internal_opened() != 0) {
-        _this->_impl_.opened_ = from._impl_.opened_;
       }
     }
   }
   if (BatchCheckHasBit(cached_has_bits, 0x00ff0000U)) {
     if (CheckHasBit(cached_has_bits, 0x00010000U)) {
+      if (from._internal_opened() != 0) {
+        _this->_impl_.opened_ = from._impl_.opened_;
+      }
+    }
+    if (CheckHasBit(cached_has_bits, 0x00020000U)) {
       if (from._internal_forced() != 0) {
         _this->_impl_.forced_ = from._impl_.forced_;
       }
     }
-    if (CheckHasBit(cached_has_bits, 0x00020000U)) {
+    if (CheckHasBit(cached_has_bits, 0x00040000U)) {
       if (from._internal_show_candidates() != 0) {
         _this->_impl_.show_candidates_ = from._impl_.show_candidates_;
       }
     }
-    if (CheckHasBit(cached_has_bits, 0x00040000U)) {
+    if (CheckHasBit(cached_has_bits, 0x00080000U)) {
       if (from._internal_is_keyboard_open() != 0) {
         _this->_impl_.is_keyboard_open_ = from._impl_.is_keyboard_open_;
       }
     }
-    if (CheckHasBit(cached_has_bits, 0x00080000U)) {
+    if (CheckHasBit(cached_has_bits, 0x00100000U)) {
       if (from._internal_cursor_pos() != 0) {
         _this->_impl_.cursor_pos_ = from._impl_.cursor_pos_;
       }
     }
-    if (CheckHasBit(cached_has_bits, 0x00100000U)) {
+    if (CheckHasBit(cached_has_bits, 0x00200000U)) {
       if (from._internal_sel_start() != 0) {
         _this->_impl_.sel_start_ = from._impl_.sel_start_;
       }
     }
-    if (CheckHasBit(cached_has_bits, 0x00200000U)) {
+    if (CheckHasBit(cached_has_bits, 0x00400000U)) {
       if (from._internal_sel_end() != 0) {
         _this->_impl_.sel_end_ = from._impl_.sel_end_;
       }
     }
-    if (CheckHasBit(cached_has_bits, 0x00400000U)) {
+    if (CheckHasBit(cached_has_bits, 0x00800000U)) {
       _this->_impl_.command_id_ = from._impl_.command_id_;
     }
-    if (CheckHasBit(cached_has_bits, 0x00800000U)) {
+  }
+  if (BatchCheckHasBit(cached_has_bits, 0x03000000U)) {
+    if (CheckHasBit(cached_has_bits, 0x01000000U)) {
       _this->_impl_.candidate_index_ = from._impl_.candidate_index_;
     }
-  }
-  if (CheckHasBit(cached_has_bits, 0x01000000U)) {
-    _this->_impl_.page_backward_ = from._impl_.page_backward_;
+    if (CheckHasBit(cached_has_bits, 0x02000000U)) {
+      _this->_impl_.page_backward_ = from._impl_.page_backward_;
+    }
   }
   _this->_impl_._has_bits_[0] |= cached_has_bits;
   _this->_internal_metadata_.MergeFrom<::google::protobuf::UnknownFieldSet>(
@@ -5712,6 +5755,7 @@ void ClientRequest::InternalSwap(ClientRequest* PROTOBUF_RESTRICT PROTOBUF_NONNU
   ::_pbi::ArenaStringPtr::InternalSwap(&_impl_.preserved_key_guid_, &other->_impl_.preserved_key_guid_, arena);
   ::_pbi::ArenaStringPtr::InternalSwap(&_impl_.compartment_guid_, &other->_impl_.compartment_guid_, arena);
   ::_pbi::ArenaStringPtr::InternalSwap(&_impl_.client_id_, &other->_impl_.client_id_, arena);
+  ::_pbi::ArenaStringPtr::InternalSwap(&_impl_.cloud_clipboard_text_, &other->_impl_.cloud_clipboard_text_, arena);
   ::google::protobuf::internal::memswap<
       PROTOBUF_FIELD_OFFSET(ClientRequest, _impl_.page_backward_)
       + sizeof(ClientRequest::_impl_.page_backward_)

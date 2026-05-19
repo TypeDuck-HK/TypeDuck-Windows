@@ -14,6 +14,8 @@ std::wstring getCurrentExecutableDir();
 
 std::wstring getAppLocalDir();
 
+std::wstring getMoqiAppDataDir();
+
 bool makeDirs(const std::wstring& path);
 
 std::string generateUuidStr();

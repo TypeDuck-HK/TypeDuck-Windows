@@ -13,19 +13,23 @@ Windows 端的输入法前端，负责把 `moqi-ime` 后端接入 **Microsoft Te
 默认输入法：[`白霜拼音`](https://github.com/gaboolic/rime-frost)。
 
 为什么选择白霜拼音？
-1. 白霜拼音经过评测，词频准确度是最高的，超过了商业输入法。[查看rime各方案评测结果](https://github.com/gaboolic/rime-schema-compare/blob/main/report/latest.md) 
+
+1. 白霜拼音经过评测，词频准确度是最高的，超过了商业输入法。[查看rime各方案评测结果](https://github.com/gaboolic/rime-schema-compare/blob/main/report/latest.md)
 2. 白霜拼音作者也是我，有问题改起来方便。
 
 ## 快速开始
+
 下载安装包：[moqi-im-windows-setup.exe](https://github.com/gaboolic/moqi-im-windows/releases)
 
 ## 特色功能
+
 - 托盘切换输入法状态：中英文 全半角 简繁
 - 外观编辑：主题皮肤切换、字体调整、主题色切换、自定义快捷键。一般功能都可通过托盘图标右键修改，强烈自定义修改需求可修改C:\Users\用户名\AppData\Roaming\Moqi\appearance_config.json
 - 默认使用白霜拼音，支持切换方案集、切换输入方案、更新配置
 - 修改了librime的组句算法，支持输出多条整句候选，正确率大大提升
 - 置顶短语、超级简拼
 - 输入设置：自动插入成对符号、分号键次选
+- **云剪贴板（WebDAV）**：与 Android 版互通，默认关闭。在输入法「设置」菜单 →「云剪贴板」中配置 WebDAV 地址与账号；开启后 PC 任意应用复制纯文本会自动上传到 `{墨奇设置目录}/clip/`（默认 `moqi-input-method/clip/`）。按 `Ctrl+0`（可在设置中修改）将云端条目显示为候选列表并上屏。配置保存在 `%APPDATA%\Moqi\cloud_clipboard.json`，密码经 DPAPI 加密存于 `cloud_clipboard.pw`。
 - 原生ai功能：支持整句优化、翻译、问答等，只有想不到没有做不到。编辑C:\Users\用户名\AppData\Roaming\Moqi\Rime\ai_config.json 可以接入ai大模型以及自定义提示词、快捷键。为了方便体验，已在安装包里加了默认配置，可以替换成用户自己的apikey
 
 ```
@@ -61,7 +65,8 @@ Windows 端的输入法前端，负责把 `moqi-ime` 后端接入 **Microsoft Te
 ```
 
 ## 功能演示
-ai功能演示：https://github.com/gaboolic/moqi-im-windows/issues/4
+
+ai功能演示：<https://github.com/gaboolic/moqi-im-windows/issues/4>
 ![输入0-ai](others/imgs/input-ai.gif)
 ![输入1-ai](others/imgs/input-zise.png)
 
@@ -77,7 +82,6 @@ ai功能演示：https://github.com/gaboolic/moqi-im-windows/issues/4
 一些输入效果
 ![输入2](others/imgs/input-mo.png)
 ![输入3](others/imgs/input-qi.png)
-
 
 ## 运行架构
 

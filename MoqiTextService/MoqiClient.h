@@ -65,6 +65,7 @@ public:
 	bool onKeyUp(Ime::KeyEvent& keyEvent, Ime::EditSession* session);
 
 	bool onPreservedKey(const GUID& guid);
+	bool onPreservedKey(const GUID& guid, Ime::EditSession* session);
 	bool highlightCandidate(int index);
 	bool selectCandidate(int index);
 	bool changePage(bool backward);
@@ -102,6 +103,7 @@ private:
 	void refreshAsyncPollTimer();
 	void pollAsyncResponses();
 	void enqueueAsyncResponse(const moqi::protocol::ServerResponse& response);
+	void flushPendingAsyncResponsesWithCurrentContext();
 	void flushPendingAsyncResponses(Ime::EditSession* session = nullptr);
 	bool applyAsyncResponse(Json::Value& msg, Ime::EditSession* session = nullptr);
 	static void CALLBACK onAsyncPollTimer(HWND hwnd, UINT msg, UINT_PTR id, DWORD time);
@@ -140,6 +142,7 @@ private:
     bool launcherStartAttempted_;
 	HWND asyncPollTimerWindow_;
 	UINT_PTR asyncPollTimerId_;
+	bool asyncFlushInProgress_;
 	std::deque<Json::Value> pendingAsyncResponses_;
 	std::vector<AutoPairRuleState> autoPairRules_;
 };

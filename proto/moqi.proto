@@ -24,6 +24,7 @@ enum Method {
   METHOD_HIGHLIGHT_CANDIDATE = 16;
   METHOD_SELECT_CANDIDATE = 17;
   METHOD_CHANGE_PAGE = 18;
+  METHOD_CLOUD_CLIPBOARD_UPLOAD = 19;
 }
 
 enum ButtonType {
@@ -143,6 +144,7 @@ message ClientRequest {
   optional string client_id = 23;
   optional int32 candidate_index = 24;
   optional bool page_backward = 25;
+  optional string cloud_clipboard_text = 26;
 }
 
 message ServerResponse {

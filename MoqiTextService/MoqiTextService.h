@@ -55,6 +55,7 @@ public:
 	virtual bool onKeyUp(Ime::KeyEvent& keyEvent, Ime::EditSession* session);
 
 	virtual bool onPreservedKey(const GUID& guid);
+	STDMETHODIMP OnPreservedKey(ITfContext* pContext, REFGUID rguid, BOOL* pfEaten) override;
 
 	virtual bool onCommand(UINT id, CommandType type);
 
@@ -333,6 +334,7 @@ private:
 	void markCandidateContentApplied(const std::wstring& renderedPreedit);
 	bool moveCandidateWindowToInputRect(Ime::EditSession* session, const wchar_t* reason, bool throttleSamePosition);
 
+	bool ensureClientForCurrentProfile(const wchar_t* reason);
 	void closeClient();
 
 private:

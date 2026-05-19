@@ -47,6 +47,61 @@ std::wstring formatDebugLogLine(const std::wstring& message);
 constexpr wchar_t kDefaultCommentFontFace[] = L"Consolas";
 constexpr ULONGLONG kCandidateWindowMoveThrottleMs = 50;
 
+bool callClientFilterKeyDown(Client* client, Ime::KeyEvent& keyEvent, bool& sehCaught) {
+	sehCaught = false;
+	__try {
+		return client->filterKeyDown(keyEvent);
+	}
+	__except (EXCEPTION_EXECUTE_HANDLER) {
+		sehCaught = true;
+		return false;
+	}
+}
+
+bool callClientOnKeyDown(Client* client, Ime::KeyEvent& keyEvent, Ime::EditSession* session, bool& sehCaught) {
+	sehCaught = false;
+	__try {
+		return client->onKeyDown(keyEvent, session);
+	}
+	__except (EXCEPTION_EXECUTE_HANDLER) {
+		sehCaught = true;
+		return false;
+	}
+}
+
+bool callClientFilterKeyUp(Client* client, Ime::KeyEvent& keyEvent, bool& sehCaught) {
+	sehCaught = false;
+	__try {
+		return client->filterKeyUp(keyEvent);
+	}
+	__except (EXCEPTION_EXECUTE_HANDLER) {
+		sehCaught = true;
+		return false;
+	}
+}
+
+bool callClientOnKeyUp(Client* client, Ime::KeyEvent& keyEvent, Ime::EditSession* session, bool& sehCaught) {
+	sehCaught = false;
+	__try {
+		return client->onKeyUp(keyEvent, session);
+	}
+	__except (EXCEPTION_EXECUTE_HANDLER) {
+		sehCaught = true;
+		return false;
+	}
+}
+
+bool callClientOnPreservedKey(Client* client, const GUID& guid, Ime::EditSession* session, bool& sehCaught) {
+	sehCaught = false;
+	__try {
+		return client->onPreservedKey(guid, session);
+	}
+	__except (EXCEPTION_EXECUTE_HANDLER) {
+		sehCaught = true;
+		return false;
+	}
+}
+
 void appendCandidateWindowLog(const std::wstring& message) {
 	if (!Ime::isTraceLoggingEnabled()) {
 		return;
@@ -223,6 +278,13 @@ std::wstring keyEventSummary(const Ime::KeyEvent& keyEvent) {
 	return stream.str();
 }
 
+bool isOrdinaryPrintableKey(const Ime::KeyEvent& keyEvent) {
+	return keyEvent.charCode() >= 0x20 &&
+	       keyEvent.charCode() != 0x7f &&
+	       !keyEvent.isKeyDown(VK_CONTROL) &&
+	       !keyEvent.isKeyDown(VK_MENU);
+}
+
 bool shouldForceUiLessForProcess(const std::wstring& imagePath) {
 	const std::wstring lowerPath = toLowerCopy(imagePath);
 	const std::wstring lowerBaseName = processBaseName(lowerPath);
@@ -298,7 +360,8 @@ TextService::TextService(ImeModule* module):
 	inlinePreedit_(true),
 	autoPairQuotes_(false),
 	suppressNextCompositionTerminatedNotification_(false),
-	candidatePreeditCursor_(0) {
+	candidatePreeditCursor_(0),
+	currentLangProfile_(GUID_NULL) {
 	shouldShowCandidateWindowUI_ = !effectiveUiLess();
 
 	// font for candidate and mesasge windows
@@ -351,10 +414,7 @@ void TextService::onActivate() {
 	    << L" manual_ui_less=" << boolText(manualUiLessOverride_)
 	    << L" " << foregroundWindowSummary();
 	logDebug(log.str());
-	// Since we support multiple language profiles in this text service,
-	// we do nothing when the whole text service is activated.
-	// Instead, we do the actual initilization for each language profile when it is activated.
-	// In Moqi, we create different client connections for different language profiles.
+	ensureClientForCurrentProfile(L"onActivate");
 }
 
 // virtual
@@ -399,6 +459,7 @@ void TextService::onSetThreadFocus() {
 	    << L" pending_candidate_recovery=" << boolText(pendingCandidateRecovery_)
 	    << L" " << foregroundWindowSummary();
 	logDebug(log.str());
+	ensureClientForCurrentProfile(L"onSetThreadFocus");
 }
 
 // virtual
@@ -419,9 +480,27 @@ bool TextService::filterKeyDown(Ime::KeyEvent& keyEvent) {
 		L" effective_ui_less=" + boolText(effectiveUiLess()));
 	// if (keyEvent.isKeyToggled(VK_CAPITAL))
 	//	return true;
-	if(!client_)
+	if (!client_ && !ensureClientForCurrentProfile(L"filterKeyDown")) {
+		if (isOrdinaryPrintableKey(keyEvent)) {
+			logDebug(L"[filterKeyDown] consumed printable key while client is not ready " + keyEventSummary(keyEvent));
+			return true;
+		}
 		return false;
-	return client_->filterKeyDown(keyEvent);
+	}
+	try {
+		bool sehCaught = false;
+		const bool result = callClientFilterKeyDown(client_.get(), keyEvent, sehCaught);
+		if (sehCaught) {
+			logDebug(L"[filterKeyDown] caught SEH exception from client");
+			closeClient();
+		}
+		return result;
+	}
+	catch (...) {
+		logDebug(L"[filterKeyDown] caught exception from client");
+		closeClient();
+		return false;
+	}
 }
 
 // virtual
@@ -432,7 +511,20 @@ bool TextService::onKeyDown(Ime::KeyEvent& keyEvent, Ime::EditSession* session) 
 	//	return true;
 	if (!client_)
 		return false;
-	return client_->onKeyDown(keyEvent, session);
+	try {
+		bool sehCaught = false;
+		const bool result = callClientOnKeyDown(client_.get(), keyEvent, session, sehCaught);
+		if (sehCaught) {
+			logDebug(L"[onKeyDown] caught SEH exception from client");
+			closeClient();
+		}
+		return result;
+	}
+	catch (...) {
+		logDebug(L"[onKeyDown] caught exception from client");
+		closeClient();
+		return false;
+	}
 }
 
 // virtual
@@ -441,7 +533,20 @@ bool TextService::filterKeyUp(Ime::KeyEvent& keyEvent) {
 		L" client=" + boolText(client_ != nullptr));
 	if(!client_)
 		return false;
-	return client_->filterKeyUp(keyEvent);
+	try {
+		bool sehCaught = false;
+		const bool result = callClientFilterKeyUp(client_.get(), keyEvent, sehCaught);
+		if (sehCaught) {
+			logDebug(L"[filterKeyUp] caught SEH exception from client");
+			closeClient();
+		}
+		return result;
+	}
+	catch (...) {
+		logDebug(L"[filterKeyUp] caught exception from client");
+		closeClient();
+		return false;
+	}
 }
 
 // virtual
@@ -450,7 +555,20 @@ bool TextService::onKeyUp(Ime::KeyEvent& keyEvent, Ime::EditSession* session) {
 		L" client=" + boolText(client_ != nullptr));
 	if(!client_)
 		return false;
-	return client_->onKeyUp(keyEvent, session);
+	try {
+		bool sehCaught = false;
+		const bool result = callClientOnKeyUp(client_.get(), keyEvent, session, sehCaught);
+		if (sehCaught) {
+			logDebug(L"[onKeyUp] caught SEH exception from client");
+			closeClient();
+		}
+		return result;
+	}
+	catch (...) {
+		logDebug(L"[onKeyUp] caught exception from client");
+		closeClient();
+		return false;
+	}
 }
 
 bool TextService::highlightCandidate(int index) {
@@ -477,6 +595,35 @@ bool TextService::onPreservedKey(const GUID& guid) {
 		return false;
 	// some preserved keys registered in ctor are pressed
 	return client_->onPreservedKey(guid);
+}
+
+STDMETHODIMP TextService::OnPreservedKey(ITfContext* pContext, REFGUID rguid, BOOL* pfEaten) {
+	if (pfEaten == nullptr) {
+		return S_OK;
+	}
+	*pfEaten = FALSE;
+	if (!client_ || pContext == nullptr || isKeyboardDisabled(pContext) || !isKeyboardOpened()) {
+		return S_OK;
+	}
+
+	HRESULT sessionResult = E_FAIL;
+	bool sehCaught = false;
+	auto session = Ime::ComPtr<Ime::EditSession>::make(
+		pContext,
+		[&](Ime::EditSession* session, TfEditCookie cookie) {
+			*pfEaten = callClientOnPreservedKey(client_.get(), rguid, session, sehCaught);
+		}
+	);
+	pContext->RequestEditSession(clientId(), session, TF_ES_SYNC | TF_ES_READWRITE, &sessionResult);
+	if (sehCaught) {
+		logDebug(L"[onPreservedKey] SEH caught while handling preserved key");
+		*pfEaten = FALSE;
+	}
+	if (FAILED(sessionResult)) {
+		logDebug(L"[onPreservedKey] RequestEditSession failed hr=" + std::to_wstring(static_cast<long>(sessionResult)));
+		*pfEaten = onPreservedKey(rguid);
+	}
+	return S_OK;
 }
 
 
@@ -574,6 +721,7 @@ void TextService::onLangProfileActivated(REFIID lang) {
 	logDebug(L"[onLangProfileActivated] profile=" + guidToString(lang) +
 		L" exe=" + processBaseName(currentProcessPath()) +
 		L" " + foregroundWindowSummary());
+	currentLangProfile_ = lang;
 	// Sometimes, Windows does not deactivate the old language profile before
 	// activating the new one. So here we do it by ourselves.
 	// If a new profile is activated, but there is an old one remaining active,
@@ -582,8 +730,14 @@ void TextService::onLangProfileActivated(REFIID lang) {
 		closeClient();
 
 	// create a new client connection to the input method server for the language profile
-	client_ = std::make_unique<Client>(this, lang);
-	client_->onActivate();
+	try {
+		client_ = std::make_unique<Client>(this, lang);
+		client_->onActivate();
+	}
+	catch (...) {
+		logDebug(L"[onLangProfileActivated] caught exception while creating client");
+		closeClient();
+	}
 }
 
 void TextService::onLangProfileDeactivated(REFIID lang) {
@@ -591,6 +745,9 @@ void TextService::onLangProfileDeactivated(REFIID lang) {
 		L" exe=" + processBaseName(currentProcessPath()) +
 		L" " + foregroundWindowSummary());
 	closeClient();
+	if (::IsEqualGUID(currentLangProfile_, lang)) {
+		currentLangProfile_ = GUID_NULL;
+	}
 }
 
 void TextService::onLayoutChange(ITfContext* context, TfLayoutCode code, ITfContextView* view) {
@@ -1087,6 +1244,28 @@ void TextService::applyUiLessOverrideState() {
 		hideMessage();
 	}
 	refreshCandidates();
+}
+
+bool TextService::ensureClientForCurrentProfile(const wchar_t* reason) {
+	if (client_) {
+		return true;
+	}
+	if (::IsEqualGUID(currentLangProfile_, GUID_NULL)) {
+		logDebug(std::wstring(L"[ensureClient] no current profile reason=") + (reason ? reason : L"<null>"));
+		return false;
+	}
+	try {
+		logDebug(std::wstring(L"[ensureClient] creating lazy client reason=") + (reason ? reason : L"<null>") +
+			L" profile=" + guidToString(currentLangProfile_));
+		client_ = std::make_unique<Client>(this, currentLangProfile_);
+		client_->onActivate();
+		return client_ != nullptr;
+	}
+	catch (...) {
+		logDebug(std::wstring(L"[ensureClient] caught exception reason=") + (reason ? reason : L"<null>"));
+		closeClient();
+		return false;
+	}
 }
 
 void TextService::closeClient() {
