@@ -1060,9 +1060,18 @@ bool Client::filterKeyDown(Ime::KeyEvent &keyEvent) {
   addKeyEventToRpcRequest(req, keyEvent);
 
   Json::Value ret;
-  callRpcMethod(req, ret);
-  if (handleRpcResponse(ret)) {
+  const bool rpcOk = callRpcMethod(req, ret);
+  if (rpcOk && handleRpcResponse(ret)) {
     return ret["return"].asBool();
+  }
+  if (isOrdinaryPrintableKey(keyEvent)) {
+    std::wostringstream log;
+    log << L"[filterKeyDown] RPC failed or invalid response; consume printable key"
+        << L" vk=" << keyEvent.keyCode()
+        << L" char=" << keyEvent.charCode()
+        << L" rpc_ok=" << (rpcOk ? L"true" : L"false");
+    appendRpcGuardLog(log.str());
+    return true;
   }
   return false;
 }
