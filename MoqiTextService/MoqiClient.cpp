@@ -770,8 +770,19 @@ void Client::updateComposition(Json::Value &msg, Ime::EditSession *session,
         if (!textService_->isComposing()) {
           textService_->startComposition(session->context());
         }
-        textService_->setCompositionString(session, compositionString.c_str(),
-                                           compositionString.length());
+        // LibIME2 setCompositionString() always collapses the selection to the
+        // end of the composition. Skip it when only the caret moved (e.g. Tab
+        // -> Shift+Right) so setCompositionCursor() is not fighting a stale
+        // end-of-string selection in hosts that ignore cursor-only updates.
+        bool compositionTextUnchanged = false;
+        if (textService_->isComposing()) {
+          compositionTextUnchanged =
+              textService_->compositionString(session) == compositionString;
+        }
+        if (!compositionTextUnchanged) {
+          textService_->setCompositionString(session, compositionString.c_str(),
+                                             compositionString.length());
+        }
       }
       // FIXME: update the position of candidate and message window when the
       // composition string is changed.
