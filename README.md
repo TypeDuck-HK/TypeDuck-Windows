@@ -24,7 +24,7 @@ Windows 端的输入法前端，负责把 `moqi-ime` 后端接入 **Microsoft Te
 ## 特色功能
 
 - 托盘切换输入法状态：中英文 全半角 简繁
-- 外观编辑：主题皮肤切换、字体调整、主题色切换、自定义快捷键。一般功能都可通过托盘图标右键修改，强烈自定义修改需求可修改C:\Users\用户名\AppData\Roaming\Moqi\appearance_config.json
+- 外观编辑：主题皮肤切换、字体调整、主题色切换、自定义快捷键。一般功能都可通过托盘图标右键修改，强烈自定义修改需求可修改C:\Users\用户名\AppData\Roaming\Moqi\appearance_config.json  现在已支持导入皮肤，可选yaml文件
 - 默认使用白霜拼音，支持切换方案集、切换输入方案、更新配置
 - 修改了librime的组句算法，支持输出多条整句候选，正确率大大提升
 - 置顶短语、超级简拼
