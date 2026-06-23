@@ -56,9 +56,16 @@ Plans:
 
 **Plans:** 3 plans
 Plans:
+**Wave 1**
 
 - [ ] 02-01-PLAN.md — Stage the pinned TypeDuck-HK runtime, schema submodule, and runtime manifest evidence.
+
+**Wave 2** *(blocked on Wave 1 completion)*
+
 - [ ] 02-02-PLAN.md — Prove TypeDuck Cantonese composition, candidates, Jyutping, and commits through the compatibility adapter boundary.
+
+**Wave 3** *(blocked on Wave 2 completion)*
+
 - [ ] 02-03-PLAN.md — Validate and document raw lookup-filter CSV/comment payload evidence.
 
 ### Phase 3: zh-HK TSF Registration and Installer Skeleton
