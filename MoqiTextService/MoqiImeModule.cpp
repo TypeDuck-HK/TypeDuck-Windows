@@ -20,6 +20,7 @@
 #include "MoqiImeModule.h"
 #include "../libIME2/src/Utils.h"
 #include "MoqiTextService.h"
+#include "TypeDuckProfile.h"
 #include <Shellapi.h>
 #include <ShlObj.h>
 #include <Shlwapi.h>
@@ -30,19 +31,18 @@
 
 namespace Moqi {
 
-// CLSID of Moqi Text Service (must stay in sync with installer/registration
-// cleanup) {8F204C91-2D7A-4B3E-9E1F-6A5C0D8B2E7F}
-const GUID g_textServiceClsid = {
-    0x8f204c91,
-    0x2d7a,
-    0x4b3e,
-    {0x9e, 0x1f, 0x6a, 0x5c, 0x0d, 0x8b, 0x2e, 0x7f}};
+const GUID g_textServiceClsid = TypeDuck::kTextServiceClsid;
 
 namespace {
 
 std::wstring getConfiguredProgramDir() {
   wchar_t path[MAX_PATH] = {};
-  DWORD len = ::GetEnvironmentVariableW(L"MOQI_PROGRAM_DIR", path, _countof(path));
+  DWORD len = ::GetEnvironmentVariableW(TypeDuck::programDirEnvVar(), path, _countof(path));
+  if (len > 0 && len < _countof(path)) {
+    return path;
+  }
+
+  len = ::GetEnvironmentVariableW(TypeDuck::legacyProgramDirEnvVar(), path, _countof(path));
   if (len > 0 && len < _countof(path)) {
     return path;
   }
@@ -53,9 +53,7 @@ std::wstring getConfiguredProgramDir() {
     result = ::SHGetFolderPathW(NULL, CSIDL_PROGRAM_FILES, NULL, 0, path);
   }
   if (result == S_OK) {
-    std::wstring programDir = path;
-    programDir += L"\\MoqiIM";
-    return programDir;
+    return TypeDuck::defaultProgramDir(path);
   }
   return std::wstring();
 }

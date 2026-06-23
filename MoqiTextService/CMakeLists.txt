@@ -23,6 +23,8 @@ add_library(MoqiTextService SHARED
     # core IME implementation
     MoqiImeModule.cpp
     MoqiImeModule.h
+    TypeDuckProfile.cpp
+    TypeDuckProfile.h
     MoqiTextService.cpp
     MoqiTextService.def
     MoqiTextService.h

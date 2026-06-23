@@ -216,9 +216,9 @@ if ($Strict) {
         "Strict mode: CMake must compile TypeDuckProfile.cpp."
     Assert-Match $failures $cmakeSource "TypeDuckProfile\.h" `
         "Strict mode: CMake must list TypeDuckProfile.h."
-    Assert-Match $failures $moduleSource "TYPEDUCK_PROGRAM_DIR" `
-        "Strict mode: MoqiImeModule.cpp must prefer TYPEDUCK_PROGRAM_DIR."
-    Assert-Match $failures $moduleSource "MOQI_PROGRAM_DIR" `
+    Assert-Match $failures $moduleSource "programDirEnvVar\(\)|TYPEDUCK_PROGRAM_DIR" `
+        "Strict mode: MoqiImeModule.cpp must prefer the centralized TYPEDUCK_PROGRAM_DIR source."
+    Assert-Match $failures $moduleSource "legacyProgramDirEnvVar\(\)|MOQI_PROGRAM_DIR" `
         "Strict mode: MoqiImeModule.cpp should retain MOQI_PROGRAM_DIR only as a compatibility fallback during transition."
 }
 
