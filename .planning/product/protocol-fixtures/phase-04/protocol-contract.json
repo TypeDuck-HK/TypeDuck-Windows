@@ -26,8 +26,50 @@
     "boundary": "TSF client -> launcher named pipe -> backend stdio",
     "protobuf_package": "moqi.protocol",
     "compatibility_bridge": "Existing framed protobuf transport remains; TypeDuck semantics are explicit fields/messages.",
-    "max_client_frame_payload_bytes": null,
-    "max_backend_frame_payload_bytes": null
+    "max_client_frame_payload_bytes": 1048576,
+    "max_backend_frame_payload_bytes": 1048576,
+    "generated_header": "build-vs32/generated/proto/moqi.pb.h",
+    "generated_source": "build-vs32/generated/proto/moqi.pb.cc"
+  },
+  "generated_fields": {
+    "candidate_entry": [
+      "text",
+      "comment",
+      "id",
+      "input_code",
+      "jyutping",
+      "raw_lookup_comment",
+      "translations",
+      "prompts",
+      "source_index",
+      "selectable"
+    ],
+    "server_response": [
+      "candidate_entries",
+      "candidate_cursor",
+      "typeduck_protocol",
+      "typeduck_candidate_page",
+      "typeduck_settings_snapshot",
+      "typeduck_settings_update",
+      "typeduck_capabilities",
+      "typeduck_engine_health",
+      "typeduck_error"
+    ],
+    "client_request": [
+      "typeduck_protocol",
+      "typeduck_settings_snapshot",
+      "typeduck_settings_update",
+      "typeduck_deploy_request",
+      "typeduck_reconfigure_request"
+    ],
+    "framing": [
+      "kMaxClientFramePayloadBytes",
+      "kMaxBackendFramePayloadBytes",
+      "FrameBuffer::lastError",
+      "FrameBuffer::hasViolation",
+      "FrameBuffer::bufferedBytes",
+      "serializeMessageBounded"
+    ]
   },
   "phase_boundary": {
     "raw_lookup_comments": "preserve byte-exact raw lookup-filter payloads",
