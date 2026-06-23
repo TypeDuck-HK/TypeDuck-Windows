@@ -56,3 +56,6 @@ build64-*
 cmake-build-ninja
 
 installer/stage
+
+# GSD local research cache
+.planning/research/.cache/
