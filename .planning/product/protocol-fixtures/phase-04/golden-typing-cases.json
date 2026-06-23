@@ -1,0 +1,102 @@
+{
+  "phase": "04-typeduck-protocol-and-typing-mvp",
+  "plan": "04-04",
+  "contract": "TypeDuck typing MVP golden proof cases",
+  "phase_4_rule": "prove raw protocol and typing behavior only; do not parse lookup-filter comments into Phase 5 dictionary UI fields",
+  "required_case_ids": [
+    "common-cantonese-input",
+    "raw-lookup-payload",
+    "reverse-lookup-marker",
+    "cangjie-key-forwarding",
+    "malformed-frame",
+    "oversized-frame",
+    "backend-timeout",
+    "backend-restart"
+  ],
+  "cases": [
+    {
+      "id": "common-cantonese-input",
+      "category": "typing",
+      "input_keys": ["n", "e", "i"],
+      "expected_observations": [
+        "composition",
+        "candidate_entries",
+        "candidate_cursor",
+        "candidate_page",
+        "commit"
+      ],
+      "acceptance": "records composition text, candidates, cursor/page data, and commit output from a backend response"
+    },
+    {
+      "id": "raw-lookup-payload",
+      "category": "raw-comment",
+      "candidate_text": "你",
+      "raw_lookup_comment_escaped": "\\u000bnei5\\u000c\\rnei,你,nei5,你,nei5,,,,,,pron,you (singular),,,,,,,",
+      "separator_code_points": ["U+000B", "U+000C", "U+000D"],
+      "forbidden_completion_evidence": [
+        "dictionary_ui",
+        "parsed_dictionary_rows",
+        "native_dictionary_view"
+      ],
+      "acceptance": "records escaped string and SHA-256 evidence proving control separators survive without Phase 5 parsing"
+    },
+    {
+      "id": "reverse-lookup-marker",
+      "category": "backend-owned-key-forwarding",
+      "expected_observations": [
+        "normal_key_request_fields",
+        "backend_supported_or_unsupported_status"
+      ],
+      "acceptance": "records forwarded key fields and engine-confirmed support state without frontend special casing"
+    },
+    {
+      "id": "cangjie-key-forwarding",
+      "category": "backend-owned-key-forwarding",
+      "expected_observations": [
+        "normal_key_request_fields",
+        "backend_supported_or_unsupported_status"
+      ],
+      "acceptance": "records forwarded key fields and engine-confirmed Cangjie version support state without frontend special casing"
+    },
+    {
+      "id": "malformed-frame",
+      "category": "recovery",
+      "expected_observations": [
+        "bounded_rejection",
+        "malformed_frame_error",
+        "no_stale_state"
+      ],
+      "acceptance": "records malformed protobuf or framing rejection with TypeDuck degraded/error semantics"
+    },
+    {
+      "id": "oversized-frame",
+      "category": "recovery",
+      "expected_observations": [
+        "payload_too_large_error",
+        "bounded_rejection",
+        "no_stale_state"
+      ],
+      "acceptance": "records oversized payload rejection at the configured Phase 4 frame limit"
+    },
+    {
+      "id": "backend-timeout",
+      "category": "recovery",
+      "expected_observations": [
+        "timeout_error",
+        "restarting_health",
+        "bounded_wait"
+      ],
+      "acceptance": "records timeout response before backend restart/cleanup"
+    },
+    {
+      "id": "backend-restart",
+      "category": "recovery",
+      "expected_observations": [
+        "restart_error",
+        "degraded_health",
+        "reset_or_reconnect"
+      ],
+      "acceptance": "records backend crash/read-error recovery with explicit degraded response"
+    }
+  ]
+}
