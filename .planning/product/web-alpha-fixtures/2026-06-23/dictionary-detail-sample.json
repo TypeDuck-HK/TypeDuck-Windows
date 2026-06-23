@@ -1,0 +1,127 @@
+{
+  "captureDate": "2026-06-23",
+  "status": "source-backed-with-partial-runtime-screenshot",
+  "runtimeEvidence": {
+    "url": "http://localhost:5173/TypeDuck-Web/aap2-alpha/",
+    "viewport": "1280x720",
+    "input": "nei",
+    "dictionaryPanelVisibleInAutomation": false,
+    "screenshot": {
+      "file": "screenshots/dictionary-detail-desktop-1280x720.png",
+      "status": "partial",
+      "limitation": "Playwright hover/move/touch automation did not display the dictionary panel, so no screenshot file was created."
+    }
+  },
+  "sourceEvidence": [
+    {
+      "file": "I:\\GitHub\\TypeDuck-Web\\src\\DictionaryPanel.tsx",
+      "commit": "db21054",
+      "evidence": "DictionaryPanel renders entry head, body, other data rows, and More Languages rows when CandidateInfo has dictionary entries."
+    },
+    {
+      "file": "I:\\GitHub\\TypeDuck-Web\\src\\CandidateInfo.ts",
+      "commit": "db21054",
+      "evidence": "CandidateEntry exposes honzi, Jyutping, part-of-speech, register, labels, definitions, written/vernacular/collocation rows, canonical reference, pronunciation notes, and other language definitions."
+    },
+    {
+      "file": "I:\\GitHub\\TypeDuck-Web\\src\\consts.ts",
+      "commit": "db21054",
+      "evidence": "Language names, part-of-speech labels, reading notes, registers, labels, and More Languages display names are mapped here."
+    },
+    {
+      "file": "I:\\GitHub\\TypeDuck-Web\\src\\index.css",
+      "commit": "db21054",
+      "evidence": "dictionary-panel, entry-head, entry-body, pos, lbl, th, and td styles define dictionary visual structure."
+    }
+  ],
+  "dictionaryFields": [
+    {
+      "field": "headword",
+      "sourceProperty": "CandidateEntry.honzi",
+      "example": "\u4f60",
+      "rendering": "entry-head large Chinese text with Kai fallback over Sung or Hei"
+    },
+    {
+      "field": "Jyutping",
+      "sourceProperty": "CandidateEntry.jyutping",
+      "example": "nei5",
+      "rendering": "entry-head secondary text"
+    },
+    {
+      "field": "reading notes",
+      "sourceProperty": "CandidateEntry.pronunciationType",
+      "example": "changed tone \u8b8a\u97f3, semantic reading \u8a13\u8b80, creative reading \u751f\u9020\u97f3, literary/colloquial reading notes when present",
+      "rendering": "entry-head parenthesized note"
+    },
+    {
+      "field": "part-of-speech",
+      "sourceProperty": "CandidateEntry.formattedPartsOfSpeech",
+      "example": "noun \u540d\u8a5e",
+      "rendering": "pos badge"
+    },
+    {
+      "field": "register",
+      "sourceProperty": "CandidateEntry.formattedRegister",
+      "example": "vernacular \u53e3\u8a9e",
+      "rendering": "italic secondary body text"
+    },
+    {
+      "field": "labels",
+      "sourceProperty": "CandidateEntry.formattedLabels",
+      "example": "(popular culture \u6d41\u884c\u6587\u5316)",
+      "rendering": "lbl secondary body text"
+    },
+    {
+      "field": "English meaning",
+      "sourceProperty": "properties.definition.eng",
+      "example": "you (singular)",
+      "rendering": "definition span in main display language"
+    },
+    {
+      "field": "More Languages",
+      "sourceProperty": "CandidateEntry.otherLanguages(preferences)",
+      "example": "Hindi, Indonesian, Nepali, Urdu rows when enabled and populated",
+      "rendering": "table with caption More Languages, language name in th, meaning in td"
+    },
+    {
+      "field": "written/vernacular/collocation",
+      "sourceProperty": "CandidateEntry.otherData",
+      "example": "Written Form \u66f8\u9762\u8a9e, Vernacular Form \u53e3\u8a9e, Collocation \u914d\u642d",
+      "rendering": "dictionary table rows"
+    },
+    {
+      "field": "canonical reference",
+      "sourceProperty": "CandidateEntry.canonicalReference",
+      "example": "\u2192ni1",
+      "rendering": "body reference text instead of a direct definition"
+    }
+  ],
+  "sampleEntryFromRuntimeCandidate": {
+    "headword": "\u4f60",
+    "jyutping": "nei5",
+    "partOfSpeech": "available when lookup-filter source data supplies partOfSpeech",
+    "englishMeaning": "you (singular)",
+    "readingNotes": "available when source data supplies pronunciation labels or literary/colloquial reading data",
+    "moreLanguages": {
+      "status": "source-backed",
+      "source": "DictionaryPanel.tsx renders More Languages rows from CandidateEntry.otherLanguages(preferences) for enabled non-main display languages.",
+      "languages": [
+        "Hindi",
+        "Indonesian",
+        "Nepali",
+        "Urdu"
+      ]
+    }
+  },
+  "visualTokens": {
+    "panel": "dictionary-panel uses base-300 background, rounded-md, px-5 pt-3 pb-4, text-[12pt], whitespace-normal, min-w-48.",
+    "headwordSize": "text-[32pt]",
+    "jyutpingSize": "text-[15pt]",
+    "partOfSpeechBadge": "font-light text-[10pt], border, rounded, p-0.5",
+    "caption": "More Languages caption uses font-medium text-[13pt]"
+  },
+  "limitations": [
+    "Dictionary screenshot is partial because automated runtime hover/touch attempts did not display the panel.",
+    "The sample entry uses runtime-observed candidate text and English meaning plus source-backed field structure; it is not a complete dictionary database dump."
+  ]
+}

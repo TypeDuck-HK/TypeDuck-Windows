@@ -1,0 +1,210 @@
+{
+  "captureDate": "2026-06-23",
+  "status": "source-backed",
+  "sourceEvidence": [
+    {
+      "file": "I:\\GitHub\\TypeDuck-Web\\src\\Preferences.tsx",
+      "commit": "db21054",
+      "evidence": "Preferences renders the settings in the listed order, with Display Languages first."
+    },
+    {
+      "file": "I:\\GitHub\\TypeDuck-Web\\src\\consts.ts",
+      "commit": "db21054",
+      "evidence": "LANGUAGE_LABELS, SHOW_ROMANIZATION_LABELS, and DEFAULT_PREFERENCES define labels, options, and defaults."
+    }
+  ],
+  "displayLanguageBehavior": {
+    "sectionLabel": "\u986f\u793a\u8a9e\u8a00 Display Languages",
+    "order": 1,
+    "defaultEnabledLanguages": [
+      "eng"
+    ],
+    "defaultMainLanguage": "eng",
+    "mainLanguageBehavior": "Selecting a main language also enables that display language.",
+    "mainLanguageMarker": "\u2b11 \u4e3b\u8981\u8a9e\u8a00 Main Language",
+    "languages": [
+      {
+        "id": "eng",
+        "code": "en",
+        "label": "\u82f1\u8a9e English",
+        "name": "English",
+        "defaultEnabled": true,
+        "defaultMain": true
+      },
+      {
+        "id": "hin",
+        "code": "hi",
+        "label": "\u5370\u5730\u8a9e Hindi",
+        "name": "Hindi",
+        "defaultEnabled": false,
+        "defaultMain": false
+      },
+      {
+        "id": "ind",
+        "code": "id",
+        "label": "\u5370\u5c3c\u8a9e Indonesian",
+        "name": "Indonesian",
+        "defaultEnabled": false,
+        "defaultMain": false
+      },
+      {
+        "id": "nep",
+        "code": "ne",
+        "label": "\u5c3c\u6cca\u723e\u8a9e Nepali",
+        "name": "Nepali",
+        "defaultEnabled": false,
+        "defaultMain": false
+      },
+      {
+        "id": "urd",
+        "code": "ur",
+        "label": "\u70cf\u723e\u90fd\u8a9e Urdu",
+        "name": "Urdu",
+        "defaultEnabled": false,
+        "defaultMain": false
+      }
+    ]
+  },
+  "settings": [
+    {
+      "order": 1,
+      "id": "displayLanguages",
+      "label": "\u986f\u793a\u8a9e\u8a00 Display Languages",
+      "control": "radio checkbox list",
+      "default": {
+        "enabled": [
+          "eng"
+        ],
+        "main": "eng"
+      },
+      "options": [
+        "\u82f1\u8a9e English",
+        "\u5370\u5730\u8a9e Hindi",
+        "\u5370\u5c3c\u8a9e Indonesian",
+        "\u5c3c\u6cca\u723e\u8a9e Nepali",
+        "\u70cf\u723e\u90fd\u8a9e Urdu"
+      ]
+    },
+    {
+      "order": 2,
+      "id": "pageSize",
+      "label": "\u6bcf\u9801\u5019\u9078\u8a5e\u6578\u91cf No. of Candidates Per Page",
+      "control": "range",
+      "default": 6,
+      "min": 4,
+      "max": 10,
+      "step": 1,
+      "ticks": [
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10
+      ]
+    },
+    {
+      "order": 3,
+      "id": "isHeiTypeface",
+      "label": "\u4e2d\u6587\u5b57\u9ad4 Chinese Typeface",
+      "control": "segmented",
+      "default": false,
+      "options": [
+        {
+          "value": false,
+          "label": "\u5b8b\u9ad4 Sung"
+        },
+        {
+          "value": true,
+          "label": "\u9ed1\u9ad4 Hei"
+        }
+      ]
+    },
+    {
+      "order": 4,
+      "id": "showRomanization",
+      "label": "\u5019\u9078\u8a5e\u7cb5\u62fc Candidates Jyutping",
+      "control": "radio list",
+      "default": "always",
+      "options": [
+        {
+          "value": "always",
+          "label": "\u986f\u793a Always Show"
+        },
+        {
+          "value": "reverse_only",
+          "label": "\u50c5\u53cd\u67e5 Only in Reverse Lookup"
+        },
+        {
+          "value": "never",
+          "label": "\u96b1\u85cf Hide"
+        }
+      ]
+    },
+    {
+      "order": 5,
+      "id": "enableCompletion",
+      "label": "\u81ea\u52d5\u5b8c\u6210 Auto-completion",
+      "control": "toggle",
+      "default": true
+    },
+    {
+      "order": 6,
+      "id": "enableCorrection",
+      "label": "\u81ea\u52d5\u6821\u6b63 Auto-correction",
+      "control": "toggle",
+      "default": false
+    },
+    {
+      "order": 7,
+      "id": "enableSentence",
+      "label": "\u81ea\u52d5\u7d44\u8a5e Auto-composition",
+      "control": "toggle",
+      "default": true
+    },
+    {
+      "order": 8,
+      "id": "enableLearning",
+      "label": "\u8f38\u5165\u8a18\u61b6 Input Memory",
+      "control": "toggle",
+      "default": true
+    },
+    {
+      "order": 9,
+      "id": "reverseLookupHeader",
+      "label": "\u53cd\u67e5\u8a2d\u5b9a Reverse Lookup Settings",
+      "control": "section heading",
+      "default": null
+    },
+    {
+      "order": 10,
+      "id": "showReverseCode",
+      "label": "\u986f\u793a\u5b8c\u6574\u8f38\u5165\u78bc Show Full Input Code",
+      "control": "toggle",
+      "default": true
+    },
+    {
+      "order": 11,
+      "id": "isCangjie5",
+      "label": "\u5009\u9821\u7248\u672c Cangjie Version",
+      "control": "segmented",
+      "default": true,
+      "options": [
+        {
+          "value": false,
+          "label": "\u4e09\u4ee3 Version 3"
+        },
+        {
+          "value": true,
+          "label": "\u4e94\u4ee3 Version 5"
+        }
+      ]
+    }
+  ],
+  "visualReference": {
+    "screenshot": "screenshots/settings-desktop-1280x720.png",
+    "status": "captured",
+    "viewport": "1280x720"
+  }
+}

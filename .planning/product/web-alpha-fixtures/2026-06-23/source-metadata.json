@@ -1,0 +1,103 @@
+{
+  "captureDate": "2026-06-23",
+  "captureStatus": "partial",
+  "statusReason": "Source, runtime URL, settings screenshot, and candidate screenshot were captured. Dictionary panel behavior is source-backed, but the desktop dictionary-detail screenshot is partial because Playwright hover/touch automation did not display the dictionary panel reliably.",
+  "alphaUrl": "http://localhost:5173/TypeDuck-Web/aap2-alpha/",
+  "runtimeAvailability": {
+    "status": "available",
+    "check": "Invoke-WebRequest -Uri http://localhost:5173/TypeDuck-Web/aap2-alpha/ -UseBasicParsing -TimeoutSec 5",
+    "httpStatus": 200,
+    "contentLength": 2208
+  },
+  "localSource": {
+    "path": "I:\\GitHub\\TypeDuck-Web",
+    "status": "available",
+    "branch": "aap2-alpha",
+    "commit": "db21054",
+    "dirtyStatus": "dirty",
+    "dirtyFiles": [
+      "M .gitignore",
+      "M README.md",
+      "m librime",
+      "m schema",
+      "M scripts/build_schema.ts"
+    ],
+    "sourceFilesRead": [
+      "I:\\GitHub\\TypeDuck-Web\\src\\Preferences.tsx",
+      "I:\\GitHub\\TypeDuck-Web\\src\\consts.ts",
+      "I:\\GitHub\\TypeDuck-Web\\src\\Candidate.tsx",
+      "I:\\GitHub\\TypeDuck-Web\\src\\CandidateInfo.ts",
+      "I:\\GitHub\\TypeDuck-Web\\src\\CandidatePanel.tsx",
+      "I:\\GitHub\\TypeDuck-Web\\src\\DictionaryPanel.tsx",
+      "I:\\GitHub\\TypeDuck-Web\\src\\index.css",
+      "I:\\GitHub\\TypeDuck-Web\\src\\types.ts",
+      "I:\\GitHub\\TypeDuck-Web\\tailwind.config.ts"
+    ]
+  },
+  "browserCapture": {
+    "tool": "Playwright",
+    "browser": "Google Chrome via Playwright Chromium launcher",
+    "browserExecutable": "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe",
+    "viewport": {
+      "width": 1280,
+      "height": 720,
+      "deviceScaleFactor": 1
+    },
+    "minimumSufficientPhase1Set": [
+      "settings-desktop-1280x720.png",
+      "candidate-desktop-1280x720.png",
+      "dictionary-detail-desktop-1280x720.png"
+    ],
+    "screenshots": [
+      {
+        "file": "screenshots/settings-desktop-1280x720.png",
+        "status": "captured",
+        "viewport": "1280x720",
+        "evidence": "Runtime page after network idle and settings section visible."
+      },
+      {
+        "file": "screenshots/candidate-desktop-1280x720.png",
+        "status": "captured",
+        "viewport": "1280x720",
+        "evidence": "Controlled textarea input `nei` produced a visible candidate panel."
+      },
+      {
+        "file": "screenshots/dictionary-detail-desktop-1280x720.png",
+        "status": "partial",
+        "viewport": "1280x720",
+        "limitation": "Candidate panel captured, but dictionary panel did not appear from controlled hover/move automation. A second touch-enabled attempt could not get a usable candidate button bounding box. Dictionary structure remains source-backed from DictionaryPanel.tsx and CandidateInfo.ts."
+      }
+    ]
+  },
+  "runtimeObservation": {
+    "inputAttempt": "Typed `nei` into the Web alpha textarea through Playwright.",
+    "candidatePanelVisible": true,
+    "candidatePanelText": "nei\u2038\n\u2039\n\u203a\n1.\t\nnei5\n\u4f60\n\t\t\nyou (singular)\n\t\u24d8\n2.\t\nnei4\n\u5c3c\n\t\t\nnun\n\t\u24d8\n3.\t\nnei1\n\u5462\n\t\t\u2192ni1\t\u24d8\n4.\t\nnei4\n\u59ae\n\t\t\nlittle girl\n\t\u24d8\n5.\t\nnei4\n\u5f4c\n\t\t\nfull; fill\n\t\u24d8\n6.\t\nnei5\n\u59b3\n\t\t\nyou\n\t\u24d8",
+    "dictionaryPanelVisible": false
+  },
+  "attemptedCommandsAndTools": [
+    "git -C I:\\GitHub\\TypeDuck-Web rev-parse --short HEAD",
+    "git -C I:\\GitHub\\TypeDuck-Web status --short",
+    "Invoke-WebRequest -Uri http://localhost:5173/TypeDuck-Web/aap2-alpha/ -UseBasicParsing -TimeoutSec 5",
+    "Playwright Chromium launch with viewport 1280x720 and Chrome executable C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe",
+    "Playwright textarea input `nei`, screenshot capture for settings and candidate panel",
+    "Playwright hover/mousemove/touchstart attempts for dictionary panel screenshot"
+  ],
+  "accessLimitations": [
+    {
+      "area": "source",
+      "status": "partial",
+      "detail": "Local TypeDuck-Web source is available, but the worktree is dirty, including modified files and submodule changes."
+    },
+    {
+      "area": "dictionary screenshot",
+      "status": "partial",
+      "detail": "Runtime dictionary panel did not appear under automated hover/touch capture despite source-backed dictionary behavior."
+    }
+  ],
+  "privacyNotes": [
+    "Candidate input used controlled sample text `nei` only.",
+    "No personal typed content or local user data was captured intentionally.",
+    "No production source, installer, registry, protocol, runtime path, or release workflow files were modified."
+  ]
+}

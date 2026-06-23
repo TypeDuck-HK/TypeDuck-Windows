@@ -1,0 +1,114 @@
+{
+  "captureDate": "2026-06-23",
+  "status": "runtime-and-source-backed",
+  "runtimeEvidence": {
+    "url": "http://localhost:5173/TypeDuck-Web/aap2-alpha/",
+    "viewport": "1280x720",
+    "input": "nei",
+    "screenshot": "screenshots/candidate-desktop-1280x720.png",
+    "candidatePanelVisible": true
+  },
+  "sourceEvidence": [
+    {
+      "file": "I:\\GitHub\\TypeDuck-Web\\src\\CandidatePanel.tsx",
+      "commit": "db21054",
+      "evidence": "CandidatePanel renders input buffer, page navigation, candidates table, highlighted index, and optional DictionaryPanel."
+    },
+    {
+      "file": "I:\\GitHub\\TypeDuck-Web\\src\\Candidate.tsx",
+      "commit": "db21054",
+      "evidence": "Candidate rows render label, Jyutping, Chinese text, note/full input code, definitions for enabled display languages, canonical reference or labels, and info indicator."
+    },
+    {
+      "file": "I:\\GitHub\\TypeDuck-Web\\src\\CandidateInfo.ts",
+      "commit": "db21054",
+      "evidence": "CandidateInfo parses comment strings into structured entries, dictionary fields, Jyutping, references, labels, and language definitions."
+    }
+  ],
+  "presentation": {
+    "inputBuffer": {
+      "active": "nei",
+      "shownInCandidatePanel": true
+    },
+    "pageNavigation": {
+      "prevButton": "\u2039",
+      "nextButton": "\u203a",
+      "source": "CandidatePanel.tsx"
+    },
+    "candidateColumns": [
+      "selection label",
+      "Jyutping when Candidates Jyutping permits",
+      "Chinese candidate text",
+      "input code or note when reverse lookup/full code permits",
+      "enabled display-language definitions or canonical/label text",
+      "dictionary info indicator"
+    ],
+    "defaultDisplayLanguageColumns": [
+      "English"
+    ],
+    "defaultPageSize": 6,
+    "highlightBehavior": "Highlighted rows use the Web alpha highlighted background token."
+  },
+  "sampleCandidates": [
+    {
+      "label": "1.",
+      "text": "\u4f60",
+      "jyutping": "nei5",
+      "englishMeaning": "you (singular)",
+      "hasDictionaryIndicator": true,
+      "runtimeObserved": true
+    },
+    {
+      "label": "2.",
+      "text": "\u5c3c",
+      "jyutping": "nei4",
+      "englishMeaning": "nun",
+      "hasDictionaryIndicator": true,
+      "runtimeObserved": true
+    },
+    {
+      "label": "3.",
+      "text": "\u5462",
+      "jyutping": "nei1",
+      "canonicalReference": "\u2192ni1",
+      "hasDictionaryIndicator": true,
+      "runtimeObserved": true
+    },
+    {
+      "label": "4.",
+      "text": "\u59ae",
+      "jyutping": "nei4",
+      "englishMeaning": "little girl",
+      "hasDictionaryIndicator": true,
+      "runtimeObserved": true
+    },
+    {
+      "label": "5.",
+      "text": "\u5f4c",
+      "jyutping": "nei4",
+      "englishMeaning": "full; fill",
+      "hasDictionaryIndicator": true,
+      "runtimeObserved": true
+    },
+    {
+      "label": "6.",
+      "text": "\u59b3",
+      "jyutping": "nei5",
+      "englishMeaning": "you",
+      "hasDictionaryIndicator": true,
+      "runtimeObserved": true
+    }
+  ],
+  "visualTokens": {
+    "sourceFiles": [
+      "I:\\GitHub\\TypeDuck-Web\\src\\index.css",
+      "I:\\GitHub\\TypeDuck-Web\\tailwind.config.ts"
+    ],
+    "panel": "candidate-panel uses flex absolute shadow, 0.1875rem base-400 border, base-100 background, 0.5625rem radius, overflow hidden, leading snug, whitespace nowrap.",
+    "highlight": "#fedc9c in light theme",
+    "border": "#ded9cf in light theme",
+    "background": "#ffffff candidate panel background in light theme",
+    "fontStack": "HK-aware sans/serif plus Chiron Sung HK and Chiron Hei HK tokens"
+  },
+  "limitations": []
+}
