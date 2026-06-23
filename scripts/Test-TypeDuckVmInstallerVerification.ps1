@@ -62,9 +62,25 @@ try {
             "startup entry",
             "scheduled task",
             "uninstall cleanup",
-            "screenshots"
+            "screenshots",
+            "registry-before.json",
+            "registry-after-install.json",
+            "registry-after-uninstall.json",
+            "vm-install-registration-uninstall.json",
+            "{7D92985A-BC53-47B5-A5CC-6E47F86B9D18}",
+            "{C6E8F5DF-6504-44F9-B7CF-17A195373A83}",
+            "TypeDuck 粵語輸入法 / TypeDuck Cantonese IME"
         )) {
         Assert-True ($notes -like "*$expectedText*") "Checklist missing expected text: $expectedText"
+    }
+    foreach ($unexpectedText in @(
+            '$vmDisplay',
+            '$installerDisplay',
+            '$kTypeDuckClsid',
+            '$kTypeDuckProfileGuid',
+            '$kTypeDuckDisplayName'
+        )) {
+        Assert-True ($notes -notlike "*$unexpectedText*") "Checklist contains unrendered or escaped text: $unexpectedText"
     }
 
     $evidence = Get-Content -Raw -LiteralPath $jsonPath | ConvertFrom-Json

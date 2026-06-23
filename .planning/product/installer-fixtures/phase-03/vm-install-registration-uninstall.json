@@ -1,9 +1,9 @@
 {
   "mode": "manual-checklist",
   "status": "needs-human-vm-verification",
-  "reason": "PowerShell Direct session failed: Cannot process command because of one or more missing mandatory parameters: Credential.",
-  "startedAt": "2026-06-23T16 時 29 時 00Z",
-  "endedAt": "2026-06-23T16 時 29 時 16Z",
+  "reason": "ManualChecklistOnly was specified.",
+  "startedAt": "2026-06-23T16 時 31 時 36Z",
+  "endedAt": "2026-06-23T16 時 31 時 36Z",
   "vm": {
     "name": "My Virtual Machine",
     "checkpointRequired": true

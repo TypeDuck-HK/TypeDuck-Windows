@@ -114,52 +114,52 @@ function New-ManualChecklistText {
 ## Safety
 
 - Do not install on the host machine.
-- Use Hyper-V VM `$vmDisplay`.
+- Use Hyper-V VM $vmDisplay.
 - Create a checkpoint before install unless using an already recorded clean checkpoint.
 - Capture screenshots only of installer/input settings surfaces; avoid personal typed content.
 
 ## Manual Checklist
 
 1. Host checkpoint:
-   - Run `Checkpoint-VM -Name "$vmDisplay" -SnapshotName "TypeDuck-Phase03-BeforeInstall"` or record the existing clean checkpoint name/id.
+   - Run ``Checkpoint-VM -Name "$vmDisplay" -SnapshotName "TypeDuck-Phase03-BeforeInstall"`` or record the existing clean checkpoint name/id.
    - Record VM Windows version from the guest.
 
 2. installer UI text:
-   - Launch `$installerDisplay` inside the VM.
+   - Launch $installerDisplay inside the VM.
    - Confirm TypeDuck branding is visible.
    - Confirm TypeDuck-controlled text is bilingual Traditional Hong Kong Chinese / English.
-   - Save screenshot as `installer-ui.png` if possible.
+   - Save screenshot as ``installer-ui.png`` if possible.
 
 3. Chinese (Traditional, Hong Kong) input settings appearance:
    - Open Windows Settings language/input pages in the VM.
-   - Confirm `TypeDuck 粵語輸入法 / TypeDuck Cantonese IME` appears under Chinese (Traditional, Hong Kong) / `zh-HK`.
-   - Save screenshot as `zh-hk-input-settings.png` if possible.
+   - Confirm ``TypeDuck 粵語輸入法 / TypeDuck Cantonese IME`` appears under Chinese (Traditional, Hong Kong) / ``zh-HK``.
+   - Save screenshot as ``zh-hk-input-settings.png`` if possible.
 
 4. Win32/x64 DLL registration:
-   - Confirm `C:\Windows\SysWOW64\TypeDuckTextService.dll` exists and record SHA-256.
-   - Confirm `C:\Windows\System32\TypeDuckTextService.dll` exists and record SHA-256.
-   - Confirm COM/TSF registration contains CLSID `$kTypeDuckClsid`.
-   - Confirm profile GUID `$kTypeDuckProfileGuid` and display text `$kTypeDuckDisplayName` are present.
+   - Confirm ``C:\Windows\SysWOW64\TypeDuckTextService.dll`` exists and record SHA-256.
+   - Confirm ``C:\Windows\System32\TypeDuckTextService.dll`` exists and record SHA-256.
+   - Confirm COM/TSF registration contains CLSID $kTypeDuckClsid.
+   - Confirm profile GUID $kTypeDuckProfileGuid and display text $kTypeDuckDisplayName are present.
 
 5. startup entry:
-   - Confirm `HKCU\Software\Microsoft\Windows\CurrentVersion\Run\TypeDuckLauncher` points to `TypeDuckLauncher.exe`.
+   - Confirm ``HKCU\Software\Microsoft\Windows\CurrentVersion\Run\TypeDuckLauncher`` points to ``TypeDuckLauncher.exe``.
 
 6. scheduled task:
-   - Confirm task `$kTaskName` is absent after normal install, or present only when restart-required fallback was documented.
+   - Confirm task $kTaskName is absent after normal install, or present only when restart-required fallback was documented.
 
 7. uninstall cleanup:
-   - Uninstall TypeDuck from Apps & Features or run the Inno uninstaller with `/VERYSILENT /SUPPRESSMSGBOXES /NORESTART`.
+   - Uninstall TypeDuck from Apps & Features or run the Inno uninstaller with ``/VERYSILENT /SUPPRESSMSGBOXES /NORESTART``.
    - Confirm TypeDuck disappears from Chinese (Traditional, Hong Kong) input methods.
    - Confirm TypeDuck CLSID/profile keys, startup entry, scheduled task, install directory, SysWOW64 DLL, and System32 DLL are removed.
    - If locked DLLs require reboot, reboot the VM and repeat cleanup checks.
 
 ## Expected Evidence Files
 
-- `registry-before.json`
-- `registry-after-install.json`
-- `registry-after-uninstall.json`
-- `vm-install-registration-uninstall.json`
-- Optional screenshots/limitations: `installer-ui.png`, `zh-hk-input-settings.png`
+- ``registry-before.json``
+- ``registry-after-install.json``
+- ``registry-after-uninstall.json``
+- ``vm-install-registration-uninstall.json``
+- Optional screenshots/limitations: ``installer-ui.png``, ``zh-hk-input-settings.png``
 
 ## Source Audit
 

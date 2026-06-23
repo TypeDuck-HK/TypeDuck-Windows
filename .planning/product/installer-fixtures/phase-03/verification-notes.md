@@ -1,8 +1,8 @@
 # TypeDuck Phase 03 VM Installer Verification Notes
 
 **Mode:** manual checklist
-**Reason:** PowerShell Direct session failed: Cannot process command because of one or more missing mandatory parameters: Credential.
-**Started:** 2026-06-23T16 時 29 時 00Z
+**Reason:** ManualChecklistOnly was specified.
+**Started:** 2026-06-23T16 時 31 時 36Z
 **VM:** My Virtual Machine
 **Installer:** D:\VSProjects\moqi-im-windows\installer\dist\typeduck-windows-ime-setup.exe
 **Installer SHA-256:** 7d72748067d029af188078d27683928124f3c75ad7d3cc3bc7945ea80176bac4
@@ -10,52 +10,52 @@
 ## Safety
 
 - Do not install on the host machine.
-- Use Hyper-V VM $vmDisplay.
+- Use Hyper-V VM My Virtual Machine.
 - Create a checkpoint before install unless using an already recorded clean checkpoint.
 - Capture screenshots only of installer/input settings surfaces; avoid personal typed content.
 
 ## Manual Checklist
 
 1. Host checkpoint:
-   - Run Checkpoint-VM -Name "My Virtual Machine" -SnapshotName "TypeDuck-Phase03-BeforeInstall" or record the existing clean checkpoint name/id.
+   - Run `Checkpoint-VM -Name "My Virtual Machine" -SnapshotName "TypeDuck-Phase03-BeforeInstall"` or record the existing clean checkpoint name/id.
    - Record VM Windows version from the guest.
 
 2. installer UI text:
-   - Launch $installerDisplay inside the VM.
+   - Launch D:\VSProjects\moqi-im-windows\installer\dist\typeduck-windows-ime-setup.exe inside the VM.
    - Confirm TypeDuck branding is visible.
    - Confirm TypeDuck-controlled text is bilingual Traditional Hong Kong Chinese / English.
-   - Save screenshot as installer-ui.png if possible.
+   - Save screenshot as `installer-ui.png` if possible.
 
 3. Chinese (Traditional, Hong Kong) input settings appearance:
    - Open Windows Settings language/input pages in the VM.
-   - Confirm TypeDuck 粵語輸入法 / TypeDuck Cantonese IME appears under Chinese (Traditional, Hong Kong) / zh-HK.
-   - Save screenshot as zh-hk-input-settings.png if possible.
+   - Confirm `TypeDuck 粵語輸入法 / TypeDuck Cantonese IME` appears under Chinese (Traditional, Hong Kong) / `zh-HK`.
+   - Save screenshot as `zh-hk-input-settings.png` if possible.
 
 4. Win32/x64 DLL registration:
-   - Confirm C:\Windows\SysWOW64\TypeDuckTextService.dll exists and record SHA-256.
-   - Confirm C:\Windows\System32\TypeDuckTextService.dll exists and record SHA-256.
-   - Confirm COM/TSF registration contains CLSID $kTypeDuckClsid.
-   - Confirm profile GUID $kTypeDuckProfileGuid and display text $kTypeDuckDisplayName are present.
+   - Confirm `C:\Windows\SysWOW64\TypeDuckTextService.dll` exists and record SHA-256.
+   - Confirm `C:\Windows\System32\TypeDuckTextService.dll` exists and record SHA-256.
+   - Confirm COM/TSF registration contains CLSID {7D92985A-BC53-47B5-A5CC-6E47F86B9D18}.
+   - Confirm profile GUID {C6E8F5DF-6504-44F9-B7CF-17A195373A83} and display text TypeDuck 粵語輸入法 / TypeDuck Cantonese IME are present.
 
 5. startup entry:
-   - Confirm HKCU\Software\Microsoft\Windows\CurrentVersion\Run\TypeDuckLauncher points to TypeDuckLauncher.exe.
+   - Confirm `HKCU\Software\Microsoft\Windows\CurrentVersion\Run\TypeDuckLauncher` points to `TypeDuckLauncher.exe`.
 
 6. scheduled task:
-   - Confirm task $kTaskName is absent after normal install, or present only when restart-required fallback was documented.
+   - Confirm task TypeDuckIME-ReRegisterTSF is absent after normal install, or present only when restart-required fallback was documented.
 
 7. uninstall cleanup:
-   - Uninstall TypeDuck from Apps & Features or run the Inno uninstaller with /VERYSILENT /SUPPRESSMSGBOXES /NORESTART.
+   - Uninstall TypeDuck from Apps & Features or run the Inno uninstaller with `/VERYSILENT /SUPPRESSMSGBOXES /NORESTART`.
    - Confirm TypeDuck disappears from Chinese (Traditional, Hong Kong) input methods.
    - Confirm TypeDuck CLSID/profile keys, startup entry, scheduled task, install directory, SysWOW64 DLL, and System32 DLL are removed.
    - If locked DLLs require reboot, reboot the VM and repeat cleanup checks.
 
 ## Expected Evidence Files
 
-- egistry-before.json
-- egistry-after-install.json
-- egistry-after-uninstall.json
-- m-install-registration-uninstall.json
-- Optional screenshots/limitations: installer-ui.png, zh-hk-input-settings.png
+- `registry-before.json`
+- `registry-after-install.json`
+- `registry-after-uninstall.json`
+- `vm-install-registration-uninstall.json`
+- Optional screenshots/limitations: `installer-ui.png`, `zh-hk-input-settings.png`
 
 ## Source Audit
 
