@@ -1,0 +1,65 @@
+{
+  "schema": "typeduck-lookup-filter-validation-v1",
+  "generatedAtUtc": "2026-06-23T12:51:31Z",
+  "inputs": {
+    "typingProofPath": "D:\\VSProjects\\moqi-im-windows\\.planning\\product\\engine-runtime-fixtures\\phase-02\\typing-proof.json",
+    "rawCommentsPath": "D:\\VSProjects\\moqi-im-windows\\.planning\\product\\engine-runtime-fixtures\\phase-02\\lookup-filter-raw-comments.ndjson",
+    "csvRowsPath": "D:\\VSProjects\\moqi-im-windows\\.planning\\product\\engine-runtime-fixtures\\phase-02\\lookup-filter-csv-rows.csv"
+  },
+  "expectedHeader": "match_input_buffer,honzi,jyutping,canonical_honzi,canonical_jyutping,components_honzi,components_jyutping,pron_label,lit_col_reading,pos,register,label,written_form,vernacular_form,collocation,eng,hin,urd,nep,ind",
+  "summary": {
+    "rawCommentRecords": 12,
+    "dictionaryRecordCount": 12,
+    "jyutpingOnlyRecordCount": 0,
+    "csvRowCount": 32,
+    "extractedDictionaryRows": 32,
+    "inputs": [
+      "housam",
+      "nei"
+    ]
+  },
+  "checks": [
+    {
+      "name": "parser-self-tests",
+      "passed": true,
+      "detail": "CSV quote/empty-field parsing and D-11 \\v/\\f/\\r separator parsing passed."
+    },
+    {
+      "name": "typing-proof-exists",
+      "passed": true,
+      "detail": "Loaded 12 candidate comments from typing-proof.json."
+    },
+    {
+      "name": "raw-comments-exist",
+      "passed": true,
+      "detail": "Loaded 12 raw comment records."
+    },
+    {
+      "name": "d-10-header-order",
+      "passed": true,
+      "detail": "CSV header is 'match_input_buffer,honzi,jyutping,canonical_honzi,canonical_jyutping,components_honzi,components_jyutping,pron_label,lit_col_reading,pos,register,label,written_form,vernacular_form,collocation,eng,hin,urd,nep,ind'."
+    },
+    {
+      "name": "d-12-csv-rows-parse",
+      "passed": true,
+      "detail": "Parsed 32 CSV evidence rows with quoted-field support."
+    },
+    {
+      "name": "d-11-raw-separators",
+      "passed": true,
+      "detail": "Validated 12 dictionary records, 0 Jyutping-only records, and 32 \\r-delimited dictionary rows."
+    },
+    {
+      "name": "csv-rows-match-raw-comments",
+      "passed": true,
+      "detail": "Raw dictionary rows: 32; CSV rows: 32; missing=0; extra=0."
+    },
+    {
+      "name": "dictionary-backed-fields",
+      "passed": true,
+      "detail": "Dictionary rows include English meaning, part-of-speech, reading/register notes, and enabled-language meanings."
+    }
+  ],
+  "status": "passed",
+  "failures": []
+}

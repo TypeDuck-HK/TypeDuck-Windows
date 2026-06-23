@@ -1,0 +1,33 @@
+match_input_buffer,honzi,jyutping,canonical_honzi,canonical_jyutping,components_honzi,components_jyutping,pron_label,lit_col_reading,pos,register,label,written_form,vernacular_form,collocation,eng,hin,urd,nep,ind
+1,你,nei5,,,,,,,oth,,,,,,you (singular),आप,تم,तपाईं,kamu
+1,尼,nei4,,,,,,,n,,,,,,nun,,,,kamu
+0,尼,nei6,,,,,,,,,,,,,,,,,
+0,尼,nei5,,,,,,,,,,,,,,,,,
+0,尼,ni1,,,,,,,,,,,,,,,,,
+1,呢,nei1,,ni1,,,,,oth,yue,,這,,,,,,,
+0,呢,ni1,,,,,,lit>nai4,oth,yue,,這,,,this,,,,
+0,呢,ne1,,,,,,,part,,,,,,(how about),(particle),(particle),,(imbuhan kata)
+0,呢,le1,,,,,,,,,,,,,,,,,
+0,呢,le4,,,,,,,,,,,,,,,,,
+0,呢,nei4,,,,,,,,,,,,,,,,,
+0,呢,li1,,,,,,,,,,,,,,,,,
+0,呢,nai4,,,,,,col<ni1,,,,,,,,,,,
+1,妮,nei4,,,,,,,n,,,,,,little girl,,,,
+1,彌,nei4,,,,,,,morph,,,,,彌補|彌留,full; fill,,,,penuh
+0,彌,mei4,,,,,,,,,,,,,,,,,
+0,彌,nei1,,,,,,,,,,,,,,,,,
+1,妳,nei5,,,,,,,oth,,,,,,you,आप,تم,तपाईं,Kamu
+0,妳,naai4,,,,,,,,,,,,,,,,,
+0,妳,naai5,,,,,,,,,,,,,,,,,
+1,好心,hou2sam1,,,,,,,adj|adv,yue,,拜托,,,kind; come on,दयालु,نرم دل,दयालु,baik hati
+1,好心你,hou2sam1nei5,,,好心|你,hou2sam1|nei5,,,,,,,,,,,,,
+1,好心,hou2sam1,,,,,,,adj|adv,yue,,拜托,,,kind; come on,दयालु,نرم دل,दयालु,baik hati
+1,你,nei5,,,,,,,oth,,,,,,you (singular),आप,تم,तपाईं,kamu
+1,好,hou2,,,,,,,adj,,,,,,good; very,बहुत,بہت,धेरै,sangat
+1,好,hou3,,,,,,,v,,,,,,like,पसंद,جیسے,जस्तै,suka
+1,號,hou6,,,,,,,morph,,,,,暗號|號碼,sign; number,संख्या,نمبر,संख्या,jumlah
+0,號,hou2,,,,,sandhi,,,,,,,,,,,,
+0,號,hou4,,,,,,,,,,,,,,,,,
+1,豪,hou4,,,,,,,adj,,,,,,rich,,,,
+1,毫,hou4,,,,,,,mw,,,,,,10 cents,,,,mili-
+0,毫,hou2,,,,,sandhi,,,,,,,,,,,,
