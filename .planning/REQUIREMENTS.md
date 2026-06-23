@@ -8,7 +8,7 @@
 ### Product Identity
 
 - [ ] **IDEN-01**: User sees TypeDuck, not Moqi, in installer title text, installed app names, tray/menu surfaces, binary/resource metadata, logs, data paths, and release artifact names.
-- [ ] **IDEN-02**: Developer has a single TypeDuck identity contract covering executable names, DLL names, AppId/CLSID/profile GUIDs, install directories, log/data directories, pipe/mutex names, registry keys, resource strings, and release artifact names.
+- [x] **IDEN-02**: Developer has a single TypeDuck identity contract covering executable names, DLL names, AppId/CLSID/profile GUIDs, install directories, log/data directories, pipe/mutex names, registry keys, resource strings, and release artifact names.
 - [ ] **IDEN-03**: User-facing surfaces contain no visible Moqi product strings after the TypeDuck identity phase.
 - [ ] **IDEN-04**: User-facing surfaces contain no visible fcitx, WebDAV/cloud clipboard, or AI feature references in the v1 product.
 
@@ -139,7 +139,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | Requirement | Phase | Status |
 |-------------|-------|--------|
 | IDEN-01 | Phase 6 | Pending |
-| IDEN-02 | Phase 1 | Pending |
+| IDEN-02 | Phase 1 | Complete |
 | IDEN-03 | Phase 6 | Pending |
 | IDEN-04 | Phase 6 | Pending |
 | INST-01 | Phase 3 | Pending |
@@ -198,6 +198,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | VER-06 | Phase 7 | Pending |
 
 **Coverage:**
+
 - v1 requirements: 58 total
 - Mapped to phases: 58
 - Unmapped: 0
