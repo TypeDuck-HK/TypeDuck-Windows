@@ -24,7 +24,7 @@ progress:
 See: .planning/PROJECT.md (updated 2026-06-23)
 
 **Core value:** Hong Kong users can install TypeDuck under Chinese (Traditional, Hong Kong) and type Cantonese with the same trusted behavior, bilingual settings, candidate details, and dictionary-like lookup experience as TypeDuck Web alpha.
-**Current focus:** Phase 2: Engine Runtime Contract Spike
+**Current focus:** Phase 3: zh-HK TSF Registration and Installer Skeleton
 
 ## Current Position
 
