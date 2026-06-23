@@ -40,6 +40,11 @@ This phase makes TypeDuck installable and removable as a deterministic Chinese (
 ### the agent's Discretion
 The user selected all gray areas with the agent's recommendations. The planner may choose the exact implementation split across plans, but should keep the first pass small enough to verify clean install, profile appearance under Chinese (Traditional, Hong Kong), dual-bitness registration, and uninstall cleanup before adding broader product cleanup.
 
+### Verification Environment
+- **D-17:** Phase 3 acceptance requires a clean Windows 10/11 VM or equivalent disposable Windows test environment. Prefer a Hyper-V checkpoint before installing TypeDuck.
+- **D-18:** Code review/build checks are not sufficient for Phase 3. Plans must collect VM evidence for install/register/uninstall behavior, `zh-HK` profile appearance, dual-bitness DLL registration, startup entry, scheduled task/reboot fallback where applicable, and cleanup after uninstall.
+- **D-19:** Main-machine installation should not be the first verification target. Use the VM path first, then consider local installation only after the VM evidence is boring.
+
 </decisions>
 
 <canonical_refs>
@@ -107,7 +112,7 @@ The user selected all gray areas with the agent's recommendations. The planner m
 - Implement the TypeDuck profile as a small first-party profile metadata table or helper in the TSF DLL registration path, seeded from `.planning/product/TYPEDUCK-IDENTITY-CONTRACT.md`.
 - Keep any backend-driven profile scanning behind a transition guard or optional path, but ensure absence/malformed `ime.json` cannot prevent the TypeDuck `zh-HK` profile from registering.
 - Prefer bilingual labels in the compact form `Traditional Hong Kong Chinese / English`, for example `TypeDuck 粵語輸入法 / TypeDuck Cantonese IME`.
-- Treat Phase 3 verification as install/register/uninstall evidence: installer launches, Windows exposes TypeDuck under Chinese (Traditional, Hong Kong), both bitness DLLs register, and uninstall removes TypeDuck-owned residue.
+- Treat Phase 3 verification as VM-backed install/register/uninstall evidence: installer launches, Windows exposes TypeDuck under Chinese (Traditional, Hong Kong), both bitness DLLs register, and uninstall removes TypeDuck-owned residue.
 
 </specifics>
 

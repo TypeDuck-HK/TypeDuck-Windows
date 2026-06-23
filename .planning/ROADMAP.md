@@ -79,6 +79,8 @@ Plans:
   4. TypeDuck works from both 32-bit and 64-bit host applications after installer registration.
   5. User can uninstall TypeDuck without leaving broken TypeDuck TSF registrations, startup entries, install files, or runtime registry/profile residue.
 
+**Verification Environment**: Requires clean Windows 10/11 VM or equivalent disposable Windows test environment evidence. Prefer Hyper-V checkpoint before installer tests. Code review/build checks are not enough for this phase.
+
 **Plans**: TBD
 **UI hint**: yes
 
@@ -94,6 +96,8 @@ Plans:
   3. Developer can inspect versioned TypeDuck protocol frames carrying structured candidate, dictionary lookup, settings, capability, deploy/reconfigure, health, and error data.
   4. Developer can run golden protocol fixtures covering common Cantonese input, dictionary lookup, reverse lookup, malformed payload, timeout, and engine restart cases.
   5. User can use TypeDuck-supported candidate count, reverse lookup, and Cangjie Version 3 or Version 5 behavior where the engine confirms support.
+
+**Verification Environment**: Mostly code-testable through protocol, parser, engine-adapter, frame-bound, timeout, and fixture tests. Once TSF typing is wired, include a targeted Windows VM smoke test for real host-process typing responsiveness.
 
 **Plans**: TBD
 
@@ -111,6 +115,8 @@ Plans:
   5. User can configure display languages, main display language, candidate count, Jyutping visibility, Chinese typeface, Auto-completion, Auto-correction, Auto-composition, Input Memory, Reverse Lookup Settings, Show Full Input Code, and supported Cangjie behavior; settings persist locally and apply to subsequent IME sessions.
   6. User can open an About dialog showing TypeDuck Windows IME identity, version, and relevant engine/schema attribution in bilingual text.
 
+**Verification Environment**: Requires Windows VM or equivalent Windows test machine evidence for real TSF candidate placement, focus behavior, settings entry points, installer-first-run settings, high DPI, and representative host apps. Preview harness screenshots are helpful but insufficient alone.
+
 **Plans**: TBD
 **UI hint**: yes
 
@@ -127,6 +133,8 @@ Plans:
   4. Runtime logs and diagnostics use TypeDuck-owned paths and avoid raw typed content by default.
   5. Named pipe access, client/server identity checks, frame-size limits, first-party settings launch, and installer cleanup avoid obvious spoofing, oversized-frame abuse, arbitrary config-tool launch, and broad legacy process kills.
   6. Developer can run automated or scripted checks that fail on visible Moqi, fcitx, WebDAV/cloud clipboard, AI, or Simplified-only strings in user-facing resources.
+
+**Verification Environment**: Mixed. Static/code tests are expected for audits, parser bounds, logging defaults, and removed handlers. Add targeted Windows VM smoke evidence for installed-path privacy, launcher/runtime behavior, config-tool removal, pipe behavior, and absence of legacy feature surfaces after installation.
 
 **Plans**: TBD
 **UI hint**: yes

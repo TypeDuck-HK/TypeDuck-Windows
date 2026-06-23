@@ -74,6 +74,14 @@ Hong Kong users can install TypeDuck under Chinese (Traditional, Hong Kong) and 
 - **UX scope**: Remove unused and excessive features; keep only TypeDuck-relevant settings and Web-alpha-accepted customization.
 - **Compatibility**: Changes must respect Windows TSF/COM bitness, installer registration, and host-process behavior.
 
+## Verification Environment Expectations
+
+- **Phase 3 requires Windows VM evidence.** Installer, TSF registration, dual-bitness DLL deployment, language profile placement, uninstall/reinstall, and reboot-required registration behavior must be verified in a clean Windows 10/11 VM or equivalent disposable Windows test environment. Prefer Hyper-V checkpoints before install tests.
+- **Phase 4 is mostly code-testable, with a VM smoke once TSF typing is wired.** Protocol, frame bounds, payload parsing, engine adapter behavior, and timeout handling should have automated code tests; real TSF typing and host-process responsiveness still need a targeted Windows VM smoke test before the phase is accepted.
+- **Phase 5 requires Windows VM/host-app UI evidence.** Preview harnesses are useful for fast layout iteration, but candidate placement, focus behavior, settings launch, installer-first-run settings, high DPI, and representative host apps must be verified in a Windows VM or equivalent test machine.
+- **Phase 6 is mixed.** Static audits and code tests can cover banned strings, removed handlers, parser bounds, and logging defaults, but installed-path privacy, launcher/runtime behavior, config-tool removal, pipe behavior, and absence of legacy feature surfaces should receive targeted Windows VM smoke evidence.
+- **Phase 7 formalizes the full matrix.** It should gather the final clean install, upgrade/reinstall, uninstall, reboot, host app, DPI, bitness, protocol recovery, and release artifact evidence.
+
 ## Key Decisions
 
 | Decision | Rationale | Outcome |
@@ -88,6 +96,7 @@ Hong Kong users can install TypeDuck under Chinese (Traditional, Hong Kong) and 
 | Preserve raw lookup-filter payloads before designing final protocol/UI fields | Phase 2 captured the exact CSV columns and control-separator semantics so Phase 4/5 can map data without guessing. | Accepted in Phase 2 |
 | Run project PowerShell scripts with `pwsh` | PowerShell 7+ avoids character-encoding failures observed with Cantonese/Traditional Chinese literals and proof artifacts; future plans and verification commands should prefer `pwsh -NoProfile -ExecutionPolicy Bypass -File ...`. | Accepted after Phase 2 UAT |
 | Remove `ime.json` as product authority after transition | It can help bridge the Moqi scaffold, but the final TypeDuck product must not depend on backend JSON for Windows profile identity, settings entry points, or capability contracts. | Accepted before Phase 3 planning |
+| Use disposable Windows VM evidence for Windows-integrated phases | TSF registration, system DLL registration, host-app candidate placement, and installed launcher behavior cannot be proven by code-only tests. | Accepted before Phase 3 planning |
 
 ## Evolution
 
