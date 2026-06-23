@@ -25,7 +25,7 @@ human_verification_completed:
 
 ### User Flow Coverage
 
-ROADMAP marks Phase 1 as `mode: mvp`, but the ROADMAP goal is not in user-story format. `user-story.validate` returned `false`. Per the user's verification brief, this report verifies the concrete documentation/fixture outcome goal-backward. The phase is documentation/fixture-only, so "user flow" means a developer can inspect and consume the source-of-truth artifacts.
+Per the user's verification brief, this report verifies the concrete documentation/fixture outcome goal-backward. The phase is documentation/fixture-only, so "user flow" means a developer can inspect and consume the source-of-truth artifacts.
 
 | Step | Expected | Evidence | Status |
 |------|----------|----------|--------|

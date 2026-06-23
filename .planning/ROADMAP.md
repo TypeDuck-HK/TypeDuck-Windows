@@ -26,7 +26,6 @@ Decimal phases appear between their surrounding integers in numeric order.
 ### Phase 1: Identity and Web Parity Contract
 
 **Goal**: Developer has a single source of truth for TypeDuck identity and Web alpha parity before product behavior is changed.
-**Mode:** mvp
 **Depends on**: Nothing (first phase)
 **Requirements**: IDEN-02, VER-01
 **Success Criteria** (what must be TRUE):
@@ -44,7 +43,6 @@ Plans:
 ### Phase 2: Engine Runtime Contract Spike
 
 **Goal**: Developer can prove that TypeDuck-HK librime, lookup-filter, schemas, dictionaries, and built assets produce the candidate and dictionary data TypeDuck Windows needs.
-**Mode:** mvp
 **Depends on**: Phase 1
 **Requirements**: ENG-01, ENG-02, ENG-03, ENG-04, ENG-05
 **Success Criteria** (what must be TRUE):
@@ -71,7 +69,6 @@ Plans:
 ### Phase 3: zh-HK TSF Registration and Installer Skeleton
 
 **Goal**: User can install and remove TypeDuck as a Chinese (Traditional, Hong Kong) Windows IME with deterministic first-party registration.
-**Mode:** mvp
 **Depends on**: Phase 2
 **Requirements**: INST-01, INST-02, INST-03, INST-04, INST-05
 **Success Criteria** (what must be TRUE):
@@ -88,7 +85,6 @@ Plans:
 ### Phase 4: TypeDuck Protocol and Typing MVP
 
 **Goal**: User can type Cantonese through TypeDuck with responsive key handling while TSF, launcher, and engine exchange bounded structured TypeDuck data.
-**Mode:** mvp
 **Depends on**: Phase 3
 **Requirements**: ENG-06, PROTO-01, PROTO-02, PROTO-03, PROTO-04, PROTO-05, PROTO-06, TYPE-01, TYPE-02, TYPE-03, TYPE-04, TYPE-05
 **Success Criteria** (what must be TRUE):
@@ -104,7 +100,6 @@ Plans:
 ### Phase 5: Candidate, Dictionary, Settings, and About UI Parity
 
 **Goal**: User can see and configure the native Windows TypeDuck experience with candidate, dictionary, settings, installer-first-run, and About surfaces matching the Web alpha contract.
-**Mode:** mvp
 **Depends on**: Phase 4
 **Requirements**: INST-06, CAND-01, CAND-02, CAND-03, CAND-04, CAND-05, CAND-06, CAND-07, SET-01, SET-02, SET-03, SET-04, SET-05, SET-06, SET-07, SET-08, SET-09, SET-10, LANG-03
 **Success Criteria** (what must be TRUE):
@@ -122,7 +117,6 @@ Plans:
 ### Phase 6: Privacy, Security, and Scaffold Cleanup
 
 **Goal**: User sees only TypeDuck v1 behavior while local diagnostics, IPC, process cleanup, and user-facing copy meet TypeDuck privacy and security expectations.
-**Mode:** mvp
 **Depends on**: Phase 5
 **Requirements**: IDEN-01, IDEN-03, IDEN-04, LANG-01, LANG-02, SEC-01, SEC-02, SEC-03, SEC-04, SEC-05, VER-02
 **Success Criteria** (what must be TRUE):
@@ -140,7 +134,6 @@ Plans:
 ### Phase 7: Compatibility and Release Verification
 
 **Goal**: Developer can produce a TypeDuck v1 installer artifact backed by repeatable Windows installation, typing, UI, protocol, and release evidence.
-**Mode:** mvp
 **Depends on**: Phase 6
 **Requirements**: VER-03, VER-04, VER-05, VER-06
 **Success Criteria** (what must be TRUE):
@@ -160,7 +153,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Identity and Web Parity Contract | 2/2 | Complete   | 2026-06-23 |
-| 2. Engine Runtime Contract Spike | 3/3 | Complete   | 2026-06-23 |
+| 2. Engine Runtime Contract Spike | 3/3 | Complete    | 2026-06-23 |
 | 3. zh-HK TSF Registration and Installer Skeleton | 0/TBD | Not started | - |
 | 4. TypeDuck Protocol and Typing MVP | 0/TBD | Not started | - |
 | 5. Candidate, Dictionary, Settings, and About UI Parity | 0/TBD | Not started | - |

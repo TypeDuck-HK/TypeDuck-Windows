@@ -25,11 +25,13 @@ Hong Kong users can install TypeDuck under Chinese (Traditional, Hong Kong) and 
 - The current repo can serve as a Windows TSF scaffold with build, installer, launcher, and candidate-window foundations.
 - ✓ TypeDuck identity, proposed identifiers, runtime paths, registry/profile names, and release artifact naming are centralized in the Phase 1 identity contract.
 - ✓ The 2026-06-23 TypeDuck Web alpha fixture set captures settings, candidate, dictionary-panel, reverse lookup, provenance, and source-code layout authority for downstream parity work.
+- ✓ Phase 2 proved the pinned TypeDuck-HK librime release, schema branch, lookup-filter provenance, dictionaries, OpenCC assets, and built schema artifacts in a Windows-shaped staged runtime.
+- ✓ Phase 2 proved Cantonese composition, candidate pages, Jyutping/comment data, commit output, and raw lookup-filter dictionary payload evidence through the internal moqi-ime adapter boundary.
 
 ### Active
 
-- [ ] Plug the TypeDuck-HK librime fork into the Windows IME runtime.
-- [ ] Include the TypeDuck-HK `rime-dictionary-lookup-filter` plugin submodule/runtime support so translations and dictionary-like candidate data can be displayed.
+- [ ] Integrate the Phase 2 TypeDuck-HK runtime proof into the Windows installer/runtime path.
+- [ ] Map Phase 2 lookup-filter raw payload evidence into TypeDuck protocol and native candidate/dictionary UI fields.
 - [ ] Replace Moqi product identity with TypeDuck identity across binaries, resources, installer, registry/profile metadata, data/log paths, and release artifacts.
 - [ ] Install/register the IME under Chinese (Traditional, Hong Kong), not Chinese (Simplified).
 - [ ] Mirror TypeDuck Web alpha settings in a native Windows settings dialog, with the language picker as the first priority.
@@ -55,7 +57,7 @@ Hong Kong users can install TypeDuck under Chinese (Traditional, Hong Kong) and 
 - Display language options currently visible in the alpha are English, Hindi, Indonesian, Nepali, and Urdu, with a main-language marker and per-language enablement.
 - Candidate UI screenshots show the candidate list plus a larger dictionary panel containing Chinese terms, Jyutping, part-of-speech labels, English meanings, reading notes, and "More Languages" blocks when additional languages are enabled.
 - The current scaffold uses C++20, Win32/COM/TSF, libIME2, libuv, protobuf, JsonCpp, spdlog, Inno Setup, and PowerShell packaging.
-- The current scaffold launches a legacy backend through `backends.json`, named pipes, and protobuf frames. TypeDuck needs an engine boundary decision for librime and dictionary lookup data.
+- The current scaffold launches a legacy backend through `backends.json`, named pipes, and protobuf frames. Phase 2 proved this boundary can host the TypeDuck-HK runtime as an internal compatibility adapter; later phases still need TypeDuck protocol, installer, and UI integration.
 - Codebase map reference: `.planning/codebase/`.
 
 ## Constraints
@@ -77,9 +79,11 @@ Hong Kong users can install TypeDuck under Chinese (Traditional, Hong Kong) and 
 | Treat Moqi as scaffold, not product target | User explicitly wants to turn another product into TypeDuck; divergence is expected. | - Pending |
 | Use TypeDuck Web alpha as behavioral and visual source of truth | The alpha will become the shipped public web product. | - Pending |
 | Use Quality model profile for GSD planning | User approved Quality for model profile and defaults for other workflow settings. | - Pending |
-| Structure work as vertical MVP phases | Each phase should move toward a usable Windows IME slice rather than isolated technical layers. | - Pending |
+| Structure work as scoped milestone phases | Phase work should stay tied to the roadmap goal and verification evidence without requiring MVP-mode user-story gates for technical spikes. | Accepted after Phase 2 |
 | Centralize TypeDuck identity before production renames | Phase 1 locked first-party names, proposed AppId/CLSID/profile GUIDs, zh-HK bilingual profile text, paths, registry keys, and artifact names before implementation consumes them. | Accepted in Phase 1 |
 | Treat dictionary layout as source-code-followable, with screenshots as evidence | The Web alpha source defines exact layout while captured dictionary-panel screenshots prove the panel can be inspected visually. | Accepted in Phase 1 |
+| Use moqi-ime only as an internal TypeDuck runtime proof adapter | Phase 2 proved TypeDuck-HK librime and lookup-filter behavior through the existing process boundary while keeping Moqi/fcitx/cloud/AI surfaces banned from product truth. | Accepted in Phase 2 |
+| Preserve raw lookup-filter payloads before designing final protocol/UI fields | Phase 2 captured the exact CSV columns and control-separator semantics so Phase 4/5 can map data without guessing. | Accepted in Phase 2 |
 
 ## Evolution
 
@@ -97,4 +101,4 @@ After each milestone:
 4. Confirm candidate/dictionary display against TypeDuck Web alpha.
 
 ---
-*Last updated: 2026-06-23 after Phase 1 verification*
+*Last updated: 2026-06-23 after Phase 2 verification*
