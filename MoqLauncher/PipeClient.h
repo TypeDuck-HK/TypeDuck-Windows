@@ -60,8 +60,20 @@ public:
     void writePipe(const char* data, size_t len) {
         // we got a response before request timeout, so stop the timer
         stopRequestTimeoutTimer();
+        pendingSeqNum_ = 0;
+        pendingMethod_ = moqi::protocol::METHOD_UNSPECIFIED;
         pipe_.write(data, len);
     }
+
+    bool writeBackendResponse(std::uint32_t seqNum, const char* data, size_t len);
+
+    void writeTypeDuckErrorResponse(
+        std::uint32_t seqNum,
+        moqi::protocol::TypeDuckErrorCode errorCode,
+        const std::string& message,
+        moqi::protocol::TypeDuckHealthStatus healthStatus,
+        bool recoverable,
+        const std::string& detail = {});
 
 	bool initBackend(const moqi::protocol::ClientRequest& params);
 
@@ -73,6 +85,8 @@ private:
     void onReadError(int error);
 
     void handleClientMessage(const char* readBuf, size_t len);
+
+    void handleClientFrameViolation();
 
     void startRequestTimeoutTimer(std::uint64_t timeoutMs);
 
@@ -87,6 +101,8 @@ private:
 	// timer used to wait for response from backend server
 	std::unique_ptr<uv_timer_t> waitResponseTimer_;
     Proto::FrameBuffer readBuffer_;
+    std::uint32_t pendingSeqNum_ = 0;
+    moqi::protocol::Method pendingMethod_ = moqi::protocol::METHOD_UNSPECIFIED;
 };
 
 } // namespace Moqi

@@ -68,6 +68,9 @@ static constexpr UINT ID_CLIPBOARD_DEBOUNCE_TIMER = 2001;
 static constexpr UINT CLIPBOARD_DEBOUNCE_MS = 400;
 static constexpr UINT MAIN_SHELL_NOTIFY_ICON_ID = 1;
 static constexpr UINT TRAY_NOTIFICATION_TIMEOUT_MS = 5000;
+static constexpr char kTypeDuckProfileGuid[] =
+    "{c6e8f5df-6504-44f9-b7cf-17a195373a83}";
+static constexpr char kTypeDuckBackendBridgeName[] = "typeduck-runtime-bridge";
 
 static constexpr UINT ID_ENABLE_DEBUG_LOG = 1000;
 static constexpr UINT ID_SHOW_DEBUG_LOGS = 1001;
@@ -85,6 +88,19 @@ static void copyNotifyText(wchar_t *dest, size_t destCount, const std::wstring &
     return;
   }
   wcsncpy_s(dest, destCount, text.c_str(), _TRUNCATE);
+}
+
+static std::string normalizeGuidKey(std::string guid) {
+  std::transform(
+      guid.begin(), guid.end(), guid.begin(),
+      [](unsigned char ch) { return static_cast<char>(std::tolower(ch)); });
+  if (!guid.empty() && guid.front() != '{') {
+    guid.insert(guid.begin(), '{');
+  }
+  if (!guid.empty() && guid.back() != '}') {
+    guid.push_back('}');
+  }
+  return guid;
 }
 
 PipeServer::PipeServer()
@@ -165,8 +181,18 @@ void PipeServer::initBackendServers(const std::wstring &topDirPath) {
     }
   }
 
-  // maps language profiles to backend names
+  seedTypeDuckProfileBackendMapping();
+
+  // maps optional backend compatibility metadata to backend names
   initInputMethods(topDirPath);
+}
+
+void PipeServer::seedTypeDuckProfileBackendMapping() {
+  if (auto backend = backendFromName(kTypeDuckBackendBridgeName)) {
+    backendMap_[kTypeDuckProfileGuid] = backend;
+  } else {
+    logger_->error("TypeDuck runtime bridge backend is not configured");
+  }
 }
 
 void PipeServer::initInputMethods(const std::wstring &topDirPath) {
@@ -196,11 +222,8 @@ void PipeServer::initInputMethods(const std::wstring &topDirPath) {
             // load the json file to get the info of input method
             Json::Value json;
             if (loadJsonFile(imejson, json)) {
-              std::string guid = json["guid"].asString();
-              std::transform(
-                  guid.begin(), guid.end(), guid.begin(),
-                  [](unsigned char ch) { return static_cast<char>(std::tolower(ch)); }); // convert GUID to lower case
-                                  // map text service GUID to its backend server
+              std::string guid = normalizeGuidKey(json["guid"].asString());
+              // map text service GUID to its backend server
               backendMap_.insert(std::make_pair(
                   guid, backendFromName(backend->name_.c_str())));
             }
@@ -332,8 +355,23 @@ void PipeServer::onBackendClosed(BackendServer *backend) {
   }
 }
 
+void PipeServer::notifyClientsOfBackendError(
+    BackendServer *backend,
+    moqi::protocol::TypeDuckErrorCode errorCode,
+    const std::string &message,
+    moqi::protocol::TypeDuckHealthStatus healthStatus,
+    bool recoverable,
+    const std::string &detail) {
+  for (auto client : clients_) {
+    if (client->backend_ == backend) {
+      client->writeTypeDuckErrorResponse(
+          0, errorCode, message, healthStatus, recoverable, detail);
+    }
+  }
+}
+
 BackendServer *PipeServer::backendFromLangProfileGuid(const char *guid) {
-  auto it = backendMap_.find(guid);
+  auto it = backendMap_.find(normalizeGuidKey(guid != nullptr ? guid : ""));
   if (it != backendMap_.end()) // found the backend for the text service
     return it->second;
   return nullptr;
@@ -737,7 +775,7 @@ void PipeServer::processClipboardUploadOnUvThread() {
   if (text.empty() || !isCloudClipboardEnabled()) {
     return;
   }
-  BackendServer *backend = backendFromName("moqi-ime");
+  BackendServer *backend = backendFromName(kTypeDuckBackendBridgeName);
   if (backend == nullptr) {
     return;
   }

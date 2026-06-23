@@ -55,13 +55,13 @@ public:
 		return name_;
 	}
 
-	void startProcess();
+	bool startProcess();
 
-	void terminateProcess();
+	void terminateProcess(bool notifyClients = true);
 
 	bool isProcessRunning();
 
-	void restartProcess();
+	bool restartProcess();
 
 	std::shared_ptr<spdlog::logger>& logger();
 

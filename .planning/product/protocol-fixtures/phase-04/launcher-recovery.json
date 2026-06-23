@@ -8,7 +8,7 @@
     "launcher_to_backend": "backend process stdin/stdout using length-prefixed protobuf frames"
   },
   "profile_mapping": {
-    "typeduck_profile_guid": "c6e8f5df-6504-44f9-b7cf-17a195373a83",
+    "typeduck_profile_guid": "{c6e8f5df-6504-44f9-b7cf-17a195373a83}",
     "backend_bridge_name": "typeduck-runtime-bridge",
     "backend_ime_json_authority": "optional compatibility metadata only"
   },

@@ -77,6 +77,14 @@ public:
 
 	void onBackendClosed(BackendServer* backend);
 
+	void notifyClientsOfBackendError(
+	    BackendServer* backend,
+	    moqi::protocol::TypeDuckErrorCode errorCode,
+	    const std::string& message,
+	    moqi::protocol::TypeDuckHealthStatus healthStatus,
+	    bool recoverable,
+	    const std::string& detail = {});
+
 	void removeClient(PipeClient* client);
 
 private:
@@ -101,6 +109,7 @@ private:
 
 	// backend server
 	void initBackendServers(const std::wstring& topDirPath);
+	void seedTypeDuckProfileBackendMapping();
 	void initInputMethods(const std::wstring& topDirPath);
 	void asyncRestartAllBackends();
     void restartAllBackends();

@@ -60,7 +60,7 @@ public:
     }
 
     if (payloadSize >
-        std::numeric_limits<std::size_t>::max() - sizeof(payloadSize)) {
+        (std::numeric_limits<std::size_t>::max)() - sizeof(payloadSize)) {
       fail(FrameError::MalformedHeader);
       return false;
     }
@@ -114,7 +114,7 @@ inline bool tryFramePayload(const std::string &payload,
   framedPayload.clear();
   if (payload.size() > maxPayloadBytes ||
       payload.size() >
-          static_cast<std::size_t>(std::numeric_limits<std::uint32_t>::max())) {
+          static_cast<std::size_t>((std::numeric_limits<std::uint32_t>::max)())) {
     return false;
   }
 
@@ -130,7 +130,7 @@ inline std::string framePayload(const std::string &payload) {
   std::string framed;
   if (!tryFramePayload(payload, framed,
                        static_cast<std::size_t>(
-                           std::numeric_limits<std::uint32_t>::max()))) {
+                           (std::numeric_limits<std::uint32_t>::max)()))) {
     return {};
   }
   return framed;

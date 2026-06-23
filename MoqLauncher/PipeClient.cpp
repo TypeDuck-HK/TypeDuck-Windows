@@ -40,7 +40,8 @@ PipeClient::PipeClient(PipeServer* server, DWORD pipeMode, SECURITY_ATTRIBUTES* 
     // generate a new uuid for client ID
     clientId_{ generateUuidStr() },
     pipe_{ pipeMode, securityAttributes },
-    waitResponseTimer_{ std::make_unique<uv_timer_t>() } {
+    waitResponseTimer_{ std::make_unique<uv_timer_t>() },
+    readBuffer_{ Proto::kMaxClientFramePayloadBytes } {
 
     pipe_.setBlocking(false);
 
@@ -94,23 +95,39 @@ void PipeClient::onReadError(int error) {
 
 void PipeClient::handleClientMessage(const char* readBuf, size_t len) {
     readBuffer_.append(readBuf, len);
+    if (readBuffer_.hasViolation()) {
+        handleClientFrameViolation();
+        return;
+    }
 
     std::string payload;
     while (readBuffer_.nextFrame(payload)) {
         moqi::protocol::ClientRequest request;
         if (!Proto::parsePayload(payload, request)) {
             logger()->error("Failed to parse protobuf request from client {}", clientId_);
+            writeTypeDuckErrorResponse(
+                0,
+                moqi::protocol::TYPEDUCK_ERROR_MALFORMED_PAYLOAD,
+                "Malformed TypeDuck client protobuf payload",
+                moqi::protocol::TYPEDUCK_HEALTH_DEGRADED,
+                true);
             continue;
         }
 
-        if (!backend_) {
-            initBackend(request);
+        if (!backend_ && !initBackend(request)) {
+            continue;
         }
 
         if (backend_) {
+            pendingSeqNum_ = request.seq_num();
+            pendingMethod_ = request.method();
             startRequestTimeoutTimer(BACKEND_REQUEST_TIMEOUT_MS);
             backend_->handleClientMessage(this, request);
         }
+    }
+
+    if (readBuffer_.hasViolation()) {
+        handleClientFrameViolation();
     }
 }
 
@@ -120,14 +137,101 @@ bool PipeClient::initBackend(const moqi::protocol::ClientRequest &params) {
 		const auto& guid = params.guid();
 		backend_ = server_->backendFromLangProfileGuid(guid.c_str());
 		if (backend_ != nullptr) {
-			// FIXME: write some response to indicate the failure
 			return true;
 		}
 		else {
 			logger()->critical("Backend is not found for text service: {}", guid);
+            writeTypeDuckErrorResponse(
+                params.seq_num(),
+                moqi::protocol::TYPEDUCK_ERROR_ENGINE_INIT_FAILED,
+                "TypeDuck backend bridge is not mapped for this text service profile",
+                moqi::protocol::TYPEDUCK_HEALTH_FAILED,
+                false,
+                guid);
 		}
 	}
 	return false;
+}
+
+bool PipeClient::writeBackendResponse(std::uint32_t seqNum, const char* data, size_t len) {
+    if (pendingSeqNum_ != 0 && seqNum != pendingSeqNum_) {
+        logger()->warn(
+            "Dropping stale backend response for client {}: response seq {}, pending seq {}",
+            clientId_,
+            seqNum,
+            pendingSeqNum_);
+        return false;
+    }
+
+    writePipe(data, len);
+    return true;
+}
+
+void PipeClient::writeTypeDuckErrorResponse(
+    std::uint32_t seqNum,
+    moqi::protocol::TypeDuckErrorCode errorCode,
+    const std::string& message,
+    moqi::protocol::TypeDuckHealthStatus healthStatus,
+    bool recoverable,
+    const std::string& detail) {
+    stopRequestTimeoutTimer();
+
+    const auto responseSeqNum = seqNum != 0 ? seqNum : pendingSeqNum_;
+    pendingSeqNum_ = 0;
+    pendingMethod_ = moqi::protocol::METHOD_UNSPECIFIED;
+
+    moqi::protocol::ServerResponse response;
+    response.set_client_id(clientId_);
+    response.set_seq_num(responseSeqNum);
+    response.set_success(false);
+    response.set_return_value(0);
+    response.set_error(message);
+
+    auto* health = response.mutable_typeduck_engine_health();
+    health->set_status(healthStatus);
+    health->set_backend_name(backend_ != nullptr ? backend_->name() : "");
+    health->set_message(message);
+    health->set_recoverable(recoverable);
+
+    auto* error = response.mutable_typeduck_error();
+    error->set_code(errorCode);
+    error->set_message(message);
+    error->set_recoverable(recoverable);
+    error->set_detail(detail);
+
+    std::string framedMessage;
+    if (!Proto::serializeMessageBounded(
+            response, framedMessage, Proto::kMaxClientFramePayloadBytes)) {
+        logger()->error("Failed to serialize TypeDuck error response for client {}", clientId_);
+        return;
+    }
+    pipe_.write(std::move(framedMessage));
+}
+
+void PipeClient::handleClientFrameViolation() {
+    const auto frameError = readBuffer_.lastError();
+    const auto errorCode =
+        frameError == Proto::FrameError::PayloadTooLarge
+            ? moqi::protocol::TYPEDUCK_ERROR_PAYLOAD_TOO_LARGE
+            : moqi::protocol::TYPEDUCK_ERROR_MALFORMED_FRAME;
+    const auto message =
+        frameError == Proto::FrameError::PayloadTooLarge
+            ? "TypeDuck client frame exceeds launcher payload limit"
+            : "Malformed TypeDuck client frame";
+    const auto detail =
+        frameError == Proto::FrameError::MalformedHeader
+            ? "FrameError::MalformedHeader"
+            : "FrameError::PayloadTooLarge";
+
+    logger()->error("Rejecting client {} frame: {}", clientId_, detail);
+    readBuffer_.clear();
+    writeTypeDuckErrorResponse(
+        0,
+        errorCode,
+        message,
+        moqi::protocol::TYPEDUCK_HEALTH_DEGRADED,
+        true,
+        detail);
 }
 
 void PipeClient::disconnectFromBackend() {
@@ -154,12 +258,17 @@ void PipeClient::stopRequestTimeoutTimer() {
 void PipeClient::onRequestTimeout() {
 	// We sent a message to the backend server, but haven't got any response before the timeout
 	// Assume that the backend server is dead. => Try to restart
+    stopRequestTimeoutTimer();
+    writeTypeDuckErrorResponse(
+        pendingSeqNum_,
+        moqi::protocol::TYPEDUCK_ERROR_BACKEND_TIMEOUT,
+        "TypeDuck backend request timed out; restarting backend bridge",
+        moqi::protocol::TYPEDUCK_HEALTH_RESTARTING,
+        true);
 	if (backend_) {
 		logger()->critical("Backend {} seems to be dead. Try to restart!", backend_->name());
 		backend_->restartProcess();
 	}
-
-    // FIXME: do we need to close the pipe or write some error response?
 }
 
 } // namespace Moqi

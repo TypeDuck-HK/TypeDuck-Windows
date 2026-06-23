@@ -155,16 +155,18 @@ function Assert-ClientRecovery {
         "Proto::kMaxClientFramePayloadBytes",
         "readBuffer_\.hasViolation\(",
         "FrameError::PayloadTooLarge",
-        "FrameError::MalformedFrame",
+        "FrameError::MalformedHeader|FrameError::MalformedFrame",
         "TYPEDUCK_ERROR_MALFORMED_FRAME",
         "TYPEDUCK_ERROR_PAYLOAD_TOO_LARGE",
         "TYPEDUCK_ERROR_MALFORMED_PAYLOAD",
         "TYPEDUCK_ERROR_ENGINE_INIT_FAILED",
         "TYPEDUCK_ERROR_BACKEND_TIMEOUT",
         "writeTypeDuckErrorResponse|sendTypeDuckErrorResponse",
+        "writeBackendResponse",
         "pendingSeqNum_",
+        "seqNum\s*!=\s*pendingSeqNum_",
         "stopRequestTimeoutTimer\(\);[\s\S]*writeTypeDuckErrorResponse"
-    ) "PipeClient must bound client frames and return TypeDuck errors for malformed, missing-backend, and timeout cases."
+    ) "PipeClient must bound client frames, return TypeDuck errors, and keep stale backend responses from clearing active requests."
 }
 
 function Assert-BackendRecovery {
@@ -181,7 +183,7 @@ function Assert-BackendRecovery {
         "Proto::kMaxBackendFramePayloadBytes",
         "stdoutFrameBuf_\.hasViolation\(",
         "FrameError::PayloadTooLarge",
-        "FrameError::MalformedFrame",
+        "FrameError::MalformedHeader|FrameError::MalformedFrame",
         "bool\s+BackendServer::startProcess\(",
         "stdinPipe_\s*==\s*nullptr",
         "TYPEDUCK_ERROR_ENGINE_INIT_FAILED",
@@ -200,8 +202,9 @@ function Assert-TypeDuckMapping {
     )
 
     Assert-AllMatch $Failures $PipeServerCpp @(
-        "c6e8f5df-6504-44f9-b7cf-17a195373a83",
+        "\{c6e8f5df-6504-44f9-b7cf-17a195373a83\}",
         "typeduck-runtime-bridge",
+        "normalizeGuidKey",
         "seedTypeDuckProfileBackendMapping",
         "backendMap_\\[kTypeDuckProfileGuid\\]|backendMap_\.insert"
     ) "PipeServer must seed the Phase 3 TypeDuck zh-HK profile GUID to the TypeDuck runtime bridge."
@@ -235,7 +238,8 @@ function Assert-TransportPreserved {
         "Proto::framePayload",
         "uv_pipe_init_windows_named_pipe",
         "stdinPipe_->write",
-        "stdoutPipe_->startRead"
+        "stdoutPipe_->startRead",
+        "writeBackendResponse\(\s*response\.seq_num\(\)"
     ) "D-01 transport must remain named pipe plus backend stdin/stdout framed protobuf."
 }
 

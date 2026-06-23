@@ -1,6 +1,8 @@
 [
     {
-        "name": "moqi-ime",
+        "name": "typeduck-runtime-bridge",
+        "displayName": "TypeDuck Runtime Bridge",
+        "description": "Internal transitional compatibility bridge for the staged TypeDuck runtime; this manifest is not product profile authority.",
         "command": "moqi-ime\\server.exe",
         "workingDir": "moqi-ime",
         "params": ""

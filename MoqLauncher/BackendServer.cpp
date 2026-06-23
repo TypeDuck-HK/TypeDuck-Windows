@@ -83,11 +83,11 @@ static std::vector<std::string> getUtf8EnvironmentVariables() {
 }
 
 BackendServer::BackendServer(PipeServer *pipeServer, const Json::Value &info)
-    : pipeServer_{pipeServer}, process_{nullptr}, stdinPipe_{nullptr},
-      stdoutPipe_{nullptr}, stderrPipe_{nullptr},
-      name_(info["name"].asString()), command_(info["command"].asString()),
-      workingDir_(info["workingDir"].asString()),
-      params_(info["params"].asString()) {}
+    : pipeServer_{pipeServer}, name_(info["name"].asString()),
+      process_{nullptr}, stdinPipe_{nullptr}, stdoutPipe_{nullptr}, stderrPipe_{nullptr},
+      stdoutFrameBuf_{Proto::kMaxBackendFramePayloadBytes},
+      command_(info["command"].asString()), params_(info["params"].asString()),
+      workingDir_(info["workingDir"].asString()) {}
 
 BackendServer::~BackendServer() { terminateProcess(); }
 
@@ -98,25 +98,52 @@ std::shared_ptr<spdlog::logger> &BackendServer::logger() {
 void BackendServer::handleClientMessage(PipeClient *client,
                                         const moqi::protocol::ClientRequest &request) {
   if (!isProcessRunning()) {
-    startProcess();
+    if (!startProcess()) {
+      client->writeTypeDuckErrorResponse(
+          request.seq_num(),
+          moqi::protocol::TYPEDUCK_ERROR_ENGINE_INIT_FAILED,
+          "TypeDuck backend bridge failed to start",
+          moqi::protocol::TYPEDUCK_HEALTH_FAILED,
+          false,
+          name_);
+      return;
+    }
   }
 
-  if (name_ == "moqi-ime" &&
+  if (name_ == "typeduck-runtime-bridge" &&
       request.method() == moqi::protocol::METHOD_ON_COMMAND &&
       request.command_id() == RIME_DEPLOY_COMMAND_ID) {
-    pipeServer_->enqueueTrayNotification(L"Rime", L"重新部署中...", NIIF_INFO);
+    pipeServer_->enqueueTrayNotification(L"TypeDuck", L"正在重新部署 / Redeploying...", NIIF_INFO);
   }
 
   moqi::protocol::ClientRequest backendRequest = request;
   backendRequest.set_client_id(client->clientId_);
   std::string framedMessage;
-  if (!Proto::serializeMessage(backendRequest, framedMessage)) {
+  if (!Proto::serializeMessageBounded(
+          backendRequest, framedMessage, Proto::kMaxBackendFramePayloadBytes)) {
     logger()->error("Failed to serialize backend request for client {}",
                     client->clientId_);
+    client->writeTypeDuckErrorResponse(
+        request.seq_num(),
+        moqi::protocol::TYPEDUCK_ERROR_MALFORMED_PAYLOAD,
+        "TypeDuck backend request could not be serialized",
+        moqi::protocol::TYPEDUCK_HEALTH_DEGRADED,
+        true,
+        name_);
     return;
   }
 
   // write the message to the backend server
+  if (stdinPipe_ == nullptr) {
+    client->writeTypeDuckErrorResponse(
+        request.seq_num(),
+        moqi::protocol::TYPEDUCK_ERROR_ENGINE_INIT_FAILED,
+        "TypeDuck backend stdin is unavailable",
+        moqi::protocol::TYPEDUCK_HEALTH_FAILED,
+        true,
+        name_);
+    return;
+  }
   stdinPipe_->write(std::move(framedMessage));
 }
 
@@ -125,7 +152,9 @@ void BackendServer::uploadCloudClipboardText(const std::string& utf8Text) {
     return;
   }
   if (!isProcessRunning()) {
-    startProcess();
+    if (!startProcess()) {
+      return;
+    }
   }
   if (stdinPipe_ == nullptr) {
     logger()->warn("Skip cloud clipboard upload: backend stdin is unavailable");
@@ -137,7 +166,8 @@ void BackendServer::uploadCloudClipboardText(const std::string& utf8Text) {
   request.set_client_id("clipboard");
   request.set_cloud_clipboard_text(utf8Text);
   std::string framedMessage;
-  if (!Proto::serializeMessage(request, framedMessage)) {
+  if (!Proto::serializeMessageBounded(
+          request, framedMessage, Proto::kMaxBackendFramePayloadBytes)) {
     logger()->error("Failed to serialize cloud clipboard upload");
     return;
   }
@@ -168,7 +198,7 @@ uv::Pipe *BackendServer::createStderrPipe() {
   return stderrPipe;
 }
 
-void BackendServer::startProcess() {
+bool BackendServer::startProcess() {
   process_ = new uv_process_t{};
   // create pipes for stdio of the child process
   stdoutPipe_ = createStdoutPipe();
@@ -221,23 +251,25 @@ void BackendServer::startProcess() {
   options.stdio = stdio_containers;
   int ret = uv_spawn(uv_default_loop(), process_, &options);
   if (ret < 0) {
+    logger()->error("Failed to start backend {}: {}", name_, uv_strerror(ret));
     delete process_;
     process_ = nullptr;
     closeStdioPipes();
-    return;
+    return false;
   }
 
   // start receiving data from the backend server
   stdoutPipe_->startRead();
   stderrPipe_->startRead();
+  return true;
 }
 
-void BackendServer::restartProcess() {
-  terminateProcess();
-  startProcess();
+bool BackendServer::restartProcess() {
+  terminateProcess(false);
+  return startProcess();
 }
 
-void BackendServer::terminateProcess() {
+void BackendServer::terminateProcess(bool notifyClients) {
   if (process_) {
     closeStdioPipes();
 
@@ -249,7 +281,9 @@ void BackendServer::terminateProcess() {
 
     process_ = nullptr;
   }
-  pipeServer_->onBackendClosed(this);
+  if (notifyClients) {
+    pipeServer_->onBackendClosed(this);
+  }
 }
 
 // check if the backend server process is running
@@ -257,11 +291,55 @@ bool BackendServer::isProcessRunning() { return process_ != nullptr; }
 
 void BackendServer::onStdoutRead(const char *buf, size_t len) {
   stdoutFrameBuf_.append(buf, len);
+  if (stdoutFrameBuf_.hasViolation()) {
+    const auto frameError = stdoutFrameBuf_.lastError();
+    pipeServer_->notifyClientsOfBackendError(
+        this,
+        frameError == Proto::FrameError::PayloadTooLarge
+            ? moqi::protocol::TYPEDUCK_ERROR_PAYLOAD_TOO_LARGE
+            : moqi::protocol::TYPEDUCK_ERROR_BACKEND_RESTART,
+        frameError == Proto::FrameError::PayloadTooLarge
+            ? "TypeDuck backend stdout frame exceeds launcher payload limit"
+            : "Malformed TypeDuck backend stdout frame",
+        moqi::protocol::TYPEDUCK_HEALTH_DEGRADED,
+        true,
+        frameError == Proto::FrameError::MalformedHeader
+            ? "FrameError::MalformedHeader"
+            : "FrameError::PayloadTooLarge");
+    stdoutFrameBuf_.clear();
+    restartProcess();
+    return;
+  }
   handleBackendReply();
+  if (stdoutFrameBuf_.hasViolation()) {
+    const auto frameError = stdoutFrameBuf_.lastError();
+    pipeServer_->notifyClientsOfBackendError(
+        this,
+        frameError == Proto::FrameError::PayloadTooLarge
+            ? moqi::protocol::TYPEDUCK_ERROR_PAYLOAD_TOO_LARGE
+            : moqi::protocol::TYPEDUCK_ERROR_BACKEND_RESTART,
+        frameError == Proto::FrameError::PayloadTooLarge
+            ? "TypeDuck backend stdout frame exceeds launcher payload limit"
+            : "Malformed TypeDuck backend stdout frame",
+        moqi::protocol::TYPEDUCK_HEALTH_DEGRADED,
+        true,
+        frameError == Proto::FrameError::MalformedHeader
+            ? "FrameError::MalformedHeader"
+            : "FrameError::PayloadTooLarge");
+    stdoutFrameBuf_.clear();
+    restartProcess();
+  }
 }
 
 void BackendServer::onReadError(int status) {
   // the backend server is broken, restart it.
+  pipeServer_->notifyClientsOfBackendError(
+      this,
+      moqi::protocol::TYPEDUCK_ERROR_BACKEND_RESTART,
+      "TypeDuck backend bridge read failed; restarting backend bridge",
+      moqi::protocol::TYPEDUCK_HEALTH_DEGRADED,
+      true,
+      uv_strerror(status));
   restartProcess();
 }
 
@@ -295,7 +373,16 @@ void BackendServer::handleBackendReply() {
     moqi::protocol::ServerResponse response;
     if (!Proto::parsePayload(payload, response)) {
       logger()->error("Failed to parse protobuf response from backend {}", name_);
-      continue;
+      pipeServer_->notifyClientsOfBackendError(
+          this,
+          moqi::protocol::TYPEDUCK_ERROR_BACKEND_RESTART,
+          "Malformed TypeDuck backend protobuf response",
+          moqi::protocol::TYPEDUCK_HEALTH_DEGRADED,
+          true,
+          "FrameError::MalformedHeader");
+      stdoutFrameBuf_.clear();
+      restartProcess();
+      return;
     }
 
     if (response.has_tray_notification()) {
@@ -317,7 +404,8 @@ void BackendServer::handleBackendReply() {
 
     if (auto client = pipeServer_->clientFromId(response.client_id())) {
       const auto framedPayload = Proto::framePayload(payload);
-      client->writePipe(framedPayload.data(), framedPayload.size());
+      client->writeBackendResponse(
+          response.seq_num(), framedPayload.data(), framedPayload.size());
     }
   }
 }
