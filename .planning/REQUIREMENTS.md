@@ -23,9 +23,9 @@
 
 ### Engine and Runtime Assets
 
-- [ ] **ENG-01**: Developer can build or package the pinned TypeDuck-HK librime fork as the TypeDuck Windows IME engine dependency.
-- [ ] **ENG-02**: Developer can build or package the `TypeDuck-HK/rime-dictionary-lookup-filter` plugin with the TypeDuck engine.
-- [ ] **ENG-03**: Installed runtime includes the TypeDuck schemas, dictionaries, OpenCC assets, and built schema assets required to mirror TypeDuck Web alpha.
+- [x] **ENG-01**: Developer can build or package the pinned TypeDuck-HK librime fork as the TypeDuck Windows IME engine dependency.
+- [x] **ENG-02**: Developer can build or package the `TypeDuck-HK/rime-dictionary-lookup-filter` plugin with the TypeDuck engine.
+- [x] **ENG-03**: Installed runtime includes the TypeDuck schemas, dictionaries, OpenCC assets, and built schema assets required to mirror TypeDuck Web alpha.
 - [ ] **ENG-04**: TypeDuck engine runtime can produce Cantonese composition, candidate pages, Jyutping, and commit output from TypeDuck schema input.
 - [ ] **ENG-05**: TypeDuck engine runtime can produce lookup-filter-backed dictionary data for candidates, including headword, Jyutping, part-of-speech, English meaning, reading notes, and enabled-language meanings when available.
 - [ ] **ENG-06**: Engine/runtime failure does not crash arbitrary TSF host applications; user receives a bounded degraded state or clean reset.
@@ -148,9 +148,9 @@ Which phases cover which requirements. Updated during roadmap creation.
 | INST-04 | Phase 3 | Pending |
 | INST-05 | Phase 3 | Pending |
 | INST-06 | Phase 5 | Pending |
-| ENG-01 | Phase 2 | Pending |
-| ENG-02 | Phase 2 | Pending |
-| ENG-03 | Phase 2 | Pending |
+| ENG-01 | Phase 2 | Complete |
+| ENG-02 | Phase 2 | Complete |
+| ENG-03 | Phase 2 | Complete |
 | ENG-04 | Phase 2 | Pending |
 | ENG-05 | Phase 2 | Pending |
 | ENG-06 | Phase 4 | Pending |
