@@ -1,25 +1,31 @@
 {
-  "mode": "manual-checklist",
-  "status": "needs-human-vm-verification",
-  "reason": "ManualChecklistOnly was specified.",
-  "startedAt": "2026-06-23T16:44:04Z",
-  "endedAt": "2026-06-23T16:44:04Z",
+  "mode": "automated-hyperv-powershell-direct",
+  "status": "complete",
+  "startedAt": "2026-06-23T16:55:30Z",
+  "endedAt": "2026-06-23T16:55:55Z",
   "vm": {
     "name": "My Virtual Machine",
-    "checkpointRequired": true
+    "id": "248a8671-ea80-4551-b9e5-f9926ff2399a",
+    "state": "Running",
+    "checkpoint": {
+      "skipped": false,
+      "name": "TypeDuck-Phase03-BeforeInstall-20260624-005531",
+      "id": "0d09d7f9-a5e3-40ea-a181-3616398d84ef",
+      "creationTime": "2026-06-23T16:55:50Z"
+    },
+    "os": {
+      "caption": "Microsoft Windows 10 Pro",
+      "version": "10.0.19045",
+      "buildNumber": "19045",
+      "osArchitecture": "64-bit"
+    }
   },
   "installer": {
-    "expectedFileName": "typeduck-windows-ime-setup.exe",
     "path": "D:\\VSProjects\\moqi-im-windows\\installer\\dist\\typeduck-windows-ime-setup.exe",
-    "sha256": "7d72748067d029af188078d27683928124f3c75ad7d3cc3bc7945ea80176bac4"
+    "guestPath": "C:\\Users\\Public\\TypeDuckVmVerify\\typeduck-windows-ime-setup.exe",
+    "expectedFileName": "typeduck-windows-ime-setup.exe",
+    "sha256": "8c678b0f19491319d7b5026911b98d97edf0f26f9ec02fdad8a33be33acdcfc0"
   },
-  "requirements": [
-    "INST-01",
-    "INST-02",
-    "INST-03",
-    "INST-04",
-    "INST-05"
-  ],
   "expected": {
     "clsid": "{7D92985A-BC53-47B5-A5CC-6E47F86B9D18}",
     "profileGuid": "{C6E8F5DF-6504-44F9-B7CF-17A195373A83}",
@@ -29,5 +35,41 @@
     "x64Dll": "C:\\Windows\\System32\\TypeDuckTextService.dll",
     "startupValue": "TypeDuckLauncher",
     "scheduledTask": "TypeDuckIME-ReRegisterTSF"
-  }
+  },
+  "install": {
+    "exitCode": 0,
+    "logPath": "C:\\Users\\Public\\TypeDuckVmVerify\\install.log",
+    "logTail": "2026-06-24 00:55:52.450   Log opened. (Time zone: UTC+08:00)\n2026-06-24 00:55:52.450   Setup version: Inno Setup version 6.7.3\n2026-06-24 00:55:52.450   Original Setup EXE: C:\\Users\\Public\\TypeDuckVmVerify\\typeduck-windows-ime-setup.exe\n2026-06-24 00:55:52.450   Setup command line: /SL5=\"$110096,2368774,893952,C:\\Users\\Public\\TypeDuckVmVerify\\typeduck-windows-ime-setup.exe\" /VERYSILENT /SUPPRESSMSGBOXES /NORESTART /LOG=\"C:\\Users\\Public\\TypeDuckVmVerify\\install.log\" \n2026-06-24 00:55:52.450   Windows version: 10.0.19045\n2026-06-24 00:55:52.450   Windows architecture: x64 (64-bit)\n2026-06-24 00:55:52.450   Machine types supported by system: x86 x64\n2026-06-24 00:55:52.450   User privileges: Administrative\n2026-06-24 00:55:52.450   Administrative install mode: Yes\n2026-06-24 00:55:52.450   Install mode root key: HKEY_LOCAL_MACHINE\n2026-06-24 00:55:52.450   64-bit install mode: Yes\n2026-06-24 00:55:52.450   RedirectionGuard status for current process: Enabled in enforcing mode\n2026-06-24 00:55:52.450   Created protected temporary directory: C:\\Users\\TYPEDU~1\\AppData\\Local\\Temp\\is-CXRFZPUYV3.tmp\n2026-06-24 00:55:52.482   Found 4 files to register with RestartManager.\n2026-06-24 00:55:52.482   Calling RestartManager's RmGetList.\n2026-06-24 00:55:52.482   RmGetList finished successfully.\n2026-06-24 00:55:52.482   RestartManager found no applications using one of our files.\n2026-06-24 00:55:52.560   Starting the installation process.\n2026-06-24 00:55:52.560   Creating directory: C:\\Program Files (x86)\\TypeDuckIME\n2026-06-24 00:55:52.560   Directory for uninstall files: C:\\Program Files (x86)\\TypeDuckIME\n2026-06-24 00:55:52.560   Creating new uninstall log: C:\\Program Files (x86)\\TypeDuckIME\\unins000.dat\n2026-06-24 00:55:52.560   -- File entry --\n2026-06-24 00:55:52.560   Dest filename: C:\\Program Files (x86)\\TypeDuckIME\\unins000.exe\n2026-06-24 00:55:52.560   Non-default bitness: 32-bit\n2026-06-24 00:55:52.560   Time stamp of our file: 2026-06-24 00:55:52.357\n2026-06-24 00:55:52.560   Installing the file.\n2026-06-24 00:55:52.560   Successfully installed the file.\n2026-06-24 00:55:52.560   -- File entry --\n2026-06-24 00:55:52.560   Dest filename: C:\\Program Files (x86)\\TypeDuckIME\\backends.json\n2026-06-24 00:55:52.560   Time stamp of our file: 2026-06-23 10:28:36.000\n2026-06-24 00:55:52.560   Installing the file.\n2026-06-24 00:55:52.560   Successfully installed the file.\n2026-06-24 00:55:52.560   -- File entry --\n2026-06-24 00:55:52.560   Dest filename: C:\\Program Files (x86)\\TypeDuckIME\\TypeDuckLauncher.exe\n2026-06-24 00:55:52.560   Time stamp of our file: 2026-06-24 00:16:20.000\n2026-06-24 00:55:52.560   Installing the file.\n2026-06-24 00:55:52.607   Successfully installed the file.\n2026-06-24 00:55:52.607   -- File entry --\n2026-06-24 00:55:52.607   Dest filename: C:\\Program Files (x86)\\TypeDuckIME\\TypeDuckSetupHelper.exe\n2026-06-24 00:55:52.607   Time stamp of our file: 2026-06-24 00:08:34.000\n2026-06-24 00:55:52.607   Installing the file.\n2026-06-24 00:55:52.622   Successfully installed the file.\n2026-06-24 00:55:52.622   -- File entry --\n2026-06-24 00:55:52.622   Dest filename: C:\\Program Files (x86)\\TypeDuckIME\\TypeDuckTextService.dll\n2026-06-24 00:55:52.622   Time stamp of our file: 2026-06-23 23:52:18.000\n2026-06-24 00:55:52.622   Installing the file.\n2026-06-24 00:55:52.638   Successfully installed the file.\n2026-06-24 00:55:52.638   -- File entry --\n2026-06-24 00:55:52.638   Dest filename: C:\\Program Files (x86)\\TypeDuckIME\\x64\\TypeDuckTextService.dll\n2026-06-24 00:55:52.638   Time stamp of our file: 2026-06-23 23:52:36.000\n2026-06-24 00:55:52.638   Installing the file.\n2026-06-24 00:55:52.638   Creating directory: C:\\Program Files (x86)\\TypeDuckIME\\x64\n2026-06-24 00:55:52.669   Successfully installed the file.\n2026-06-24 00:55:52.669   -- Icon entry --\n2026-06-24 00:55:52.669   Dest filename: C:\\ProgramData\\Microsoft\\Windows\\Start Menu\\Programs\\TypeDuck 粵語輸入法 \\ TypeDuck Cantonese IME\\解除安裝 \\ Uninstall.lnk\n2026-06-24 00:55:52.669   Creating directory: C:\\ProgramData\\Microsoft\\Windows\\Start Menu\\Programs\\TypeDuck 粵語輸入法\n2026-06-24 00:55:52.669   Creating directory: C:\\ProgramData\\Microsoft\\Windows\\Start Menu\\Programs\\TypeDuck 粵語輸入法 \\ TypeDuck Cantonese IME\n2026-06-24 00:55:52.669   Exception message:\n2026-06-24 00:55:52.669   Defaulting to OK for suppressed message box (OK):\n                          Setup was unable to create the directory \"C:\\ProgramData\\Microsoft\\Windows\\Start Menu\\Programs\\TypeDuck 粵語輸入法 \\ TypeDuck Cantonese IME\".\n                          \n                          Error 3: The system cannot find the path specified.\n2026-06-24 00:55:52.669   -- Registry entry --\n2026-06-24 00:55:52.669   Key: HKEY_CURRENT_USER\\Software\\Microsoft\\Windows\\CurrentVersion\\Run\n2026-06-24 00:55:52.669   Value name: TypeDuckLauncher\n2026-06-24 00:55:52.669   Creating or opening the key.\n2026-06-24 00:55:52.669   Creating or setting the value.\n2026-06-24 00:55:52.669   Successfully created or set the value.\n2026-06-24 00:55:52.669   Saving uninstall information.\n2026-06-24 00:55:52.669   Creating new uninstall key: HKEY_LOCAL_MACHINE\\Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\{9B52CF20-1C5D-4C74-9F5D-9E66377C8F37}_is1\n2026-06-24 00:55:52.669   Writing uninstall key values.\n2026-06-24 00:55:52.669   Detected previous non administrative install? No\n2026-06-24 00:55:52.669   Detected previous administrative 32-bit install? No\n2026-06-24 00:55:52.716   Installation process succeeded.\n2026-06-24 00:55:53.013   Defaulting to OK for suppressed message box (OK):\n                          偵測到覆蓋安裝。如果目前 Windows 工作階段仍有舊 TSF 實例，TypeDuck 可能需要登出或重啟 Windows 後才會即時恢復正常輸入。\n                          An existing install was detected. If the current Windows session still has an old TSF instance loaded, TypeDuck may need sign-out or Windows restart before input resumes immediately.\n2026-06-24 00:55:53.013   Need to restart Windows? No\n2026-06-24 00:55:53.028   Deinitializing Setup.\n2026-06-24 00:55:53.028   Log closed.",
+    "PSComputerName": "My Virtual Machine",
+    "RunspaceId": "e4e83c2f-b95f-4680-b141-c03cc2b23ebe",
+    "PSShowComputerName": true
+  },
+  "uninstall": {
+    "exitCode": 0,
+    "executable": "C:\\Program Files (x86)\\TypeDuckIME\\unins000.exe",
+    "logPath": "C:\\Users\\Public\\TypeDuckVmVerify\\uninstall.log",
+    "logTail": "2026-06-24 00:55:53.987   Log opened. (Time zone: UTC+08:00)\n2026-06-24 00:55:53.987   Setup version: Inno Setup version 6.7.3\n2026-06-24 00:55:53.987   Original Uninstall EXE: C:\\Program Files (x86)\\TypeDuckIME\\unins000.exe\n2026-06-24 00:55:53.987   Uninstall DAT: C:\\Program Files (x86)\\TypeDuckIME\\unins000.dat\n2026-06-24 00:55:53.987   Current Uninstall EXE: C:\\Users\\TYPEDU~1\\AppData\\Local\\Temp\\is-UM87M7GATA-uninstall.tmp\\_unins.tmp\n2026-06-24 00:55:53.987   Uninstall command line: /SECONDPHASE=\"C:\\Program Files (x86)\\TypeDuckIME\\unins000.exe\" /FIRSTPHASEWND=$10007E /VERYSILENT /SUPPRESSMSGBOXES /NORESTART /LOG=\"C:\\Users\\Public\\TypeDuckVmVerify\\uninstall.log\" \n2026-06-24 00:55:53.987   Windows version: 10.0.19045\n2026-06-24 00:55:53.987   Windows architecture: x64 (64-bit)\n2026-06-24 00:55:53.987   Machine types supported by system: x86 x64\n2026-06-24 00:55:53.987   User privileges: Administrative\n2026-06-24 00:55:53.987   Administrative install mode: Yes\n2026-06-24 00:55:53.987   Install mode root key: HKEY_LOCAL_MACHINE\n2026-06-24 00:55:53.987   RedirectionGuard status for current process: Enabled in enforcing mode\n2026-06-24 00:55:53.987   Cleaning up any residual temporary files from previous Uninstall runs.\n2026-06-24 00:55:53.987   Deleted file: C:\\Users\\TYPEDU~1\\AppData\\Local\\Temp\\is-OB9K4I7FXX-uninstall.tmp\\_unins.tmp\n2026-06-24 00:55:53.987   Cleanup finished (2 directories found, 2 directories checked, 1 files deleted).\n2026-06-24 00:55:53.987   Created protected temporary directory: C:\\Users\\TYPEDU~1\\AppData\\Local\\Temp\\is-9IQVVAH4Y6.tmp\n2026-06-24 00:55:54.159   Starting the uninstallation process.\n2026-06-24 00:55:54.159   Deleting registry key: HKEY_LOCAL_MACHINE\\Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\{9B52CF20-1C5D-4C74-9F5D-9E66377C8F37}_is1\n2026-06-24 00:55:54.159   Deleting registry value: HKEY_CURRENT_USER\\Software\\Microsoft\\Windows\\CurrentVersion\\Run\\TypeDuckLauncher\n2026-06-24 00:55:54.159   Deleting directory: C:\\ProgramData\\Microsoft\\Windows\\Start Menu\\Programs\\TypeDuck 粵語輸入法\n2026-06-24 00:55:54.159   Deleting file: C:\\Program Files (x86)\\TypeDuckIME\\x64\\TypeDuckTextService.dll\n2026-06-24 00:55:54.159   Deleting directory: C:\\Program Files (x86)\\TypeDuckIME\\x64\n2026-06-24 00:55:54.159   Deleting file: C:\\Program Files (x86)\\TypeDuckIME\\TypeDuckTextService.dll\n2026-06-24 00:55:54.159   Deleting file: C:\\Program Files (x86)\\TypeDuckIME\\TypeDuckSetupHelper.exe\n2026-06-24 00:55:54.159   Deleting file: C:\\Program Files (x86)\\TypeDuckIME\\TypeDuckLauncher.exe\n2026-06-24 00:55:54.159   Deleting file: C:\\Program Files (x86)\\TypeDuckIME\\backends.json\n2026-06-24 00:55:54.159   Deleting directory: C:\\Program Files (x86)\\TypeDuckIME\n2026-06-24 00:55:54.159   Failed to delete directory (145). Will retry later.\n2026-06-24 00:55:54.159   Deleting Uninstall data files.\n2026-06-24 00:55:54.159   Creating \"_unins-done.tmp\" file.\n2026-06-24 00:55:54.675   Deleting directory: C:\\Program Files (x86)\\TypeDuckIME\n2026-06-24 00:55:54.675   Uninstallation process succeeded.\n2026-06-24 00:55:54.675   Removed all? Yes\n2026-06-24 00:55:54.675   Need to restart Windows? No\n2026-06-24 00:55:54.675   Log closed.",
+    "PSComputerName": "My Virtual Machine",
+    "RunspaceId": "e4e83c2f-b95f-4680-b141-c03cc2b23ebe",
+    "PSShowComputerName": true
+  },
+  "snapshots": {
+    "before": "registry-before.json",
+    "afterInstall": "registry-after-install.json",
+    "afterUninstall": "registry-after-uninstall.json"
+  },
+  "checks": {
+    "afterInstallFailures": [],
+    "afterUninstallFailures": []
+  },
+  "limitations": [
+    "Get-WinUserLanguageList did not report zh-HK for the guest user; rely on CTF/TIP registry evidence and capture Settings screenshot if needed."
+  ],
+  "requirements": [
+    "INST-01",
+    "INST-02",
+    "INST-03",
+    "INST-04",
+    "INST-05"
+  ]
 }

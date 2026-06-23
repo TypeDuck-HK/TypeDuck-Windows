@@ -591,13 +591,13 @@ function Write-AutomationNotes {
 
 - Installer exit code: $($Evidence.install.exitCode)
 - Uninstaller exit code: $($Evidence.uninstall.exitCode)
-- CLSID: `$kTypeDuckClsid`
-- Profile GUID: `$kTypeDuckProfileGuid`
-- Display text: `$kTypeDuckDisplayName`
+- CLSID: $kTypeDuckClsid
+- Profile GUID: $kTypeDuckProfileGuid
+- Display text: $kTypeDuckDisplayName
 - Win32 DLL: `C:\Windows\SysWOW64\TypeDuckTextService.dll`
 - x64 DLL: `C:\Windows\System32\TypeDuckTextService.dll`
-- Startup value: `$kLauncherValue`
-- Scheduled task: `$kTaskName`
+- Startup value: $kLauncherValue
+- Scheduled task: $kTaskName
 
 ## After-Install Failures
 
@@ -688,11 +688,11 @@ try {
     $beforeSnapshot = Save-GuestSnapshot -Session $session -EvidenceRootPath $resolvedEvidenceRoot -FileName $kBeforeName -Label "before-install"
     $installResult = Invoke-GuestInstaller -Session $session
     $afterInstallSnapshot = Save-GuestSnapshot -Session $session -EvidenceRootPath $resolvedEvidenceRoot -FileName $kAfterInstallName -Label "after-install"
-    $installFailures = Test-InstallSnapshot -Snapshot $afterInstallSnapshot
+    $installFailures = @(Test-InstallSnapshot -Snapshot $afterInstallSnapshot)
 
     $uninstallResult = Invoke-GuestUninstaller -Session $session
     $afterUninstallSnapshot = Save-GuestSnapshot -Session $session -EvidenceRootPath $resolvedEvidenceRoot -FileName $kAfterUninstallName -Label "after-uninstall"
-    $uninstallFailures = Test-UninstallSnapshot -Snapshot $afterUninstallSnapshot
+    $uninstallFailures = @(Test-UninstallSnapshot -Snapshot $afterUninstallSnapshot)
 
     $limitations = @()
     if ($afterInstallSnapshot.scheduledTask.exists) {

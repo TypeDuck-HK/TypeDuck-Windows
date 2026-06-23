@@ -1,74 +1,51 @@
 # TypeDuck Phase 03 VM Installer Verification Notes
 
-**Mode:** manual checklist
-**Reason:** ManualChecklistOnly was specified.
-**Started:** 2026-06-23T16:44:04Z
+**Mode:** automated Hyper-V / PowerShell Direct
+**Status:** complete
 **VM:** My Virtual Machine
-**Installer:** D:\VSProjects\moqi-im-windows\installer\dist\typeduck-windows-ime-setup.exe
-**Installer SHA-256:** 7d72748067d029af188078d27683928124f3c75ad7d3cc3bc7945ea80176bac4
+**Checkpoint:** TypeDuck-Phase03-BeforeInstall-20260624-005531 / 0d09d7f9-a5e3-40ea-a181-3616398d84ef
+**Started:** 2026-06-23T16:55:30Z
+**Completed:** 2026-06-23T16:55:55Z
+**Installer SHA-256:** 8c678b0f19491319d7b5026911b98d97edf0f26f9ec02fdad8a33be33acdcfc0
 
-## Safety
+## Verification Results
 
-- Do not install on the host machine.
-- Use Hyper-V VM My Virtual Machine.
-- Create a checkpoint before install unless using an already recorded clean checkpoint.
-- Capture screenshots only of installer/input settings surfaces; avoid personal typed content.
+- Installer exit code: 0
+- Uninstaller exit code: 0
+- CLSID: {7D92985A-BC53-47B5-A5CC-6E47F86B9D18}
+- Profile GUID: {C6E8F5DF-6504-44F9-B7CF-17A195373A83}
+- Display text: TypeDuck 粵語輸入法 / TypeDuck Cantonese IME
+- Win32 DLL: C:\Windows\SysWOW64\TypeDuckTextService.dll
+- x64 DLL: C:\Windows\System32\TypeDuckTextService.dll
+- Startup value: TypeDuckLauncher
+- Scheduled task: TypeDuckIME-ReRegisterTSF
 
-## Manual Checklist
+## After-Install Failures
 
-1. Host checkpoint:
-   - Run `Checkpoint-VM -Name "My Virtual Machine" -SnapshotName "TypeDuck-Phase03-BeforeInstall"` or record the existing clean checkpoint name/id.
-   - Record VM Windows version from the guest.
+None
 
-2. installer UI text:
-   - Launch D:\VSProjects\moqi-im-windows\installer\dist\typeduck-windows-ime-setup.exe inside the VM.
-   - Confirm TypeDuck branding is visible.
-   - Confirm TypeDuck-controlled text is bilingual Traditional Hong Kong Chinese / English.
-   - Save screenshot as `installer-ui.png` if possible.
+## After-Uninstall Failures
 
-3. Chinese (Traditional, Hong Kong) input settings appearance:
-   - Open Windows Settings language/input pages in the VM.
-   - Confirm `TypeDuck 粵語輸入法 / TypeDuck Cantonese IME` appears under Chinese (Traditional, Hong Kong) / `zh-HK`.
-   - Save screenshot as `zh-hk-input-settings.png` if possible.
+None
 
-4. Win32/x64 DLL registration:
-   - Confirm `C:\Windows\SysWOW64\TypeDuckTextService.dll` exists and record SHA-256.
-   - Confirm `C:\Windows\System32\TypeDuckTextService.dll` exists and record SHA-256.
-   - Confirm COM/TSF registration contains CLSID {7D92985A-BC53-47B5-A5CC-6E47F86B9D18}.
-   - Confirm profile GUID {C6E8F5DF-6504-44F9-B7CF-17A195373A83} and display text TypeDuck 粵語輸入法 / TypeDuck Cantonese IME are present.
+## Screenshots / Settings Evidence
 
-5. startup entry:
-   - Confirm `HKCU\Software\Microsoft\Windows\CurrentVersion\Run\TypeDuckLauncher` points to `TypeDuckLauncher.exe`.
-
-6. scheduled task:
-   - Confirm task TypeDuckIME-ReRegisterTSF is absent after normal install, or present only when restart-required fallback was documented.
-
-7. uninstall cleanup:
-   - Uninstall TypeDuck from Apps & Features or run the Inno uninstaller with `/VERYSILENT /SUPPRESSMSGBOXES /NORESTART`.
-   - Confirm TypeDuck disappears from Chinese (Traditional, Hong Kong) input methods.
-   - Confirm TypeDuck CLSID/profile keys, startup entry, scheduled task, install directory, SysWOW64 DLL, and System32 DLL are removed.
-   - If locked DLLs require reboot, reboot the VM and repeat cleanup checks.
-
-## Expected Evidence Files
-
-- `registry-before.json`
-- `registry-after-install.json`
-- `registry-after-uninstall.json`
-- `vm-install-registration-uninstall.json`
-- Optional screenshots/limitations: `installer-ui.png`, `zh-hk-input-settings.png`
-
-## Source Audit
-
-GOAL Phase 3: COVERED by Plans 03-01, 03-02, and VM evidence in 03-03.
-INST-01: Bilingual TypeDuck-branded installer, covered by installer skeleton and VM UI evidence.
-INST-02: Select TypeDuck under Chinese (Traditional, Hong Kong), covered by VM settings/profile evidence.
-INST-03: Deterministic CLSID/profile GUID/zh-HK/display text, covered by source constants and VM registry evidence.
-INST-04: Win32 and x64 TSF DLL registration, covered by SysWOW64/System32 evidence.
-INST-05: TypeDuck-owned uninstall cleanup, covered by after-uninstall VM evidence.
-D-01 through D-16: Covered by Plans 03-01 and 03-02 source changes.
-D-17 through D-19: Covered only when this packet is completed against a disposable VM; static checks alone are insufficient.
+- Automation collected registry, file, task, language-list, and uninstall-entry snapshots.
+- If a screenshot is needed for product review, capture Windows Settings showing TypeDuck 粵語輸入法 / TypeDuck Cantonese IME under Chinese (Traditional, Hong Kong) and save it as zh-hk-input-settings.png.
+- Screenshot capture must avoid personal typed content.
 
 ## Limitations
 
-- Manual checklist mode does not prove VM installation by itself.
-- Mark Plan 03-03 complete only after the VM evidence files above contain actual guest snapshots.
+- Get-WinUserLanguageList did not report zh-HK for the guest user; rely on CTF/TIP registry evidence and capture Settings screenshot if needed.
+
+## Source Audit
+
+GOAL Phase 3: COVERED by Plans 03-01, 03-02, and this VM evidence packet.
+INST-01: Bilingual TypeDuck-branded installer, covered by Plan 03-02 source plus installer execution evidence and optional UI screenshot.
+INST-02: Select TypeDuck under Chinese (Traditional, Hong Kong), covered by TypeDuck zh-HK profile registry/language evidence and optional Settings screenshot.
+INST-03: Deterministic CLSID/profile GUID/zh-HK/display text, covered by Plan 03-01 constants and VM registry snapshots.
+INST-04: Win32 and x64 TSF DLL registration, covered by SysWOW64/System32 file hashes and regsvr-created registry snapshots.
+INST-05: TypeDuck-owned uninstall cleanup, covered by after-uninstall snapshots.
+D-01 through D-04: Covered by Plan 03-01 first-party TypeDuck profile registration.
+D-05 through D-16: Covered by Plan 03-02 installer/setup/staging changes.
+D-17 through D-19: Covered by this VM checkpoint and install/uninstall evidence; no host install was attempted.

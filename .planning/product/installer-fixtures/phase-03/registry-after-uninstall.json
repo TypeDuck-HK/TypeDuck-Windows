@@ -1,0 +1,77 @@
+{
+  "label": "after-uninstall",
+  "capturedAt": "2026-06-23T16:55:55Z",
+  "os": {
+    "caption": "Microsoft Windows 10 Pro",
+    "version": "10.0.19045",
+    "buildNumber": "19045",
+    "osArchitecture": "64-bit"
+  },
+  "expected": {
+    "clsid": "{7D92985A-BC53-47B5-A5CC-6E47F86B9D18}",
+    "profileGuid": "{C6E8F5DF-6504-44F9-B7CF-17A195373A83}",
+    "locale": "zh-HK",
+    "displayName": "TypeDuck 粵語輸入法 / TypeDuck Cantonese IME"
+  },
+  "registry": {
+    "hklmTip": {
+      "path": "HKLM:\\SOFTWARE\\Microsoft\\CTF\\TIP\\{7D92985A-BC53-47B5-A5CC-6E47F86B9D18}",
+      "exists": false,
+      "values": {},
+      "children": []
+    },
+    "hkcuTip": {
+      "path": "HKCU:\\Software\\Microsoft\\CTF\\TIP\\{7D92985A-BC53-47B5-A5CC-6E47F86B9D18}",
+      "exists": false,
+      "values": {},
+      "children": []
+    },
+    "hkcrClsid": {
+      "path": "Registry::HKEY_CLASSES_ROOT\\CLSID\\{7D92985A-BC53-47B5-A5CC-6E47F86B9D18}",
+      "exists": false,
+      "values": {},
+      "children": []
+    },
+    "hkcuClsid": {
+      "path": "HKCU:\\Software\\Classes\\CLSID\\{7D92985A-BC53-47B5-A5CC-6E47F86B9D18}",
+      "exists": false,
+      "values": {},
+      "children": []
+    },
+    "runTypeDuckLauncher": ""
+  },
+  "files": {
+    "installDir": {
+      "path": "C:\\Program Files (x86)\\TypeDuckIME",
+      "exists": false
+    },
+    "win32Dll": {
+      "path": "C:\\Windows\\SysWOW64\\TypeDuckTextService.dll",
+      "exists": false,
+      "sha256": null,
+      "length": null,
+      "lastWriteTimeUtc": null
+    },
+    "x64Dll": {
+      "path": "C:\\Windows\\System32\\TypeDuckTextService.dll",
+      "exists": false,
+      "sha256": null,
+      "length": null,
+      "lastWriteTimeUtc": null
+    }
+  },
+  "scheduledTask": {
+    "exists": false,
+    "taskName": "TypeDuckIME-ReRegisterTSF"
+  },
+  "languageList": {
+    "languageTag": "en-US",
+    "inputMethodTips": [
+      "0409:00000409"
+    ]
+  },
+  "uninstallEntries": {},
+  "PSComputerName": "My Virtual Machine",
+  "RunspaceId": "e4e83c2f-b95f-4680-b141-c03cc2b23ebe",
+  "PSShowComputerName": true
+}

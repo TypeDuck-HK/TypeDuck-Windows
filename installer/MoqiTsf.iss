@@ -8,6 +8,9 @@
 #define MyAppId "{{9B52CF20-1C5D-4C74-9F5D-9E66377C8F37}"
 #define ImeClsid "{{7D92985A-BC53-47B5-A5CC-6E47F86B9D18}}"
 #define LegacyMoqiImeClsid "{{8F204C91-2D7A-4B3E-9E1F-6A5C0D8B2E7F}}"
+#define ImeClsidCode "{7D92985A-BC53-47B5-A5CC-6E47F86B9D18}"
+#define ImeProfileGuidCode "{C6E8F5DF-6504-44F9-B7CF-17A195373A83}"
+#define LegacyMoqiImeClsidCode "{8F204C91-2D7A-4B3E-9E1F-6A5C0D8B2E7F}"
 
 #ifndef StageDir
   #define StageDir "..\stage"
@@ -89,10 +92,10 @@ begin
     FileExists(ExpandConstant('{app}\TypeDuckLauncher.exe')) or
     FileExists(ExpandConstant('{syswow64}\TypeDuckTextService.dll')) or
     FileExists(ExpandConstant('{sys}\TypeDuckTextService.dll')) or
-    RegKeyExists(HKEY_LOCAL_MACHINE, 'SOFTWARE\Microsoft\CTF\TIP\{#ImeClsid}') or
-    RegKeyExists(HKEY_CURRENT_USER, 'Software\Microsoft\CTF\TIP\{#ImeClsid}') or
-    RegKeyExists(HKEY_CLASSES_ROOT, 'CLSID\{#ImeClsid}') or
-    RegKeyExists(HKEY_CURRENT_USER, 'Software\Classes\CLSID\{#ImeClsid}');
+    RegKeyExists(HKEY_LOCAL_MACHINE, 'SOFTWARE\Microsoft\CTF\TIP\{#ImeClsidCode}') or
+    RegKeyExists(HKEY_CURRENT_USER, 'Software\Microsoft\CTF\TIP\{#ImeClsidCode}') or
+    RegKeyExists(HKEY_CLASSES_ROOT, 'CLSID\{#ImeClsidCode}') or
+    RegKeyExists(HKEY_CURRENT_USER, 'Software\Classes\CLSID\{#ImeClsidCode}');
 end;
 
 procedure DeleteRegistryTreeIfPresent(const RootKey: Integer; const Subkey: String);
@@ -106,22 +109,25 @@ var
   ClsidKey: String;
   TipKey: String;
 begin
-  ClsidKey := 'CLSID\{#ImeClsid}';
-  TipKey := 'SOFTWARE\Microsoft\CTF\TIP\{#ImeClsid}';
+  ClsidKey := 'CLSID\{#ImeClsidCode}';
+  TipKey := 'SOFTWARE\Microsoft\CTF\TIP\{#ImeClsidCode}';
   DeleteRegistryTreeIfPresent(HKEY_CLASSES_ROOT, ClsidKey);
   DeleteRegistryTreeIfPresent(HKEY_LOCAL_MACHINE, TipKey);
-  DeleteRegistryTreeIfPresent(HKEY_CURRENT_USER, 'Software\Microsoft\CTF\TIP\{#ImeClsid}');
-  DeleteRegistryTreeIfPresent(HKEY_CURRENT_USER, 'Software\Classes\CLSID\{#ImeClsid}');
+  DeleteRegistryTreeIfPresent(HKEY_CURRENT_USER, 'Software\Microsoft\CTF\TIP\{#ImeClsidCode}\LanguageProfile\0x00000c04\{#ImeProfileGuidCode}');
+  DeleteRegistryTreeIfPresent(HKEY_CURRENT_USER, 'Software\Microsoft\CTF\TIP\{#ImeClsidCode}\LanguageProfile\0x00000c04');
+  DeleteRegistryTreeIfPresent(HKEY_CURRENT_USER, 'Software\Microsoft\CTF\TIP\{#ImeClsidCode}\LanguageProfile');
+  DeleteRegistryTreeIfPresent(HKEY_CURRENT_USER, 'Software\Microsoft\CTF\TIP\{#ImeClsidCode}');
+  DeleteRegistryTreeIfPresent(HKEY_CURRENT_USER, 'Software\Classes\CLSID\{#ImeClsidCode}');
   RegDeleteValue(HKEY_CURRENT_USER, StartupSubkey, 'TypeDuckLauncher');
 end;
 
 procedure RegPurgeLegacyMoqiResiduals;
 begin
   // Legacy Moqi migration cleanup: allowlist only this scaffold CLSID/TIP/startup residue.
-  DeleteRegistryTreeIfPresent(HKEY_CLASSES_ROOT, 'CLSID\{#LegacyMoqiImeClsid}');
-  DeleteRegistryTreeIfPresent(HKEY_LOCAL_MACHINE, 'SOFTWARE\Microsoft\CTF\TIP\{#LegacyMoqiImeClsid}');
-  DeleteRegistryTreeIfPresent(HKEY_CURRENT_USER, 'Software\Microsoft\CTF\TIP\{#LegacyMoqiImeClsid}');
-  DeleteRegistryTreeIfPresent(HKEY_CURRENT_USER, 'Software\Classes\CLSID\{#LegacyMoqiImeClsid}');
+  DeleteRegistryTreeIfPresent(HKEY_CLASSES_ROOT, 'CLSID\{#LegacyMoqiImeClsidCode}');
+  DeleteRegistryTreeIfPresent(HKEY_LOCAL_MACHINE, 'SOFTWARE\Microsoft\CTF\TIP\{#LegacyMoqiImeClsidCode}');
+  DeleteRegistryTreeIfPresent(HKEY_CURRENT_USER, 'Software\Microsoft\CTF\TIP\{#LegacyMoqiImeClsidCode}');
+  DeleteRegistryTreeIfPresent(HKEY_CURRENT_USER, 'Software\Classes\CLSID\{#LegacyMoqiImeClsidCode}');
   RegDeleteValue(HKEY_CURRENT_USER, StartupSubkey, 'MoqiLauncher');
 end;
 
