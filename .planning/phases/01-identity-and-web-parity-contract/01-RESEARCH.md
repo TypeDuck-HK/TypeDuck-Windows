@@ -325,15 +325,15 @@ rg -n "Display Languages|Candidates Jyutping|Auto-completion|Auto-correction|Aut
 
 ## Open Questions
 
+Resolved by Phase 1 plan coverage in revision iteration 1. [VERIFIED: 01-01-PLAN.md; VERIFIED: 01-02-PLAN.md]
+
 1. **Should generated TypeDuck GUID/AppId values be locked automatically or gated by human review?**
-   - What we know: D-05 prefers new deterministic TypeDuck-owned values. [VERIFIED: 01-CONTEXT.md]
-   - What's unclear: Whether the user wants to approve exact AppId/CLSID/profile GUIDs before downstream phases consume them. [ASSUMED]
-   - Recommendation: Planner should include a checkpoint after the identity contract proposes exact identifiers. [ASSUMED]
+   - Resolution: `01-01-PLAN.md` requires the identity contract to include Channel Readiness guidance and to mark AppId/CLSID/profile GUID values as proposed/pending human review unless already approved. [VERIFIED: 01-01-PLAN.md]
+   - Implementation boundary: Phase 1 remains documentation-only and explicitly does not implement beta/stable side-by-side support. [VERIFIED: 01-CONTEXT.md; VERIFIED: 01-01-PLAN.md]
 
 2. **How much screenshot capture is enough for VER-01?**
-   - What we know: VER-01 requires dated fixtures covering settings defaults, labels, candidate list, dictionary panel, and visual references. [VERIFIED: .planning/REQUIREMENTS.md]
-   - What's unclear: Exact viewport count and sample candidate inputs are not locked. [VERIFIED: 01-CONTEXT.md]
-   - Recommendation: Capture at least desktop settings, candidate list, dictionary panel with English, and dictionary panel with additional display languages; record any missing sample as partial. [ASSUMED]
+   - Resolution: `01-02-PLAN.md` defines the Phase 1 minimum sufficient visual set as desktop 1280x720 settings, candidate-list, and dictionary-detail screenshots when runtime capture works. [VERIFIED: 01-02-PLAN.md]
+   - Fallback: blocked/partial metadata is acceptable when runtime or screenshot capture is unavailable, provided the exact unavailable source or attempted capture is recorded. [VERIFIED: 01-CONTEXT.md; VERIFIED: 01-02-PLAN.md]
 
 ## Environment Availability
 
