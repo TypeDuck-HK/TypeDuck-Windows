@@ -86,7 +86,7 @@
 
 ### Verification and Release Readiness
 
-- [ ] **VER-01**: Developer has a dated TypeDuck Web alpha parity fixture set covering settings defaults, labels, candidate list, dictionary panel, and visual references.
+- [x] **VER-01**: Developer has a dated TypeDuck Web alpha parity fixture set covering settings defaults, labels, candidate list, dictionary panel, and visual references.
 - [ ] **VER-02**: Developer can run automated or scripted checks that fail when visible Moqi, fcitx, WebDAV/cloud clipboard, AI, or Simplified-only strings remain in user-facing resources.
 - [ ] **VER-03**: Developer can verify clean install, upgrade/reinstall, uninstall, and reboot-required registration behavior on Windows 10/11 or equivalent test VMs.
 - [ ] **VER-04**: Developer can verify TypeDuck typing and candidate UI in representative host apps including Notepad, browsers, Office or Office-like apps, terminal/console contexts, elevated apps, and high-DPI/multi-monitor setups.
@@ -190,7 +190,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | SEC-03 | Phase 6 | Pending |
 | SEC-04 | Phase 6 | Pending |
 | SEC-05 | Phase 6 | Pending |
-| VER-01 | Phase 1 | Pending |
+| VER-01 | Phase 1 | Complete |
 | VER-02 | Phase 6 | Pending |
 | VER-03 | Phase 7 | Pending |
 | VER-04 | Phase 7 | Pending |
