@@ -153,10 +153,11 @@ Captured status for this run:
 
 Blocked/partial metadata is acceptable for Phase 1 when capture is unavailable or unreliable, provided the exact attempted source and limitation are recorded. This artifact records that limitation in `source-metadata.json` and `dictionary-detail-sample.json`.
 
-Dictionary capture interaction note:
+### Pattern Established: Dictionary Hover Requires Movement
 
 - The Web alpha intentionally requires actual mouse movement over a candidate before showing the dictionary panel. This prevents flicker while typing if the pointer happens to be resting on later candidates.
 - The successful capture scrolled down, then moved the mouse across the third candidate cell for 呢 after typing `nei`.
+- Downstream Windows candidate UI work should model this as movement-triggered dictionary reveal, not as passive hover-on-rest. Phase 5 should verify the native candidate panel does not flicker when a stationary pointer rests over a candidate during typing.
 
 Visual token evidence from `tailwind.config.ts` and `index.css`:
 

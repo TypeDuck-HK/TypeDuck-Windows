@@ -43,6 +43,7 @@ key-decisions:
 patterns-established:
   - "Fixture metadata must include URL, source path, commit/hash, dirty status, viewport, capture tool, screenshots, and limitations."
   - "Blocked or partial runtime evidence is acceptable only when the exact attempted source and limitation are recorded."
+  - "Dictionary detail reveal is movement-triggered: actual mouse movement over a candidate shows the panel, while a stationary pointer should not cause typing flicker."
 
 requirements-completed:
   - VER-01
@@ -96,6 +97,7 @@ status: complete
 - Treat `db21054` plus dirty source status as the provenance for this fixture, not as a permanently clean product baseline.
 - Preserve the original baseline screenshots and add multilingual screenshots rather than replacing prior evidence.
 - Use readable UTF-8 JSON with a BOM, and prefer `Get-Content -Raw -Encoding UTF8` for validation.
+- Document the Web alpha dictionary reveal as a movement-triggered interaction pattern for downstream candidate UI work.
 
 ## Deviations from Plan
 
@@ -117,6 +119,7 @@ status: complete
 ## Issues Encountered
 
 - Initial dictionary-detail screenshot capture was partial because the automation did not move across a concrete candidate cell. A follow-up capture succeeded by scrolling down and moving the mouse over the third candidate cell for 呢, matching the Web alpha anti-flicker behavior.
+- GSD handoff note: Phase 5 should treat dictionary reveal as movement-triggered hover behavior and test against stationary-pointer flicker during typing.
 
 ## Known Stubs
 

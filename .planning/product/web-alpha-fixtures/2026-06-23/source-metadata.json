@@ -1,6 +1,6 @@
 ﻿{
   "captureDate": "2026-06-23",
-  "captureStatus": "complete-with-baseline-limitation",
+  "captureStatus": "complete",
   "statusReason": "Source, runtime URL, baseline settings/candidate screenshots, and an additional multilingual Indonesian-main settings/candidate/dictionary screenshot set were captured. The multilingual dictionary screenshot targets the third candidate 呢, scrolls down, then moves across that candidate cell so the richer lower dictionary entries are visible.",
   "alphaUrl": "http://localhost:5173/TypeDuck-Web/aap2-alpha/",
   "runtimeAvailability": {
@@ -138,7 +138,7 @@
     "Playwright Chromium launch with viewport 1280x720 and Chrome executable C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe",
     "Playwright textarea input `nei`, screenshot capture for settings and candidate panel",
     "Playwright hover/mousemove/touchstart attempts for dictionary panel screenshot",
-    "Playwright enabled all display languages, selected Indonesian as main language, typed `nei`, and moved the mouse over the first candidate cell before capturing the dictionary panel.",
+    "Initial Playwright multilingual capture enabled all display languages, selected Indonesian as main language, typed `nei`, and moved the mouse over the first candidate cell before capturing the dictionary panel.",
     "Playwright replacement capture selected the row containing third candidate 呢 and moved the mouse across its candidate cell before replacing dictionary-detail-multilingual-indonesian-main-desktop-1280x720.png."
   ],
   "accessLimitations": [
