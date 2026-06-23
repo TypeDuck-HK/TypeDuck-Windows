@@ -1,0 +1,76 @@
+{
+  "phase": "04-typeduck-protocol-and-typing-mvp",
+  "plan": "04-02",
+  "contract": "TypeDuck launcher recovery proof obligations",
+  "transport": {
+    "preserved": true,
+    "client_to_launcher": "same-user Windows named pipe using length-prefixed protobuf frames",
+    "launcher_to_backend": "backend process stdin/stdout using length-prefixed protobuf frames"
+  },
+  "profile_mapping": {
+    "typeduck_profile_guid": "c6e8f5df-6504-44f9-b7cf-17a195373a83",
+    "backend_bridge_name": "typeduck-runtime-bridge",
+    "backend_ime_json_authority": "optional compatibility metadata only"
+  },
+  "frame_bounds": {
+    "client_payload_bytes": 1048576,
+    "backend_payload_bytes": 1048576
+  },
+  "runtime_cases": [
+    {
+      "id": "malformed-client-frame-cleanup",
+      "trigger": "send a client named-pipe frame with malformed protobuf payload or invalid length framing",
+      "expected_response": {
+        "success": false,
+        "error_code": "TYPEDUCK_ERROR_MALFORMED_FRAME",
+        "health_status": "TYPEDUCK_HEALTH_DEGRADED",
+        "recoverable": true
+      },
+      "plan_04_04_proof": "Probe sends malformed client input and records that the launcher rejects it without retaining stale client/backend state."
+    },
+    {
+      "id": "oversized-backend-stdout-rejection",
+      "trigger": "backend emits a stdout frame whose declared payload exceeds the configured backend frame limit",
+      "expected_response": {
+        "success": false,
+        "error_code": "TYPEDUCK_ERROR_PAYLOAD_TOO_LARGE",
+        "health_status": "TYPEDUCK_HEALTH_DEGRADED",
+        "recoverable": true
+      },
+      "plan_04_04_proof": "Probe backend emits an oversized stdout frame and records that no stale backend payload is routed to a TSF client."
+    },
+    {
+      "id": "missing-backend-init-failure-response",
+      "trigger": "client sends METHOD_INIT with an unmapped or unavailable TypeDuck profile/backend bridge",
+      "expected_response": {
+        "success": false,
+        "error_code": "TYPEDUCK_ERROR_ENGINE_INIT_FAILED",
+        "health_status": "TYPEDUCK_HEALTH_FAILED",
+        "recoverable": false
+      },
+      "plan_04_04_proof": "Probe starts launcher without a usable bridge mapping and records a bounded init failure response."
+    },
+    {
+      "id": "backend-timeout-response-before-restart",
+      "trigger": "backend accepts a request but does not answer before the request timeout",
+      "expected_response": {
+        "success": false,
+        "error_code": "TYPEDUCK_ERROR_BACKEND_TIMEOUT",
+        "health_status": "TYPEDUCK_HEALTH_RESTARTING",
+        "recoverable": true
+      },
+      "plan_04_04_proof": "Probe backend hangs and records that the waiting client receives a timeout response before launcher restart/cleanup."
+    },
+    {
+      "id": "backend-restart-degraded-response",
+      "trigger": "backend stdout/read error or crash forces launcher restart handling",
+      "expected_response": {
+        "success": false,
+        "error_code": "TYPEDUCK_ERROR_BACKEND_RESTART",
+        "health_status": "TYPEDUCK_HEALTH_DEGRADED",
+        "recoverable": true
+      },
+      "plan_04_04_proof": "Probe backend closes unexpectedly and records an explicit degraded restart response."
+    }
+  ]
+}
