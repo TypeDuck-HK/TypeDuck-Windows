@@ -112,7 +112,12 @@ Plans:
 
 **Verification Environment**: Mostly code-testable through protocol, parser, engine-adapter, frame-bound, timeout, and fixture tests. Once TSF typing is wired, include a targeted Windows VM smoke test for real host-process typing responsiveness.
 
-**Plans**: TBD
+**Plans**: 1/4 plans executed
+
+- [x] 04-01-PLAN.md
+- [ ] 04-02-PLAN.md
+- [ ] 04-03-PLAN.md
+- [ ] 04-04-PLAN.md
 
 ### Phase 5: Candidate, Dictionary, Settings, and About UI Parity
 
@@ -176,8 +181,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7
 | 1. Identity and Web Parity Contract | 2/2 | Complete   | 2026-06-23 |
 | 2. Engine Runtime Contract Spike | 3/3 | Complete    | 2026-06-23 |
 | 3. zh-HK TSF Registration and Installer Skeleton | 3/3 | Complete    | 2026-06-24 |
-| 4. TypeDuck Protocol and Typing MVP | 0/TBD | Not started | - |
+| 4. TypeDuck Protocol and Typing MVP | 1/4 | In Progress|  |
 | 5. Candidate, Dictionary, Settings, and About UI Parity | 0/TBD | Not started | - |
 | 6. Privacy, Security, and Scaffold Cleanup | 0/TBD | Not started | - |
 | 7. Compatibility and Release Verification | 0/TBD | Not started | - |
-
