@@ -1,7 +1,7 @@
 ﻿{
   "captureDate": "2026-06-23",
   "captureStatus": "complete",
-  "statusReason": "Source, runtime URL, scrolled settings screenshots, candidate screenshots, and multilingual Indonesian-main dictionary screenshot were captured. Settings screenshots are scrolled to expose lower controls including Candidates Jyutping, toggles, Reverse Lookup Settings, Show Full Input Code, and Cangjie Version.",
+  "statusReason": "Source, runtime URL, scrolled settings screenshots, candidate screenshots, multilingual Indonesian-main dictionary screenshots, and reverse lookup screenshot were captured. Settings screenshots are scrolled to expose lower controls including Candidates Jyutping, toggles, Reverse Lookup Settings, Show Full Input Code, and Cangjie Version.",
   "alphaUrl": "http://localhost:5173/TypeDuck-Web/aap2-alpha/",
   "runtimeAvailability": {
     "status": "available",
@@ -92,6 +92,32 @@
           "jyutping": "nei1"
         },
         "scrollY": 260
+      },
+      {
+        "file": "screenshots/dictionary-detail-housam-second-candidate-multilingual-indonesian-main-desktop-1280x720.png",
+        "status": "captured_scrolled",
+        "viewport": "1280x720",
+        "evidence": "Typed `housam`, scrolled down, then moved the mouse across the second candidate cell for 好心你, showing compound dictionary entries for 好心 and 你.",
+        "input": "housam",
+        "targetCandidate": {
+          "index": 2,
+          "text": "好心你",
+          "jyutping": "hou2 sam1 nei5"
+        },
+        "scrollY": 220
+      },
+      {
+        "file": "screenshots/candidate-reverse-lookup-cangjie-nei-onf-multilingual-indonesian-main-desktop-1280x720.png",
+        "status": "captured",
+        "viewport": "1280x720",
+        "evidence": "Typed backtick + c + Cangjie code `onf` for 你, showing reverse lookup buffer `onf〔倉頡五代〕（人弓火）` and 你 as the first candidate.",
+        "input": "`conf",
+        "reverseLookup": {
+          "mode": "Cangjie Version 5",
+          "target": "你",
+          "cangjieCode": "onf",
+          "cangjieRoots": "人弓火"
+        }
       }
     ]
   },
@@ -132,6 +158,14 @@
       "jyutping": "nei1",
       "note": "→ni1"
     },
+    "housamSecondCandidateDictionaryPanelVisible": true,
+    "housamSecondCandidateDictionaryPanelText": "好心hou2 sam1\nadjective 形容詞adverb 副詞vernacular 口語baik hati\nWritten Form 書面語\t拜托\nMore Languages\nEnglish\tkind; come on\nHindi\tदयालु\nNepali\tदयालु\nUrdu\tنرم دل\n你nei5\nother 其他kamu\nMore Languages\nEnglish\tyou (singular)\nHindi\tआप\nNepali\tतपाईं\nUrdu\tتم",
+    "reverseLookupCangjieNei": {
+      "inputSequence": "backtick + c + onf",
+      "candidatePanelText": "onf‸〔倉頡五代〕（人弓火）\n‹\n›\n1. nei5 你 you (singular) / kamu / आप / तपाईं / تم\n2. siu1 㲵 ～月\n3. hei3 氣 ～木 gas / gas / हवा / हावा / ہوا\n4. daam6 氮 ～火 Nitrogen",
+      "showFullInputCode": true,
+      "cangjieVersion": "五代 Version 5"
+    },
     "settingsScrollCapture": {
       "scrollY": 494,
       "reason": "Settings screenshots are scrolled down so lower controls are visible: Candidates Jyutping, Auto-completion, Auto-correction, Auto-composition, Input Memory, Reverse Lookup Settings, Show Full Input Code, and Cangjie Version."
@@ -146,7 +180,9 @@
     "Playwright hover/mousemove/touchstart attempts for dictionary panel screenshot",
     "Initial Playwright multilingual capture enabled all display languages, selected Indonesian as main language, typed `nei`, and moved the mouse over the first candidate cell before capturing the dictionary panel.",
     "Playwright replacement capture selected the row containing third candidate 呢 and moved the mouse across its candidate cell before replacing dictionary-detail-multilingual-indonesian-main-desktop-1280x720.png.",
-    "Playwright recaptured both settings screenshots after scrolling to the lower settings area at window.scrollY 494."
+    "Playwright recaptured both settings screenshots after scrolling to the lower settings area at window.scrollY 494.",
+    "Playwright captured `housam` after scrolling to window.scrollY 220 and moving across the second candidate cell for 好心你.",
+    "Playwright captured reverse lookup by pressing Backquote, then typing `conf` for Cangjie code `onf` of 你."
   ],
   "accessLimitations": [
     {

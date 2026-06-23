@@ -20,6 +20,27 @@
           "urd"
         ],
         "mainLanguage": "ind"
+      },
+      {
+        "file": "screenshots/candidate-reverse-lookup-cangjie-nei-onf-multilingual-indonesian-main-desktop-1280x720.png",
+        "status": "captured",
+        "viewport": "1280x720",
+        "inputSequence": "backtick + c + onf",
+        "reverseLookup": {
+          "mode": "Cangjie Version 5",
+          "target": "你",
+          "cangjieCode": "onf",
+          "cangjieRoots": "人弓火",
+          "candidatePanelBuffer": "onf〔倉頡五代〕（人弓火）"
+        },
+        "displayLanguages": [
+          "eng",
+          "hin",
+          "ind",
+          "nep",
+          "urd"
+        ],
+        "mainLanguage": "ind"
       }
     ]
   },
@@ -168,6 +189,51 @@
       "jyutping": "nei1",
       "note": "→ni1"
     }
+  },
+  "reverseLookupPresentation": {
+    "status": "captured",
+    "screenshot": "screenshots/candidate-reverse-lookup-cangjie-nei-onf-multilingual-indonesian-main-desktop-1280x720.png",
+    "inputSequence": "backtick + c + onf",
+    "inputBuffer": "onf",
+    "modeLabel": "〔倉頡五代〕",
+    "rootDisplay": "（人弓火）",
+    "targetCandidate": {
+      "label": "1.",
+      "text": "你",
+      "jyutping": "nei5",
+      "indonesian": "kamu",
+      "english": "you (singular)",
+      "hindi": "आप",
+      "nepali": "तपाईं",
+      "urdu": "تم"
+    },
+    "showFullInputCode": true,
+    "candidateRowsObserved": [
+      {
+        "label": "1.",
+        "text": "你",
+        "jyutping": "nei5",
+        "codeOrNote": ""
+      },
+      {
+        "label": "2.",
+        "text": "㲵",
+        "jyutping": "siu1",
+        "codeOrNote": "～月"
+      },
+      {
+        "label": "3.",
+        "text": "氣",
+        "jyutping": "hei3",
+        "codeOrNote": "～木"
+      },
+      {
+        "label": "4.",
+        "text": "氮",
+        "jyutping": "daam6",
+        "codeOrNote": "～火"
+      }
+    ]
   },
   "validationNote": "JSON is stored as readable UTF-8 with BOM for Windows PowerShell 5.1 compatibility. Prefer Get-Content -Raw -Encoding UTF8 when validating."
 }

@@ -21,7 +21,7 @@ This artifact records the TypeDuck Web alpha behavior and source evidence captur
 | Browser capture | Playwright with Google Chrome |
 | Browser executable | `C:\Program Files\Google\Chrome\Application\chrome.exe` |
 | Viewport | 1280x720, device scale factor 1 |
-| Overall fixture status | Complete with baseline limitation: source evidence, runtime URL, baseline settings/candidate screenshots, and an additional multilingual Indonesian-main settings/candidate/dictionary screenshot set were captured |
+| Overall fixture status | Complete: source evidence, runtime URL, baseline settings/candidate screenshots, multilingual Indonesian-main settings/candidate/dictionary screenshots, and reverse lookup evidence were captured. The original baseline dictionary screenshot remains a recorded limitation, not the overall fixture status |
 
 Supporting assets:
 
@@ -35,6 +35,8 @@ Supporting assets:
 - `web-alpha-fixtures/2026-06-23/screenshots/settings-multilingual-indonesian-main-desktop-1280x720.png` - captured with all Display Languages enabled, Indonesian selected as main, and the page scrolled down to expose lower settings
 - `web-alpha-fixtures/2026-06-23/screenshots/candidate-multilingual-indonesian-main-desktop-1280x720.png` - captured with all Display Languages enabled and Indonesian selected as main
 - `web-alpha-fixtures/2026-06-23/screenshots/dictionary-detail-multilingual-indonesian-main-desktop-1280x720.png` - captured after scrolling down and physically moving the mouse over the third candidate cell for 呢
+- `web-alpha-fixtures/2026-06-23/screenshots/dictionary-detail-housam-second-candidate-multilingual-indonesian-main-desktop-1280x720.png` - captured after typing `housam`, scrolling down, and physically moving the mouse over the second candidate cell for 好心你
+- `web-alpha-fixtures/2026-06-23/screenshots/candidate-reverse-lookup-cangjie-nei-onf-multilingual-indonesian-main-desktop-1280x720.png` - captured after typing backtick + `c` + Cangjie code `onf` for 你
 
 ## Settings
 
@@ -71,6 +73,7 @@ Visual reference:
 
 - `web-alpha-fixtures/2026-06-23/screenshots/candidate-desktop-1280x720.png`
 - `web-alpha-fixtures/2026-06-23/screenshots/candidate-multilingual-indonesian-main-desktop-1280x720.png`
+- `web-alpha-fixtures/2026-06-23/screenshots/candidate-reverse-lookup-cangjie-nei-onf-multilingual-indonesian-main-desktop-1280x720.png`
 - Viewport: 1280x720
 - Status: captured
 
@@ -84,6 +87,17 @@ Observed runtime candidate panel for `nei`:
 | 4. | `nei4` | 妮 | little girl | shown |
 | 5. | `nei4` | 彌 | full; fill | shown |
 | 6. | `nei5` | 妳 | you | shown |
+
+Observed runtime reverse lookup for backtick + `c` + Cangjie code `onf` for 你:
+
+| Label | Jyutping | Candidate | Meaning / Note | Dictionary Indicator |
+|-------|----------|-----------|----------------|----------------------|
+| 1. | `nei5` | 你 | you (singular), Indonesian `kamu`, Hindi `आप`, Nepali `तपाईं`, Urdu `تم` | shown |
+| 2. | `siu1` | 㲵 | `～月` | not shown |
+| 3. | `hei3` | 氣 | `～木`, gas | shown |
+| 4. | `daam6` | 氮 | `～火`, Nitrogen | shown |
+
+The reverse lookup buffer displays `onf〔倉頡五代〕（人弓火）` when Show Full Input Code is enabled and Cangjie Version 5 is selected.
 
 Candidate presentation contract:
 
@@ -103,9 +117,10 @@ Visual reference:
 
 - `web-alpha-fixtures/2026-06-23/screenshots/dictionary-detail-desktop-1280x720.png`
 - `web-alpha-fixtures/2026-06-23/screenshots/dictionary-detail-multilingual-indonesian-main-desktop-1280x720.png`
+- `web-alpha-fixtures/2026-06-23/screenshots/dictionary-detail-housam-second-candidate-multilingual-indonesian-main-desktop-1280x720.png`
 - Viewport: 1280x720
 - Status: baseline partial, multilingual captured
-- Limitation: The original baseline dictionary-detail screenshot remains partial because the first automation did not move across a concrete candidate cell. The multilingual Indonesian-main dictionary screenshot was captured after scrolling down and physically moving the mouse across the third candidate cell for 呢, which matches the Web alpha behavior that prevents flicker when the pointer is merely resting on candidates during typing.
+- Limitation: The original baseline dictionary-detail screenshot remains partial because the first automation did not move across a concrete candidate cell. The multilingual Indonesian-main dictionary screenshots were captured after scrolling down and physically moving the mouse across concrete candidate cells for 呢 and 好心你, which matches the Web alpha behavior that prevents flicker when the pointer is merely resting on candidates during typing.
 
 Dictionary fields the Windows UI must be able to represent when engine data exists:
 
@@ -130,6 +145,13 @@ Sample source-backed entry anchored to the runtime `nei` candidate list:
 - Indonesian main definition in multilingual capture: `kamu`
 - More Languages runtime capture: English `you (singular)`, Hindi `आप`, Nepali `तपाईं`, Urdu `تم`.
 
+Sample source-backed compound detail anchored to the runtime `housam` candidate list:
+
+- Target candidate: second candidate `好心你`, Jyutping `hou2 sam1 nei5`.
+- Dictionary panel entries: `好心` (`hou2 sam1`) and `你` (`nei5`).
+- `好心` shows adjective/adverb badges, vernacular register, Indonesian main definition `baik hati`, written form `拜托`, and More Languages rows.
+- `你` shows Indonesian main definition `kamu` and More Languages rows for English, Hindi, Nepali, and Urdu.
+
 Full machine-readable detail is in `web-alpha-fixtures/2026-06-23/dictionary-detail-sample.json`.
 
 ## Visual References
@@ -150,6 +172,8 @@ Captured status for this run:
 | Settings, multilingual Indonesian main | captured, scrolled | `web-alpha-fixtures/2026-06-23/screenshots/settings-multilingual-indonesian-main-desktop-1280x720.png` at scrollY 494, showing lower settings with all Display Languages enabled and Indonesian as main |
 | Candidate list, multilingual Indonesian main | captured | `web-alpha-fixtures/2026-06-23/screenshots/candidate-multilingual-indonesian-main-desktop-1280x720.png` |
 | Dictionary detail, multilingual Indonesian main | captured | `web-alpha-fixtures/2026-06-23/screenshots/dictionary-detail-multilingual-indonesian-main-desktop-1280x720.png` |
+| Dictionary detail, `housam` second candidate | captured, scrolled | `web-alpha-fixtures/2026-06-23/screenshots/dictionary-detail-housam-second-candidate-multilingual-indonesian-main-desktop-1280x720.png` at scrollY 220, showing compound entries for 好心 and 你 |
+| Reverse lookup, Cangjie 你 | captured | `web-alpha-fixtures/2026-06-23/screenshots/candidate-reverse-lookup-cangjie-nei-onf-multilingual-indonesian-main-desktop-1280x720.png`, showing backtick + `c` + `onf`, buffer `onf〔倉頡五代〕（人弓火）`, and 你 as the first candidate |
 
 Blocked/partial metadata is acceptable for Phase 1 when capture is unavailable or unreliable, provided the exact attempted source and limitation are recorded. This artifact records that limitation in `source-metadata.json` and `dictionary-detail-sample.json`.
 
@@ -157,6 +181,7 @@ Blocked/partial metadata is acceptable for Phase 1 when capture is unavailable o
 
 - The Web alpha intentionally requires actual mouse movement over a candidate before showing the dictionary panel. This prevents flicker while typing if the pointer happens to be resting on later candidates.
 - The successful capture scrolled down, then moved the mouse across the third candidate cell for 呢 after typing `nei`.
+- A second successful capture scrolled down, then moved the mouse across the second candidate cell for 好心你 after typing `housam`.
 - Downstream Windows candidate UI work should model this as movement-triggered dictionary reveal, not as passive hover-on-rest. Phase 5 should verify the native candidate panel does not flicker when a stationary pointer rests over a candidate during typing.
 
 Visual token evidence from `tailwind.config.ts` and `index.css`:
@@ -211,4 +236,4 @@ These notes are future consumer constraints only. They are not production change
 ---
 
 *Fixture: TypeDuck Web alpha 2026-06-23*
-*Status: partial, source-backed*
+*Status: complete, source-backed*

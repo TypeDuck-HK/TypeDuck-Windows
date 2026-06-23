@@ -5,10 +5,10 @@ milestone_name: milestone
 current_phase: 1
 current_phase_name: Identity and Web Parity Contract
 status: executing
-stopped_at: Completed 01-02-PLAN.md
-last_updated: "2026-06-23T07:41:35.184Z"
+stopped_at: Added supplemental Web alpha fixture screenshots for 01-02
+last_updated: "2026-06-23T09:00:58.135Z"
 last_activity: 2026-06-23
-last_activity_desc: Phase 1 identity, banned-surface, and Web alpha fixture contracts completed.
+last_activity_desc: Phase 1 Web alpha fixtures supplemented with housam dictionary and Cangjie reverse lookup screenshots.
 progress:
   total_phases: 7
   completed_phases: 1
@@ -31,7 +31,7 @@ See: .planning/PROJECT.md (updated 2026-06-23)
 Phase: 1 of 7 (Identity and Web Parity Contract)
 Plan: 2 of 2 in Phase 1 (complete)
 Status: Phase 1 complete, ready for Phase 2 planning/execution
-Last activity: 2026-06-23 - Phase 1 identity, banned-surface, and Web alpha fixture contracts completed.
+Last activity: 2026-06-23 - Web alpha fixtures supplemented with `housam` second-candidate dictionary detail and backtick + `c` + `onf` reverse lookup for 你.
 
 Progress: [█░░░░░░░░░] 14%
 
@@ -72,7 +72,7 @@ Recent decisions affecting current work:
 - [Phase 01]: TypeDuck AppId, CLSID, and profile GUID values are proposed pending human review, while zh-HK bilingual profile text is locked by phase decisions.
 - [Phase 01]: Moqi, fcitx, WebDAV/cloud clipboard, AI, Simplified-only copy, generic config tools, excessive customization, and legacy Moqi backend fallback are banned from v1 product surfaces.
 - [Phase 01]: The 2026-06-23 Web alpha fixture is source-backed at TypeDuck-Web commit db21054 with dirty-worktree status recorded.
-- [Phase 01]: Baseline settings/candidate screenshots and multilingual Indonesian-main settings/candidate/dictionary screenshots were captured at 1280x720.
+- [Phase 01]: Baseline settings/candidate screenshots, multilingual Indonesian-main settings/candidate/dictionary screenshots, supplemental `housam` compound dictionary detail, and Cangjie reverse lookup screenshots were captured at 1280x720.
 - [Phase 01]: Web alpha dictionary detail reveal is movement-triggered: actual mouse movement over a candidate shows the panel, while a stationary pointer should not cause typing flicker.
 - [Phase 01]: Phase 5 and Phase 7 must refresh Web alpha fixtures if the alpha drifts before UI implementation or release verification.
 
@@ -94,6 +94,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-06-23T07:41:35.177Z
-Stopped at: Completed 01-02-PLAN.md
+Last session: 2026-06-23T09:00:58.135Z
+Stopped at: Added supplemental Web alpha fixture screenshots for 01-02
 Resume file: None

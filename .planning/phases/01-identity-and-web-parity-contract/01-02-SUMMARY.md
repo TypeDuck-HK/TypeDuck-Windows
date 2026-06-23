@@ -11,7 +11,7 @@ provides:
   - Dated TypeDuck Web alpha fixture contract for VER-01
   - Source/runtime provenance JSON for the 2026-06-23 Web alpha capture
   - Settings, candidate-list, and dictionary-detail fixture JSON
-  - Settings and candidate-list desktop screenshots, plus additional multilingual Indonesian-main settings/candidate/dictionary screenshots
+  - Settings and candidate-list desktop screenshots, plus additional multilingual Indonesian-main settings/candidate/dictionary, housam compound dictionary, and Cangjie reverse lookup screenshots
 affects: [phase-5-ui-parity, phase-7-release-verification]
 
 tech-stack:
@@ -33,6 +33,8 @@ key-files:
     - .planning/product/web-alpha-fixtures/2026-06-23/screenshots/settings-multilingual-indonesian-main-desktop-1280x720.png
     - .planning/product/web-alpha-fixtures/2026-06-23/screenshots/candidate-multilingual-indonesian-main-desktop-1280x720.png
     - .planning/product/web-alpha-fixtures/2026-06-23/screenshots/dictionary-detail-multilingual-indonesian-main-desktop-1280x720.png
+    - .planning/product/web-alpha-fixtures/2026-06-23/screenshots/dictionary-detail-housam-second-candidate-multilingual-indonesian-main-desktop-1280x720.png
+    - .planning/product/web-alpha-fixtures/2026-06-23/screenshots/candidate-reverse-lookup-cangjie-nei-onf-multilingual-indonesian-main-desktop-1280x720.png
   modified: []
 
 key-decisions:
@@ -70,7 +72,7 @@ status: complete
 - Created the dated VER-01 fixture contract at `.planning/product/TYPEDUCK-WEB-ALPHA-FIXTURES-2026-06-23.md`.
 - Captured source provenance from `I:\GitHub\TypeDuck-Web` at commit `db21054`, branch `aap2-alpha`, with dirty worktree status recorded.
 - Created small JSON fixtures for settings order/defaults, candidate-list presentation, and dictionary-detail structure.
-- Captured settings and candidate-list desktop screenshots at `1280x720`, then added a multilingual Indonesian-main settings/candidate/dictionary screenshot set after moving the mouse over a concrete candidate cell.
+- Captured settings and candidate-list desktop screenshots at `1280x720`, then added multilingual Indonesian-main settings/candidate/dictionary screenshots, a `housam` second-candidate dictionary screenshot, and a Cangjie reverse lookup screenshot for 你.
 
 ## Task Commits
 
@@ -91,6 +93,8 @@ status: complete
 - `.planning/product/web-alpha-fixtures/2026-06-23/screenshots/settings-multilingual-indonesian-main-desktop-1280x720.png` - Captured scrolled settings screenshot with all display languages enabled and Indonesian as main.
 - `.planning/product/web-alpha-fixtures/2026-06-23/screenshots/candidate-multilingual-indonesian-main-desktop-1280x720.png` - Captured candidate-list screenshot with multilingual definitions.
 - `.planning/product/web-alpha-fixtures/2026-06-23/screenshots/dictionary-detail-multilingual-indonesian-main-desktop-1280x720.png` - Captured dictionary-detail screenshot after scrolling down and moving over the third candidate cell for 呢.
+- `.planning/product/web-alpha-fixtures/2026-06-23/screenshots/dictionary-detail-housam-second-candidate-multilingual-indonesian-main-desktop-1280x720.png` - Captured dictionary-detail screenshot after scrolling down and moving over the second candidate cell for 好心你.
+- `.planning/product/web-alpha-fixtures/2026-06-23/screenshots/candidate-reverse-lookup-cangjie-nei-onf-multilingual-indonesian-main-desktop-1280x720.png` - Captured reverse lookup screenshot for backtick + `c` + Cangjie code `onf` of 你.
 
 ## Decisions Made
 
@@ -120,6 +124,7 @@ status: complete
 
 - Initial dictionary-detail screenshot capture was partial because the automation did not move across a concrete candidate cell. A follow-up capture succeeded by scrolling down and moving the mouse over the third candidate cell for 呢, matching the Web alpha anti-flicker behavior.
 - GSD handoff note: Phase 5 should treat dictionary reveal as movement-triggered hover behavior and test against stationary-pointer flicker during typing.
+- Follow-up fixture refinement captured `housam` on the second candidate and reverse lookup with backtick + `c` + `onf` for 你.
 
 ## Known Stubs
 
@@ -156,6 +161,8 @@ Phase 1 artifacts now cover IDEN-02 and VER-01. Phase 2 can proceed to the engin
 - Found `.planning/product/web-alpha-fixtures/2026-06-23/screenshots/settings-multilingual-indonesian-main-desktop-1280x720.png`
 - Found `.planning/product/web-alpha-fixtures/2026-06-23/screenshots/candidate-multilingual-indonesian-main-desktop-1280x720.png`
 - Found `.planning/product/web-alpha-fixtures/2026-06-23/screenshots/dictionary-detail-multilingual-indonesian-main-desktop-1280x720.png`
+- Found `.planning/product/web-alpha-fixtures/2026-06-23/screenshots/dictionary-detail-housam-second-candidate-multilingual-indonesian-main-desktop-1280x720.png`
+- Found `.planning/product/web-alpha-fixtures/2026-06-23/screenshots/candidate-reverse-lookup-cangjie-nei-onf-multilingual-indonesian-main-desktop-1280x720.png`
 - Found task commit `b835f77`
 - Found task commit `002873b`
 
