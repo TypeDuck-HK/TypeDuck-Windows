@@ -1,0 +1,12 @@
+diff --git a/input_methods/rime/librime.go b/input_methods/rime/librime.go
+index 58e99fb..46e3ac1 100644
+--- a/input_methods/rime/librime.go
++++ b/input_methods/rime/librime.go
+@@ -73,6 +73,7 @@ type rimeCompositionC struct {
+ type rimeCandidateC struct {
+ 	Text     *byte
+ 	Comment  *byte
++	Quality  float64
+ 	Reserved uintptr
+ }
+ 
