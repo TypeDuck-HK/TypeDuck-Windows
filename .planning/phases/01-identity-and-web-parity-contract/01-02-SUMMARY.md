@@ -89,7 +89,7 @@ status: complete
 - `.planning/product/web-alpha-fixtures/2026-06-23/screenshots/candidate-desktop-1280x720.png` - Captured candidate-list screenshot.
 - `.planning/product/web-alpha-fixtures/2026-06-23/screenshots/settings-multilingual-indonesian-main-desktop-1280x720.png` - Captured settings screenshot with all display languages enabled and Indonesian as main.
 - `.planning/product/web-alpha-fixtures/2026-06-23/screenshots/candidate-multilingual-indonesian-main-desktop-1280x720.png` - Captured candidate-list screenshot with multilingual definitions.
-- `.planning/product/web-alpha-fixtures/2026-06-23/screenshots/dictionary-detail-multilingual-indonesian-main-desktop-1280x720.png` - Captured dictionary-detail screenshot after moving over the first candidate cell.
+- `.planning/product/web-alpha-fixtures/2026-06-23/screenshots/dictionary-detail-multilingual-indonesian-main-desktop-1280x720.png` - Captured dictionary-detail screenshot after scrolling down and moving over the third candidate cell for 呢.
 
 ## Decisions Made
 
@@ -116,7 +116,7 @@ status: complete
 
 ## Issues Encountered
 
-- Initial dictionary-detail screenshot capture was partial because the automation did not move across a concrete candidate cell. A follow-up capture succeeded by moving the mouse over the first candidate cell, matching the Web alpha anti-flicker behavior.
+- Initial dictionary-detail screenshot capture was partial because the automation did not move across a concrete candidate cell. A follow-up capture succeeded by scrolling down and moving the mouse over the third candidate cell for 呢, matching the Web alpha anti-flicker behavior.
 
 ## Known Stubs
 

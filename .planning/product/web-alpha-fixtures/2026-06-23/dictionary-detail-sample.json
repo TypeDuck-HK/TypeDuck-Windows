@@ -29,9 +29,17 @@
           "urd"
         ],
         "mainLanguage": "ind",
-        "captureMethod": "Physical mouse movement across the first candidate cell after typing `nei`."
+        "captureMethod": "Scrolled down, then physically moved the mouse across the third candidate cell for 呢 after typing `nei`.",
+        "targetCandidate": {
+          "index": 3,
+          "text": "呢",
+          "jyutping": "nei1",
+          "note": "→ni1"
+        },
+        "scrollY": 260
       }
-    ]
+    ],
+    "dictionaryPanelText": "呢nei1\nother 其他vernacular 口語→ni1\nWritten Form 書面語\t這\n呢ni1(literary reading 文讀 > nai4)\nother 其他vernacular 口語\nWritten Form 書面語\t這\nMore Languages\nEnglish\tthis\n呢ne1\nparticle 助詞(imbuhan kata)\nMore Languages\nEnglish\t(how about)\nHindi\t(particle)\nUrdu\t(particle)"
   },
   "sourceEvidence": [
     {
@@ -118,44 +126,37 @@
     }
   ],
   "sampleEntryFromRuntimeCandidate": {
-    "headword": "你",
-    "jyutping": "nei5",
-    "partOfSpeech": "available when lookup-filter source data supplies partOfSpeech",
-    "englishMeaning": "you (singular)",
-    "readingNotes": "available when source data supplies pronunciation labels or literary/colloquial reading data",
+    "headword": "呢",
+    "jyutping": "nei1",
+    "canonicalReference": "→ni1",
+    "partOfSpeech": "particle 助詞 for the ne1 entry when lookup data supplies it",
+    "englishMeaning": "this; (how about)",
+    "readingNotes": "literary reading 文讀 > nai4 appears on the ni1 entry",
+    "writtenForm": "這",
+    "register": "vernacular 口語",
     "moreLanguages": {
-      "status": "source-backed",
-      "source": "DictionaryPanel.tsx renders More Languages rows from CandidateEntry.otherLanguages(preferences) for enabled non-main display languages.",
-      "languages": [
-        "Hindi",
-        "Indonesian",
-        "Nepali",
-        "Urdu"
-      ],
-      "runtimeObserved": {
-        "status": "captured",
-        "screenshot": "screenshots/dictionary-detail-multilingual-indonesian-main-desktop-1280x720.png",
-        "mainLanguage": "Indonesian",
-        "mainDefinition": "kamu",
-        "rows": [
-          {
-            "language": "English",
-            "value": "you (singular)"
-          },
-          {
-            "language": "Hindi",
-            "value": "आप"
-          },
-          {
-            "language": "Nepali",
-            "value": "तपाईं"
-          },
-          {
-            "language": "Urdu",
-            "value": "تم"
-          }
-        ]
-      }
+      "status": "captured",
+      "screenshot": "screenshots/dictionary-detail-multilingual-indonesian-main-desktop-1280x720.png",
+      "mainLanguage": "Indonesian",
+      "mainDefinition": "(imbuhan kata) for the particle entry when present",
+      "rows": [
+        {
+          "language": "English",
+          "value": "this"
+        },
+        {
+          "language": "English",
+          "value": "(how about)"
+        },
+        {
+          "language": "Hindi",
+          "value": "(particle)"
+        },
+        {
+          "language": "Urdu",
+          "value": "(particle)"
+        }
+      ]
     }
   },
   "visualTokens": {
@@ -167,7 +168,7 @@
   },
   "limitations": [
     "The original baseline dictionary-detail screenshot remains partial because the first automation did not move across a concrete candidate cell.",
-    "A multilingual Indonesian-main dictionary screenshot was captured after moving the mouse over the first candidate cell.",
+    "The multilingual Indonesian-main dictionary screenshot targets the third candidate 呢, scrolls down first, and was captured after moving the mouse over that candidate cell.",
     "The sample entry is not a complete dictionary database dump."
   ],
   "validationNote": "JSON is stored as readable UTF-8 with BOM for Windows PowerShell 5.1 compatibility. Prefer Get-Content -Raw -Encoding UTF8 when validating."

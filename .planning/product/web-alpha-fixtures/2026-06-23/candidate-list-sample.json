@@ -160,7 +160,14 @@
         "nepali": "तपाईं",
         "urdu": "تم"
       }
-    ]
+    ],
+    "dictionaryScreenshotTarget": {
+      "file": "screenshots/dictionary-detail-multilingual-indonesian-main-desktop-1280x720.png",
+      "candidateIndex": 3,
+      "text": "呢",
+      "jyutping": "nei1",
+      "note": "→ni1"
+    }
   },
   "validationNote": "JSON is stored as readable UTF-8 with BOM for Windows PowerShell 5.1 compatibility. Prefer Get-Content -Raw -Encoding UTF8 when validating."
 }

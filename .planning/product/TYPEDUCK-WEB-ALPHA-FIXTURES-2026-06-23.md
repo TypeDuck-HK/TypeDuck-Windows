@@ -34,7 +34,7 @@ Supporting assets:
 - `web-alpha-fixtures/2026-06-23/screenshots/dictionary-detail-desktop-1280x720.png` - partial/blocked, no file created because the dictionary panel did not appear under controlled Playwright hover/touch attempts
 - `web-alpha-fixtures/2026-06-23/screenshots/settings-multilingual-indonesian-main-desktop-1280x720.png` - captured with all Display Languages enabled and Indonesian selected as main
 - `web-alpha-fixtures/2026-06-23/screenshots/candidate-multilingual-indonesian-main-desktop-1280x720.png` - captured with all Display Languages enabled and Indonesian selected as main
-- `web-alpha-fixtures/2026-06-23/screenshots/dictionary-detail-multilingual-indonesian-main-desktop-1280x720.png` - captured after physically moving the mouse over the first candidate cell
+- `web-alpha-fixtures/2026-06-23/screenshots/dictionary-detail-multilingual-indonesian-main-desktop-1280x720.png` - captured after scrolling down and physically moving the mouse over the third candidate cell for 呢
 
 ## Settings
 
@@ -105,7 +105,7 @@ Visual reference:
 - `web-alpha-fixtures/2026-06-23/screenshots/dictionary-detail-multilingual-indonesian-main-desktop-1280x720.png`
 - Viewport: 1280x720
 - Status: baseline partial, multilingual captured
-- Limitation: The original baseline dictionary-detail screenshot remains partial because the first automation did not move across a concrete candidate cell. The multilingual Indonesian-main dictionary screenshot was captured after physically moving the mouse across the first candidate cell, which matches the Web alpha behavior that prevents flicker when the pointer is merely resting on candidates during typing.
+- Limitation: The original baseline dictionary-detail screenshot remains partial because the first automation did not move across a concrete candidate cell. The multilingual Indonesian-main dictionary screenshot was captured after scrolling down and physically moving the mouse across the third candidate cell for 呢, which matches the Web alpha behavior that prevents flicker when the pointer is merely resting on candidates during typing.
 
 Dictionary fields the Windows UI must be able to represent when engine data exists:
 
@@ -156,7 +156,7 @@ Blocked/partial metadata is acceptable for Phase 1 when capture is unavailable o
 Dictionary capture interaction note:
 
 - The Web alpha intentionally requires actual mouse movement over a candidate before showing the dictionary panel. This prevents flicker while typing if the pointer happens to be resting on later candidates.
-- The successful capture moved the mouse across the first candidate cell after typing `nei`.
+- The successful capture scrolled down, then moved the mouse across the third candidate cell for 呢 after typing `nei`.
 
 Visual token evidence from `tailwind.config.ts` and `index.css`:
 

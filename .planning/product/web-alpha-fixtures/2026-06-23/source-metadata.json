@@ -1,7 +1,7 @@
 ﻿{
   "captureDate": "2026-06-23",
   "captureStatus": "complete-with-baseline-limitation",
-  "statusReason": "Source, runtime URL, baseline settings/candidate screenshots, and an additional multilingual Indonesian-main settings/candidate/dictionary screenshot set were captured. The original baseline dictionary-detail filename remains partial because the first automation did not move over a concrete candidate cell.",
+  "statusReason": "Source, runtime URL, baseline settings/candidate screenshots, and an additional multilingual Indonesian-main settings/candidate/dictionary screenshot set were captured. The multilingual dictionary screenshot targets the third candidate 呢, scrolls down, then moves across that candidate cell so the richer lower dictionary entries are visible.",
   "alphaUrl": "http://localhost:5173/TypeDuck-Web/aap2-alpha/",
   "runtimeAvailability": {
     "status": "available",
@@ -83,7 +83,13 @@
         "file": "screenshots/dictionary-detail-multilingual-indonesian-main-desktop-1280x720.png",
         "status": "captured",
         "viewport": "1280x720",
-        "evidence": "Dictionary panel appeared after moving the mouse across the first candidate cell, matching the Web alpha anti-flicker behavior."
+        "evidence": "Scrolled down, then moved the mouse across the third candidate cell for 呢, showing canonical reference, written-form rows, literary reading note, part-of-speech, and lower More Languages details.",
+        "targetCandidate": {
+          "index": 3,
+          "text": "呢",
+          "jyutping": "nei1"
+        },
+        "scrollY": 260
       }
     ]
   },
@@ -116,8 +122,14 @@
     },
     "multilingualCandidatePanelText": "nei‸\n‹\n›\n1. nei5 你 you (singular) / kamu / आप / तपाईं / تم\n2. nei4 尼 nun / kamu\n3. nei1 呢 →ni1\n4. nei4 妮 little girl\n5. nei4 彌 full; fill / penuh\n6. nei5 妳 you / Kamu / आप / तपाईं / تم",
     "multilingualDictionaryPanelVisible": true,
-    "multilingualDictionaryPanelText": "你nei5\nother 其他kamu\nMore Languages\nEnglish\tyou (singular)\nHindi\tआप\nNepali\tतपाईं\nUrdu\tتم",
-    "dictionaryHoverBehavior": "The Web alpha intentionally requires mouse movement over a candidate, not merely a stationary pointer, before showing the dictionary panel. Capture used multiple physical mouse moves across the first candidate cell."
+    "multilingualDictionaryPanelText": "呢nei1\nother 其他vernacular 口語→ni1\nWritten Form 書面語\t這\n呢ni1(literary reading 文讀 > nai4)\nother 其他vernacular 口語\nWritten Form 書面語\t這\nMore Languages\nEnglish\tthis\n呢ne1\nparticle 助詞(imbuhan kata)\nMore Languages\nEnglish\t(how about)\nHindi\t(particle)\nUrdu\t(particle)",
+    "dictionaryHoverBehavior": "The Web alpha intentionally requires mouse movement over a candidate, not merely a stationary pointer, before showing the dictionary panel. The replacement dictionary screenshot scrolls down first, then moves across the third candidate cell for 呢.",
+    "multilingualDictionaryTargetCandidate": {
+      "index": 3,
+      "text": "呢",
+      "jyutping": "nei1",
+      "note": "→ni1"
+    }
   },
   "attemptedCommandsAndTools": [
     "git -C I:\\GitHub\\TypeDuck-Web rev-parse --short HEAD",
@@ -126,7 +138,8 @@
     "Playwright Chromium launch with viewport 1280x720 and Chrome executable C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe",
     "Playwright textarea input `nei`, screenshot capture for settings and candidate panel",
     "Playwright hover/mousemove/touchstart attempts for dictionary panel screenshot",
-    "Playwright enabled all display languages, selected Indonesian as main language, typed `nei`, and moved the mouse over the first candidate cell before capturing the dictionary panel."
+    "Playwright enabled all display languages, selected Indonesian as main language, typed `nei`, and moved the mouse over the first candidate cell before capturing the dictionary panel.",
+    "Playwright replacement capture selected the row containing third candidate 呢 and moved the mouse across its candidate cell before replacing dictionary-detail-multilingual-indonesian-main-desktop-1280x720.png."
   ],
   "accessLimitations": [
     {
