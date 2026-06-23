@@ -14,7 +14,7 @@ TypeDuck Windows IME will move the existing Moqi Windows IME scaffold into a Typ
 Decimal phases appear between their surrounding integers in numeric order.
 
 - [x] **Phase 1: Identity and Web Parity Contract** - TypeDuck identity, banned-surface rules, and dated Web alpha acceptance fixtures are locked before implementation spreads. (completed 2026-06-23)
-- [ ] **Phase 2: Engine Runtime Contract Spike** - The TypeDuck-HK librime fork, lookup-filter plugin, and TypeDuck runtime assets are proven on Windows.
+- [x] **Phase 2: Engine Runtime Contract Spike** - The TypeDuck-HK librime fork, lookup-filter plugin, and TypeDuck runtime assets are proven on Windows. (completed 2026-06-23)
 - [ ] **Phase 3: zh-HK TSF Registration and Installer Skeleton** - TypeDuck installs, registers, unregisters, and appears under Chinese (Traditional, Hong Kong).
 - [ ] **Phase 4: TypeDuck Protocol and Typing MVP** - TSF, launcher, and engine communicate with a bounded TypeDuck protocol that supports real Cantonese typing behavior.
 - [ ] **Phase 5: Candidate, Dictionary, Settings, and About UI Parity** - Users see and configure the TypeDuck Web alpha experience in native Windows surfaces.
@@ -54,7 +54,7 @@ Plans:
   3. Developer can run a minimal engine host or spike executable that produces Cantonese composition, candidate pages, Jyutping, and commit output from TypeDuck schema input.
   4. Developer can capture lookup-filter-backed dictionary data for candidates, including headword, Jyutping, part-of-speech, English meaning, reading notes, and enabled-language meanings when available.
 
-**Plans:** 2/3 plans executed
+**Plans:** 3/3 plans complete
 Plans:
 **Wave 1**
 
@@ -66,7 +66,7 @@ Plans:
 
 **Wave 3** *(blocked on Wave 2 completion)*
 
-- [ ] 02-03-PLAN.md — Validate and document raw lookup-filter CSV/comment payload evidence.
+- [x] 02-03-PLAN.md — Validate and document raw lookup-filter CSV/comment payload evidence.
 
 ### Phase 3: zh-HK TSF Registration and Installer Skeleton
 
@@ -160,7 +160,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Identity and Web Parity Contract | 2/2 | Complete   | 2026-06-23 |
-| 2. Engine Runtime Contract Spike | 2/3 | In Progress|  |
+| 2. Engine Runtime Contract Spike | 3/3 | Complete   | 2026-06-23 |
 | 3. zh-HK TSF Registration and Installer Skeleton | 0/TBD | Not started | - |
 | 4. TypeDuck Protocol and Typing MVP | 0/TBD | Not started | - |
 | 5. Candidate, Dictionary, Settings, and About UI Parity | 0/TBD | Not started | - |
