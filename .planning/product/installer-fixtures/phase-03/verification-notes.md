@@ -1,11 +1,11 @@
 # TypeDuck Phase 03 VM Installer Verification Notes
 
 **Mode:** manual checklist
-**Reason:** ManualChecklistOnly was specified.
-**Started:** 2026-06-23T16 時 28 時 10Z
-**VM:** <Hyper-V VM name>
-**Installer:** <path to typeduck-windows-ime-setup.exe>
-**Installer SHA-256:** 
+**Reason:** PowerShell Direct session failed: Cannot process command because of one or more missing mandatory parameters: Credential.
+**Started:** 2026-06-23T16 時 29 時 00Z
+**VM:** My Virtual Machine
+**Installer:** D:\VSProjects\moqi-im-windows\installer\dist\typeduck-windows-ime-setup.exe
+**Installer SHA-256:** 7d72748067d029af188078d27683928124f3c75ad7d3cc3bc7945ea80176bac4
 
 ## Safety
 
@@ -17,7 +17,7 @@
 ## Manual Checklist
 
 1. Host checkpoint:
-   - Run Checkpoint-VM -Name "<Hyper-V VM name>" -SnapshotName "TypeDuck-Phase03-BeforeInstall" or record the existing clean checkpoint name/id.
+   - Run Checkpoint-VM -Name "My Virtual Machine" -SnapshotName "TypeDuck-Phase03-BeforeInstall" or record the existing clean checkpoint name/id.
    - Record VM Windows version from the guest.
 
 2. installer UI text:
