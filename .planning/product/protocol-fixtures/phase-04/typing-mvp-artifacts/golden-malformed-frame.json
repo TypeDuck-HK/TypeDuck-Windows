@@ -1,0 +1,13 @@
+{
+  "artifact_type": "observed-data",
+  "id": "malformed-frame",
+  "source": "",
+  "status": "passed",
+  "command": "build-vs32\\Tests\\TypeDuckProtocol\\Debug\\ProtoFraming_test.exe plus launcher protocol guard",
+  "timestamp": "2026-06-23T21:44:15Z",
+  "artifact_path": ".planning\\product\\protocol-fixtures\\phase-04\\typing-mvp-artifacts\\golden-malformed-frame.json",
+  "observed_outcome": "Malformed payload rejection is covered by ProtoFraming_test and launcher degraded error mapping guard.",
+  "details": {
+    "frame_log": ".planning\\product\\engine-runtime-fixtures\\phase-02\\backend-stdio-frames.ndjson"
+  }
+}

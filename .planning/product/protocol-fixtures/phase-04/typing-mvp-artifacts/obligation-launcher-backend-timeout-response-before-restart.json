@@ -1,0 +1,20 @@
+{
+  "artifact_type": "launcher-runtime-obligation",
+  "id": "backend-timeout-response-before-restart",
+  "source": "launcher-recovery",
+  "status": "manual_pending",
+  "command": "scripts\\Test-TypeDuckLauncherProtocol.ps1 -Strict",
+  "timestamp": "2026-06-23T21:44:15Z",
+  "artifact_path": ".planning\\product\\protocol-fixtures\\phase-04\\typing-mvp-artifacts\\obligation-launcher-backend-timeout-response-before-restart.json",
+  "observed_outcome": "Requires executable launcher/runtime probe before this obligation can pass: Probe backend hangs and records that the waiting client receives a timeout response before launcher restart/cleanup.",
+  "details": {
+    "trigger": "backend accepts a request but does not answer before the request timeout",
+    "expected_response": {
+      "success": false,
+      "error_code": "TYPEDUCK_ERROR_BACKEND_TIMEOUT",
+      "health_status": "TYPEDUCK_HEALTH_RESTARTING",
+      "recoverable": true
+    },
+    "runtime_probe_required": true
+  }
+}

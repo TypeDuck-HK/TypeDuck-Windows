@@ -1,0 +1,15 @@
+{
+  "artifact_type": "typing-client-obligation",
+  "id": "raw-comment-byte-preservation",
+  "source": "typing-client",
+  "status": "passed",
+  "command": "scripts\\Test-TypeDuckLookupPayload.ps1 plus scripts\\Test-TypeDuckTypingClient.ps1 -Strict",
+  "timestamp": "2026-06-23T21:44:15Z",
+  "artifact_path": ".planning\\product\\protocol-fixtures\\phase-04\\typing-mvp-artifacts\\obligation-typing-raw-comment-byte-preservation.json",
+  "observed_outcome": "Probe compares escaped output and SHA-256 of raw comment payload.",
+  "details": {
+    "trigger": "backend returns CandidateEntry.comment/raw_lookup_comment containing \\u000b, \\u000c, and \\r separators",
+    "expected": "candidate comment shown/passed at current comment position with separators intact",
+    "vm_required_for_host_process_observation": false
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "id": "engine-proof-check",
+  "command": "pwsh -NoProfile -ExecutionPolicy Bypass -File scripts\\Invoke-TypeDuckEngineProof.ps1 -RepoRoot . -StageRoot .\\runtime\\typeduck-phase02 -MoqiImeRoot ..\\moqi-ime -OutputPath .planning\\product\\engine-runtime-fixtures\\phase-02\\typing-proof.json -CheckOnly",
+  "timestamp": "2026-06-23T21:43:56Z",
+  "status": "passed",
+  "exit_code": 0,
+  "output_tail": [
+    "OK: existing TypeDuck typing proof is valid."
+  ]
+}

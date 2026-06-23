@@ -1,0 +1,20 @@
+{
+  "artifact_type": "launcher-runtime-obligation",
+  "id": "oversized-backend-stdout-rejection",
+  "source": "launcher-recovery",
+  "status": "manual_pending",
+  "command": "scripts\\Test-TypeDuckLauncherProtocol.ps1 -Strict",
+  "timestamp": "2026-06-23T21:44:15Z",
+  "artifact_path": ".planning\\product\\protocol-fixtures\\phase-04\\typing-mvp-artifacts\\obligation-launcher-oversized-backend-stdout-rejection.json",
+  "observed_outcome": "Requires executable launcher/runtime probe before this obligation can pass: Probe backend emits an oversized stdout frame and records that no stale backend payload is routed to a TSF client.",
+  "details": {
+    "trigger": "backend emits a stdout frame whose declared payload exceeds the configured backend frame limit",
+    "expected_response": {
+      "success": false,
+      "error_code": "TYPEDUCK_ERROR_PAYLOAD_TOO_LARGE",
+      "health_status": "TYPEDUCK_HEALTH_DEGRADED",
+      "recoverable": true
+    },
+    "runtime_probe_required": true
+  }
+}

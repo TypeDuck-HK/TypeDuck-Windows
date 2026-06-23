@@ -1,0 +1,15 @@
+{
+  "artifact_type": "typing-client-obligation",
+  "id": "backend-restart-reset-reconnect",
+  "source": "typing-client",
+  "status": "manual_pending",
+  "command": "scripts\\Test-TypeDuckTypingClient.ps1 -Strict",
+  "timestamp": "2026-06-23T21:44:15Z",
+  "artifact_path": ".planning\\product\\protocol-fixtures\\phase-04\\typing-mvp-artifacts\\obligation-typing-backend-restart-reset-reconnect.json",
+  "observed_outcome": "Requires Windows VM host-process smoke before this obligation can pass: Probe forces backend restart and records bounded degraded reset.",
+  "details": {
+    "trigger": "launcher returns TypeDuck backend restart/degraded health response",
+    "expected": "client clears visible typing state, returns promptly, and allows later reconnect",
+    "vm_required_for_host_process_observation": true
+  }
+}

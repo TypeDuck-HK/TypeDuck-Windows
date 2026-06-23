@@ -54,7 +54,8 @@ function Assert-CommandSucceeded {
   param(
     [System.Collections.Generic.List[string]] $Failures,
     [object] $CommandEvidence,
-    [string] $Id
+    [string] $Id,
+    [string] $Root
   )
   if (-not $CommandEvidence) {
     Add-Failure $Failures "Missing guard command evidence: $Id"
@@ -69,6 +70,12 @@ function Assert-CommandSucceeded {
   if ($CommandEvidence.status -ne "passed") {
     Add-Failure $Failures "Guard command '$Id' must be passed."
   }
+  if (-not [string]::IsNullOrWhiteSpace([string] $CommandEvidence.artifact_path)) {
+    $artifactPath = Resolve-ProofPath -BasePath $Root -Path ([string] $CommandEvidence.artifact_path)
+    if (-not (Test-Path -LiteralPath $artifactPath -PathType Leaf)) {
+      Add-Failure $Failures "Guard command '$Id' artifact_path does not exist: $($CommandEvidence.artifact_path)"
+    }
+  }
 }
 
 function Assert-EvidenceItem {
@@ -76,6 +83,7 @@ function Assert-EvidenceItem {
     [System.Collections.Generic.List[string]] $Failures,
     [object] $Item,
     [string] $Label,
+    [string] $Root,
     [bool] $RequirePass = $true
   )
   if (-not $Item) {
@@ -89,6 +97,12 @@ function Assert-EvidenceItem {
   }
   if ($RequirePass -and $Item.status -ne "passed") {
     Add-Failure $Failures "Evidence '$Label' must be passed."
+  }
+  if (-not [string]::IsNullOrWhiteSpace([string] $Item.artifact_path)) {
+    $artifactPath = Resolve-ProofPath -BasePath $Root -Path ([string] $Item.artifact_path)
+    if (-not (Test-Path -LiteralPath $artifactPath -PathType Leaf)) {
+      Add-Failure $Failures "Evidence '$Label' artifact_path does not exist: $($Item.artifact_path)"
+    }
   }
 }
 
@@ -106,19 +120,48 @@ function Assert-NoDictionaryParsingEvidence {
 function Assert-RawLookupEvidence {
   param(
     [System.Collections.Generic.List[string]] $Failures,
-    [object] $Item
+    [object] $Item,
+    [string] $Root
   )
   if (-not $Item) {
     return
   }
-  $json = $Item | ConvertTo-Json -Depth 20 -Compress
+  $artifactPath = Resolve-ProofPath -BasePath $Root -Path ([string] $Item.artifact_path)
+  if (-not (Test-Path -LiteralPath $artifactPath -PathType Leaf)) {
+    Add-Failure $Failures "Raw lookup artifact is missing: $($Item.artifact_path)"
+    return
+  }
+  $artifact = Read-JsonFile -Path $artifactPath -Label "raw lookup artifact"
+  if ($artifact.artifact_type -ne "raw-lookup-observation") {
+    Add-Failure $Failures "Raw lookup artifact must have artifact_type raw-lookup-observation."
+  }
+  $json = $artifact | ConvertTo-Json -Depth 20 -Compress
   foreach ($needle in @("\\u000b", "\\u000c", "\\r")) {
     if ($json -notmatch [regex]::Escape($needle)) {
       Add-Failure $Failures "Raw lookup evidence must include escaped separator $needle."
     }
   }
-  if ($json -notmatch "(?i)sha256") {
-    Add-Failure $Failures "Raw lookup evidence must include SHA-256 proof metadata."
+  if ([string]::IsNullOrWhiteSpace([string] $artifact.details.phase2_source.sha256)) {
+    Add-Failure $Failures "Raw lookup evidence must include SHA-256 from Phase 2 raw output."
+  }
+  $phase2RawPath = Resolve-ProofPath -BasePath $Root -Path ([string] $artifact.details.phase2_source.artifact)
+  if (-not (Test-Path -LiteralPath $phase2RawPath -PathType Leaf)) {
+    Add-Failure $Failures "Raw lookup Phase 2 source artifact is missing: $($artifact.details.phase2_source.artifact)"
+  } else {
+    $matchingSha = $false
+    foreach ($line in Get-Content -LiteralPath $phase2RawPath) {
+      if ([string]::IsNullOrWhiteSpace($line)) {
+        continue
+      }
+      $record = $line | ConvertFrom-Json
+      if ($record.candidateText -eq $artifact.details.candidate_text -and $record.sha256 -eq $artifact.details.phase2_source.sha256) {
+        $matchingSha = $true
+        break
+      }
+    }
+    if (-not $matchingSha) {
+      Add-Failure $Failures "Raw lookup SHA does not match Phase 2 raw output for candidate '$($artifact.details.candidate_text)'."
+    }
   }
 }
 
@@ -194,8 +237,13 @@ if (-not (Test-Path -LiteralPath $evidenceFull -PathType Leaf)) {
   foreach ($guard in @($evidence.guard_commands)) {
     $guardMap[[string] $guard.id] = $guard
   }
-  foreach ($guardId in @("protocol-contract", "launcher-protocol", "typing-client")) {
-    Assert-CommandSucceeded -Failures $failures -CommandEvidence $guardMap[$guardId] -Id $guardId
+  foreach ($guardId in @("protocol-contract", "launcher-protocol", "typing-client", "engine-proof-check", "lookup-payload")) {
+    Assert-CommandSucceeded -Failures $failures -CommandEvidence $guardMap[$guardId] -Id $guardId -Root $root
+  }
+  if ($Strict) {
+    foreach ($guardId in @("build-win32-launcher", "build-win32-textservice", "build-protoframing-test", "run-protoframing-test")) {
+      Assert-CommandSucceeded -Failures $failures -CommandEvidence $guardMap[$guardId] -Id $guardId -Root $root
+    }
   }
 
   $goldenMap = @{}
@@ -203,9 +251,9 @@ if (-not (Test-Path -LiteralPath $evidenceFull -PathType Leaf)) {
     $goldenMap[[string] $case.id] = $case
   }
   foreach ($caseId in $requiredGoldenIds) {
-    Assert-EvidenceItem -Failures $failures -Item $goldenMap[$caseId] -Label "golden:$caseId"
+    Assert-EvidenceItem -Failures $failures -Item $goldenMap[$caseId] -Label "golden:$caseId" -Root $root
   }
-  Assert-RawLookupEvidence -Failures $failures -Item $goldenMap["raw-lookup-payload"]
+  Assert-RawLookupEvidence -Failures $failures -Item $goldenMap["raw-lookup-payload"] -Root $root
   Assert-NoDictionaryParsingEvidence -Failures $failures -Value $evidence
 
   $obligationMap = @{}
@@ -214,21 +262,36 @@ if (-not (Test-Path -LiteralPath $evidenceFull -PathType Leaf)) {
     $obligationMap[$key] = $obligation
   }
   foreach ($case in @($launcher.runtime_cases)) {
-    Assert-EvidenceItem -Failures $failures -Item $obligationMap["launcher-recovery:$($case.id)"] -Label "launcher-recovery:$($case.id)"
+    Assert-EvidenceItem -Failures $failures -Item $obligationMap["launcher-recovery:$($case.id)"] -Label "launcher-recovery:$($case.id)" -Root $root -RequirePass:$Strict
   }
   foreach ($case in @($typingClient.runtime_cases)) {
-    Assert-EvidenceItem -Failures $failures -Item $obligationMap["typing-client:$($case.id)"] -Label "typing-client:$($case.id)"
+    $item = $obligationMap["typing-client:$($case.id)"]
+    $vmRequired = $false
+    if ($item -and $item.details) {
+      $vmRequired = $item.details.vm_required_for_host_process_observation -eq $true
+    }
+    Assert-EvidenceItem -Failures $failures -Item $item -Label "typing-client:$($case.id)" -Root $root -RequirePass:($Strict -or -not $vmRequired)
   }
 
   if ($Strict) {
     if (-not $evidence.windows_smoke) {
       Add-Failure $failures "Strict proof evidence must include windows_smoke section."
     } else {
-      if (@("passed", "manual_pending", "blocked", "failed") -notcontains $evidence.windows_smoke.status) {
-        Add-Failure $failures "windows_smoke.status must be passed, manual_pending, blocked, or failed."
+      if ($evidence.windows_smoke.status -ne "passed") {
+        Add-Failure $failures "Strict proof requires windows_smoke.status to be passed."
       }
       if ([string]::IsNullOrWhiteSpace([string] $evidence.windows_smoke.artifact_path)) {
         Add-Failure $failures "windows_smoke must include artifact_path."
+      } else {
+        $smokePath = Resolve-ProofPath -BasePath $root -Path ([string] $evidence.windows_smoke.artifact_path)
+        if (-not (Test-Path -LiteralPath $smokePath -PathType Leaf)) {
+          Add-Failure $failures "windows_smoke artifact_path does not exist: $($evidence.windows_smoke.artifact_path)"
+        }
+      }
+      foreach ($field in @("composition", "candidates", "paging", "numeric_selection", "commit", "bounded_recovery")) {
+        if ($evidence.windows_smoke.observations.$field -ne $true) {
+          Add-Failure $failures "Strict proof requires windows_smoke.observations.$field = true."
+        }
       }
     }
   }

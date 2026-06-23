@@ -1,0 +1,10 @@
+{
+  "id": "launcher-protocol",
+  "command": "pwsh -NoProfile -ExecutionPolicy Bypass -File scripts\\Test-TypeDuckLauncherProtocol.ps1 -RepoRoot . -Strict",
+  "timestamp": "2026-06-23T21:43:55Z",
+  "status": "passed",
+  "exit_code": 0,
+  "output_tail": [
+    "TypeDuck launcher protocol check passed."
+  ]
+}

@@ -1,0 +1,10 @@
+{
+  "id": "lookup-payload",
+  "command": "pwsh -NoProfile -ExecutionPolicy Bypass -File scripts\\Test-TypeDuckLookupPayload.ps1 -TypingProofPath .planning\\product\\engine-runtime-fixtures\\phase-02\\typing-proof.json -RawCommentsPath .planning\\product\\engine-runtime-fixtures\\phase-02\\lookup-filter-raw-comments.ndjson -CsvRowsPath .planning\\product\\engine-runtime-fixtures\\phase-02\\lookup-filter-csv-rows.csv -ValidationPath .planning\\product\\engine-runtime-fixtures\\phase-02\\lookup-filter-validation.json",
+  "timestamp": "2026-06-23T21:43:56Z",
+  "status": "passed",
+  "exit_code": 0,
+  "output_tail": [
+    "OK: TypeDuck lookup payload validation passed."
+  ]
+}

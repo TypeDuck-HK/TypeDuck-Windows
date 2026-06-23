@@ -1,0 +1,34 @@
+{
+  "artifact_type": "raw-lookup-observation",
+  "id": "raw-lookup-payload",
+  "source": "",
+  "status": "passed",
+  "command": "scripts\\Test-TypeDuckLookupPayload.ps1 plus TypeDuck raw_lookup_comment fixture",
+  "timestamp": "2026-06-23T21:44:15Z",
+  "artifact_path": ".planning\\product\\protocol-fixtures\\phase-04\\typing-mvp-artifacts\\golden-raw-lookup-payload.json",
+  "observed_outcome": "Phase 2 captured lookup-filter raw comments with real SHA-256 evidence; protocol fixture separately preserves U+000B, U+000C, and U+000D without Phase 5 parsing.",
+  "details": {
+    "candidate_text": "你",
+    "phase2_source": {
+      "escaped": "\\f\\r1,你,nei5,,,,,,,oth,,,,,,you (singular),आप,تم,तपाईं,kamu",
+      "sha256": "2c66ec49cbbb38b8f974ad68b5ee5d893856baed18f3a7fabcaf240c20da6b90",
+      "control_counts": {
+        "verticalTab": 0,
+        "formFeed": 1,
+        "carriageReturn": 1
+      },
+      "artifact": ".planning\\product\\engine-runtime-fixtures\\phase-02\\lookup-filter-raw-comments.ndjson"
+    },
+    "protocol_fixture": {
+      "escaped": "\\u000bnei5\\u000c\\rnei,你,nei5,你,nei5,,,,,,pron,you (singular),,,,,,,",
+      "sha256_utf8": "2b19004f598d830e756b7a1b3c53eb691790da44614194b3380166eb148f0cd9",
+      "separator_code_points": [
+        "U+000B",
+        "U+000C",
+        "U+000D"
+      ]
+    },
+    "phase2_raw_comments": ".planning\\product\\engine-runtime-fixtures\\phase-02\\lookup-filter-raw-comments.ndjson",
+    "phase2_lookup_validation": ".planning\\product\\engine-runtime-fixtures\\phase-02\\lookup-filter-validation.json"
+  }
+}

@@ -1,0 +1,29 @@
+{
+  "id": "run-protoframing-test",
+  "command": "build-vs32\\Tests\\TypeDuckProtocol\\Debug\\ProtoFraming_test.exe",
+  "timestamp": "2026-06-23T21:44:15Z",
+  "status": "passed",
+  "exit_code": 0,
+  "output_tail": [
+    "Running main() from D:\\VSProjects\\moqi-im-windows\\libIME2\\lib\\googletest-release-1.10.0\\googletest\\src\\gtest_main.cc",
+    "[==========] Running 4 tests from 2 test suites.",
+    "[----------] Global test environment set-up.",
+    "[----------] 3 tests from TypeDuckProtoFraming",
+    "[ RUN      ] TypeDuckProtoFraming.RejectsOversizedFrameAndDropsBody",
+    "[       OK ] TypeDuckProtoFraming.RejectsOversizedFrameAndDropsBody (0 ms)",
+    "[ RUN      ] TypeDuckProtoFraming.TruncatedFrameRemainsPendingOnlyWithinLimit",
+    "[       OK ] TypeDuckProtoFraming.TruncatedFrameRemainsPendingOnlyWithinLimit (0 ms)",
+    "[ RUN      ] TypeDuckProtoFraming.MalformedPayloadDoesNotParseRequestOrResponse",
+    "[       OK ] TypeDuckProtoFraming.MalformedPayloadDoesNotParseRequestOrResponse (0 ms)",
+    "[----------] 3 tests from TypeDuckProtoFraming (0 ms total)",
+    "",
+    "[----------] 1 test from TypeDuckProtocol",
+    "[ RUN      ] TypeDuckProtocol.RawLookupSeparatorsSurviveCandidateComments",
+    "[       OK ] TypeDuckProtocol.RawLookupSeparatorsSurviveCandidateComments (0 ms)",
+    "[----------] 1 test from TypeDuckProtocol (0 ms total)",
+    "",
+    "[----------] Global test environment tear-down",
+    "[==========] 4 tests from 2 test suites ran. (0 ms total)",
+    "[  PASSED  ] 4 tests."
+  ]
+}

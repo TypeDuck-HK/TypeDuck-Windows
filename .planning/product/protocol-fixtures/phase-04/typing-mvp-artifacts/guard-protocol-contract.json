@@ -1,0 +1,10 @@
+{
+  "id": "protocol-contract",
+  "command": "pwsh -NoProfile -ExecutionPolicy Bypass -File scripts\\Test-TypeDuckProtocolContract.ps1 -RepoRoot . -Strict",
+  "timestamp": "2026-06-23T21:43:54Z",
+  "status": "passed",
+  "exit_code": 0,
+  "output_tail": [
+    "TypeDuck protocol contract guard passed."
+  ]
+}

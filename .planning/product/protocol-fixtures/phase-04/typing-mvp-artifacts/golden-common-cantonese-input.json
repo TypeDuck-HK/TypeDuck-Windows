@@ -1,0 +1,28 @@
+{
+  "artifact_type": "observed-data",
+  "id": "common-cantonese-input",
+  "source": "",
+  "status": "passed",
+  "command": "scripts\\Invoke-TypeDuckEngineProof.ps1 -CheckOnly plus Phase 4 TSF client guard",
+  "timestamp": "2026-06-23T21:44:15Z",
+  "artifact_path": ".planning\\product\\protocol-fixtures\\phase-04\\typing-mvp-artifacts\\golden-common-cantonese-input.json",
+  "observed_outcome": "Phase 2 backend proof records composition, candidate entries, cursor/page data, and commit; Phase 4 TSF client guard proves those fields are consumed.",
+  "details": {
+    "input": "nei",
+    "keys": [
+      "n",
+      "e",
+      "i"
+    ],
+    "composition": "nei",
+    "candidate_count": 6,
+    "first_candidate": "你",
+    "commit": "你",
+    "page": {
+      "show_candidates": true,
+      "candidate_cursor": 0,
+      "select_keys": "123456"
+    },
+    "phase2_proof": ".planning\\product\\engine-runtime-fixtures\\phase-02\\typing-proof.json"
+  }
+}

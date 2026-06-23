@@ -1,0 +1,33 @@
+{
+  "artifact_type": "windows-smoke-direct-session",
+  "status": "blocked",
+  "command": "New-PSSession -VMName <vm> -Credential <runtime credential>; Invoke-Command { OS and interactivity probe }",
+  "timestamp": "2026-06-23T21:44:15Z",
+  "artifact_path": ".planning\\product\\protocol-fixtures\\phase-04\\typing-mvp-artifacts\\windows-smoke-vm-direct.json",
+  "observed_outcome": "PowerShell Direct connectivity was checked, but the session is non-interactive and cannot prove real TSF host-process typing.",
+  "vm": {
+    "name": "My Virtual Machine",
+    "guest_user": "typeduckverify",
+    "probe": {
+      "user": "typeduckverify",
+      "computer": "DESKTOP-T528G50",
+      "os": "Microsoft Windows 10 Pro",
+      "version": "10.0.19045",
+      "buildNumber": "19045",
+      "interactive": false,
+      "typeduckInstallDirExists": false,
+      "typeDuckLauncherRunValue": "",
+      "PSComputerName": "My Virtual Machine",
+      "RunspaceId": "4c6788e7-c64b-4a5c-adfa-21a4623ca9be",
+      "PSShowComputerName": true
+    }
+  },
+  "observations": {
+    "composition": false,
+    "candidates": false,
+    "paging": false,
+    "numeric_selection": false,
+    "commit": false,
+    "bounded_recovery": false
+  }
+}

@@ -1,0 +1,486 @@
+{
+  "phase": "04-typeduck-protocol-and-typing-mvp",
+  "plan": "04-04",
+  "generated_at": "2026-06-23T21:44:16Z",
+  "runner": "scripts\\Invoke-TypeDuckTypingMvpProof.ps1",
+  "repo": {
+    "root": "D:\\VSProjects\\moqi-im-windows",
+    "commit": "2f219efb66300d1d3b6950febe5091c7480fb7bf"
+  },
+  "inputs": {
+    "stage_root": "runtime\\typeduck-phase02",
+    "golden_cases": ".planning\\product\\protocol-fixtures\\phase-04\\golden-typing-cases.json",
+    "phase2_typing_proof": ".planning\\product\\engine-runtime-fixtures\\phase-02\\typing-proof.json",
+    "phase2_frame_log": ".planning\\product\\engine-runtime-fixtures\\phase-02\\backend-stdio-frames.ndjson"
+  },
+  "guard_commands": [
+    {
+      "id": "protocol-contract",
+      "status": "passed",
+      "command": "pwsh -NoProfile -ExecutionPolicy Bypass -File scripts\\Test-TypeDuckProtocolContract.ps1 -RepoRoot . -Strict",
+      "timestamp": "2026-06-23T21:43:54Z",
+      "artifact_path": ".planning\\product\\protocol-fixtures\\phase-04\\typing-mvp-artifacts\\guard-protocol-contract.json",
+      "observed_outcome": "command exited 0"
+    },
+    {
+      "id": "launcher-protocol",
+      "status": "passed",
+      "command": "pwsh -NoProfile -ExecutionPolicy Bypass -File scripts\\Test-TypeDuckLauncherProtocol.ps1 -RepoRoot . -Strict",
+      "timestamp": "2026-06-23T21:43:55Z",
+      "artifact_path": ".planning\\product\\protocol-fixtures\\phase-04\\typing-mvp-artifacts\\guard-launcher-protocol.json",
+      "observed_outcome": "command exited 0"
+    },
+    {
+      "id": "typing-client",
+      "status": "passed",
+      "command": "pwsh -NoProfile -ExecutionPolicy Bypass -File scripts\\Test-TypeDuckTypingClient.ps1 -RepoRoot . -Strict",
+      "timestamp": "2026-06-23T21:43:55Z",
+      "artifact_path": ".planning\\product\\protocol-fixtures\\phase-04\\typing-mvp-artifacts\\guard-typing-client.json",
+      "observed_outcome": "command exited 0"
+    },
+    {
+      "id": "engine-proof-check",
+      "status": "passed",
+      "command": "pwsh -NoProfile -ExecutionPolicy Bypass -File scripts\\Invoke-TypeDuckEngineProof.ps1 -RepoRoot . -StageRoot .\\runtime\\typeduck-phase02 -MoqiImeRoot ..\\moqi-ime -OutputPath .planning\\product\\engine-runtime-fixtures\\phase-02\\typing-proof.json -CheckOnly",
+      "timestamp": "2026-06-23T21:43:56Z",
+      "artifact_path": ".planning\\product\\protocol-fixtures\\phase-04\\typing-mvp-artifacts\\guard-engine-proof-check.json",
+      "observed_outcome": "command exited 0"
+    },
+    {
+      "id": "lookup-payload",
+      "status": "passed",
+      "command": "pwsh -NoProfile -ExecutionPolicy Bypass -File scripts\\Test-TypeDuckLookupPayload.ps1 -TypingProofPath .planning\\product\\engine-runtime-fixtures\\phase-02\\typing-proof.json -RawCommentsPath .planning\\product\\engine-runtime-fixtures\\phase-02\\lookup-filter-raw-comments.ndjson -CsvRowsPath .planning\\product\\engine-runtime-fixtures\\phase-02\\lookup-filter-csv-rows.csv -ValidationPath .planning\\product\\engine-runtime-fixtures\\phase-02\\lookup-filter-validation.json",
+      "timestamp": "2026-06-23T21:43:56Z",
+      "artifact_path": ".planning\\product\\protocol-fixtures\\phase-04\\typing-mvp-artifacts\\guard-lookup-payload.json",
+      "observed_outcome": "command exited 0"
+    },
+    {
+      "id": "build-win32-launcher",
+      "status": "passed",
+      "command": "cmake --build build-vs32 --config Debug --target MoqiLauncher -- /m:1",
+      "timestamp": "2026-06-23T21:43:57Z",
+      "artifact_path": ".planning\\product\\protocol-fixtures\\phase-04\\typing-mvp-artifacts\\build-win32-launcher.json",
+      "observed_outcome": "command exited 0"
+    },
+    {
+      "id": "build-win32-textservice",
+      "status": "passed",
+      "command": "cmake --build build-vs32 --config Debug --target MoqiTextService -- /m:1",
+      "timestamp": "2026-06-23T21:44:01Z",
+      "artifact_path": ".planning\\product\\protocol-fixtures\\phase-04\\typing-mvp-artifacts\\build-win32-textservice.json",
+      "observed_outcome": "command exited 0"
+    },
+    {
+      "id": "build-x64-textservice",
+      "status": "passed",
+      "command": "cmake --build build-vs64 --config Debug --target MoqiTextService -- /m:1",
+      "timestamp": "2026-06-23T21:44:06Z",
+      "artifact_path": ".planning\\product\\protocol-fixtures\\phase-04\\typing-mvp-artifacts\\build-x64-textservice.json",
+      "observed_outcome": "command exited 0"
+    },
+    {
+      "id": "build-protoframing-test",
+      "status": "passed",
+      "command": "cmake --build build-vs32 --config Debug --target ProtoFraming_test -- /m:1",
+      "timestamp": "2026-06-23T21:44:11Z",
+      "artifact_path": ".planning\\product\\protocol-fixtures\\phase-04\\typing-mvp-artifacts\\build-protoframing-test.json",
+      "observed_outcome": "command exited 0"
+    },
+    {
+      "id": "run-protoframing-test",
+      "status": "passed",
+      "command": "build-vs32\\Tests\\TypeDuckProtocol\\Debug\\ProtoFraming_test.exe",
+      "timestamp": "2026-06-23T21:44:15Z",
+      "artifact_path": ".planning\\product\\protocol-fixtures\\phase-04\\typing-mvp-artifacts\\run-protoframing-test.json",
+      "observed_outcome": "command exited 0"
+    }
+  ],
+  "golden_cases": [
+    {
+      "artifact_type": "observed-data",
+      "id": "common-cantonese-input",
+      "source": "",
+      "status": "passed",
+      "command": "scripts\\Invoke-TypeDuckEngineProof.ps1 -CheckOnly plus Phase 4 TSF client guard",
+      "timestamp": "2026-06-23T21:44:15Z",
+      "artifact_path": ".planning\\product\\protocol-fixtures\\phase-04\\typing-mvp-artifacts\\golden-common-cantonese-input.json",
+      "observed_outcome": "Phase 2 backend proof records composition, candidate entries, cursor/page data, and commit; Phase 4 TSF client guard proves those fields are consumed.",
+      "details": {
+        "input": "nei",
+        "keys": [
+          "n",
+          "e",
+          "i"
+        ],
+        "composition": "nei",
+        "candidate_count": 6,
+        "first_candidate": "你",
+        "commit": "你",
+        "page": {
+          "show_candidates": true,
+          "candidate_cursor": 0,
+          "select_keys": "123456"
+        },
+        "phase2_proof": ".planning\\product\\engine-runtime-fixtures\\phase-02\\typing-proof.json"
+      }
+    },
+    {
+      "artifact_type": "raw-lookup-observation",
+      "id": "raw-lookup-payload",
+      "source": "",
+      "status": "passed",
+      "command": "scripts\\Test-TypeDuckLookupPayload.ps1 plus TypeDuck raw_lookup_comment fixture",
+      "timestamp": "2026-06-23T21:44:15Z",
+      "artifact_path": ".planning\\product\\protocol-fixtures\\phase-04\\typing-mvp-artifacts\\golden-raw-lookup-payload.json",
+      "observed_outcome": "Phase 2 captured lookup-filter raw comments with real SHA-256 evidence; protocol fixture separately preserves U+000B, U+000C, and U+000D without Phase 5 parsing.",
+      "details": {
+        "candidate_text": "你",
+        "phase2_source": {
+          "escaped": "\\f\\r1,你,nei5,,,,,,,oth,,,,,,you (singular),आप,تم,तपाईं,kamu",
+          "sha256": "2c66ec49cbbb38b8f974ad68b5ee5d893856baed18f3a7fabcaf240c20da6b90",
+          "control_counts": {
+            "verticalTab": 0,
+            "formFeed": 1,
+            "carriageReturn": 1
+          },
+          "artifact": ".planning\\product\\engine-runtime-fixtures\\phase-02\\lookup-filter-raw-comments.ndjson"
+        },
+        "protocol_fixture": {
+          "escaped": "\\u000bnei5\\u000c\\rnei,你,nei5,你,nei5,,,,,,pron,you (singular),,,,,,,",
+          "sha256_utf8": "2b19004f598d830e756b7a1b3c53eb691790da44614194b3380166eb148f0cd9",
+          "separator_code_points": [
+            "U+000B",
+            "U+000C",
+            "U+000D"
+          ]
+        },
+        "phase2_raw_comments": ".planning\\product\\engine-runtime-fixtures\\phase-02\\lookup-filter-raw-comments.ndjson",
+        "phase2_lookup_validation": ".planning\\product\\engine-runtime-fixtures\\phase-02\\lookup-filter-validation.json"
+      }
+    },
+    {
+      "artifact_type": "observed-data",
+      "id": "reverse-lookup-marker",
+      "source": "",
+      "status": "passed",
+      "command": "schema capability scan plus scripts\\Test-TypeDuckTypingClient.ps1 -Strict",
+      "timestamp": "2026-06-23T21:44:15Z",
+      "artifact_path": ".planning\\product\\protocol-fixtures\\phase-04\\typing-mvp-artifacts\\golden-reverse-lookup-marker.json",
+      "observed_outcome": "Backend schema declares reverse_lookup recognizer and frontend forwards keys normally; real host-process key smoke remains tracked by windows_smoke.",
+      "details": {
+        "backend_capability": "supported_by_schema",
+        "schema": "runtime\\typeduck-phase02\\input_methods\\rime\\jyut6ping3.schema.yaml",
+        "frontend_behavior": "ordinary key forwarding; no reverse lookup frontend special casing"
+      }
+    },
+    {
+      "artifact_type": "observed-data",
+      "id": "cangjie-key-forwarding",
+      "source": "",
+      "status": "passed",
+      "command": "schema capability scan plus scripts\\Test-TypeDuckTypingClient.ps1 -Strict",
+      "timestamp": "2026-06-23T21:44:15Z",
+      "artifact_path": ".planning\\product\\protocol-fixtures\\phase-04\\typing-mvp-artifacts\\golden-cangjie-key-forwarding.json",
+      "observed_outcome": "Backend schema declares Cangjie 3/5 assets and frontend forwards keys normally; real host-process key smoke remains tracked by windows_smoke.",
+      "details": {
+        "cangjie3_schema": "runtime\\typeduck-phase02\\input_methods\\rime\\cangjie3.schema.yaml",
+        "cangjie5_schema": "runtime\\typeduck-phase02\\input_methods\\rime\\cangjie5.schema.yaml",
+        "jyutping_schema_declares_cangjie": true,
+        "frontend_behavior": "ordinary key forwarding; no Cangjie frontend special casing"
+      }
+    },
+    {
+      "artifact_type": "observed-data",
+      "id": "malformed-frame",
+      "source": "",
+      "status": "passed",
+      "command": "build-vs32\\Tests\\TypeDuckProtocol\\Debug\\ProtoFraming_test.exe plus launcher protocol guard",
+      "timestamp": "2026-06-23T21:44:15Z",
+      "artifact_path": ".planning\\product\\protocol-fixtures\\phase-04\\typing-mvp-artifacts\\golden-malformed-frame.json",
+      "observed_outcome": "Malformed payload rejection is covered by ProtoFraming_test and launcher degraded error mapping guard.",
+      "details": {
+        "frame_log": ".planning\\product\\engine-runtime-fixtures\\phase-02\\backend-stdio-frames.ndjson"
+      }
+    },
+    {
+      "artifact_type": "observed-data",
+      "id": "oversized-frame",
+      "source": "",
+      "status": "passed",
+      "command": "build-vs32\\Tests\\TypeDuckProtocol\\Debug\\ProtoFraming_test.exe plus launcher protocol guard",
+      "timestamp": "2026-06-23T21:44:15Z",
+      "artifact_path": ".planning\\product\\protocol-fixtures\\phase-04\\typing-mvp-artifacts\\golden-oversized-frame.json",
+      "observed_outcome": "Oversized payload rejection is covered by bounded FrameBuffer tests and launcher payload-too-large mapping guard.",
+      "details": {
+        "max_frame_bytes": 1048576
+      }
+    },
+    {
+      "artifact_type": "observed-data",
+      "id": "backend-timeout",
+      "source": "",
+      "status": "passed",
+      "command": "scripts\\Test-TypeDuckLauncherProtocol.ps1 -Strict",
+      "timestamp": "2026-06-23T21:44:15Z",
+      "artifact_path": ".planning\\product\\protocol-fixtures\\phase-04\\typing-mvp-artifacts\\golden-backend-timeout.json",
+      "observed_outcome": "Launcher protocol guard proves timeout response is emitted before restart cleanup with restarting health semantics.",
+      "details": {
+        "error_code": "TYPEDUCK_ERROR_BACKEND_TIMEOUT",
+        "health": "TYPEDUCK_HEALTH_RESTARTING"
+      }
+    },
+    {
+      "artifact_type": "observed-data",
+      "id": "backend-restart",
+      "source": "",
+      "status": "passed",
+      "command": "scripts\\Test-TypeDuckLauncherProtocol.ps1 -Strict",
+      "timestamp": "2026-06-23T21:44:15Z",
+      "artifact_path": ".planning\\product\\protocol-fixtures\\phase-04\\typing-mvp-artifacts\\golden-backend-restart.json",
+      "observed_outcome": "Launcher protocol guard proves backend restart/read-error paths return degraded TypeDuck recovery responses.",
+      "details": {
+        "error_code": "TYPEDUCK_ERROR_BACKEND_RESTART",
+        "health": "TYPEDUCK_HEALTH_DEGRADED"
+      }
+    }
+  ],
+  "imported_obligations": [
+    {
+      "artifact_type": "launcher-runtime-obligation",
+      "id": "malformed-client-frame-cleanup",
+      "source": "launcher-recovery",
+      "status": "manual_pending",
+      "command": "scripts\\Test-TypeDuckLauncherProtocol.ps1 -Strict",
+      "timestamp": "2026-06-23T21:44:15Z",
+      "artifact_path": ".planning\\product\\protocol-fixtures\\phase-04\\typing-mvp-artifacts\\obligation-launcher-malformed-client-frame-cleanup.json",
+      "observed_outcome": "Requires executable launcher/runtime probe before this obligation can pass: Probe sends malformed client input and records that the launcher rejects it without retaining stale client/backend state.",
+      "details": {
+        "trigger": "send a client named-pipe frame with malformed protobuf payload or invalid length framing",
+        "expected_response": {
+          "success": false,
+          "error_code": "TYPEDUCK_ERROR_MALFORMED_FRAME",
+          "health_status": "TYPEDUCK_HEALTH_DEGRADED",
+          "recoverable": true
+        },
+        "runtime_probe_required": true
+      }
+    },
+    {
+      "artifact_type": "launcher-runtime-obligation",
+      "id": "oversized-backend-stdout-rejection",
+      "source": "launcher-recovery",
+      "status": "manual_pending",
+      "command": "scripts\\Test-TypeDuckLauncherProtocol.ps1 -Strict",
+      "timestamp": "2026-06-23T21:44:15Z",
+      "artifact_path": ".planning\\product\\protocol-fixtures\\phase-04\\typing-mvp-artifacts\\obligation-launcher-oversized-backend-stdout-rejection.json",
+      "observed_outcome": "Requires executable launcher/runtime probe before this obligation can pass: Probe backend emits an oversized stdout frame and records that no stale backend payload is routed to a TSF client.",
+      "details": {
+        "trigger": "backend emits a stdout frame whose declared payload exceeds the configured backend frame limit",
+        "expected_response": {
+          "success": false,
+          "error_code": "TYPEDUCK_ERROR_PAYLOAD_TOO_LARGE",
+          "health_status": "TYPEDUCK_HEALTH_DEGRADED",
+          "recoverable": true
+        },
+        "runtime_probe_required": true
+      }
+    },
+    {
+      "artifact_type": "launcher-runtime-obligation",
+      "id": "missing-backend-init-failure-response",
+      "source": "launcher-recovery",
+      "status": "manual_pending",
+      "command": "scripts\\Test-TypeDuckLauncherProtocol.ps1 -Strict",
+      "timestamp": "2026-06-23T21:44:15Z",
+      "artifact_path": ".planning\\product\\protocol-fixtures\\phase-04\\typing-mvp-artifacts\\obligation-launcher-missing-backend-init-failure-response.json",
+      "observed_outcome": "Requires executable launcher/runtime probe before this obligation can pass: Probe starts launcher without a usable bridge mapping and records a bounded init failure response.",
+      "details": {
+        "trigger": "client sends METHOD_INIT with an unmapped or unavailable TypeDuck profile/backend bridge",
+        "expected_response": {
+          "success": false,
+          "error_code": "TYPEDUCK_ERROR_ENGINE_INIT_FAILED",
+          "health_status": "TYPEDUCK_HEALTH_FAILED",
+          "recoverable": false
+        },
+        "runtime_probe_required": true
+      }
+    },
+    {
+      "artifact_type": "launcher-runtime-obligation",
+      "id": "backend-timeout-response-before-restart",
+      "source": "launcher-recovery",
+      "status": "manual_pending",
+      "command": "scripts\\Test-TypeDuckLauncherProtocol.ps1 -Strict",
+      "timestamp": "2026-06-23T21:44:15Z",
+      "artifact_path": ".planning\\product\\protocol-fixtures\\phase-04\\typing-mvp-artifacts\\obligation-launcher-backend-timeout-response-before-restart.json",
+      "observed_outcome": "Requires executable launcher/runtime probe before this obligation can pass: Probe backend hangs and records that the waiting client receives a timeout response before launcher restart/cleanup.",
+      "details": {
+        "trigger": "backend accepts a request but does not answer before the request timeout",
+        "expected_response": {
+          "success": false,
+          "error_code": "TYPEDUCK_ERROR_BACKEND_TIMEOUT",
+          "health_status": "TYPEDUCK_HEALTH_RESTARTING",
+          "recoverable": true
+        },
+        "runtime_probe_required": true
+      }
+    },
+    {
+      "artifact_type": "launcher-runtime-obligation",
+      "id": "backend-restart-degraded-response",
+      "source": "launcher-recovery",
+      "status": "manual_pending",
+      "command": "scripts\\Test-TypeDuckLauncherProtocol.ps1 -Strict",
+      "timestamp": "2026-06-23T21:44:15Z",
+      "artifact_path": ".planning\\product\\protocol-fixtures\\phase-04\\typing-mvp-artifacts\\obligation-launcher-backend-restart-degraded-response.json",
+      "observed_outcome": "Requires executable launcher/runtime probe before this obligation can pass: Probe backend closes unexpectedly and records an explicit degraded restart response.",
+      "details": {
+        "trigger": "backend stdout/read error or crash forces launcher restart handling",
+        "expected_response": {
+          "success": false,
+          "error_code": "TYPEDUCK_ERROR_BACKEND_RESTART",
+          "health_status": "TYPEDUCK_HEALTH_DEGRADED",
+          "recoverable": true
+        },
+        "runtime_probe_required": true
+      }
+    },
+    {
+      "artifact_type": "typing-client-obligation",
+      "id": "ordinary-key-response-latency",
+      "source": "typing-client",
+      "status": "manual_pending",
+      "command": "scripts\\Test-TypeDuckTypingClient.ps1 -Strict",
+      "timestamp": "2026-06-23T21:44:15Z",
+      "artifact_path": ".planning\\product\\protocol-fixtures\\phase-04\\typing-mvp-artifacts\\obligation-typing-ordinary-key-response-latency.json",
+      "observed_outcome": "Requires Windows VM host-process smoke before this obligation can pass: Probe records key response timing below the Phase 4 threshold and captures returned composition/candidate state.",
+      "details": {
+        "trigger": "type ordinary Cantonese input into a Windows text field",
+        "expected": "composition, candidates, candidate cursor, comments, and commit apply from backend response within bounded key-path wait",
+        "vm_required_for_host_process_observation": true
+      }
+    },
+    {
+      "artifact_type": "typing-client-obligation",
+      "id": "missing-launcher-fast-fail-degraded-state",
+      "source": "typing-client",
+      "status": "passed",
+      "command": "scripts\\Test-TypeDuckTypingClient.ps1 -Strict",
+      "timestamp": "2026-06-23T21:44:15Z",
+      "artifact_path": ".planning\\product\\protocol-fixtures\\phase-04\\typing-mvp-artifacts\\obligation-typing-missing-launcher-fast-fail-degraded-state.json",
+      "observed_outcome": "Probe disables launcher and records fast failed key handling plus reset state.",
+      "details": {
+        "trigger": "typing path cannot connect to the launcher",
+        "expected": "client enters degraded state promptly and does not run the old repeated three-second connection loop",
+        "vm_required_for_host_process_observation": false
+      }
+    },
+    {
+      "artifact_type": "typing-client-obligation",
+      "id": "malformed-response-reset",
+      "source": "typing-client",
+      "status": "passed",
+      "command": "scripts\\Test-TypeDuckTypingClient.ps1 -Strict",
+      "timestamp": "2026-06-23T21:44:15Z",
+      "artifact_path": ".planning\\product\\protocol-fixtures\\phase-04\\typing-mvp-artifacts\\obligation-typing-malformed-response-reset.json",
+      "observed_outcome": "Probe injects malformed response and records reset plus later reconnect.",
+      "details": {
+        "trigger": "launcher or backend returns malformed framed protobuf to the TSF client",
+        "expected": "client closes pipe, clears async queue, resets candidates/composition, and can reconnect later",
+        "vm_required_for_host_process_observation": false
+      }
+    },
+    {
+      "artifact_type": "typing-client-obligation",
+      "id": "backend-restart-reset-reconnect",
+      "source": "typing-client",
+      "status": "manual_pending",
+      "command": "scripts\\Test-TypeDuckTypingClient.ps1 -Strict",
+      "timestamp": "2026-06-23T21:44:15Z",
+      "artifact_path": ".planning\\product\\protocol-fixtures\\phase-04\\typing-mvp-artifacts\\obligation-typing-backend-restart-reset-reconnect.json",
+      "observed_outcome": "Requires Windows VM host-process smoke before this obligation can pass: Probe forces backend restart and records bounded degraded reset.",
+      "details": {
+        "trigger": "launcher returns TypeDuck backend restart/degraded health response",
+        "expected": "client clears visible typing state, returns promptly, and allows later reconnect",
+        "vm_required_for_host_process_observation": true
+      }
+    },
+    {
+      "artifact_type": "typing-client-obligation",
+      "id": "raw-comment-byte-preservation",
+      "source": "typing-client",
+      "status": "passed",
+      "command": "scripts\\Test-TypeDuckLookupPayload.ps1 plus scripts\\Test-TypeDuckTypingClient.ps1 -Strict",
+      "timestamp": "2026-06-23T21:44:15Z",
+      "artifact_path": ".planning\\product\\protocol-fixtures\\phase-04\\typing-mvp-artifacts\\obligation-typing-raw-comment-byte-preservation.json",
+      "observed_outcome": "Probe compares escaped output and SHA-256 of raw comment payload.",
+      "details": {
+        "trigger": "backend returns CandidateEntry.comment/raw_lookup_comment containing \\u000b, \\u000c, and \\r separators",
+        "expected": "candidate comment shown/passed at current comment position with separators intact",
+        "vm_required_for_host_process_observation": false
+      }
+    },
+    {
+      "artifact_type": "typing-client-obligation",
+      "id": "reverse-lookup-key-forwarding",
+      "source": "typing-client",
+      "status": "manual_pending",
+      "command": "scripts\\Test-TypeDuckTypingClient.ps1 -Strict",
+      "timestamp": "2026-06-23T21:44:15Z",
+      "artifact_path": ".planning\\product\\protocol-fixtures\\phase-04\\typing-mvp-artifacts\\obligation-typing-reverse-lookup-key-forwarding.json",
+      "observed_outcome": "Requires Windows VM host-process smoke before this obligation can pass: Probe records key request fields and confirms no frontend reverse-lookup special casing.",
+      "details": {
+        "trigger": "user presses reverse lookup key sequence supported by backend",
+        "expected": "frontend forwards normal key event data and renders only backend-returned state",
+        "vm_required_for_host_process_observation": true
+      }
+    },
+    {
+      "artifact_type": "typing-client-obligation",
+      "id": "cangjie-key-forwarding",
+      "source": "typing-client",
+      "status": "manual_pending",
+      "command": "scripts\\Test-TypeDuckTypingClient.ps1 -Strict",
+      "timestamp": "2026-06-23T21:44:15Z",
+      "artifact_path": ".planning\\product\\protocol-fixtures\\phase-04\\typing-mvp-artifacts\\obligation-typing-cangjie-key-forwarding.json",
+      "observed_outcome": "Requires Windows VM host-process smoke before this obligation can pass: Probe records key request fields and confirms no frontend Cangjie special casing.",
+      "details": {
+        "trigger": "user presses Cangjie Version 3 or 5 related key sequence supported by backend",
+        "expected": "frontend forwards normal key event data and renders only backend-returned state",
+        "vm_required_for_host_process_observation": true
+      }
+    }
+  ],
+  "windows_smoke": {
+    "status": "blocked",
+    "command": "New-PSSession -VMName <vm> -Credential <runtime credential>; Invoke-Command { OS and interactivity probe }",
+    "timestamp": "2026-06-23T21:44:15Z",
+    "artifact_path": ".planning\\product\\protocol-fixtures\\phase-04\\typing-mvp-artifacts\\windows-smoke-vm-direct.json",
+    "observed_outcome": "PowerShell Direct connectivity was checked, but the session is non-interactive and cannot prove real TSF host-process typing.",
+    "observations": {
+      "composition": false,
+      "candidates": false,
+      "paging": false,
+      "numeric_selection": false,
+      "commit": false,
+      "bounded_recovery": false
+    },
+    "vm": {
+      "name": "My Virtual Machine",
+      "guest_user": "typeduckverify",
+      "probe": {
+        "user": "typeduckverify",
+        "computer": "DESKTOP-T528G50",
+        "os": "Microsoft Windows 10 Pro",
+        "version": "10.0.19045",
+        "buildNumber": "19045",
+        "interactive": false,
+        "typeduckInstallDirExists": false,
+        "typeDuckLauncherRunValue": "",
+        "PSComputerName": "My Virtual Machine",
+        "RunspaceId": "4c6788e7-c64b-4a5c-adfa-21a4623ca9be",
+        "PSShowComputerName": true
+      }
+    }
+  }
+}

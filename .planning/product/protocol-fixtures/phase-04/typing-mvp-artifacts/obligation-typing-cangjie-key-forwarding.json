@@ -1,0 +1,15 @@
+{
+  "artifact_type": "typing-client-obligation",
+  "id": "cangjie-key-forwarding",
+  "source": "typing-client",
+  "status": "manual_pending",
+  "command": "scripts\\Test-TypeDuckTypingClient.ps1 -Strict",
+  "timestamp": "2026-06-23T21:44:15Z",
+  "artifact_path": ".planning\\product\\protocol-fixtures\\phase-04\\typing-mvp-artifacts\\obligation-typing-cangjie-key-forwarding.json",
+  "observed_outcome": "Requires Windows VM host-process smoke before this obligation can pass: Probe records key request fields and confirms no frontend Cangjie special casing.",
+  "details": {
+    "trigger": "user presses Cangjie Version 3 or 5 related key sequence supported by backend",
+    "expected": "frontend forwards normal key event data and renders only backend-returned state",
+    "vm_required_for_host_process_observation": true
+  }
+}

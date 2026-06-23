@@ -1,0 +1,16 @@
+{
+  "artifact_type": "observed-data",
+  "id": "cangjie-key-forwarding",
+  "source": "",
+  "status": "passed",
+  "command": "schema capability scan plus scripts\\Test-TypeDuckTypingClient.ps1 -Strict",
+  "timestamp": "2026-06-23T21:44:15Z",
+  "artifact_path": ".planning\\product\\protocol-fixtures\\phase-04\\typing-mvp-artifacts\\golden-cangjie-key-forwarding.json",
+  "observed_outcome": "Backend schema declares Cangjie 3/5 assets and frontend forwards keys normally; real host-process key smoke remains tracked by windows_smoke.",
+  "details": {
+    "cangjie3_schema": "runtime\\typeduck-phase02\\input_methods\\rime\\cangjie3.schema.yaml",
+    "cangjie5_schema": "runtime\\typeduck-phase02\\input_methods\\rime\\cangjie5.schema.yaml",
+    "jyutping_schema_declares_cangjie": true,
+    "frontend_behavior": "ordinary key forwarding; no Cangjie frontend special casing"
+  }
+}

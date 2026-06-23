@@ -1,0 +1,14 @@
+{
+  "artifact_type": "observed-data",
+  "id": "backend-restart",
+  "source": "",
+  "status": "passed",
+  "command": "scripts\\Test-TypeDuckLauncherProtocol.ps1 -Strict",
+  "timestamp": "2026-06-23T21:44:15Z",
+  "artifact_path": ".planning\\product\\protocol-fixtures\\phase-04\\typing-mvp-artifacts\\golden-backend-restart.json",
+  "observed_outcome": "Launcher protocol guard proves backend restart/read-error paths return degraded TypeDuck recovery responses.",
+  "details": {
+    "error_code": "TYPEDUCK_ERROR_BACKEND_RESTART",
+    "health": "TYPEDUCK_HEALTH_DEGRADED"
+  }
+}

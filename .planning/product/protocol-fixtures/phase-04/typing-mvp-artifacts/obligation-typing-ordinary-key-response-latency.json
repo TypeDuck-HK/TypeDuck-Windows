@@ -1,0 +1,15 @@
+{
+  "artifact_type": "typing-client-obligation",
+  "id": "ordinary-key-response-latency",
+  "source": "typing-client",
+  "status": "manual_pending",
+  "command": "scripts\\Test-TypeDuckTypingClient.ps1 -Strict",
+  "timestamp": "2026-06-23T21:44:15Z",
+  "artifact_path": ".planning\\product\\protocol-fixtures\\phase-04\\typing-mvp-artifacts\\obligation-typing-ordinary-key-response-latency.json",
+  "observed_outcome": "Requires Windows VM host-process smoke before this obligation can pass: Probe records key response timing below the Phase 4 threshold and captures returned composition/candidate state.",
+  "details": {
+    "trigger": "type ordinary Cantonese input into a Windows text field",
+    "expected": "composition, candidates, candidate cursor, comments, and commit apply from backend response within bounded key-path wait",
+    "vm_required_for_host_process_observation": true
+  }
+}
