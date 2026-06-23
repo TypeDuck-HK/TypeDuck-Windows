@@ -1,34 +1,20 @@
 ---
 phase: 03-zh-hk-tsf-registration-and-installer-skeleton
 verified: 2026-06-23T17:10:00Z
-status: human_needed
-score: 3/5 must-haves verified
-behavior_unverified: 2
+status: passed
+score: 5/5 must-haves verified
+behavior_unverified: 0
 overrides_applied: 0
-behavior_unverified_items:
-  - truth: "User can select TypeDuck under Windows Chinese (Traditional, Hong Kong) language/input settings after installation."
-    test: "Open Windows Settings in the VM and inspect Chinese (Traditional, Hong Kong) input methods after install."
-    expected: "TypeDuck 粵語輸入法 / TypeDuck Cantonese IME is selectable under Chinese (Traditional, Hong Kong), not only present in CTF/TIP registry."
-    why_human: "The VM packet proves CTF/TIP registry state under 0x00000c04, but Get-WinUserLanguageList remained en-US and no Settings screenshot was captured."
-  - truth: "TypeDuck works from both 32-bit and 64-bit host applications after installer registration."
-    test: "In the VM, activate/select TypeDuck from one 32-bit host and one 64-bit host after install."
-    expected: "Both host bitnesses can load/select the TypeDuck TSF profile without missing-COM or missing-DLL errors."
-    why_human: "Source and fixture evidence show both DLL copies and regsvr32 paths, but no host-application activation smoke test was captured."
-human_verification:
-  - test: "Open Windows Settings in the VM and inspect Chinese (Traditional, Hong Kong) input methods after install."
-    expected: "TypeDuck 粵語輸入法 / TypeDuck Cantonese IME is selectable under Chinese (Traditional, Hong Kong)."
-    why_human: "Get-WinUserLanguageList did not report zh-HK; registry evidence is strong but does not visually prove Settings selectability."
-  - test: "Activate/select TypeDuck from one 32-bit host and one 64-bit host after install."
-    expected: "Both host bitnesses can load/select the TypeDuck TSF profile without missing-COM or missing-DLL errors."
-    why_human: "The harness verified files and registry, not real host activation."
+behavior_unverified_items: []
+human_verification: complete
 ---
 
 # Phase 3: zh-HK TSF Registration and Installer Skeleton Verification Report
 
 **Phase Goal:** User can install and remove TypeDuck as a Chinese (Traditional, Hong Kong) Windows IME with deterministic first-party registration.  
 **Verified:** 2026-06-23T17:10:00Z  
-**Status:** human_needed  
-**Re-verification:** No - initial verification
+**Status:** passed  
+**Re-verification:** Yes - human UAT completed the two original behavior-unverified checks
 
 ## Goal Achievement
 
@@ -37,12 +23,12 @@ human_verification:
 | # | Truth | Status | Evidence |
 |---|---|---|---|
 | 1 | User can run a TypeDuck-branded installer worded in bilingual Traditional Hong Kong Chinese and English. | VERIFIED | `installer/MoqiTsf.iss` uses TypeDuck app name/publisher/output and bilingual product-controlled strings; `scripts\Test-TypeDuckInstallerSkeleton.ps1 -Strict` passed; VM installer exited 0. |
-| 2 | User can select TypeDuck under Windows Chinese (Traditional, Hong Kong) language/input settings after installation. | PRESENT_BEHAVIOR_UNVERIFIED | After-install registry has `LanguageProfile\0x00000c04\{C6E8F5DF-...}` with display text, `HiddenInSettingUI=0`, and `Enable=1`; however `Get-WinUserLanguageList` stayed `en-US` and no Settings screenshot was captured. |
+| 2 | User can select TypeDuck under Windows Chinese (Traditional, Hong Kong) language/input settings after installation. | VERIFIED | After-install registry has `LanguageProfile\0x00000c04\{C6E8F5DF-...}` with display text, `HiddenInSettingUI=0`, and `Enable=1`; human UAT confirmed Settings UI selectability in the VM. |
 | 3 | TypeDuck appears with deterministic TypeDuck-owned CLSID/profile GUID, zh-HK locale metadata, TypeDuck icon, and bilingual display text. | VERIFIED | `TypeDuckProfile.cpp` centralizes CLSID `{7D92985A-...}`, profile `{C6E8F5DF-...}`, `zh-HK`, display text, and DLL name; after-install HKLM TIP registry contains description and `IconFile=C:\Windows\System32\TypeDuckTextService.dll`. |
-| 4 | TypeDuck works from both 32-bit and 64-bit host applications after installer registration. | PRESENT_BEHAVIOR_UNVERIFIED | SetupHelper copies/registers SysWOW64 and System32 DLLs through matching regsvr32 paths; VM snapshot shows both DLLs present. No 32-bit and 64-bit host activation smoke test was captured. |
+| 4 | TypeDuck works from both 32-bit and 64-bit host applications after installer registration. | VERIFIED | SetupHelper copies/registers SysWOW64 and System32 DLLs through matching regsvr32 paths; VM snapshot shows both DLLs present; human UAT confirmed 32-bit and 64-bit host activation without missing-COM or missing-DLL errors. |
 | 5 | User can uninstall TypeDuck without leaving broken TypeDuck TSF registrations, startup entries, install files, or runtime registry/profile residue. | VERIFIED | VM uninstall exited 0; after-uninstall snapshot shows HKLM/HKCU TIP false, HKCR CLSID false, Run value empty, install dir false, both system DLLs false, scheduled task false. |
 
-**Score:** 3/5 truths verified (2 present, behavior-unverified)
+**Score:** 5/5 truths verified
 
 ### Required Artifacts
 
@@ -93,9 +79,9 @@ human_verification:
 | Requirement | Source Plan | Description | Status | Evidence |
 |---|---|---|---|---|
 | INST-01 | 03-02, 03-03 | Bilingual TypeDuck-branded installer | SATISFIED | Static installer guard passed; installer executed successfully with TypeDuck name and bilingual controlled messages. |
-| INST-02 | 03-01, 03-03 | Select TypeDuck under Chinese (Traditional, Hong Kong) settings | HUMAN NEEDED | CTF/TIP registry is present under `0x00000c04`, but Settings UI selectability was not visually captured and language list stayed `en-US`. |
+| INST-02 | 03-01, 03-03 | Select TypeDuck under Chinese (Traditional, Hong Kong) settings | SATISFIED | CTF/TIP registry is present under `0x00000c04`; human UAT confirmed Settings UI selectability in the VM. |
 | INST-03 | 03-01, 03-02, 03-03 | Deterministic GUIDs, zh-HK metadata, icon, bilingual text | SATISFIED | Source constants and VM HKLM TIP/profile snapshot match. |
-| INST-04 | 03-02, 03-03 | Register both 32-bit and 64-bit TSF DLLs | HUMAN NEEDED | Both DLLs and regsvr paths are evidenced; real 32-bit/64-bit host activation was not captured. |
+| INST-04 | 03-02, 03-03 | Register both 32-bit and 64-bit TSF DLLs | SATISFIED | Both DLLs and regsvr paths are evidenced; human UAT confirmed real 32-bit/64-bit host activation. |
 | INST-05 | 03-02, 03-03 | Clean uninstall without broken residue | SATISFIED | After-uninstall snapshot shows TypeDuck registry/file/startup/task cleanup complete. |
 
 ### Anti-Patterns Found
@@ -105,23 +91,28 @@ human_verification:
 | `.planning/product/installer-fixtures/phase-03/registry-before.json` | n/a | HKCU TypeDuck TIP existed before install | WARNING | VM was disposable/checkpointed but not fully clean for per-user TIP state; it weakens proof of fresh Settings/user-language enablement. |
 | `.planning/product/installer-fixtures/phase-03/vm-install-registration-uninstall.json` | n/a | Inno Start Menu directory creation warning from slash in bilingual app name | WARNING | Install/register/uninstall still succeeded; Start Menu shortcut polish should be fixed later but is not a Phase 3 registration blocker. |
 
-### Human Verification Required
+### Human Verification Completed
 
 #### 1. Windows Settings Selectability
 
 **Test:** Open Windows Settings in the VM after install and inspect Chinese (Traditional, Hong Kong) input methods.  
 **Expected:** `TypeDuck 粵語輸入法 / TypeDuck Cantonese IME` is selectable under Chinese (Traditional, Hong Kong).  
-**Why human:** `Get-WinUserLanguageList` did not report `zh-HK`; CTF/TIP registry evidence does not visually prove the Settings user flow.
+**Result:** Pass. Human UAT confirmed the Settings user flow in the VM.
 
 #### 2. Dual-Bitness Host Activation
 
 **Test:** Activate/select TypeDuck from one 32-bit host and one 64-bit host after install.  
 **Expected:** Both host bitnesses can load/select the TypeDuck TSF profile without missing-COM or missing-DLL errors.  
-**Why human:** The harness verified files and registry, not real host activation.
+**Result:** Pass. Human UAT confirmed both host bitnesses can select TypeDuck without missing-COM or missing-DLL errors. ASCII output was observed but is outside this phase's registration/installer skeleton scope.
 
 ### Gaps Summary
 
-No blocking implementation gaps were found. Automated source checks and VM fixture assertions support install, deterministic registration metadata, dual-bitness registration wiring, and uninstall cleanup. The phase should not be marked fully passed until the two user-flow checks above are confirmed.
+No blocking implementation gaps were found. Automated source checks, VM fixture assertions, and human UAT support install, deterministic registration metadata, Settings selectability, dual-bitness host activation, and uninstall cleanup.
+
+### Non-Blocking Follow-Ups
+
+- Installer language picker showed duplicate English entries; keep as installer-localization follow-up.
+- Inno Start Menu directory creation warning from the slash in the bilingual app name remains a known follow-up for a later phase.
 
 ---
 
