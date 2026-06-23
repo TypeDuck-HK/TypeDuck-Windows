@@ -92,6 +92,30 @@ public:
 		candPerRow_ = candPerRow;
 	}
 
+	int candidatePageSize() const {
+		return candidatePageSize_;
+	}
+
+	void setCandidatePageSize(int candidatePageSize) {
+		candidatePageSize_ = (std::max)(0, candidatePageSize);
+	}
+
+	int candidatePageIndex() const {
+		return candidatePageIndex_;
+	}
+
+	void setCandidatePageIndex(int candidatePageIndex) {
+		candidatePageIndex_ = (std::max)(0, candidatePageIndex);
+	}
+
+	int candidateTotalCount() const {
+		return candidateTotalCount_;
+	}
+
+	void setCandidateTotalCount(int candidateTotalCount) {
+		candidateTotalCount_ = (std::max)(0, candidateTotalCount);
+	}
+
 	int candSpacing() const {
 		return candSpacing_;
 	}
@@ -298,6 +322,7 @@ public:
 	void updateCandidates(Ime::EditSession* session);
     void updateCandidatesWindow(Ime::EditSession* session);
 	void hideCandidates(bool preserveRecoveryState = false);
+	void resetTypeDuckDegradedState(Ime::EditSession* session = nullptr);
 	bool highlightCandidate(int index);
 	bool selectCandidate(int index);
 	bool changeCandidatePage(bool backward);
@@ -365,6 +390,9 @@ private:
 	HFONT commentFont_;
 	bool updateFont_;
 	int candPerRow_;
+	int candidatePageIndex_;
+	int candidatePageSize_;
+	int candidateTotalCount_;
 	int candSpacing_;
 	std::wstring selKeys_;
 	bool candUseCursor_;

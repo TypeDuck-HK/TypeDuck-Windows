@@ -345,6 +345,9 @@ TextService::TextService(ImeModule* module):
 	lastCandidateWindowMoveTick_(0),
 	updateFont_(false),
 	candPerRow_(1),
+	candidatePageIndex_(0),
+	candidatePageSize_(0),
+	candidateTotalCount_(0),
 	candSpacing_(20),
 	selKeys_(L"1234567890"),
 	candUseCursor_(true),
@@ -1073,6 +1076,24 @@ void TextService::hideCandidates(bool preserveRecoveryState) {
 	log << L"[TextService::hideCandidates] hidden preserve_recovery="
 		<< boolText(preserveRecoveryState);
 	appendCandidateWindowLog(log.str());
+}
+
+void TextService::resetTypeDuckDegradedState(Ime::EditSession* session) {
+	candidates_.clear();
+	candidatePageIndex_ = 0;
+	candidatePageSize_ = 0;
+	candidateTotalCount_ = 0;
+	candidatePreedit_.clear();
+	candidatePreeditCursor_ = 0;
+	pendingCandidateRecovery_ = false;
+	hideCandidates();
+	hideMessage();
+	if (session != nullptr && isComposing()) {
+		setCompositionString(session, L"", 0);
+		suppressNextCompositionTerminatedNotification();
+		endComposition(session->context());
+	}
+	invalidateCandidateUiCache();
 }
 
 // message window

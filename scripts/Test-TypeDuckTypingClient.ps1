@@ -1,7 +1,7 @@
 #Requires -Version 5.1
 <#
 .SYNOPSIS
-  Static contract guard for the TypeDuck TSF typing client path.
+  Static contract guard for the TypeDuck TSF typing client and candidate UI path.
 
 .PARAMETER RepoRoot
   Repository root to inspect. Defaults to the parent directory of this script.
@@ -139,14 +139,18 @@ function Assert-ResponseMapping {
         "typeduck_engine_health",
         "typeduck_error",
         "TYPEDUCK_HEALTH_DEGRADED|TYPEDUCK_HEALTH_RESTARTING|TYPEDUCK_HEALTH_FAILED",
-        "resetTypeDuckDegradedState|handleTypeDuckFailure|markRpcDegraded"
+        "resetTypeDuckDegradedState|handleTypeDuckFailure|markRpcDegraded",
+        "pollAsyncResponses\(\)\s*\|\|\s*pipe_\s*==\s*INVALID_HANDLE_VALUE"
     ) "MoqiClient must map TypeDuck candidate raw comments, page metadata, and health/error responses."
 
     Assert-AllMatch $Failures $service @(
+        "setCandidatePageIndex",
         "setCandidatePageSize",
         "setCandidateTotalCount",
+        "candidatePageIndex_",
         "candidatePageSize_",
         "candidateTotalCount_",
+        "suppressNextCompositionTerminatedNotification\(\)",
         "hideCandidates\(\)",
         "candidatePreedit_\.clear\(\)"
     ) "MoqiTextService must store TypeDuck page/count state and reset visible candidate state on degraded paths."
@@ -171,6 +175,7 @@ function Assert-KeyPathBounds {
         "FrameBuffer\s+responseBuffer\{\s*Proto::kMaxClientFramePayloadBytes\s*\}",
         "TYPEDUCK_KEYPATH_CONNECT_TIMEOUT_MS|kTypeDuckKeyPathConnectTimeoutMs",
         "degradedUntilTick_|markRpcDegraded",
+        "malformedAsyncFrame|malformedAsyncPayload",
         "pendingAsyncResponses_\.clear\(\)",
         "resetTextServiceState\(\)"
     ) "TSF key-path RPC must use bounded frames, bounded connection wait, and degraded reset state."
@@ -210,6 +215,7 @@ $files = @{
     "MoqiTextService/MoqiClient.h" = Read-RequiredFile $root "MoqiTextService/MoqiClient.h"
     "MoqiTextService/MoqiTextService.cpp" = Read-RequiredFile $root "MoqiTextService/MoqiTextService.cpp"
     "MoqiTextService/MoqiTextService.h" = Read-RequiredFile $root "MoqiTextService/MoqiTextService.h"
+    "MoqiTextService/MoqiCandidateWindow.cpp" = Read-RequiredFile $root "MoqiTextService/MoqiCandidateWindow.cpp"
     "proto/moqi.proto" = Read-RequiredFile $root "proto/moqi.proto"
     ".planning/product/protocol-fixtures/phase-04/typing-client.json" = Read-RequiredFile $root ".planning/product/protocol-fixtures/phase-04/typing-client.json"
 }
@@ -219,7 +225,7 @@ Assert-ResponseMapping $failures `
     $files["MoqiTextService/MoqiClient.cpp"] `
     $files["MoqiTextService/MoqiClient.h"] `
     $files["MoqiTextService/MoqiTextService.cpp"] `
-    $files["MoqiTextService/MoqiTextService.h"] `
+    ($files["MoqiTextService/MoqiTextService.h"] + "`n" + $files["MoqiTextService/MoqiCandidateWindow.cpp"]) `
     $files["proto/moqi.proto"]
 Assert-KeyPathBounds $failures $files["MoqiTextService/MoqiClient.cpp"]
 Assert-KeyForwarding $failures $files["MoqiTextService/MoqiClient.cpp"]

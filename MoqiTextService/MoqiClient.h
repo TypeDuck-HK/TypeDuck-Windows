@@ -101,13 +101,14 @@ private:
 	bool waitForRpcIdle(int timeoutMs) const;
 	bool readPendingPipeMessage(std::string& serializedReply);
 	void refreshAsyncPollTimer();
-	void pollAsyncResponses();
+	bool pollAsyncResponses();
 	void enqueueAsyncResponse(const moqi::protocol::ServerResponse& response);
 	void flushPendingAsyncResponsesWithCurrentContext();
 	void flushPendingAsyncResponses(Ime::EditSession* session = nullptr);
 	bool applyAsyncResponse(Json::Value& msg, Ime::EditSession* session = nullptr);
 	static void CALLBACK onAsyncPollTimer(HWND hwnd, UINT msg, UINT_PTR id, DWORD time);
     void closeRpcConnection();
+	void markRpcDegraded(const wchar_t* reason);
 
 	bool init();
     void resetTextServiceState();
@@ -116,6 +117,7 @@ private:
     bool sendOnMenu(std::string button_id, Json::Value& result);
 
     bool handleRpcResponse(Json::Value& msg, Ime::EditSession* session = nullptr);
+	bool handleTypeDuckFailure(Json::Value& msg, Ime::EditSession* session = nullptr);
 
     // Update text service and UI status based on RPC responses.
     void updateSelectionKeys(Json::Value& msg);
@@ -140,6 +142,7 @@ private:
 	bool isActivated_;
     bool shouldWaitConnection_;
     bool launcherStartAttempted_;
+	ULONGLONG degradedUntilTick_;
 	HWND asyncPollTimerWindow_;
 	UINT_PTR asyncPollTimerId_;
 	bool asyncFlushInProgress_;

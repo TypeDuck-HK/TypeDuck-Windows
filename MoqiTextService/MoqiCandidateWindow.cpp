@@ -27,6 +27,10 @@ constexpr COLORREF kSelectedBackground = RGB(198, 221, 249);
 constexpr COLORREF kSelectedText = RGB(0, 0, 0);
 constexpr int kDefaultCandidateSpacing = 20;
 
+Moqi::TextService* productTextService(Ime::TextService* service) {
+    return static_cast<Moqi::TextService*>(service);
+}
+
 std::wstring currentProcessPath() {
     std::wstring buffer(MAX_PATH, L'\0');
     DWORD len = ::GetModuleFileNameW(nullptr, &buffer[0], static_cast<DWORD>(buffer.size()));
@@ -332,7 +336,11 @@ STDMETHODIMP CandidateWindow::GetCount(UINT* puCount) {
     if (!puCount) {
         return E_INVALIDARG;
     }
-    *puCount = (std::min<UINT>)(10, static_cast<UINT>(items_.size()));
+    const auto* service = productTextService(textService_);
+    const int totalCount = service != nullptr ? service->candidateTotalCount() : 0;
+    *puCount = totalCount > 0
+        ? static_cast<UINT>(totalCount)
+        : (std::min<UINT>)(10, static_cast<UINT>(items_.size()));
     return S_OK;
 }
 
@@ -341,7 +349,11 @@ STDMETHODIMP CandidateWindow::GetSelection(UINT* puIndex) {
         return E_INVALIDARG;
     }
     assert(currentSel_ >= 0);
-    *puIndex = static_cast<UINT>(currentSel_);
+    const auto* service = productTextService(textService_);
+    const int pageSize = service != nullptr ? service->candidatePageSize() : 0;
+    const int pageIndex = service != nullptr ? service->candidatePageIndex() : 0;
+    const int pageStart = pageSize > 0 ? pageIndex * pageSize : 0;
+    *puIndex = static_cast<UINT>(pageStart + currentSel_);
     return S_OK;
 }
 
@@ -349,10 +361,19 @@ STDMETHODIMP CandidateWindow::GetString(UINT uIndex, BSTR* pbstr) {
     if (!pbstr) {
         return E_INVALIDARG;
     }
-    if (uIndex >= items_.size()) {
+    const auto* service = productTextService(textService_);
+    const int pageSize = service != nullptr ? service->candidatePageSize() : 0;
+    const int pageIndex = service != nullptr ? service->candidatePageIndex() : 0;
+    const UINT pageStart =
+        pageSize > 0 ? static_cast<UINT>(pageIndex * pageSize) : 0;
+    const UINT localIndex = pageSize > 0 ? uIndex - pageStart : uIndex;
+    if (pageSize > 0 && uIndex < pageStart) {
         return E_INVALIDARG;
     }
-    *pbstr = SysAllocString(items_[uIndex].combinedText().c_str());
+    if (localIndex >= items_.size()) {
+        return E_INVALIDARG;
+    }
+    *pbstr = SysAllocString(items_[localIndex].combinedText().c_str());
     return S_OK;
 }
 
@@ -360,12 +381,24 @@ STDMETHODIMP CandidateWindow::GetPageIndex(UINT* puIndex, UINT uSize, UINT* puPa
     if (!puPageCnt) {
         return E_INVALIDARG;
     }
-    *puPageCnt = 1;
+    const auto* service = productTextService(textService_);
+    const int pageSize = service != nullptr ? service->candidatePageSize() : 0;
+    const int totalCount = service != nullptr ? service->candidateTotalCount() : 0;
+    const UINT effectivePageSize =
+        pageSize > 0 ? static_cast<UINT>(pageSize)
+                     : (std::max<UINT>)(1, static_cast<UINT>(items_.size()));
+    const UINT effectiveTotal =
+        totalCount > 0 ? static_cast<UINT>(totalCount)
+                       : static_cast<UINT>(items_.size());
+    *puPageCnt = (std::max<UINT>)(1, (effectiveTotal + effectivePageSize - 1) /
+                                         effectivePageSize);
     if (puIndex) {
         if (uSize < *puPageCnt) {
             return E_INVALIDARG;
         }
-        puIndex[0] = 0;
+        for (UINT i = 0; i < *puPageCnt; ++i) {
+            puIndex[i] = i * effectivePageSize;
+        }
     }
     return S_OK;
 }
@@ -382,7 +415,20 @@ STDMETHODIMP CandidateWindow::GetCurrentPage(UINT* puPage) {
     if (!puPage) {
         return E_INVALIDARG;
     }
-    *puPage = 0;
+    const auto* service = productTextService(textService_);
+    const int pageSize = service != nullptr ? service->candidatePageSize() : 0;
+    const int totalCount = service != nullptr ? service->candidateTotalCount() : 0;
+    const UINT effectivePageSize =
+        pageSize > 0 ? static_cast<UINT>(pageSize)
+                     : (std::max<UINT>)(1, static_cast<UINT>(items_.size()));
+    const UINT effectiveTotal =
+        totalCount > 0 ? static_cast<UINT>(totalCount)
+                       : static_cast<UINT>(items_.size());
+    const UINT pageCount = (std::max<UINT>)(
+        1, (effectiveTotal + effectivePageSize - 1) / effectivePageSize);
+    const UINT pageIndex =
+        service != nullptr ? static_cast<UINT>(service->candidatePageIndex()) : 0;
+    *puPage = (std::min)(pageIndex, pageCount - 1);
     return S_OK;
 }
 

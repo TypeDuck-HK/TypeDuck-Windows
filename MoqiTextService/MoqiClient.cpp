@@ -48,6 +48,8 @@ namespace Moqi {
 
 static constexpr UINT ASYNC_RPC_POLL_INTERVAL_MS = 50;
 static constexpr int FIRST_PRINTABLE_KEY_RPC_WAIT_MS = 200;
+static constexpr DWORD TYPEDUCK_KEYPATH_CONNECT_TIMEOUT_MS = 120;
+static constexpr ULONGLONG TYPEDUCK_DEGRADED_RETRY_DELAY_MS = 1000;
 static constexpr DWORD RPC_BUSY_POLL_INTERVAL_MS = 5;
 
 namespace {
@@ -93,6 +95,28 @@ void appendRpcGuardLog(const std::wstring &message) {
     return;
   }
   stream << L"[" << timestamp << L"] " << message << L"\n";
+}
+
+std::wstring utf8ToUtf16(const std::string &text) {
+  if (text.empty()) {
+    return L"";
+  }
+
+  const int inputLength = static_cast<int>(text.size());
+  int wlen =
+      ::MultiByteToWideChar(CP_UTF8, 0, text.data(), inputLength, nullptr, 0);
+  if (wlen <= 0) {
+    return L"";
+  }
+
+  std::wstring wtext;
+  wtext.resize(wlen);
+  ::MultiByteToWideChar(CP_UTF8, 0, text.data(), inputLength, &wtext[0], wlen);
+  return wtext;
+}
+
+std::wstring jsonStringToUtf16(const Json::Value &value) {
+  return value.isString() ? utf8ToUtf16(value.asString()) : L"";
 }
 
 class ScopedRpcInProgress {
@@ -352,6 +376,30 @@ static Json::Value customizeUiToJson(const moqi::protocol::CustomizeUi &ui) {
   return result;
 }
 
+static const char *typeDuckHealthStatusName(
+    moqi::protocol::TypeDuckHealthStatus status) {
+  switch (status) {
+  case moqi::protocol::TYPEDUCK_HEALTH_OK:
+    return "ok";
+  case moqi::protocol::TYPEDUCK_HEALTH_DEGRADED:
+    return "degraded";
+  case moqi::protocol::TYPEDUCK_HEALTH_RESTARTING:
+    return "restarting";
+  case moqi::protocol::TYPEDUCK_HEALTH_FAILED:
+    return "failed";
+  case moqi::protocol::TYPEDUCK_HEALTH_STATUS_UNSPECIFIED:
+  default:
+    return "unspecified";
+  }
+}
+
+static bool isTypeDuckDegradedStatus(
+    moqi::protocol::TypeDuckHealthStatus status) {
+  return status == moqi::protocol::TYPEDUCK_HEALTH_DEGRADED ||
+         status == moqi::protocol::TYPEDUCK_HEALTH_RESTARTING ||
+         status == moqi::protocol::TYPEDUCK_HEALTH_FAILED;
+}
+
 static Json::Value buttonInfoToJson(const moqi::protocol::ButtonInfo &button) {
   Json::Value result;
   result["id"] = button.id();
@@ -408,11 +456,55 @@ static Json::Value responseToJson(const moqi::protocol::ServerResponse &response
     for (const auto &candidate : response.candidate_entries()) {
       Json::Value item;
       item["text"] = candidate.text();
-      if (!candidate.comment().empty())
-        item["comment"] = candidate.comment();
+      const std::string comment = !candidate.raw_lookup_comment().empty()
+                                      ? candidate.raw_lookup_comment()
+                                      : candidate.comment();
+      if (!comment.empty())
+        item["comment"] = comment;
+      if (!candidate.raw_lookup_comment().empty())
+        item["rawLookupComment"] = candidate.raw_lookup_comment();
+      if (!candidate.input_code().empty())
+        item["inputCode"] = candidate.input_code();
+      if (!candidate.jyutping().empty())
+        item["jyutping"] = candidate.jyutping();
       candidateEntries.append(item);
     }
     result["candidateEntries"] = candidateEntries;
+  }
+
+  if (response.has_typeduck_candidate_page()) {
+    const auto &page = response.typeduck_candidate_page();
+    result["candidatePageIndex"] = page.page_index();
+    result["candidatePageSize"] = page.page_size();
+    result["candidateTotalCount"] = page.total_count();
+    result["candidateHasPrevious"] = page.has_previous();
+    result["candidateHasNext"] = page.has_next();
+  }
+
+  if (response.has_typeduck_engine_health()) {
+    const auto &health = response.typeduck_engine_health();
+    Json::Value typeduckHealth;
+    typeduckHealth["status"] = typeDuckHealthStatusName(health.status());
+    typeduckHealth["statusCode"] = static_cast<int>(health.status());
+    typeduckHealth["backendName"] = health.backend_name();
+    typeduckHealth["message"] = health.message();
+    typeduckHealth["recoverable"] = health.recoverable();
+    typeduckHealth["restartCount"] = health.restart_count();
+    result["typeduckHealth"] = typeduckHealth;
+    if (isTypeDuckDegradedStatus(health.status())) {
+      result["typeduckDegraded"] = true;
+    }
+  }
+
+  if (response.has_typeduck_error()) {
+    const auto &error = response.typeduck_error();
+    Json::Value typeduckError;
+    typeduckError["code"] = static_cast<int>(error.code());
+    typeduckError["message"] = error.message();
+    typeduckError["recoverable"] = error.recoverable();
+    typeduckError["detail"] = error.detail();
+    result["typeduckError"] = typeduckError;
+    result["typeduckDegraded"] = true;
   }
 
   if (!response.menu_items().empty()) {
@@ -520,6 +612,7 @@ Client::Client(TextService *service, REFIID langProfileGuid)
       pipe_(INVALID_HANDLE_VALUE), rpcInProgress_(0),
       activationInProgress_(false), nextSeqNum_(0), isActivated_(false),
       shouldWaitConnection_{true}, launcherStartAttempted_{false},
+      degradedUntilTick_(0),
       asyncPollTimerWindow_(nullptr),
       asyncPollTimerId_(0), asyncFlushInProgress_(false),
       autoPairRules_(defaultAutoPairRules()) {}
@@ -553,10 +646,29 @@ void Client::addKeyEventToRpcRequest(moqi::protocol::ClientRequest &request,
 
 bool Client::handleRpcResponse(Json::Value &msg, Ime::EditSession *session) {
   bool success = msg.get("success", false).asBool();
+  if (!success) {
+    return handleTypeDuckFailure(msg, session);
+  }
   if (success) {
     updateStatus(msg, session);
   }
   return success;
+}
+
+bool Client::handleTypeDuckFailure(Json::Value &msg, Ime::EditSession *session) {
+  const bool hasTypeduckFailure = msg.get("typeduckDegraded", false).asBool() ||
+      msg["typeduckError"].isObject() || msg["typeduckHealth"].isObject() ||
+      msg["error"].isString();
+  appendRpcGuardLog(hasTypeduckFailure
+                        ? L"[TypeDuck degraded] resetting TSF client state"
+                        : L"[RPC failure] resetting TSF client state");
+  markRpcDegraded(hasTypeduckFailure ? L"typeDuckFailure" : L"rpcFailure");
+  closeRpcConnection();
+  resetTextServiceState();
+  if (textService_ != nullptr) {
+    textService_->resetTypeDuckDegradedState(session);
+  }
+  return false;
 }
 
 void Client::updateUI(const Json::Value &data) {
@@ -904,6 +1016,18 @@ void Client::updateStatus(Json::Value &msg, Ime::EditSession *session) {
   // For example, setCompositionCursor() should happen after
   // setCompositionCursor().
   updateSelectionKeys(msg);
+  const auto &candidatePageIndexVal = msg["candidatePageIndex"];
+  if (candidatePageIndexVal.isUInt()) {
+    textService_->setCandidatePageIndex(candidatePageIndexVal.asInt());
+  }
+  const auto &candidatePageSizeVal = msg["candidatePageSize"];
+  if (candidatePageSizeVal.isUInt()) {
+    textService_->setCandidatePageSize(candidatePageSizeVal.asInt());
+  }
+  const auto &candidateTotalCountVal = msg["candidateTotalCount"];
+  if (candidateTotalCountVal.isUInt()) {
+    textService_->setCandidateTotalCount(candidateTotalCountVal.asInt());
+  }
 
   // show message
   bool endComposition = false;
@@ -916,11 +1040,10 @@ void Client::updateStatus(Json::Value &msg, Ime::EditSession *session) {
     updateMessageWindow(msg, session, endComposition);
 
     const bool hasCommitString =
-        msg["commitString"].isString() &&
-        !utf8ToUtf16(msg["commitString"].asCString()).empty();
+        msg["commitString"].isString() && !jsonStringToUtf16(msg["commitString"]).empty();
     const bool hasNonEmptyComposition =
         msg["compositionString"].isString() &&
-        !utf8ToUtf16(msg["compositionString"].asCString()).empty();
+        !jsonStringToUtf16(msg["compositionString"]).empty();
 
     // Fixed-length schemas may commit current code and immediately start the
     // next composition in the same response, e.g. "ggtts" -> commit "五笔"
@@ -967,10 +1090,10 @@ void Client::updateCandidateList(Json::Value &msg, Ime::EditSession *session) {
       CandidateUiItem item;
       if (candidate.isObject()) {
         if (candidate["text"].isString()) {
-          item.text = utf8ToUtf16(candidate["text"].asCString());
+          item.text = jsonStringToUtf16(candidate["text"]);
         }
         if (candidate["comment"].isString()) {
-          item.comment = utf8ToUtf16(candidate["comment"].asCString());
+          item.comment = jsonStringToUtf16(candidate["comment"]);
         }
       }
       candidates.emplace_back(std::move(item));
@@ -984,7 +1107,7 @@ void Client::updateCandidateList(Json::Value &msg, Ime::EditSession *session) {
     candidates.clear();
     for (const auto &candidate : candidateListVal) {
       CandidateUiItem item;
-      item.text = utf8ToUtf16(candidate.asCString());
+      item.text = jsonStringToUtf16(candidate);
       candidates.emplace_back(std::move(item));
     }
     hasVisibleCandidates = !candidates.empty();
@@ -1479,27 +1602,42 @@ void Client::flushPendingAsyncResponsesWithCurrentContext() {
   }
 }
 
-void Client::pollAsyncResponses() {
+bool Client::pollAsyncResponses() {
   if (pipe_ == INVALID_HANDLE_VALUE) {
-    return;
+    return true;
   }
 
   std::string serializedResponse;
   while (readPendingPipeMessage(serializedResponse)) {
-    Proto::FrameBuffer responseBuffer;
+    Proto::FrameBuffer responseBuffer{Proto::kMaxClientFramePayloadBytes};
     responseBuffer.append(serializedResponse.data(), serializedResponse.size());
+    if (responseBuffer.hasViolation()) {
+      markRpcDegraded(L"malformedAsyncFrame");
+      closeRpcConnection();
+      resetTextServiceState();
+      if (textService_ != nullptr) {
+        textService_->resetTypeDuckDegradedState();
+      }
+      return false;
+    }
     std::string payload;
     while (responseBuffer.nextFrame(payload)) {
       moqi::protocol::ServerResponse protoResponse;
       if (!Proto::parsePayload(payload, protoResponse)) {
+        markRpcDegraded(L"malformedAsyncPayload");
         closeRpcConnection();
-        return;
+        resetTextServiceState();
+        if (textService_ != nullptr) {
+          textService_->resetTypeDuckDegradedState();
+        }
+        return false;
       }
       enqueueAsyncResponse(protoResponse);
     }
   }
 
   flushPendingAsyncResponsesWithCurrentContext();
+  return pipe_ != INVALID_HANDLE_VALUE;
 }
 
 bool Client::callRpcPipe(HANDLE pipe, const std::string &serializedRequest,
@@ -1539,14 +1677,17 @@ bool Client::callRpcMethod(moqi::protocol::ClientRequest &request,
       return false;
     }
 
-    pollAsyncResponses();
+    if (!pollAsyncResponses() || pipe_ == INVALID_HANDLE_VALUE) {
+      return false;
+    }
 
     // Add a sequence number for the request.
     auto seqNum = nextSeqNum_++;
     request.set_seq_num(seqNum);
 
     std::string serializedRequest;
-    if (!Proto::serializeMessage(request, serializedRequest)) {
+    if (!Proto::serializeMessageBounded(
+            request, serializedRequest, Proto::kMaxClientFramePayloadBytes)) {
       return false;
     }
 
@@ -1554,8 +1695,12 @@ bool Client::callRpcMethod(moqi::protocol::ClientRequest &request,
     bool success = false;
     if (callRpcPipe(pipe_, serializedRequest, serializedResponse)) {
       while (true) {
-        Proto::FrameBuffer responseBuffer;
+        Proto::FrameBuffer responseBuffer{Proto::kMaxClientFramePayloadBytes};
         responseBuffer.append(serializedResponse.data(), serializedResponse.size());
+        if (responseBuffer.hasViolation()) {
+          success = false;
+          break;
+        }
         std::string payload;
         moqi::protocol::ServerResponse protoResponse;
         success = responseBuffer.nextFrame(payload) &&
@@ -1582,9 +1727,13 @@ bool Client::callRpcMethod(moqi::protocol::ClientRequest &request,
     flushPendingAsyncResponses();
 
     if (!success) {            // fail to send the request to the server
+      markRpcDegraded(L"rpcPipeFailure");
       closeRpcConnection();    // close the pipe connection since it's broken
       resetTextServiceState(); // since we lost the connection, the state is
                                // unknonw so we reset.
+      if (textService_ != nullptr) {
+        textService_->resetTypeDuckDegradedState();
+      }
     }
     return success;
   } catch (const std::exception &) {
@@ -1594,6 +1743,9 @@ bool Client::callRpcMethod(moqi::protocol::ClientRequest &request,
   }
   closeRpcConnection();
   resetTextServiceState();
+  if (textService_ != nullptr) {
+    textService_->resetTypeDuckDegradedState();
+  }
   return false;
 }
 
@@ -1664,16 +1816,28 @@ bool Client::waitForRpcConnection() {
     return true;
   }
 
+  const ULONGLONG now = ::GetTickCount64();
+  if (degradedUntilTick_ > now) {
+    return false;
+  }
+
   wstring serverPipeName = getPipeName(L"Launcher");
   pipe_ = connectPipe(serverPipeName.c_str(), 0);
   if (pipe_ == INVALID_HANDLE_VALUE) {
     ensureLauncherRunning();
   }
 
-  for (int attempt = 0; pipe_ == INVALID_HANDLE_VALUE && attempt < 10;
-       ++attempt) {
-    // try to connect to the server
-    pipe_ = connectPipe(serverPipeName.c_str(), 3000);
+  if (pipe_ == INVALID_HANDLE_VALUE) {
+    pipe_ = connectPipe(serverPipeName.c_str(), TYPEDUCK_KEYPATH_CONNECT_TIMEOUT_MS);
+  }
+
+  if (pipe_ == INVALID_HANDLE_VALUE) {
+    markRpcDegraded(L"launcherConnectionFailed");
+    resetTextServiceState();
+    if (textService_ != nullptr) {
+      textService_->resetTypeDuckDegradedState();
+    }
+    return false;
   }
 
   if (pipe_ != INVALID_HANDLE_VALUE) {
@@ -1683,6 +1847,11 @@ bool Client::waitForRpcConnection() {
     if (!init()) {
       closeRpcConnection();
       shouldWaitConnection_ = true;
+      markRpcDegraded(L"initFailed");
+      resetTextServiceState();
+      if (textService_ != nullptr) {
+        textService_->resetTypeDuckDegradedState();
+      }
       return false;
     }
 
@@ -1696,6 +1865,13 @@ bool Client::waitForRpcConnection() {
   }
   // if init() or onActivate() RPC fails, the pipe_ might have been closed.
   return pipe_ != INVALID_HANDLE_VALUE;
+}
+
+void Client::markRpcDegraded(const wchar_t* reason) {
+  degradedUntilTick_ = ::GetTickCount64() + TYPEDUCK_DEGRADED_RETRY_DELAY_MS;
+  std::wstring message = L"[markRpcDegraded] ";
+  message += reason != nullptr ? reason : L"<unknown>";
+  appendRpcGuardLog(message);
 }
 
 void Client::resetTextServiceState() {
