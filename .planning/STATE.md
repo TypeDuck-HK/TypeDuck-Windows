@@ -5,16 +5,16 @@ milestone_name: milestone
 current_phase: 2
 current_phase_name: Engine Runtime Contract Spike
 status: in_progress
-stopped_at: Completed 02-01-PLAN.md
-last_updated: "2026-06-23T11:43:00Z"
+stopped_at: Completed 02-02-PLAN.md
+last_updated: "2026-06-23T12:39:29.304Z"
 last_activity: 2026-06-23
-last_activity_desc: Phase 2 Plan 01 completed with TypeDuck runtime staging evidence
+last_activity_desc: Phase 2 Plan 02 completed with TypeDuck adapter typing proof evidence
 progress:
   total_phases: 7
   completed_phases: 1
   total_plans: 5
-  completed_plans: 3
-  percent: 60
+  completed_plans: 4
+  percent: 80
 ---
 
 # Project State
@@ -29,36 +29,37 @@ See: .planning/PROJECT.md (updated 2026-06-23)
 ## Current Position
 
 Phase: 2 of 7 (Engine Runtime Contract Spike)
-Plan: 1 of 3 complete; next 02-02
+Plan: 2 of 3 complete; next 02-03
 Status: Phase 2 in progress
-Last activity: 2026-06-23 — Phase 2 Plan 01 completed with TypeDuck runtime staging evidence
+Last activity: 2026-06-23 — Phase 2 Plan 02 completed with TypeDuck adapter typing proof evidence
 
-Progress: [██████░░░░] 60%
+Progress: [████████░░] 80%
 
 ## Performance Metrics
 
 **Velocity:**
 
-- Total plans completed: 3
-- Average duration: 11 min
-- Total execution time: 0.5 hours
+- Total plans completed: 4
+- Average duration: 22 min
+- Total execution time: 1.4 hours
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
 | 01 | 2 | 22 min | 11 min |
-| 02 | 1 | 10 min | 10 min |
+| 02 | 2 | 65 min | 33 min |
 
 **Recent Trend:**
 
-- Last 5 plans: P01 5 min, P02 17 min, P03 10 min
-- Trend: documentation/fixture capture complete; engine runtime staging evidence started
+- Last 5 plans: P01 5 min, P02 17 min, P03 10 min, P04 55 min
+- Trend: engine runtime staging and adapter typing proof complete; dictionary lookup payload proof remains
 
 *Updated after each plan completion*
 | Phase 01 P01 | 5 min | 2 tasks | 2 files |
 | Phase 01 P02 | 17 min | 2 tasks | 8 files |
 | Phase 02 P01 | 10 min | 3 tasks | 7 files |
+| Phase 02 P02 | 55min | 3 tasks | 9 files |
 
 ## Accumulated Context
 
@@ -79,6 +80,8 @@ Recent decisions affecting current work:
 - [Phase 01]: Phase 5 and Phase 7 must refresh Web alpha fixtures if the alpha drifts before UI implementation or release verification.
 - [Phase 02 Plan 01]: Lookup-filter evidence is recorded as static runtime inclusion: the TypeDuck-HK librime release `version-info.txt` names `rime-dictionary-lookup-filter` commit `3671814d4e4aeab8d616ceea3c7f6d88e96bba02`, tied to staged `rime.dll` SHA-256 evidence.
 - [Phase 02 Plan 01]: Generated TypeDuck runtime and cache trees stay ignored; reproducible scripts and manifest evidence are committed instead.
+- [Phase 02 Plan 02]: ENG-04 is proven through the existing moqi-ime framed protobuf process boundary, not direct in-process librime.
+- [Phase 02 Plan 02]: TypeDuck-HK librime version labels are fork-specific; Rime API compatibility patches are based on API shape and commit history.
 
 ### Pending Todos
 
@@ -86,7 +89,7 @@ None yet.
 
 ### Blockers/Concerns
 
-- [Phase 2]: TypeDuck-HK librime fork, lookup-filter provenance, schema deployment, and built schema assets are staged; adapter typing proof and dictionary payload capture remain for 02-02 and 02-03.
+- [Phase 2]: TypeDuck-HK librime fork, lookup-filter provenance, schema deployment, built schema assets, and adapter typing proof are staged; dictionary payload capture remains for 02-03.
 - [Phase 3]: zh-HK TSF registration, dual-bitness DLL deployment, and uninstall cleanup are fragile and require clean Windows verification.
 - [Phase 5]: TypeDuck Web alpha can drift; UI/settings planning should refresh fixtures before implementation.
 
@@ -98,6 +101,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-06-23T11:43:00Z
-Stopped at: Completed 02-01-PLAN.md
+Last session: 2026-06-23T12:38:31.634Z
+Stopped at: Completed 02-02-PLAN.md
 Resume file: None

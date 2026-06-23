@@ -54,7 +54,7 @@ Plans:
   3. Developer can run a minimal engine host or spike executable that produces Cantonese composition, candidate pages, Jyutping, and commit output from TypeDuck schema input.
   4. Developer can capture lookup-filter-backed dictionary data for candidates, including headword, Jyutping, part-of-speech, English meaning, reading notes, and enabled-language meanings when available.
 
-**Plans:** 1/3 plans executed
+**Plans:** 2/3 plans executed
 Plans:
 **Wave 1**
 
@@ -62,7 +62,7 @@ Plans:
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
-- [ ] 02-02-PLAN.md — Prove TypeDuck Cantonese composition, candidates, Jyutping, and commits through the compatibility adapter boundary.
+- [x] 02-02-PLAN.md — Prove TypeDuck Cantonese composition, candidates, Jyutping, and commits through the compatibility adapter boundary.
 
 **Wave 3** *(blocked on Wave 2 completion)*
 
@@ -160,7 +160,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Identity and Web Parity Contract | 2/2 | Complete   | 2026-06-23 |
-| 2. Engine Runtime Contract Spike | 1/3 | In Progress|  |
+| 2. Engine Runtime Contract Spike | 2/3 | In Progress|  |
 | 3. zh-HK TSF Registration and Installer Skeleton | 0/TBD | Not started | - |
 | 4. TypeDuck Protocol and Typing MVP | 0/TBD | Not started | - |
 | 5. Candidate, Dictionary, Settings, and About UI Parity | 0/TBD | Not started | - |
