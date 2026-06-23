@@ -5,16 +5,16 @@ milestone_name: milestone
 current_phase: 3
 current_phase_name: zh-HK TSF Registration and Installer Skeleton
 status: executing
-stopped_at: Completed 03-01-PLAN.md
-last_updated: "2026-06-23T15:56:56.942Z"
-last_activity: 2026-06-23
-last_activity_desc: Phase 3 planned with 3 execution plans
+stopped_at: Completed 03-02-PLAN.md
+last_updated: "2026-06-23T16:20:50.061Z"
+last_activity: 2026-06-24
+last_activity_desc: Phase 3 Plan 03-02 installer skeleton completed
 progress:
   total_phases: 7
   completed_phases: 2
   total_plans: 8
-  completed_plans: 6
-  percent: 29
+  completed_plans: 7
+  percent: 88
 ---
 
 # Project State
@@ -29,17 +29,17 @@ See: .planning/PROJECT.md (updated 2026-06-23)
 ## Current Position
 
 Phase: 3 of 7 (zh-HK TSF Registration and Installer Skeleton)
-Plan: 3 planned
-Status: Ready to execute
-Last activity: 2026-06-23 — Phase 3 planned with 3 execution plans
+Plan: 2 of 3 executed; next 03-03
+Status: Ready to execute Plan 03-03
+Last activity: 2026-06-24 — Phase 3 Plan 03-02 installer skeleton completed
 
-Progress: [████████░░] 75%
+Progress: [█████████░] 88%
 
 ## Performance Metrics
 
 **Velocity:**
 
-- Total plans completed: 8
+- Total plans completed: 9
 - Average duration: 20 min
 - Total execution time: 1.7 hours
 
@@ -62,6 +62,7 @@ Progress: [████████░░] 75%
 | Phase 02 P02 | 55min | 3 tasks | 9 files |
 | Phase 02 P03 | 13min | 3 tasks | 6 files |
 | Phase 03 P01 | 9 min | 3 tasks | 8 files |
+| Phase 03 P02 | 17 min | 3 tasks | 12 files |
 
 ## Accumulated Context
 
@@ -90,6 +91,9 @@ Recent decisions affecting current work:
 - [Phase 03]: TypeDuck TSF identity is centralized in MoqiTextService/TypeDuckProfile.* using the Phase 3 CLSID/profile GUID contract. — Plan 03-01 moved CLSID/profile GUID/display/DLL constants out of backend metadata and into first-party source.
 - [Phase 03]: DllRegisterServer seeds the TypeDuck zh-HK profile before optional backend ime.json scanning. — Backend profile JSON may remain transition metadata but cannot replace or override the required TypeDuck profile.
 - [Phase 03]: The CMake target remains MoqiTextService while output/module identity is TypeDuckTextService.dll. — This keeps source churn low while satisfying deployed TSF DLL identity.
+- [Phase 03]: Deployed installer/setup names are TypeDuck-owned while internal scaffold target/source names may remain temporarily. — Plan 03-02 deploys TypeDuckLauncher.exe, TypeDuckSetupHelper.exe, TypeDuckTextService.dll, TypeDuckIME paths, and typeduck-windows-ime-setup.exe.
+- [Phase 03]: TYPEDUCK_PROGRAM_DIR is the setup-helper registration environment variable. — MOQI_PROGRAM_DIR remains only as a transition-only compatibility alias during registration.
+- [Phase 03]: TypeDuck-controlled installer/setup strings are bilingual; standard Inno wizard chrome may fall back to English until a vetted Traditional Chinese pack is bundled. — The local Inno Setup install lacked ChineseTraditional.isl.
 
 ### Pending Todos
 
@@ -108,6 +112,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-06-23T15:56:06.832Z
-Stopped at: Completed 03-01-PLAN.md
+Last session: 2026-06-23T16:20:50.054Z
+Stopped at: Completed 03-02-PLAN.md
 Resume file: None
