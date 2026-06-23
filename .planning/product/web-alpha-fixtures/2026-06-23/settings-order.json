@@ -204,11 +204,22 @@
   ],
   "visualReference": {
     "screenshot": "screenshots/settings-desktop-1280x720.png",
-    "status": "captured",
-    "viewport": "1280x720"
+    "status": "captured_scrolled",
+    "viewport": "1280x720",
+    "scrollY": 494,
+    "visibleLowerControls": [
+      "候選詞粵拼 Candidates Jyutping",
+      "自動完成 Auto-completion",
+      "自動校正 Auto-correction",
+      "自動組詞 Auto-composition",
+      "輸入記憶 Input Memory",
+      "反查設定 Reverse Lookup Settings",
+      "顯示完整輸入碼 Show Full Input Code",
+      "倉頡版本 Cangjie Version"
+    ]
   },
   "multilingualDisplayLanguageCapture": {
-    "status": "captured",
+    "status": "captured_scrolled",
     "screenshot": "screenshots/settings-multilingual-indonesian-main-desktop-1280x720.png",
     "viewport": "1280x720",
     "enabledLanguages": [
@@ -219,7 +230,18 @@
       "urd"
     ],
     "mainLanguage": "ind",
-    "mainLanguageLabel": "印尼語 Indonesian"
+    "mainLanguageLabel": "印尼語 Indonesian",
+    "scrollY": 494,
+    "visibleLowerControls": [
+      "候選詞粵拼 Candidates Jyutping",
+      "自動完成 Auto-completion",
+      "自動校正 Auto-correction",
+      "自動組詞 Auto-composition",
+      "輸入記憶 Input Memory",
+      "反查設定 Reverse Lookup Settings",
+      "顯示完整輸入碼 Show Full Input Code",
+      "倉頡版本 Cangjie Version"
+    ]
   },
   "validationNote": "JSON is stored as readable UTF-8 with BOM for Windows PowerShell 5.1 compatibility. Prefer Get-Content -Raw -Encoding UTF8 when validating."
 }

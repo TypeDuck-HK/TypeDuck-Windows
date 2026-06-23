@@ -1,7 +1,7 @@
 ﻿{
   "captureDate": "2026-06-23",
   "captureStatus": "complete",
-  "statusReason": "Source, runtime URL, baseline settings/candidate screenshots, and an additional multilingual Indonesian-main settings/candidate/dictionary screenshot set were captured. The multilingual dictionary screenshot targets the third candidate 呢, scrolls down, then moves across that candidate cell so the richer lower dictionary entries are visible.",
+  "statusReason": "Source, runtime URL, scrolled settings screenshots, candidate screenshots, and multilingual Indonesian-main dictionary screenshot were captured. Settings screenshots are scrolled to expose lower controls including Candidates Jyutping, toggles, Reverse Lookup Settings, Show Full Input Code, and Cangjie Version.",
   "alphaUrl": "http://localhost:5173/TypeDuck-Web/aap2-alpha/",
   "runtimeAvailability": {
     "status": "available",
@@ -51,9 +51,10 @@
     "screenshots": [
       {
         "file": "screenshots/settings-desktop-1280x720.png",
-        "status": "captured",
+        "status": "captured_scrolled",
         "viewport": "1280x720",
-        "evidence": "Runtime page after network idle and settings section visible."
+        "evidence": "Runtime page scrolled down to expose lower settings and reverse lookup controls.",
+        "scrollY": 494
       },
       {
         "file": "screenshots/candidate-desktop-1280x720.png",
@@ -69,9 +70,10 @@
       },
       {
         "file": "screenshots/settings-multilingual-indonesian-main-desktop-1280x720.png",
-        "status": "captured",
+        "status": "captured_scrolled",
         "viewport": "1280x720",
-        "evidence": "Runtime page with all Display Languages enabled and Indonesian selected as main language."
+        "evidence": "Runtime page with all Display Languages enabled and Indonesian selected as main, scrolled down to expose lower settings and reverse lookup controls.",
+        "scrollY": 494
       },
       {
         "file": "screenshots/candidate-multilingual-indonesian-main-desktop-1280x720.png",
@@ -129,6 +131,10 @@
       "text": "呢",
       "jyutping": "nei1",
       "note": "→ni1"
+    },
+    "settingsScrollCapture": {
+      "scrollY": 494,
+      "reason": "Settings screenshots are scrolled down so lower controls are visible: Candidates Jyutping, Auto-completion, Auto-correction, Auto-composition, Input Memory, Reverse Lookup Settings, Show Full Input Code, and Cangjie Version."
     }
   },
   "attemptedCommandsAndTools": [
@@ -139,7 +145,8 @@
     "Playwright textarea input `nei`, screenshot capture for settings and candidate panel",
     "Playwright hover/mousemove/touchstart attempts for dictionary panel screenshot",
     "Initial Playwright multilingual capture enabled all display languages, selected Indonesian as main language, typed `nei`, and moved the mouse over the first candidate cell before capturing the dictionary panel.",
-    "Playwright replacement capture selected the row containing third candidate 呢 and moved the mouse across its candidate cell before replacing dictionary-detail-multilingual-indonesian-main-desktop-1280x720.png."
+    "Playwright replacement capture selected the row containing third candidate 呢 and moved the mouse across its candidate cell before replacing dictionary-detail-multilingual-indonesian-main-desktop-1280x720.png.",
+    "Playwright recaptured both settings screenshots after scrolling to the lower settings area at window.scrollY 494."
   ],
   "accessLimitations": [
     {

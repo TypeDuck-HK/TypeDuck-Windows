@@ -29,10 +29,10 @@ Supporting assets:
 - `web-alpha-fixtures/2026-06-23/settings-order.json`
 - `web-alpha-fixtures/2026-06-23/candidate-list-sample.json`
 - `web-alpha-fixtures/2026-06-23/dictionary-detail-sample.json`
-- `web-alpha-fixtures/2026-06-23/screenshots/settings-desktop-1280x720.png` - captured
+- `web-alpha-fixtures/2026-06-23/screenshots/settings-desktop-1280x720.png` - captured after scrolling down to expose lower settings
 - `web-alpha-fixtures/2026-06-23/screenshots/candidate-desktop-1280x720.png` - captured
 - `web-alpha-fixtures/2026-06-23/screenshots/dictionary-detail-desktop-1280x720.png` - partial/blocked, no file created because the dictionary panel did not appear under controlled Playwright hover/touch attempts
-- `web-alpha-fixtures/2026-06-23/screenshots/settings-multilingual-indonesian-main-desktop-1280x720.png` - captured with all Display Languages enabled and Indonesian selected as main
+- `web-alpha-fixtures/2026-06-23/screenshots/settings-multilingual-indonesian-main-desktop-1280x720.png` - captured with all Display Languages enabled, Indonesian selected as main, and the page scrolled down to expose lower settings
 - `web-alpha-fixtures/2026-06-23/screenshots/candidate-multilingual-indonesian-main-desktop-1280x720.png` - captured with all Display Languages enabled and Indonesian selected as main
 - `web-alpha-fixtures/2026-06-23/screenshots/dictionary-detail-multilingual-indonesian-main-desktop-1280x720.png` - captured after scrolling down and physically moving the mouse over the third candidate cell for 呢
 
@@ -144,10 +144,10 @@ Captured status for this run:
 
 | Screenshot | Status | Path / Limitation |
 |------------|--------|-------------------|
-| Settings | captured | `web-alpha-fixtures/2026-06-23/screenshots/settings-desktop-1280x720.png` |
+| Settings | captured, scrolled | `web-alpha-fixtures/2026-06-23/screenshots/settings-desktop-1280x720.png` at scrollY 494, showing Candidates Jyutping, toggles, Reverse Lookup Settings, Show Full Input Code, and Cangjie Version |
 | Candidate list | captured | `web-alpha-fixtures/2026-06-23/screenshots/candidate-desktop-1280x720.png` |
 | Dictionary detail | partial/blocked baseline | No baseline screenshot file created; the first automation did not move across a concrete candidate cell. |
-| Settings, multilingual Indonesian main | captured | `web-alpha-fixtures/2026-06-23/screenshots/settings-multilingual-indonesian-main-desktop-1280x720.png` |
+| Settings, multilingual Indonesian main | captured, scrolled | `web-alpha-fixtures/2026-06-23/screenshots/settings-multilingual-indonesian-main-desktop-1280x720.png` at scrollY 494, showing lower settings with all Display Languages enabled and Indonesian as main |
 | Candidate list, multilingual Indonesian main | captured | `web-alpha-fixtures/2026-06-23/screenshots/candidate-multilingual-indonesian-main-desktop-1280x720.png` |
 | Dictionary detail, multilingual Indonesian main | captured | `web-alpha-fixtures/2026-06-23/screenshots/dictionary-detail-multilingual-indonesian-main-desktop-1280x720.png` |
 

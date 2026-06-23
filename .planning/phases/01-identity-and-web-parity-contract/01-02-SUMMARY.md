@@ -86,9 +86,9 @@ status: complete
 - `.planning/product/web-alpha-fixtures/2026-06-23/settings-order.json` - Settings labels, order, defaults, options, and Display Languages behavior.
 - `.planning/product/web-alpha-fixtures/2026-06-23/candidate-list-sample.json` - Candidate presentation fields and runtime `nei` sample.
 - `.planning/product/web-alpha-fixtures/2026-06-23/dictionary-detail-sample.json` - Dictionary panel field contract and partial screenshot status.
-- `.planning/product/web-alpha-fixtures/2026-06-23/screenshots/settings-desktop-1280x720.png` - Captured settings screenshot.
+- `.planning/product/web-alpha-fixtures/2026-06-23/screenshots/settings-desktop-1280x720.png` - Captured scrolled settings screenshot showing lower controls.
 - `.planning/product/web-alpha-fixtures/2026-06-23/screenshots/candidate-desktop-1280x720.png` - Captured candidate-list screenshot.
-- `.planning/product/web-alpha-fixtures/2026-06-23/screenshots/settings-multilingual-indonesian-main-desktop-1280x720.png` - Captured settings screenshot with all display languages enabled and Indonesian as main.
+- `.planning/product/web-alpha-fixtures/2026-06-23/screenshots/settings-multilingual-indonesian-main-desktop-1280x720.png` - Captured scrolled settings screenshot with all display languages enabled and Indonesian as main.
 - `.planning/product/web-alpha-fixtures/2026-06-23/screenshots/candidate-multilingual-indonesian-main-desktop-1280x720.png` - Captured candidate-list screenshot with multilingual definitions.
 - `.planning/product/web-alpha-fixtures/2026-06-23/screenshots/dictionary-detail-multilingual-indonesian-main-desktop-1280x720.png` - Captured dictionary-detail screenshot after scrolling down and moving over the third candidate cell for 呢.
 
