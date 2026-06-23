@@ -1,0 +1,59 @@
+{
+  "phase": "04-typeduck-protocol-and-typing-mvp",
+  "plan": "04-03",
+  "contract": "TypeDuck TSF typing client proof obligations",
+  "raw_comment_sample": {
+    "candidate_text": "你",
+    "escaped": "\\u000bnei5\\u000c\\rnei,你,nei5,你,nei5,,,,,,pron,you (singular),,,,,,,",
+    "separator_code_points": [
+      "U+000B",
+      "U+000C",
+      "U+000D"
+    ],
+    "phase_4_rule": "preserve raw bytes at current candidate comment position; do not parse into Phase 5 dictionary fields"
+  },
+  "runtime_cases": [
+    {
+      "id": "ordinary-key-response-latency",
+      "trigger": "type ordinary Cantonese input into a Windows text field",
+      "expected": "composition, candidates, candidate cursor, comments, and commit apply from backend response within bounded key-path wait",
+      "plan_04_04_proof": "Probe records key response timing below the Phase 4 threshold and captures returned composition/candidate state."
+    },
+    {
+      "id": "missing-launcher-fast-fail-degraded-state",
+      "trigger": "typing path cannot connect to the launcher",
+      "expected": "client enters degraded state promptly and does not run the old repeated three-second connection loop",
+      "plan_04_04_proof": "Probe disables launcher and records fast failed key handling plus reset state."
+    },
+    {
+      "id": "malformed-response-reset",
+      "trigger": "launcher or backend returns malformed framed protobuf to the TSF client",
+      "expected": "client closes pipe, clears async queue, resets candidates/composition, and can reconnect later",
+      "plan_04_04_proof": "Probe injects malformed response and records reset plus later reconnect."
+    },
+    {
+      "id": "backend-restart-reset-reconnect",
+      "trigger": "launcher returns TypeDuck backend restart/degraded health response",
+      "expected": "client clears visible typing state, returns promptly, and allows later reconnect",
+      "plan_04_04_proof": "Probe forces backend restart and records bounded degraded reset."
+    },
+    {
+      "id": "raw-comment-byte-preservation",
+      "trigger": "backend returns CandidateEntry.comment/raw_lookup_comment containing \\u000b, \\u000c, and \\r separators",
+      "expected": "candidate comment shown/passed at current comment position with separators intact",
+      "plan_04_04_proof": "Probe compares escaped output and SHA-256 of raw comment payload."
+    },
+    {
+      "id": "reverse-lookup-key-forwarding",
+      "trigger": "user presses reverse lookup key sequence supported by backend",
+      "expected": "frontend forwards normal key event data and renders only backend-returned state",
+      "plan_04_04_proof": "Probe records key request fields and confirms no frontend reverse-lookup special casing."
+    },
+    {
+      "id": "cangjie-key-forwarding",
+      "trigger": "user presses Cangjie Version 3 or 5 related key sequence supported by backend",
+      "expected": "frontend forwards normal key event data and renders only backend-returned state",
+      "plan_04_04_proof": "Probe records key request fields and confirms no frontend Cangjie special casing."
+    }
+  ]
+}
