@@ -31,7 +31,10 @@ Decimal phases appear between their surrounding integers in numeric order.
   1. Developer can inspect one TypeDuck identity contract covering executable names, DLL names, AppId/CLSID/profile GUIDs, install directories, log/data directories, pipe/mutex names, registry keys, resource strings, and release artifact names.
   2. Developer can inspect a dated TypeDuck Web alpha fixture set covering settings defaults, labels, candidate list, dictionary panel, and visual references.
   3. Developer can identify which Moqi, fcitx, WebDAV/cloud clipboard, AI, Simplified-only, and excessive customization surfaces are banned from the v1 product.
-**Plans**: TBD
+**Plans**: 2 plans
+Plans:
+- [ ] 01-01-PLAN.md — Create the TypeDuck identity contract and banned-surface contract.
+- [ ] 01-02-PLAN.md — Create dated TypeDuck Web alpha fixture markdown and supporting fixture assets.
 
 ### Phase 2: Engine Runtime Contract Spike
 **Goal**: Developer can prove that TypeDuck-HK librime, lookup-filter, schemas, dictionaries, and built assets produce the candidate and dictionary data TypeDuck Windows needs.
