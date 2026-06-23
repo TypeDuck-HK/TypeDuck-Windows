@@ -39,6 +39,10 @@ add_library(MoqiTextService SHARED
     ${CMAKE_CURRENT_BINARY_DIR}/MoqiTextService.rc
 )
 
+set_target_properties(MoqiTextService PROPERTIES
+    OUTPUT_NAME "TypeDuckTextService"
+)
+
 set_source_files_properties(${MOQI_PROTO_CPP} ${MOQI_PROTO_HDR} PROPERTIES GENERATED TRUE)
 add_dependencies(MoqiTextService moqi_proto_cpp_gen)
 

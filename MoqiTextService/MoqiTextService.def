@@ -1,4 +1,4 @@
-LIBRARY MoqiTextService.dll
+LIBRARY TypeDuckTextService.dll
 
 EXPORTS
     DllGetClassObject               PRIVATE

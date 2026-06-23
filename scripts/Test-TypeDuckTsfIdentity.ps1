@@ -142,7 +142,7 @@ function Test-RegistrationAuthority {
         "TypeDuck profile authority must appear before optional backend langProfileFromJson scanning."
     Test-Order $Failures $DllEntrySource "langProfiles.push_back" "for (const auto backendDir" `
         "DllRegisterServer must seed the TypeDuck profile before backend ime.json scanning."
-    Assert-Match $Failures $DllEntrySource "registerServer\(L`"TypeDuckTextService`"|registerServer\(L`"TypeDuck" `
+    Assert-Match $Failures $DllEntrySource "registerServer\(Moqi::TypeDuck::serviceName\(\)|registerServer\(TypeDuck::serviceName\(\)|registerServer\(L`"TypeDuckTextService`"|registerServer\(L`"TypeDuck" `
         "DllRegisterServer must register the COM server with TypeDuck service naming."
 }
 

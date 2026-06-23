@@ -14,10 +14,10 @@
 #undef APSTUDIO_READONLY_SYMBOLS
 
 /////////////////////////////////////////////////////////////////////////////
-// Chinese (Simplified, PRC) resources
+// Chinese (Traditional, Hong Kong) resources
 
-#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_CHS)
-LANGUAGE LANG_CHINESE, SUBLANG_CHINESE_SIMPLIFIED
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_CHT)
+LANGUAGE LANG_CHINESE, SUBLANG_CHINESE_HONGKONG
 
 #ifdef APSTUDIO_INVOKED
 /////////////////////////////////////////////////////////////////////////////
@@ -72,21 +72,32 @@ VS_VERSION_INFO VERSIONINFO
 BEGIN
     BLOCK "StringFileInfo"
     BEGIN
-        BLOCK "080404b0"
+        BLOCK "0C0404B0"
         BEGIN
-            VALUE "CompanyName", "Moqi"
-            VALUE "FileDescription", "墨奇输入法"
+            VALUE "CompanyName", "TypeDuck"
+            VALUE "FileDescription", "TypeDuck 粵語輸入法 / TypeDuck Cantonese IME"
             VALUE "FileVersion", "@MOQI_VERSION_MAJOR@.@MOQI_VERSION_MINOR@.@MOQI_VERSION_PATCH@"
-            VALUE "InternalName", "MoqiTextService.dll"
-            VALUE "LegalCopyright", "Copyright (C) 2013-2016 Moqi developers"
-            VALUE "OriginalFilename", "MoqiTextService.dll"
-            VALUE "ProductName", "墨奇输入法"
+            VALUE "InternalName", "TypeDuckTextService.dll"
+            VALUE "LegalCopyright", "Copyright (C) 2026 TypeDuck developers"
+            VALUE "OriginalFilename", "TypeDuckTextService.dll"
+            VALUE "ProductName", "TypeDuck 粵語輸入法 / TypeDuck Cantonese IME"
+            VALUE "ProductVersion", "@MOQI_VERSION_MAJOR@.@MOQI_VERSION_MINOR@.@MOQI_VERSION_PATCH@"
+        END
+        BLOCK "040904B0"
+        BEGIN
+            VALUE "CompanyName", "TypeDuck"
+            VALUE "FileDescription", "TypeDuck 粵語輸入法 / TypeDuck Cantonese IME"
+            VALUE "FileVersion", "@MOQI_VERSION_MAJOR@.@MOQI_VERSION_MINOR@.@MOQI_VERSION_PATCH@"
+            VALUE "InternalName", "TypeDuckTextService.dll"
+            VALUE "LegalCopyright", "Copyright (C) 2026 TypeDuck developers"
+            VALUE "OriginalFilename", "TypeDuckTextService.dll"
+            VALUE "ProductName", "TypeDuck 粵語輸入法 / TypeDuck Cantonese IME"
             VALUE "ProductVersion", "@MOQI_VERSION_MAJOR@.@MOQI_VERSION_MINOR@.@MOQI_VERSION_PATCH@"
         END
     END
     BLOCK "VarFileInfo"
     BEGIN
-        VALUE "Translation", 0x804, 1200
+        VALUE "Translation", 0x0c04, 1200, 0x0409, 1200
     END
 END
 
@@ -101,7 +112,7 @@ END
 // String Table
 //
 
-#endif    // Chinese (Simplified, PRC) resources
+#endif    // Chinese (Traditional, Hong Kong) resources
 /////////////////////////////////////////////////////////////////////////////
 
 

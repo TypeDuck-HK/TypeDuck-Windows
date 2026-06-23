@@ -1,4 +1,5 @@
 #include "MoqiImeModule.h"
+#include "TypeDuckProfile.h"
 #include "resource.h"
 #include <iostream>
 #include <fstream>
@@ -208,6 +209,12 @@ static inline Ime::LangProfileInfo langProfileFromJson(std::wstring file, std::s
 	return Ime::LangProfileInfo();
 }
 
+static bool isTypeDuckRequiredProfile(const Ime::LangProfileInfo& langProfile) {
+	return ::IsEqualGUID(langProfile.profileGuid, Moqi::TypeDuck::kProfileGuid) ||
+		_wcsicmp(langProfile.locale.c_str(), Moqi::TypeDuck::localeName()) == 0 ||
+		_wcsicmp(langProfile.name.c_str(), Moqi::TypeDuck::profileDisplayName()) == 0;
+}
+
 STDAPI DllRegisterServer(void) {
 	Moqi::ImeModule* imeModule = getOrCreateImeModule();
 	if (imeModule == nullptr) {
@@ -218,6 +225,10 @@ STDAPI DllRegisterServer(void) {
 		iconIndex = 1; // use Windows 8 style IME icon
     }
 	std::vector<Ime::LangProfileInfo> langProfiles;
+	wchar_t modulePath[MAX_PATH] = {};
+	::GetModuleFileNameW(imeModule->hInstance(), modulePath, _countof(modulePath));
+	langProfiles.push_back(Moqi::TypeDuck::makeLangProfile(modulePath, iconIndex));
+
 	std::wstring dirPath;
 	for (const auto backendDir: imeModule->backendDirs()) {
 		std::string backendName = utf16ToUtf8(backendDir.c_str());
@@ -242,7 +253,7 @@ STDAPI DllRegisterServer(void) {
 							// load the json file to get the info of input method
 							std::string guid;
 							Ime::LangProfileInfo langProfile = langProfileFromJson(imejson, guid, iconIndex);
-							if (!langProfile.name.empty()) {
+							if (!langProfile.name.empty() && !isTypeDuckRequiredProfile(langProfile)) {
 								langProfiles.push_back(std::move(langProfile));
 							}
 						}
@@ -252,5 +263,5 @@ STDAPI DllRegisterServer(void) {
 			::FindClose(hFind);
 		}
 	}
-	return imeModule->registerServer(L"MoqiTextService", langProfiles.data(), langProfiles.size());
+	return imeModule->registerServer(Moqi::TypeDuck::serviceName(), langProfiles.data(), langProfiles.size());
 }
