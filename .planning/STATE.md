@@ -5,16 +5,16 @@ milestone_name: milestone
 current_phase: 3
 current_phase_name: zh-HK TSF Registration and Installer Skeleton
 status: executing
-stopped_at: Completed 03-02-PLAN.md
-last_updated: "2026-06-23T16:20:50.061Z"
+stopped_at: Completed 03-03-PLAN.md
+last_updated: "2026-06-23T17:00:21.606Z"
 last_activity: 2026-06-24
-last_activity_desc: Phase 3 Plan 03-02 installer skeleton completed
+last_activity_desc: Phase 3 Plan 03-03 VM installer verification completed
 progress:
   total_phases: 7
-  completed_phases: 2
+  completed_phases: 3
   total_plans: 8
-  completed_plans: 7
-  percent: 88
+  completed_plans: 8
+  percent: 43
 ---
 
 # Project State
@@ -29,11 +29,11 @@ See: .planning/PROJECT.md (updated 2026-06-23)
 ## Current Position
 
 Phase: 3 of 7 (zh-HK TSF Registration and Installer Skeleton)
-Plan: 2 of 3 executed; next 03-03
-Status: Ready to execute Plan 03-03
-Last activity: 2026-06-24 — Phase 3 Plan 03-02 installer skeleton completed
+Plan: 3 of 3 executed; Phase 3 complete
+Status: Phase 3 complete; ready for Phase 4 planning
+Last activity: 2026-06-24 — Phase 3 Plan 03-03 VM installer verification completed
 
-Progress: [█████████░] 88%
+Progress: [██████████] 100%
 
 ## Performance Metrics
 
@@ -63,6 +63,7 @@ Progress: [█████████░] 88%
 | Phase 02 P03 | 13min | 3 tasks | 6 files |
 | Phase 03 P01 | 9 min | 3 tasks | 8 files |
 | Phase 03 P02 | 17 min | 3 tasks | 12 files |
+| Phase 03 P03 | 33 min | 3 tasks | 10 files |
 
 ## Accumulated Context
 
@@ -94,14 +95,15 @@ Recent decisions affecting current work:
 - [Phase 03]: Deployed installer/setup names are TypeDuck-owned while internal scaffold target/source names may remain temporarily. — Plan 03-02 deploys TypeDuckLauncher.exe, TypeDuckSetupHelper.exe, TypeDuckTextService.dll, TypeDuckIME paths, and typeduck-windows-ime-setup.exe.
 - [Phase 03]: TYPEDUCK_PROGRAM_DIR is the setup-helper registration environment variable. — MOQI_PROGRAM_DIR remains only as a transition-only compatibility alias during registration.
 - [Phase 03]: TypeDuck-controlled installer/setup strings are bilingual; standard Inno wizard chrome may fall back to English until a vetted Traditional Chinese pack is bundled. — The local Inno Setup install lacked ChineseTraditional.isl.
-
+- [Phase 03]: Plan 03-03 accepts VM registry/file/task evidence as automated zh-HK registration proof; the guest language list remained en-US, so a Settings screenshot remains optional product-review evidence.
+- [Phase 03]: Installer cleanup uses code-safe GUID constants in Pascal registry paths while retaining escaped GUID constants for Inno identity fields.
+- [Phase 03]: The VM verification harness never runs the installer on the host; install and uninstall actions run only through PowerShell Direct inside the named Hyper-V VM.
 ### Pending Todos
 
 None yet.
 
 ### Blockers/Concerns
 
-- [Phase 3]: zh-HK TSF registration, dual-bitness DLL deployment, and uninstall cleanup are fragile and require clean Windows verification.
 - [Phase 5]: TypeDuck Web alpha can drift; UI/settings planning should refresh fixtures before implementation.
 
 ## Deferred Items
@@ -112,6 +114,7 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-06-23T16:20:50.054Z
-Stopped at: Completed 03-02-PLAN.md
+Last session: 2026-06-23T17:00:21.378Z
+Stopped at: Completed 03-03-PLAN.md
 Resume file: None
+

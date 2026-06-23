@@ -15,7 +15,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 
 - [x] **Phase 1: Identity and Web Parity Contract** - TypeDuck identity, banned-surface rules, and dated Web alpha acceptance fixtures are locked before implementation spreads. (completed 2026-06-23)
 - [x] **Phase 2: Engine Runtime Contract Spike** - The TypeDuck-HK librime fork, lookup-filter plugin, and TypeDuck runtime assets are proven on Windows. (completed 2026-06-23)
-- [ ] **Phase 3: zh-HK TSF Registration and Installer Skeleton** - TypeDuck installs, registers, unregisters, and appears under Chinese (Traditional, Hong Kong).
+- [x] **Phase 3: zh-HK TSF Registration and Installer Skeleton** - TypeDuck installs, registers, unregisters, and appears under Chinese (Traditional, Hong Kong). (completed 2026-06-24)
 - [ ] **Phase 4: TypeDuck Protocol and Typing MVP** - TSF, launcher, and engine communicate with a bounded TypeDuck protocol that supports real Cantonese typing behavior.
 - [ ] **Phase 5: Candidate, Dictionary, Settings, and About UI Parity** - Users see and configure the TypeDuck Web alpha experience in native Windows surfaces.
 - [ ] **Phase 6: Privacy, Security, and Scaffold Cleanup** - Off-scope Moqi/fcitx/cloud/AI behavior is removed or gated, diagnostics are safe, and visible strings are audited.
@@ -81,7 +81,7 @@ Plans:
 
 **Verification Environment**: Requires clean Windows 10/11 VM or equivalent disposable Windows test environment evidence. Prefer Hyper-V checkpoint before installer tests. Code review/build checks are not enough for this phase.
 
-**Plans:** 2/3 plans executed
+**Plans:** 3/3 plans complete
 Plans:
 **Wave 1**
 
@@ -93,7 +93,7 @@ Plans:
 
 **Wave 3** *(blocked on Wave 2 completion)*
 
-- [ ] 03-03-PLAN.md — Verify install, registration, dual-bitness behavior, and uninstall cleanup in the launched Hyper-V VM.
+- [x] 03-03-PLAN.md — Verify install, registration, dual-bitness behavior, and uninstall cleanup in the launched Hyper-V VM.
 
 **UI hint**: yes
 
@@ -175,8 +175,9 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7
 |-------|----------------|--------|-----------|
 | 1. Identity and Web Parity Contract | 2/2 | Complete   | 2026-06-23 |
 | 2. Engine Runtime Contract Spike | 3/3 | Complete    | 2026-06-23 |
-| 3. zh-HK TSF Registration and Installer Skeleton | 2/3 | In Progress|  |
+| 3. zh-HK TSF Registration and Installer Skeleton | 3/3 | Complete    | 2026-06-24 |
 | 4. TypeDuck Protocol and Typing MVP | 0/TBD | Not started | - |
 | 5. Candidate, Dictionary, Settings, and About UI Parity | 0/TBD | Not started | - |
 | 6. Privacy, Security, and Scaffold Cleanup | 0/TBD | Not started | - |
 | 7. Compatibility and Release Verification | 0/TBD | Not started | - |
+
