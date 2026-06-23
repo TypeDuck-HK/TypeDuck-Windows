@@ -154,7 +154,7 @@ constexpr int kDefaultCandidateSpacing = 20;
 std::wstring logDir = std::wstring(localAppData) + L"\\MoqiIM\\Log";
 ```
 
-**Planner instruction:** Structure the fixture doc as metadata first, then tables for `Settings`, `Candidate List`, `Dictionary Detail`, `Visual References`, `Unsupported/Blocked Windows Mappings`, and `Source Evidence`. If the local web runtime or `I:\GitHub\TypeDuck-Web` is unavailable, mark the relevant section `partial` or `blocked` with exact attempted source and date.
+**Planner instruction:** Structure the fixture doc as metadata first, then tables for `Settings`, `Candidate List`, `Dictionary Detail`, `Visual References`, `Unsupported/Blocked Windows Mappings`, and `Source Evidence`. If the local web runtime or `I:\GitHub\TypeDuck-Web` is unavailable in a future refresh, mark the relevant section with exact unavailable-evidence metadata, attempted source, and date.
 
 ---
 

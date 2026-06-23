@@ -23,6 +23,8 @@ Hong Kong users can install TypeDuck under Chinese (Traditional, Hong Kong) and 
 
 - TypeDuck Web alpha defines the target settings and candidate/dictionary UX.
 - The current repo can serve as a Windows TSF scaffold with build, installer, launcher, and candidate-window foundations.
+- ✓ TypeDuck identity, proposed identifiers, runtime paths, registry/profile names, and release artifact naming are centralized in the Phase 1 identity contract.
+- ✓ The 2026-06-23 TypeDuck Web alpha fixture set captures settings, candidate, dictionary-panel, reverse lookup, provenance, and source-code layout authority for downstream parity work.
 
 ### Active
 
@@ -76,6 +78,8 @@ Hong Kong users can install TypeDuck under Chinese (Traditional, Hong Kong) and 
 | Use TypeDuck Web alpha as behavioral and visual source of truth | The alpha will become the shipped public web product. | - Pending |
 | Use Quality model profile for GSD planning | User approved Quality for model profile and defaults for other workflow settings. | - Pending |
 | Structure work as vertical MVP phases | Each phase should move toward a usable Windows IME slice rather than isolated technical layers. | - Pending |
+| Centralize TypeDuck identity before production renames | Phase 1 locked first-party names, proposed AppId/CLSID/profile GUIDs, zh-HK bilingual profile text, paths, registry keys, and artifact names before implementation consumes them. | Accepted in Phase 1 |
+| Treat dictionary layout as source-code-followable, with screenshots as evidence | The Web alpha source defines exact layout while captured dictionary-panel screenshots prove the panel can be inspected visually. | Accepted in Phase 1 |
 
 ## Evolution
 
@@ -93,4 +97,4 @@ After each milestone:
 4. Confirm candidate/dictionary display against TypeDuck Web alpha.
 
 ---
-*Last updated: 2026-06-23 after $gsd-new-project initialization*
+*Last updated: 2026-06-23 after Phase 1 verification*

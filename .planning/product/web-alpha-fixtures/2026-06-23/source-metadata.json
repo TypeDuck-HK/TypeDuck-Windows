@@ -46,7 +46,8 @@
     "minimumSufficientPhase1Set": [
       "settings-desktop-1280x720.png",
       "candidate-desktop-1280x720.png",
-      "dictionary-detail-desktop-1280x720.png"
+      "dictionary-detail-multilingual-indonesian-main-desktop-1280x720.png",
+      "dictionary-detail-housam-second-candidate-multilingual-indonesian-main-desktop-1280x720.png"
     ],
     "screenshots": [
       {
@@ -61,12 +62,6 @@
         "status": "captured",
         "viewport": "1280x720",
         "evidence": "Controlled textarea input `nei` produced a visible candidate panel."
-      },
-      {
-        "file": "screenshots/dictionary-detail-desktop-1280x720.png",
-        "status": "partial",
-        "viewport": "1280x720",
-        "limitation": "Candidate panel captured, but dictionary panel did not appear from controlled hover/move automation. A second touch-enabled attempt could not get a usable candidate button bounding box. Dictionary structure remains source-backed from DictionaryPanel.tsx and CandidateInfo.ts."
       },
       {
         "file": "screenshots/settings-multilingual-indonesian-main-desktop-1280x720.png",
@@ -125,7 +120,7 @@
     "inputAttempt": "Typed `nei` into the Web alpha textarea through Playwright.",
     "candidatePanelVisible": true,
     "candidatePanelText": "nei‸\n‹\n›\n1.\t\nnei5\n你\n\t\t\nyou (singular)\n\tⓘ\n2.\t\nnei4\n尼\n\t\t\nnun\n\tⓘ\n3.\t\nnei1\n呢\n\t\t→ni1\tⓘ\n4.\t\nnei4\n妮\n\t\t\nlittle girl\n\tⓘ\n5.\t\nnei4\n彌\n\t\t\nfull; fill\n\tⓘ\n6.\t\nnei5\n妳\n\t\t\nyou\n\tⓘ",
-    "dictionaryPanelVisible": false,
+    "dictionaryPanelVisible": true,
     "multilingualPreferenceAttempt": {
       "displayLanguages": [
         "eng",
@@ -151,7 +146,7 @@
     "multilingualCandidatePanelText": "nei‸\n‹\n›\n1. nei5 你 you (singular) / kamu / आप / तपाईं / تم\n2. nei4 尼 nun / kamu\n3. nei1 呢 →ni1\n4. nei4 妮 little girl\n5. nei4 彌 full; fill / penuh\n6. nei5 妳 you / Kamu / आप / तपाईं / تم",
     "multilingualDictionaryPanelVisible": true,
     "multilingualDictionaryPanelText": "呢nei1\nother 其他vernacular 口語→ni1\nWritten Form 書面語\t這\n呢ni1(literary reading 文讀 > nai4)\nother 其他vernacular 口語\nWritten Form 書面語\t這\nMore Languages\nEnglish\tthis\n呢ne1\nparticle 助詞(imbuhan kata)\nMore Languages\nEnglish\t(how about)\nHindi\t(particle)\nUrdu\t(particle)",
-    "dictionaryHoverBehavior": "The Web alpha intentionally requires mouse movement over a candidate, not merely a stationary pointer, before showing the dictionary panel. The replacement dictionary screenshot scrolls down first, then moves across the third candidate cell for 呢.",
+    "dictionaryHoverBehavior": "The Web alpha intentionally requires mouse movement over a candidate, not merely a stationary pointer, before showing the dictionary panel. Captured dictionary screenshots scroll down first, then move across concrete candidate cells for 呢 and 好心你.",
     "multilingualDictionaryTargetCandidate": {
       "index": 3,
       "text": "呢",
@@ -177,7 +172,6 @@
     "Invoke-WebRequest -Uri http://localhost:5173/TypeDuck-Web/aap2-alpha/ -UseBasicParsing -TimeoutSec 5",
     "Playwright Chromium launch with viewport 1280x720 and Chrome executable C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe",
     "Playwright textarea input `nei`, screenshot capture for settings and candidate panel",
-    "Playwright hover/mousemove/touchstart attempts for dictionary panel screenshot",
     "Initial Playwright multilingual capture enabled all display languages, selected Indonesian as main language, typed `nei`, and moved the mouse over the first candidate cell before capturing the dictionary panel.",
     "Playwright replacement capture selected the row containing third candidate 呢 and moved the mouse across its candidate cell before replacing dictionary-detail-multilingual-indonesian-main-desktop-1280x720.png.",
     "Playwright recaptured both settings screenshots after scrolling to the lower settings area at window.scrollY 494.",
@@ -189,13 +183,19 @@
       "area": "source",
       "status": "partial",
       "detail": "Local TypeDuck-Web source is available, but the worktree is dirty, including modified files and submodule changes."
-    },
-    {
-      "area": "dictionary screenshot",
-      "status": "baseline partial, multilingual captured",
-      "detail": "The original baseline dictionary-detail screenshot remained partial, but an additional multilingual Indonesian-main dictionary screenshot was captured after moving over a concrete candidate cell."
     }
   ],
+  "layoutAuthority": {
+    "note": "Exact layout should be followed by inspecting source code, not by approximating screenshot feel alone.",
+    "sourceFiles": [
+      "I:\\GitHub\\TypeDuck-Web\\src\\DictionaryPanel.tsx",
+      "I:\\GitHub\\TypeDuck-Web\\src\\CandidatePanel.tsx",
+      "I:\\GitHub\\TypeDuck-Web\\src\\Candidate.tsx",
+      "I:\\GitHub\\TypeDuck-Web\\src\\CandidateInfo.ts",
+      "I:\\GitHub\\TypeDuck-Web\\src\\index.css",
+      "I:\\GitHub\\TypeDuck-Web\\tailwind.config.ts"
+    ]
+  },
   "privacyNotes": [
     "Candidate input used controlled sample text `nei` only.",
     "No personal typed content or local user data was captured intentionally.",

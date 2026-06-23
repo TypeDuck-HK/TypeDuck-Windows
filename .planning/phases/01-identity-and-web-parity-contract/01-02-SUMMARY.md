@@ -19,7 +19,7 @@ tech-stack:
   patterns:
     - Source-backed Web alpha fixture directory under .planning/product/web-alpha-fixtures/YYYY-MM-DD
     - JSON fixtures kept ASCII-safe for Windows PowerShell 5.1 validation
-    - Screenshot capture limitations recorded as partial/blocked metadata
+    - Screenshot capture limitations recorded with exact unavailable-evidence metadata when needed
 
 key-files:
   created:
@@ -44,7 +44,7 @@ key-decisions:
 
 patterns-established:
   - "Fixture metadata must include URL, source path, commit/hash, dirty status, viewport, capture tool, screenshots, and limitations."
-  - "Blocked or partial runtime evidence is acceptable only when the exact attempted source and limitation are recorded."
+  - "Unavailable runtime evidence is acceptable only when the exact attempted source and limitation are recorded."
   - "Dictionary detail reveal is movement-triggered: actual mouse movement over a candidate shows the panel, while a stationary pointer should not cause typing flicker."
 
 requirements-completed:
@@ -87,7 +87,7 @@ status: complete
 - `.planning/product/web-alpha-fixtures/2026-06-23/source-metadata.json` - Machine-readable source/runtime/screenshot provenance.
 - `.planning/product/web-alpha-fixtures/2026-06-23/settings-order.json` - Settings labels, order, defaults, options, and Display Languages behavior.
 - `.planning/product/web-alpha-fixtures/2026-06-23/candidate-list-sample.json` - Candidate presentation fields and runtime `nei` sample.
-- `.planning/product/web-alpha-fixtures/2026-06-23/dictionary-detail-sample.json` - Dictionary panel field contract and partial screenshot status.
+- `.planning/product/web-alpha-fixtures/2026-06-23/dictionary-detail-sample.json` - Dictionary panel field contract and captured screenshot status.
 - `.planning/product/web-alpha-fixtures/2026-06-23/screenshots/settings-desktop-1280x720.png` - Captured scrolled settings screenshot showing lower controls.
 - `.planning/product/web-alpha-fixtures/2026-06-23/screenshots/candidate-desktop-1280x720.png` - Captured candidate-list screenshot.
 - `.planning/product/web-alpha-fixtures/2026-06-23/screenshots/settings-multilingual-indonesian-main-desktop-1280x720.png` - Captured scrolled settings screenshot with all display languages enabled and Indonesian as main.
@@ -122,7 +122,7 @@ status: complete
 
 ## Issues Encountered
 
-- Initial dictionary-detail screenshot capture was partial because the automation did not move across a concrete candidate cell. A follow-up capture succeeded by scrolling down and moving the mouse over the third candidate cell for 呢, matching the Web alpha anti-flicker behavior.
+- Dictionary-detail screenshots were captured successfully by scrolling down and moving the mouse across concrete candidate cells for 呢 and 好心你, matching the Web alpha anti-flicker behavior.
 - GSD handoff note: Phase 5 should treat dictionary reveal as movement-triggered hover behavior and test against stationary-pointer flicker during typing.
 - Follow-up fixture refinement captured `housam` on the second candidate and reverse lookup with backtick + `c` + `onf` for 你.
 

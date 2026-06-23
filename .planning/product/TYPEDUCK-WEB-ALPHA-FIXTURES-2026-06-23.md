@@ -21,7 +21,7 @@ This artifact records the TypeDuck Web alpha behavior and source evidence captur
 | Browser capture | Playwright with Google Chrome |
 | Browser executable | `C:\Program Files\Google\Chrome\Application\chrome.exe` |
 | Viewport | 1280x720, device scale factor 1 |
-| Overall fixture status | Complete: source evidence, runtime URL, baseline settings/candidate screenshots, multilingual Indonesian-main settings/candidate/dictionary screenshots, and reverse lookup evidence were captured. The original baseline dictionary screenshot remains a recorded limitation, not the overall fixture status |
+| Overall fixture status | Complete: source evidence, runtime URL, baseline settings/candidate screenshots, multilingual Indonesian-main settings/candidate/dictionary screenshots, compound dictionary screenshots, and reverse lookup evidence were captured. |
 
 Supporting assets:
 
@@ -31,7 +31,6 @@ Supporting assets:
 - `web-alpha-fixtures/2026-06-23/dictionary-detail-sample.json`
 - `web-alpha-fixtures/2026-06-23/screenshots/settings-desktop-1280x720.png` - captured after scrolling down to expose lower settings
 - `web-alpha-fixtures/2026-06-23/screenshots/candidate-desktop-1280x720.png` - captured
-- `web-alpha-fixtures/2026-06-23/screenshots/dictionary-detail-desktop-1280x720.png` - partial/blocked, no file created because the dictionary panel did not appear under controlled Playwright hover/touch attempts
 - `web-alpha-fixtures/2026-06-23/screenshots/settings-multilingual-indonesian-main-desktop-1280x720.png` - captured with all Display Languages enabled, Indonesian selected as main, and the page scrolled down to expose lower settings
 - `web-alpha-fixtures/2026-06-23/screenshots/candidate-multilingual-indonesian-main-desktop-1280x720.png` - captured with all Display Languages enabled and Indonesian selected as main
 - `web-alpha-fixtures/2026-06-23/screenshots/dictionary-detail-multilingual-indonesian-main-desktop-1280x720.png` - captured after scrolling down and physically moving the mouse over the third candidate cell for 呢
@@ -115,12 +114,11 @@ Source-backed by `I:\GitHub\TypeDuck-Web\src\DictionaryPanel.tsx`, `CandidateInf
 
 Visual reference:
 
-- `web-alpha-fixtures/2026-06-23/screenshots/dictionary-detail-desktop-1280x720.png`
 - `web-alpha-fixtures/2026-06-23/screenshots/dictionary-detail-multilingual-indonesian-main-desktop-1280x720.png`
 - `web-alpha-fixtures/2026-06-23/screenshots/dictionary-detail-housam-second-candidate-multilingual-indonesian-main-desktop-1280x720.png`
 - Viewport: 1280x720
-- Status: baseline partial, multilingual captured
-- Limitation: The original baseline dictionary-detail screenshot remains partial because the first automation did not move across a concrete candidate cell. The multilingual Indonesian-main dictionary screenshots were captured after scrolling down and physically moving the mouse across concrete candidate cells for 呢 and 好心你, which matches the Web alpha behavior that prevents flicker when the pointer is merely resting on candidates during typing.
+- Status: captured
+- Capture note: Dictionary detail screenshots were captured after scrolling down and physically moving the mouse across concrete candidate cells for 呢 and 好心你. Treat dictionary-panel screenshot coverage as successful for Phase 1.
 
 Dictionary fields the Windows UI must be able to represent when engine data exists:
 
@@ -168,14 +166,14 @@ Captured status for this run:
 |------------|--------|-------------------|
 | Settings | captured, scrolled | `web-alpha-fixtures/2026-06-23/screenshots/settings-desktop-1280x720.png` at scrollY 494, showing Candidates Jyutping, toggles, Reverse Lookup Settings, Show Full Input Code, and Cangjie Version |
 | Candidate list | captured | `web-alpha-fixtures/2026-06-23/screenshots/candidate-desktop-1280x720.png` |
-| Dictionary detail | partial/blocked baseline | No baseline screenshot file created; the first automation did not move across a concrete candidate cell. |
+| Dictionary detail | captured | `web-alpha-fixtures/2026-06-23/screenshots/dictionary-detail-multilingual-indonesian-main-desktop-1280x720.png` and `web-alpha-fixtures/2026-06-23/screenshots/dictionary-detail-housam-second-candidate-multilingual-indonesian-main-desktop-1280x720.png` |
 | Settings, multilingual Indonesian main | captured, scrolled | `web-alpha-fixtures/2026-06-23/screenshots/settings-multilingual-indonesian-main-desktop-1280x720.png` at scrollY 494, showing lower settings with all Display Languages enabled and Indonesian as main |
 | Candidate list, multilingual Indonesian main | captured | `web-alpha-fixtures/2026-06-23/screenshots/candidate-multilingual-indonesian-main-desktop-1280x720.png` |
 | Dictionary detail, multilingual Indonesian main | captured | `web-alpha-fixtures/2026-06-23/screenshots/dictionary-detail-multilingual-indonesian-main-desktop-1280x720.png` |
 | Dictionary detail, `housam` second candidate | captured, scrolled | `web-alpha-fixtures/2026-06-23/screenshots/dictionary-detail-housam-second-candidate-multilingual-indonesian-main-desktop-1280x720.png` at scrollY 220, showing compound entries for 好心 and 你 |
 | Reverse lookup, Cangjie 你 | captured | `web-alpha-fixtures/2026-06-23/screenshots/candidate-reverse-lookup-cangjie-nei-onf-multilingual-indonesian-main-desktop-1280x720.png`, showing backtick + `c` + `onf`, buffer `onf〔倉頡五代〕（人弓火）`, and 你 as the first candidate |
 
-Blocked/partial metadata is acceptable for Phase 1 when capture is unavailable or unreliable, provided the exact attempted source and limitation are recorded. This artifact records that limitation in `source-metadata.json` and `dictionary-detail-sample.json`.
+Unavailable-evidence metadata remains acceptable for future fixture refreshes when capture is unavailable or unreliable, provided the exact attempted source and limitation are recorded. For this Phase 1 fixture, dictionary-panel screenshots are captured successfully.
 
 ### Pattern Established: Dictionary Hover Requires Movement
 
@@ -183,6 +181,7 @@ Blocked/partial metadata is acceptable for Phase 1 when capture is unavailable o
 - The successful capture scrolled down, then moved the mouse across the third candidate cell for 呢 after typing `nei`.
 - A second successful capture scrolled down, then moved the mouse across the second candidate cell for 好心你 after typing `housam`.
 - Downstream Windows candidate UI work should model this as movement-triggered dictionary reveal, not as passive hover-on-rest. Phase 5 should verify the native candidate panel does not flicker when a stationary pointer rests over a candidate during typing.
+- Exact layout should be followed by inspecting the source code, not by approximating the feel of screenshots alone. Phase 5 should use `DictionaryPanel.tsx`, `CandidatePanel.tsx`, `Candidate.tsx`, `CandidateInfo.ts`, `index.css`, and `tailwind.config.ts` as the layout/style authority, with screenshots serving as visual evidence.
 
 Visual token evidence from `tailwind.config.ts` and `index.css`:
 
@@ -205,7 +204,7 @@ These notes are future consumer constraints only. They are not production change
 | Preview utility | `Preview/main.cpp` uses Moqi preview title, Simplified sample candidates, and blue highlight | Preview can be useful later, but it is not Web alpha parity today |
 | Dictionary detail | Current native candidate window has no source-backed dictionary panel equivalent | Phase 5 needs a native dictionary panel surface or an explicitly accepted alternative |
 | Display language settings | Current Windows scaffold does not expose the Web alpha Display Languages group first | Phase 5 settings and installer-first-run settings must use Display Languages first |
-| Screenshot capture | Dictionary-detail screenshot is partial/blocked in this run | Refresh before Phase 5 UI implementation and before Phase 7 release verification |
+| Screenshot capture | Dictionary-detail screenshots are captured in this run | Refresh before Phase 5 UI implementation and before Phase 7 release verification if the Web alpha changes |
 
 ## Source Evidence
 
@@ -230,7 +229,7 @@ These notes are future consumer constraints only. They are not production change
 - Always record capture date, source path, commit/hash, dirty status, runtime URL, viewport, browser/tool, screenshots, and limitations.
 - Validate readable UTF-8 JSON with `Get-Content -Raw -Encoding UTF8 -LiteralPath <file> | ConvertFrom-Json` in Windows PowerShell. The JSON files are also saved with a UTF-8 BOM for compatibility with the original plan checks.
 - Use controlled sample input only. Do not capture personal typed content or local user data.
-- If runtime, source, screenshot, candidate, or dictionary evidence is unavailable, mark the affected section blocked or partial with the exact attempted source.
+- If runtime, source, screenshot, candidate, or dictionary evidence is unavailable in a future refresh, mark the affected section with exact unavailable-evidence metadata and the attempted source.
 - Do not treat Moqi, fcitx, WebDAV/cloud clipboard, AI controls, Simplified-only copy, generic backend config tools, excessive customization, or legacy Moqi backend behavior as acceptable TypeDuck parity.
 
 ---

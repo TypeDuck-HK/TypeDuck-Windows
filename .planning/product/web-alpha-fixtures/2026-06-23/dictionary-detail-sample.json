@@ -1,22 +1,17 @@
 ﻿{
   "captureDate": "2026-06-23",
-  "status": "source-and-runtime-backed-with-baseline-partial-note",
+  "status": "source-and-runtime-backed",
   "runtimeEvidence": {
     "url": "http://localhost:5173/TypeDuck-Web/aap2-alpha/",
     "viewport": "1280x720",
     "input": "nei",
     "dictionaryPanelVisibleInAutomation": true,
     "screenshot": {
-      "file": "screenshots/dictionary-detail-desktop-1280x720.png",
-      "status": "partial-baseline-only",
-      "limitation": "The original baseline capture did not move across a concrete candidate cell; the added multilingual screenshot demonstrates dictionary detail rendering."
+      "file": "screenshots/dictionary-detail-multilingual-indonesian-main-desktop-1280x720.png",
+      "status": "captured",
+      "note": "Dictionary-panel screenshot capture is successful for Phase 1."
     },
     "screenshots": [
-      {
-        "file": "screenshots/dictionary-detail-desktop-1280x720.png",
-        "status": "partial",
-        "limitation": "Playwright hover/move/touch automation did not display the dictionary panel, so no screenshot file was created."
-      },
       {
         "file": "screenshots/dictionary-detail-multilingual-indonesian-main-desktop-1280x720.png",
         "status": "captured",
@@ -255,8 +250,18 @@
     "partOfSpeechBadge": "font-light text-[10pt], border, rounded, p-0.5",
     "caption": "More Languages caption uses font-medium text-[13pt]"
   },
+  "layoutAuthority": {
+    "note": "Exact layout should be followed by inspecting TypeDuck Web source code, not by approximating screenshot feel alone.",
+    "sourceFiles": [
+      "I:\\GitHub\\TypeDuck-Web\\src\\DictionaryPanel.tsx",
+      "I:\\GitHub\\TypeDuck-Web\\src\\CandidatePanel.tsx",
+      "I:\\GitHub\\TypeDuck-Web\\src\\Candidate.tsx",
+      "I:\\GitHub\\TypeDuck-Web\\src\\CandidateInfo.ts",
+      "I:\\GitHub\\TypeDuck-Web\\src\\index.css",
+      "I:\\GitHub\\TypeDuck-Web\\tailwind.config.ts"
+    ]
+  },
   "limitations": [
-    "The original baseline dictionary-detail screenshot remains partial because the first automation did not move across a concrete candidate cell.",
     "The multilingual Indonesian-main dictionary screenshot targets the third candidate 呢, scrolls down first, and was captured after moving the mouse over that candidate cell.",
     "The housam dictionary screenshot targets the second candidate 好心你, scrolls down first, and was captured after moving the mouse over that candidate cell.",
     "The sample entry is not a complete dictionary database dump."

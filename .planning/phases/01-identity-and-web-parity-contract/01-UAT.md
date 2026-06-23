@@ -1,42 +1,39 @@
 ---
-status: testing
+status: complete
 phase: 01-identity-and-web-parity-contract
 source:
   - 01-VERIFICATION.md
   - 01-01-SUMMARY.md
   - 01-02-SUMMARY.md
 started: 2026-06-23T16:14:58+08:00
-updated: 2026-06-23T16:14:58+08:00
+updated: 2026-06-23T16:30:00+08:00
 ---
 
 ## Current Test
 
-number: 1
-name: Proposed Identifier Approval
+number: [testing complete]
+name: [testing complete]
 expected: |
-  Review the proposed TypeDuck AppId, text service CLSID, and zh-HK profile GUID in `.planning/product/TYPEDUCK-IDENTITY-CONTRACT.md`.
-
-  Expected: A human either accepts the proposed identifier values or updates the contract before Phase 3 production code, installer metadata, or TSF registration consumes them.
-awaiting: user response
+  All UAT checkpoints passed.
+awaiting: none
 
 ## Tests
 
 ### 1. Proposed Identifier Approval
 expected: Review the proposed TypeDuck AppId, text service CLSID, and zh-HK profile GUID in `.planning/product/TYPEDUCK-IDENTITY-CONTRACT.md`. Expected: accept the proposed identifier values or update the contract before production code, installer metadata, or TSF registration consumes them.
-result: [pending]
+result: pass
 
 ### 2. Web Alpha Visual Sufficiency
-expected: Inspect the Web alpha fixture screenshots and partial dictionary-detail notes before Phase 5 UI implementation. Expected: the captured settings and candidate screenshots plus the multilingual dictionary-detail screenshot are accepted as sufficient Phase 1 visual references, with the baseline dictionary screenshot limitation understood.
-result: [pending]
+expected: Inspect the Web alpha fixture screenshots before Phase 5 UI implementation. Expected: the captured settings, candidate, and dictionary-panel screenshots are accepted as sufficient Phase 1 visual references, with exact layout followable from the TypeDuck Web source code rather than from screenshot feel alone.
+result: pass
 
 ## Summary
 
 total: 2
-passed: 0
+passed: 2
 issues: 0
-pending: 2
+pending: 0
 skipped: 0
 blocked: 0
 
 ## Gaps
-
