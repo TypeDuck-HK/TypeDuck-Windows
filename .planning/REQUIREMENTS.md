@@ -41,10 +41,10 @@
 
 ### Typing Behavior
 
-- [ ] **TYPE-01**: User can type Cantonese through TypeDuck in ordinary Windows text fields with composition text, candidate list, candidate paging, numeric selection, and commit behavior.
-- [ ] **TYPE-02**: User can use candidate count per page according to the TypeDuck setting.
-- [ ] **TYPE-03**: User can use reverse lookup behavior consistent with TypeDuck Web alpha where supported by the engine.
-- [ ] **TYPE-04**: User can choose Cangjie Version 3 or Version 5 where TypeDuck Web alpha exposes that setting and the engine confirms support.
+- [x] **TYPE-01**: User can type Cantonese through TypeDuck in ordinary Windows text fields with composition text, candidate list, candidate paging, numeric selection, and commit behavior.
+- [x] **TYPE-02**: User can use candidate count per page according to the TypeDuck setting.
+- [x] **TYPE-03**: User can use reverse lookup behavior consistent with TypeDuck Web alpha where supported by the engine.
+- [x] **TYPE-04**: User can choose Cangjie Version 3 or Version 5 where TypeDuck Web alpha exposes that setting and the engine confirms support.
 - [x] **TYPE-05**: Key handling remains responsive under normal typing; engine timeouts or restarts do not hang host applications.
 
 ### Candidate and Dictionary UI
@@ -160,10 +160,10 @@ Which phases cover which requirements. Updated during roadmap creation.
 | PROTO-04 | Phase 4 | Complete |
 | PROTO-05 | Phase 4 | Complete |
 | PROTO-06 | Phase 4 | Complete |
-| TYPE-01 | Phase 4 | Pending |
-| TYPE-02 | Phase 4 | Pending |
-| TYPE-03 | Phase 4 | Pending |
-| TYPE-04 | Phase 4 | Pending |
+| TYPE-01 | Phase 4 | Complete |
+| TYPE-02 | Phase 4 | Complete |
+| TYPE-03 | Phase 4 | Complete |
+| TYPE-04 | Phase 4 | Complete |
 | TYPE-05 | Phase 4 | Complete |
 | CAND-01 | Phase 5 | Pending |
 | CAND-02 | Phase 5 | Pending |
