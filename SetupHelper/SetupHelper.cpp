@@ -14,8 +14,12 @@ constexpr int kExitSuccess = 0;
 constexpr int kExitFailure = 1;
 constexpr int kExitRestartRequired = 2;
 constexpr int kExitInvalidArgs = 3;
-constexpr wchar_t kProgramDirEnvVar[] = L"MOQI_PROGRAM_DIR";
-constexpr wchar_t kReregisterTaskName[] = L"MoqiIM-ReRegisterTSF";
+constexpr wchar_t kProgramDirEnvVar[] = L"TYPEDUCK_PROGRAM_DIR";
+// Transition-only compatibility alias for Plan 03-01 registration paths.
+constexpr wchar_t kLegacyProgramDirEnvVar[] = L"MOQI_PROGRAM_DIR";
+constexpr wchar_t kReregisterTaskName[] = L"TypeDuckIME-ReRegisterTSF";
+constexpr wchar_t kTextServiceDllName[] = L"TypeDuckTextService.dll";
+constexpr wchar_t kSetupHelperCaption[] = L"TypeDuckSetupHelper";
 
 enum class Action {
   kHelp,
@@ -28,6 +32,12 @@ struct Options {
   Action action = Action::kHelp;
   bool silent = false;
   std::wstring app_dir;
+};
+
+struct EnvironmentVariableSnapshot {
+  std::wstring name;
+  bool had_value = false;
+  std::wstring value;
 };
 
 bool NeedsCommandLineQuoting(const std::wstring& value) {
@@ -103,6 +113,30 @@ std::wstring FormatWindowsErrorMessage(const DWORD error_code) {
     LocalFree(buffer);
   }
   return message;
+}
+
+std::wstring Bilingual(const std::wstring& zh, const std::wstring& en) {
+  return zh + L"\n" + en;
+}
+
+EnvironmentVariableSnapshot CaptureEnvironmentVariable(const wchar_t* name) {
+  EnvironmentVariableSnapshot snapshot;
+  snapshot.name = name;
+  const DWORD length = GetEnvironmentVariableW(name, nullptr, 0);
+  if (length > 0) {
+    snapshot.had_value = true;
+    snapshot.value.resize(length - 1);
+    GetEnvironmentVariableW(name, snapshot.value.data(), length);
+  }
+  return snapshot;
+}
+
+void RestoreEnvironmentVariable(const EnvironmentVariableSnapshot& snapshot) {
+  if (snapshot.had_value) {
+    SetEnvironmentVariableW(snapshot.name.c_str(), snapshot.value.c_str());
+  } else {
+    SetEnvironmentVariableW(snapshot.name.c_str(), nullptr);
+  }
 }
 
 std::wstring GetModulePath() {
@@ -328,22 +362,18 @@ bool RunRegsvr(const fs::path& regsvr_path,
 
   std::wstring mutable_command = command;
   std::wstring working_dir = dll_path_for_process.parent_path().wstring();
-  std::wstring previous_program_dir;
-  const DWORD previous_len = GetEnvironmentVariableW(kProgramDirEnvVar, nullptr, 0);
-  if (previous_len > 0) {
-    previous_program_dir.resize(previous_len - 1);
-    GetEnvironmentVariableW(kProgramDirEnvVar, previous_program_dir.data(), previous_len);
-  }
+  const EnvironmentVariableSnapshot previous_program_dir =
+      CaptureEnvironmentVariable(kProgramDirEnvVar);
+  const EnvironmentVariableSnapshot previous_legacy_program_dir =
+      CaptureEnvironmentVariable(kLegacyProgramDirEnvVar);
   SetEnvironmentVariableW(kProgramDirEnvVar, program_dir.c_str());
+  SetEnvironmentVariableW(kLegacyProgramDirEnvVar, program_dir.c_str());
 
   DWORD exit_code = 0;
   const bool ran =
       RunProcess(regsvr_path.wstring(), mutable_command, working_dir, &exit_code);
-  if (previous_len > 0) {
-    SetEnvironmentVariableW(kProgramDirEnvVar, previous_program_dir.c_str());
-  } else {
-    SetEnvironmentVariableW(kProgramDirEnvVar, nullptr);
-  }
+  RestoreEnvironmentVariable(previous_program_dir);
+  RestoreEnvironmentVariable(previous_legacy_program_dir);
   if (!ran) {
     return false;
   }
@@ -447,8 +477,10 @@ bool ScheduleReplaceOnReboot(const fs::path& source,
   const fs::path staged_source = BuildPendingRebootPath(source);
   if (CopyFileW(source.c_str(), staged_source.c_str(), FALSE) != TRUE) {
     if (error != nullptr) {
-      *error = L"Failed to create staged reboot copy " + staged_source.wstring() +
-               L" (" + FormatWindowsErrorMessage(GetLastError()) + L").";
+      *error = Bilingual(
+          L"未能建立重啟後替換用的暫存副本: " + staged_source.wstring(),
+          L"Failed to create staged reboot copy: " + staged_source.wstring()) +
+               L"\n(" + FormatWindowsErrorMessage(GetLastError()) + L").";
     }
     return false;
   }
@@ -465,9 +497,12 @@ bool ScheduleReplaceOnReboot(const fs::path& source,
     std::error_code ec;
     fs::remove(staged_source, ec);
     if (error != nullptr) {
-      *error = L"Failed to schedule reboot replacement from " +
-               staged_source.wstring() + L" to " + destination.wstring() +
-               L" (" + FormatWindowsErrorMessage(move_error) + L").";
+      *error = Bilingual(
+          L"未能安排重啟後替換 TSF DLL: " + destination.wstring(),
+          L"Failed to schedule reboot replacement for TSF DLL: " +
+              destination.wstring()) +
+               L"\n" + staged_source.wstring() + L"\n(" +
+               FormatWindowsErrorMessage(move_error) + L").";
     }
     return false;
   }
@@ -527,14 +562,16 @@ bool ScheduleReregisterTask(const Options& options, std::wstring& error) {
   DWORD error_code = 0;
   if (!RunProcess(schtasks.wstring(), command, GetModuleDirectory(), &exit_code,
                   &error_code)) {
-    error = L"Failed to launch schtasks.exe (" +
-            FormatWindowsErrorMessage(error_code) + L").";
+    error = Bilingual(L"未能啟動 schtasks.exe。",
+                      L"Failed to launch schtasks.exe.") +
+            L"\n(" + FormatWindowsErrorMessage(error_code) + L").";
     return false;
   }
   if (exit_code != 0) {
-    error = L"Failed to schedule TSF re-registration after reboot "
-            L"(schtasks exit code " +
-            std::to_wstring(exit_code) + L").";
+    error = Bilingual(
+        L"未能安排 Windows 重啟後重新註冊 TypeDuck TSF。",
+        L"Failed to schedule TypeDuck TSF re-registration after reboot.") +
+            L"\n(schtasks exit code " + std::to_wstring(exit_code) + L").";
     return false;
   }
   return true;
@@ -564,7 +601,8 @@ bool CopyFileWithFallback(const fs::path& source,
   }
   if (!fs::exists(source)) {
     if (error != nullptr) {
-      *error = L"Source file does not exist: " + source.wstring();
+      *error = Bilingual(L"找不到來源檔案: " + source.wstring(),
+                         L"Source file does not exist: " + source.wstring());
     }
     return false;
   }
@@ -592,11 +630,11 @@ bool CopyFileWithFallback(const fs::path& source,
       *fallback_error = retry_copy_error;
     }
     if (error != nullptr) {
-      *error = L"Initial copy failed (" +
-               FormatWindowsErrorMessage(initial_copy_error_code) +
-               L"); existing destination was scheduled for delete-on-reboot, "
-               L"but retry copy also failed (" +
-               FormatWindowsErrorMessage(retry_copy_error) + L").";
+      *error = Bilingual(
+          L"初次複製失敗；已安排舊檔重啟後刪除，但重新複製仍然失敗。",
+          L"Initial copy failed; the old file was scheduled for delete-on-reboot, but retry copy also failed.") +
+          L"\n(" + FormatWindowsErrorMessage(initial_copy_error_code) +
+          L")\n(" + FormatWindowsErrorMessage(retry_copy_error) + L").";
     }
     return false;
   }
@@ -605,27 +643,28 @@ bool CopyFileWithFallback(const fs::path& source,
     if (fallback_error != nullptr) {
       *fallback_error = rename_error;
     }
-    *error = L"Initial copy failed (" +
-             FormatWindowsErrorMessage(initial_copy_error_code) +
-             L"); fallback rename/delete-on-reboot also failed (" +
-             FormatWindowsErrorMessage(rename_error) + L").";
+    *error = Bilingual(
+        L"初次複製失敗；後備重新命名及重啟後刪除亦失敗。",
+        L"Initial copy failed; fallback rename/delete-on-reboot also failed.") +
+        L"\n(" + FormatWindowsErrorMessage(initial_copy_error_code) +
+        L")\n(" + FormatWindowsErrorMessage(rename_error) + L").";
   }
   return false;
 }
 
 int ShowFailureAndReturn(const std::wstring& message, const bool silent) {
-  ShowMessage(message, L"SetupHelper", MB_ICONERROR | MB_OK, silent);
+  ShowMessage(message, kSetupHelperCaption, MB_ICONERROR | MB_OK, silent);
   return kExitFailure;
 }
 
 int RunReregister(const Options& options) {
   const fs::path app_dir(options.app_dir);
-  const fs::path source32 = app_dir / L"MoqiTextService.dll";
-  const fs::path source64 = app_dir / L"x64" / L"MoqiTextService.dll";
-  const fs::path dest32 = fs::path(GetSyswow64DirectoryPath()) / L"MoqiTextService.dll";
-  const fs::path dest64 = fs::path(GetNativeSystemDirectoryPath()) / L"MoqiTextService.dll";
+  const fs::path source32 = app_dir / kTextServiceDllName;
+  const fs::path source64 = app_dir / L"x64" / kTextServiceDllName;
+  const fs::path dest32 = fs::path(GetSyswow64DirectoryPath()) / kTextServiceDllName;
+  const fs::path dest64 = fs::path(GetNativeSystemDirectoryPath()) / kTextServiceDllName;
   const fs::path dest64_for_regsvr =
-      fs::path(GetNativeSystemDirectoryForChildProcess()) / L"MoqiTextService.dll";
+      fs::path(GetNativeSystemDirectoryForChildProcess()) / kTextServiceDllName;
   const fs::path regsvr32 = fs::path(GetSyswow64DirectoryPath()) / L"regsvr32.exe";
   const fs::path regsvr64 = fs::path(GetNativeSystemDirectoryPath()) / L"regsvr32.exe";
 
@@ -635,12 +674,16 @@ int RunReregister(const Options& options) {
   CleanupStaleRebootCopies(source64);
 
   if (!RunRegsvr(regsvr32, dest32, app_dir, false)) {
-    return ShowFailureAndReturn(L"Failed to register Win32 TSF DLL.",
-                                options.silent);
+    return ShowFailureAndReturn(
+        Bilingual(L"未能註冊 Win32 TypeDuck TSF DLL。",
+                  L"Failed to register Win32 TypeDuck TSF DLL."),
+        options.silent);
   }
   if (!RunRegsvr(regsvr64, dest64_for_regsvr, app_dir, false)) {
-    return ShowFailureAndReturn(L"Failed to register x64 TSF DLL.",
-                                options.silent);
+    return ShowFailureAndReturn(
+        Bilingual(L"未能註冊 x64 TypeDuck TSF DLL。",
+                  L"Failed to register x64 TypeDuck TSF DLL."),
+        options.silent);
   }
   DeleteReregisterTask();
   return kExitSuccess;
@@ -648,24 +691,28 @@ int RunReregister(const Options& options) {
 
 int RunInstall(const Options& options) {
   const fs::path app_dir(options.app_dir);
-  const fs::path source32 = app_dir / L"MoqiTextService.dll";
-  const fs::path source64 = app_dir / L"x64" / L"MoqiTextService.dll";
+  const fs::path source32 = app_dir / kTextServiceDllName;
+  const fs::path source64 = app_dir / L"x64" / kTextServiceDllName;
   // TSF DLLs must live in system directories, or IME input will not work in
   // some games such as CS2.
-  const fs::path dest32 = fs::path(GetSyswow64DirectoryPath()) / L"MoqiTextService.dll";
-  const fs::path dest64 = fs::path(GetNativeSystemDirectoryPath()) / L"MoqiTextService.dll";
+  const fs::path dest32 = fs::path(GetSyswow64DirectoryPath()) / kTextServiceDllName;
+  const fs::path dest64 = fs::path(GetNativeSystemDirectoryPath()) / kTextServiceDllName;
   const fs::path dest64_for_regsvr =
-      fs::path(GetNativeSystemDirectoryForChildProcess()) / L"MoqiTextService.dll";
+      fs::path(GetNativeSystemDirectoryForChildProcess()) / kTextServiceDllName;
   const fs::path regsvr32 = fs::path(GetSyswow64DirectoryPath()) / L"regsvr32.exe";
   const fs::path regsvr64 = fs::path(GetNativeSystemDirectoryPath()) / L"regsvr32.exe";
 
   if (!fs::exists(source32)) {
-    return ShowFailureAndReturn(L"Missing Win32 payload: " + source32.wstring(),
-                                options.silent);
+    return ShowFailureAndReturn(
+        Bilingual(L"缺少 Win32 TypeDuck 安裝檔案: " + source32.wstring(),
+                  L"Missing Win32 TypeDuck payload: " + source32.wstring()),
+        options.silent);
   }
   if (!fs::exists(source64)) {
-    return ShowFailureAndReturn(L"Missing x64 payload: " + source64.wstring(),
-                                options.silent);
+    return ShowFailureAndReturn(
+        Bilingual(L"缺少 x64 TypeDuck 安裝檔案: " + source64.wstring(),
+                  L"Missing x64 TypeDuck payload: " + source64.wstring()),
+        options.silent);
   }
 
   DeleteReregisterTask();
@@ -687,8 +734,10 @@ int RunInstall(const Options& options) {
           ScheduleReplaceOnReboot(source32, dest32, reboot_required,
                                   &copy_error))) {
       return ShowFailureAndReturn(
-          L"Failed to update Win32 TSF DLL in " + dest32.wstring() + L"\n\n" +
-              copy_error,
+          Bilingual(L"未能更新 Win32 TypeDuck TSF DLL: " + dest32.wstring(),
+                    L"Failed to update Win32 TypeDuck TSF DLL: " +
+                        dest32.wstring()) +
+              L"\n\n" + copy_error,
           options.silent);
     }
   }
@@ -703,8 +752,10 @@ int RunInstall(const Options& options) {
           ScheduleReplaceOnReboot(source64, dest64, reboot_required,
                                   &copy_error))) {
       return ShowFailureAndReturn(
-          L"Failed to update x64 TSF DLL in " + dest64.wstring() + L"\n\n" +
-              copy_error,
+          Bilingual(L"未能更新 x64 TypeDuck TSF DLL: " + dest64.wstring(),
+                    L"Failed to update x64 TypeDuck TSF DLL: " +
+                        dest64.wstring()) +
+              L"\n\n" + copy_error,
           options.silent);
     }
   }
@@ -718,22 +769,26 @@ int RunInstall(const Options& options) {
   }
 
   if (!RunRegsvr(regsvr32, dest32, app_dir, false)) {
-    return ShowFailureAndReturn(L"Failed to register Win32 TSF DLL.",
-                                options.silent);
+    return ShowFailureAndReturn(
+        Bilingual(L"未能註冊 Win32 TypeDuck TSF DLL。",
+                  L"Failed to register Win32 TypeDuck TSF DLL."),
+        options.silent);
   }
   if (!RunRegsvr(regsvr64, dest64_for_regsvr, app_dir, false)) {
-    return ShowFailureAndReturn(L"Failed to register x64 TSF DLL.",
-                                options.silent);
+    return ShowFailureAndReturn(
+        Bilingual(L"未能註冊 x64 TypeDuck TSF DLL。",
+                  L"Failed to register x64 TypeDuck TSF DLL."),
+        options.silent);
   }
   return kExitSuccess;
 }
 
 int RunUninstall(const Options& options) {
   const fs::path app_dir(options.app_dir);
-  const fs::path dest32 = fs::path(GetSyswow64DirectoryPath()) / L"MoqiTextService.dll";
-  const fs::path dest64 = fs::path(GetNativeSystemDirectoryPath()) / L"MoqiTextService.dll";
+  const fs::path dest32 = fs::path(GetSyswow64DirectoryPath()) / kTextServiceDllName;
+  const fs::path dest64 = fs::path(GetNativeSystemDirectoryPath()) / kTextServiceDllName;
   const fs::path dest64_for_regsvr =
-      fs::path(GetNativeSystemDirectoryForChildProcess()) / L"MoqiTextService.dll";
+      fs::path(GetNativeSystemDirectoryForChildProcess()) / kTextServiceDllName;
   const fs::path regsvr32 = fs::path(GetSyswow64DirectoryPath()) / L"regsvr32.exe";
   const fs::path regsvr64 = fs::path(GetNativeSystemDirectoryPath()) / L"regsvr32.exe";
 
@@ -744,24 +799,30 @@ int RunUninstall(const Options& options) {
   bool reboot_required = false;
   if (!DeleteFileWithFallback(dest32, reboot_required)) {
     return ShowFailureAndReturn(
-        L"Failed to remove Win32 TSF DLL from " + dest32.wstring(), options.silent);
+        Bilingual(L"未能移除 Win32 TypeDuck TSF DLL: " + dest32.wstring(),
+                  L"Failed to remove Win32 TypeDuck TSF DLL: " +
+                      dest32.wstring()),
+        options.silent);
   }
   if (!DeleteFileWithFallback(dest64, reboot_required)) {
     return ShowFailureAndReturn(
-        L"Failed to remove x64 TSF DLL from " + dest64.wstring(), options.silent);
+        Bilingual(L"未能移除 x64 TypeDuck TSF DLL: " + dest64.wstring(),
+                  L"Failed to remove x64 TypeDuck TSF DLL: " +
+                      dest64.wstring()),
+        options.silent);
   }
   return reboot_required ? kExitRestartRequired : kExitSuccess;
 }
 
 void ShowUsage() {
   const std::wstring help_text =
-      L"Usage: SetupHelper.exe /i|/r|/u [/s] [--appdir <path>]\n"
-      L"  /i       Install or upgrade the TSF DLLs.\n"
-      L"  /r       Register the TSF DLLs after a reboot.\n"
-      L"  /u       Uninstall the TSF DLLs.\n"
-      L"  /s       Silent mode.\n"
-      L"  --appdir Explicit application directory.\n";
-  MessageBoxW(nullptr, help_text.c_str(), L"SetupHelper",
+      L"用法 / Usage: TypeDuckSetupHelper.exe /i|/r|/u [/s] [--appdir <path>]\n"
+      L"  /i       安裝或更新 TypeDuck TSF DLLs / Install or upgrade the TypeDuck TSF DLLs.\n"
+      L"  /r       重啟後重新註冊 TSF DLLs / Register the TSF DLLs after a reboot.\n"
+      L"  /u       解除安裝 TSF DLLs / Uninstall the TSF DLLs.\n"
+      L"  /s       靜默模式 / Silent mode.\n"
+      L"  --appdir 指定應用程式資料夾 / Explicit application directory.\n";
+  MessageBoxW(nullptr, help_text.c_str(), kSetupHelperCaption,
               MB_ICONINFORMATION | MB_OK);
 }
 
@@ -774,19 +835,22 @@ bool ParseOptions(const std::vector<std::wstring>& args,
     const std::wstring& arg = args[i];
     if (arg == L"/i") {
       if (options.action != Action::kHelp) {
-        error = L"Only one action may be specified.";
+        error = Bilingual(L"只可以指定一個動作。",
+                          L"Only one action may be specified.");
         return false;
       }
       options.action = Action::kInstall;
     } else if (arg == L"/r") {
       if (options.action != Action::kHelp) {
-        error = L"Only one action may be specified.";
+        error = Bilingual(L"只可以指定一個動作。",
+                          L"Only one action may be specified.");
         return false;
       }
       options.action = Action::kReregister;
     } else if (arg == L"/u") {
       if (options.action != Action::kHelp) {
-        error = L"Only one action may be specified.";
+        error = Bilingual(L"只可以指定一個動作。",
+                          L"Only one action may be specified.");
         return false;
       }
       options.action = Action::kUninstall;
@@ -796,21 +860,23 @@ bool ParseOptions(const std::vector<std::wstring>& args,
       options.action = Action::kHelp;
     } else if (arg == L"--appdir") {
       if (i + 1 >= args.size()) {
-        error = L"--appdir requires a path.";
+        error = Bilingual(L"--appdir 需要路徑。",
+                          L"--appdir requires a path.");
         return false;
       }
       options.app_dir = args[++i];
     } else if (arg.rfind(L"--appdir=", 0) == 0) {
       options.app_dir = arg.substr(9);
     } else {
-      error = L"Unknown argument: " + arg;
+      error = Bilingual(L"不明參數: " + arg,
+                        L"Unknown argument: " + arg);
       return false;
     }
   }
 
   if (options.action == Action::kHelp && args.size() > 1 &&
       options.app_dir == GetModuleDirectory()) {
-    error = L"No action specified.";
+    error = Bilingual(L"未指定動作。", L"No action specified.");
     return false;
   }
   return true;
@@ -823,7 +889,7 @@ int WINAPI wWinMain(HINSTANCE, HINSTANCE, PWSTR, int) {
   Options options;
   std::wstring error;
   if (!ParseOptions(args, options, error)) {
-    ShowMessage(error, L"SetupHelper", MB_ICONERROR | MB_OK, false);
+    ShowMessage(error, kSetupHelperCaption, MB_ICONERROR | MB_OK, false);
     ShowUsage();
     return kExitInvalidArgs;
   }

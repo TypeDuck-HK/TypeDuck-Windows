@@ -141,7 +141,7 @@ function Assert-InstallerScript {
     Assert-Match $Failures $Iss "Name:\s*`"english`"" "Installer must include English wizard resources."
     Assert-Match $Failures $Iss "chinesetraditional|ChineseTraditional|Traditional Chinese" "Installer must use Traditional Chinese-compatible resources."
     Assert-BilingualCopy $Failures $Iss "installer/MoqiTsf.iss"
-    Assert-NotMatch $Failures $Iss "MoqiLauncher\.exe|SetupHelper\.exe|MoqiTextService\.dll|DefaultDirName=\{autopf32\}\\MoqiIM|OutputBaseFilename=moqi-im-windows-setup" `
+    Assert-NotMatch $Failures $Iss "MoqiLauncher\.exe|(?<!TypeDuck)SetupHelper\.exe|MoqiTextService\.dll|DefaultDirName=\{autopf32\}\\MoqiIM|OutputBaseFilename=moqi-im-windows-setup" `
         "Installer-controlled payload, install directory, and artifact names must not use Moqi deployed names."
     Assert-Match $Failures $Iss "RegPurgeTypeDuckResiduals|PurgeTypeDuck" "Uninstall must purge TypeDuck COM/TSF registry residue."
     Assert-Match $Failures $Iss "RegPurgeLegacyMoqiResiduals|Legacy Moqi migration cleanup" "Any Moqi cleanup must be explicit and narrow."

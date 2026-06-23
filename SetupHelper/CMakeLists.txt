@@ -4,6 +4,10 @@ add_executable(SetupHelper WIN32
     SetupHelper.cpp
 )
 
+set_target_properties(SetupHelper PROPERTIES
+    OUTPUT_NAME "TypeDuckSetupHelper"
+)
+
 target_include_directories(SetupHelper PRIVATE
     ${CMAKE_SOURCE_DIR}
 )
