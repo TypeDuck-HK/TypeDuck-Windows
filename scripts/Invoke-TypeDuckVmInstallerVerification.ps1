@@ -43,6 +43,14 @@ $kBeforeName = "registry-before.json"
 $kAfterInstallName = "registry-after-install.json"
 $kAfterUninstallName = "registry-after-uninstall.json"
 
+function Format-UtcTimestamp {
+    param([datetime] $Value = [datetime]::UtcNow)
+
+    return $Value.ToUniversalTime().ToString(
+        "yyyy-MM-dd'T'HH':'mm':'ss'Z'",
+        [System.Globalization.CultureInfo]::InvariantCulture)
+}
+
 function Resolve-RepoRoot {
     return [System.IO.Path]::GetFullPath((Join-Path $PSScriptRoot ".."))
 }
@@ -193,7 +201,7 @@ function Write-ManualPacket {
         status = "needs-human-vm-verification"
         reason = $Reason
         startedAt = $StartedAt
-        endedAt = (Get-Date).ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ssZ")
+        endedAt = Format-UtcTimestamp
         vm = [ordered]@{
             name = $VmName
             checkpointRequired = -not $SkipCheckpoint.IsPresent
@@ -246,7 +254,7 @@ function Get-HyperVCheckpointMetadata {
         skipped = $false
         name = $snapshot.Name
         id = $snapshot.Id.ToString()
-        creationTime = $snapshot.CreationTime.ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ssZ")
+        creationTime = Format-UtcTimestamp -Value $snapshot.CreationTime
     }
 }
 
@@ -288,6 +296,14 @@ function Save-GuestSnapshot {
             [string] $TaskName,
             [string] $LauncherValue
         )
+
+        function Format-UtcTimestamp {
+            param([datetime] $Value = [datetime]::UtcNow)
+
+            return $Value.ToUniversalTime().ToString(
+                "yyyy-MM-dd'T'HH':'mm':'ss'Z'",
+                [System.Globalization.CultureInfo]::InvariantCulture)
+        }
 
         function Get-RegistryNode {
             param([string] $Path)
@@ -339,7 +355,7 @@ function Save-GuestSnapshot {
                 exists = $true
                 sha256 = (Get-FileHash -Algorithm SHA256 -LiteralPath $Path).Hash.ToLowerInvariant()
                 length = $item.Length
-                lastWriteTimeUtc = $item.LastWriteTimeUtc.ToString("yyyy-MM-ddTHH:mm:ssZ")
+                lastWriteTimeUtc = Format-UtcTimestamp -Value $item.LastWriteTimeUtc
             }
         }
 
@@ -409,7 +425,7 @@ function Save-GuestSnapshot {
         $programFilesX86 = [Environment]::GetFolderPath("ProgramFilesX86")
         [ordered]@{
             label = $Label
-            capturedAt = (Get-Date).ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ssZ")
+            capturedAt = Format-UtcTimestamp
             os = [ordered]@{
                 caption = $os.Caption
                 version = $os.Version
@@ -616,7 +632,7 @@ D-17 through D-19: Covered by this VM checkpoint and install/uninstall evidence;
     Set-Content -LiteralPath (Join-Path $EvidenceRootPath $kNotesName) -Value $notes -Encoding UTF8
 }
 
-$startedAt = (Get-Date).ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ssZ")
+$startedAt = Format-UtcTimestamp
 $resolvedEvidenceRoot = Resolve-EvidenceRoot -RequestedRoot $EvidenceRoot
 
 if ($ManualChecklistOnly) {
@@ -687,7 +703,7 @@ try {
         $limitations += "Get-WinUserLanguageList did not report zh-HK for the guest user; rely on CTF/TIP registry evidence and capture Settings screenshot if needed."
     }
 
-    $endedAt = (Get-Date).ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ssZ")
+    $endedAt = Format-UtcTimestamp
     $status = if ($installFailures.Count -eq 0 -and $uninstallFailures.Count -eq 0 -and $installResult.exitCode -eq 0 -and $uninstallResult.exitCode -eq 0) { "complete" } else { "failed" }
 
     $evidence = [ordered]@{

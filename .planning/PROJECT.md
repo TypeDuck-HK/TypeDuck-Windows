@@ -59,6 +59,7 @@ Hong Kong users can install TypeDuck under Chinese (Traditional, Hong Kong) and 
 - Candidate UI screenshots show the candidate list plus a larger dictionary panel containing Chinese terms, Jyutping, part-of-speech labels, English meanings, reading notes, and "More Languages" blocks when additional languages are enabled.
 - The current scaffold uses C++20, Win32/COM/TSF, libIME2, libuv, protobuf, JsonCpp, spdlog, Inno Setup, and PowerShell packaging.
 - Project `.ps1` scripts should be run with PowerShell 7+ (`pwsh`), not Windows PowerShell `powershell.exe`, to avoid character-encoding failures with Cantonese/Traditional Chinese literals, paths, and proof evidence.
+- Documentation/evidence timestamps must use invariant UTC formatting so locale-specific time separators do not leak into docs. Use `pwsh -NoProfile -Command "([DateTime]::UtcNow.ToString('s', [Globalization.CultureInfo]::InvariantCulture) + 'Z')"`.
 - The current scaffold launches a legacy backend through `backends.json`, named pipes, and protobuf frames. Phase 2 proved this boundary can host the TypeDuck-HK runtime as an internal compatibility adapter; later phases still need TypeDuck protocol, installer, and UI integration.
 - Codebase map reference: `.planning/codebase/`.
 

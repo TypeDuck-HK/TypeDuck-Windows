@@ -2,8 +2,8 @@
   "mode": "manual-checklist",
   "status": "needs-human-vm-verification",
   "reason": "ManualChecklistOnly was specified.",
-  "startedAt": "2026-06-23T16 時 31 時 36Z",
-  "endedAt": "2026-06-23T16 時 31 時 36Z",
+  "startedAt": "2026-06-23T16:44:04Z",
+  "endedAt": "2026-06-23T16:44:04Z",
   "vm": {
     "name": "My Virtual Machine",
     "checkpointRequired": true
