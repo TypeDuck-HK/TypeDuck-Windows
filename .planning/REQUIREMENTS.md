@@ -138,70 +138,70 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| IDEN-01 | TBD | Pending |
-| IDEN-02 | TBD | Pending |
-| IDEN-03 | TBD | Pending |
-| IDEN-04 | TBD | Pending |
-| INST-01 | TBD | Pending |
-| INST-02 | TBD | Pending |
-| INST-03 | TBD | Pending |
-| INST-04 | TBD | Pending |
-| INST-05 | TBD | Pending |
-| INST-06 | TBD | Pending |
-| ENG-01 | TBD | Pending |
-| ENG-02 | TBD | Pending |
-| ENG-03 | TBD | Pending |
-| ENG-04 | TBD | Pending |
-| ENG-05 | TBD | Pending |
-| ENG-06 | TBD | Pending |
-| PROTO-01 | TBD | Pending |
-| PROTO-02 | TBD | Pending |
-| PROTO-03 | TBD | Pending |
-| PROTO-04 | TBD | Pending |
-| PROTO-05 | TBD | Pending |
-| PROTO-06 | TBD | Pending |
-| TYPE-01 | TBD | Pending |
-| TYPE-02 | TBD | Pending |
-| TYPE-03 | TBD | Pending |
-| TYPE-04 | TBD | Pending |
-| TYPE-05 | TBD | Pending |
-| CAND-01 | TBD | Pending |
-| CAND-02 | TBD | Pending |
-| CAND-03 | TBD | Pending |
-| CAND-04 | TBD | Pending |
-| CAND-05 | TBD | Pending |
-| CAND-06 | TBD | Pending |
-| CAND-07 | TBD | Pending |
-| SET-01 | TBD | Pending |
-| SET-02 | TBD | Pending |
-| SET-03 | TBD | Pending |
-| SET-04 | TBD | Pending |
-| SET-05 | TBD | Pending |
-| SET-06 | TBD | Pending |
-| SET-07 | TBD | Pending |
-| SET-08 | TBD | Pending |
-| SET-09 | TBD | Pending |
-| SET-10 | TBD | Pending |
-| LANG-01 | TBD | Pending |
-| LANG-02 | TBD | Pending |
-| LANG-03 | TBD | Pending |
-| SEC-01 | TBD | Pending |
-| SEC-02 | TBD | Pending |
-| SEC-03 | TBD | Pending |
-| SEC-04 | TBD | Pending |
-| SEC-05 | TBD | Pending |
-| VER-01 | TBD | Pending |
-| VER-02 | TBD | Pending |
-| VER-03 | TBD | Pending |
-| VER-04 | TBD | Pending |
-| VER-05 | TBD | Pending |
-| VER-06 | TBD | Pending |
+| IDEN-01 | Phase 6 | Pending |
+| IDEN-02 | Phase 1 | Pending |
+| IDEN-03 | Phase 6 | Pending |
+| IDEN-04 | Phase 6 | Pending |
+| INST-01 | Phase 3 | Pending |
+| INST-02 | Phase 3 | Pending |
+| INST-03 | Phase 3 | Pending |
+| INST-04 | Phase 3 | Pending |
+| INST-05 | Phase 3 | Pending |
+| INST-06 | Phase 5 | Pending |
+| ENG-01 | Phase 2 | Pending |
+| ENG-02 | Phase 2 | Pending |
+| ENG-03 | Phase 2 | Pending |
+| ENG-04 | Phase 2 | Pending |
+| ENG-05 | Phase 2 | Pending |
+| ENG-06 | Phase 4 | Pending |
+| PROTO-01 | Phase 4 | Pending |
+| PROTO-02 | Phase 4 | Pending |
+| PROTO-03 | Phase 4 | Pending |
+| PROTO-04 | Phase 4 | Pending |
+| PROTO-05 | Phase 4 | Pending |
+| PROTO-06 | Phase 4 | Pending |
+| TYPE-01 | Phase 4 | Pending |
+| TYPE-02 | Phase 4 | Pending |
+| TYPE-03 | Phase 4 | Pending |
+| TYPE-04 | Phase 4 | Pending |
+| TYPE-05 | Phase 4 | Pending |
+| CAND-01 | Phase 5 | Pending |
+| CAND-02 | Phase 5 | Pending |
+| CAND-03 | Phase 5 | Pending |
+| CAND-04 | Phase 5 | Pending |
+| CAND-05 | Phase 5 | Pending |
+| CAND-06 | Phase 5 | Pending |
+| CAND-07 | Phase 5 | Pending |
+| SET-01 | Phase 5 | Pending |
+| SET-02 | Phase 5 | Pending |
+| SET-03 | Phase 5 | Pending |
+| SET-04 | Phase 5 | Pending |
+| SET-05 | Phase 5 | Pending |
+| SET-06 | Phase 5 | Pending |
+| SET-07 | Phase 5 | Pending |
+| SET-08 | Phase 5 | Pending |
+| SET-09 | Phase 5 | Pending |
+| SET-10 | Phase 5 | Pending |
+| LANG-01 | Phase 6 | Pending |
+| LANG-02 | Phase 6 | Pending |
+| LANG-03 | Phase 5 | Pending |
+| SEC-01 | Phase 6 | Pending |
+| SEC-02 | Phase 6 | Pending |
+| SEC-03 | Phase 6 | Pending |
+| SEC-04 | Phase 6 | Pending |
+| SEC-05 | Phase 6 | Pending |
+| VER-01 | Phase 1 | Pending |
+| VER-02 | Phase 6 | Pending |
+| VER-03 | Phase 7 | Pending |
+| VER-04 | Phase 7 | Pending |
+| VER-05 | Phase 7 | Pending |
+| VER-06 | Phase 7 | Pending |
 
 **Coverage:**
 - v1 requirements: 58 total
-- Mapped to phases: 0
-- Unmapped: 58
+- Mapped to phases: 58
+- Unmapped: 0
 
 ---
 *Requirements defined: 2026-06-23*
-*Last updated: 2026-06-23 after initial definition*
+*Last updated: 2026-06-23 after roadmap creation*
