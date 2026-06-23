@@ -1,13 +1,16 @@
 #Requires -Version 5.1
 <#
 .SYNOPSIS
-  One-click build for moqi-ime backend, moqi-im-windows binaries, and installer package.
+  One-click build for the transitional backend, TypeDuck Windows IME binaries, and installer package.
+
+  Legacy Moqi scaffold compatibility: this script can still build/copy the
+  sibling moqi-ime adapter until the TypeDuck runtime package is finalized.
 
 .PARAMETER RepoRoot
-  Root of moqi-im-windows (defaults to the parent directory of this script).
+  Root of this TypeDuck Windows IME scaffold checkout (defaults to the parent directory of this script).
 
 .PARAMETER MoqiImeRoot
-  Root of sibling moqi-ime repository (defaults to RepoRoot\..\moqi-ime).
+  Root of sibling transitional moqi-ime repository (defaults to RepoRoot\..\moqi-ime).
 
 .PARAMETER Configuration
   Build configuration for moqi-im-windows (default: Release).
@@ -118,8 +121,8 @@ foreach ($path in @($moqiImeBuildScript, $windowsBuildScript, $windowsInstallScr
     }
 }
 
-Write-Host "== Step 1/3: Build moqi-ime runtime =="
-Invoke-Step -FilePath "powershell.exe" -ArgumentList @(
+Write-Host "== Step 1/3: Build transitional moqi-ime runtime for TypeDuck packaging =="
+Invoke-Step -FilePath "pwsh" -ArgumentList @(
     "-NoProfile",
     "-ExecutionPolicy", "Bypass",
     "-File", "`"$moqiImeBuildScript`"",
@@ -130,7 +133,7 @@ if (-not (Test-Path -LiteralPath (Join-Path $moqiImeRuntimeDir "server.exe"))) {
     throw "moqi-ime runtime was not produced: $moqiImeRuntimeDir"
 }
 
-Write-Host "== Step 2/3: Build moqi-im-windows binaries =="
+Write-Host "== Step 2/3: Build TypeDuck Windows IME binaries =="
  $windowsBuildArgs = @(
     "-NoProfile",
     "-ExecutionPolicy", "Bypass",
@@ -145,10 +148,10 @@ if ($ProtobufSourceDir) {
 if ($ProtobufRoot) {
     $windowsBuildArgs += @("-ProtobufRoot", "`"$ProtobufRoot`"")
 }
-Invoke-Step -FilePath "powershell.exe" -ArgumentList $windowsBuildArgs -WorkingDirectory $RepoRoot
+Invoke-Step -FilePath "pwsh" -ArgumentList $windowsBuildArgs -WorkingDirectory $RepoRoot
 
-Write-Host "== Step 3/3: Build installer package =="
-Invoke-Step -FilePath "powershell.exe" -ArgumentList @(
+Write-Host "== Step 3/3: Build TypeDuck installer package =="
+Invoke-Step -FilePath "pwsh" -ArgumentList @(
     "-NoProfile",
     "-ExecutionPolicy", "Bypass",
     "-File", "`"$windowsInstallScript`"",
@@ -156,7 +159,7 @@ Invoke-Step -FilePath "powershell.exe" -ArgumentList @(
     "-MoqiImeSource", "`"$moqiImeRuntimeDir`""
 ) -WorkingDirectory $RepoRoot
 
-$installerPath = Join-Path $RepoRoot "installer\dist\moqi-im-windows-setup.exe"
+$installerPath = Join-Path $RepoRoot "installer\dist\typeduck-windows-ime-setup.exe"
 if (Test-Path -LiteralPath $installerPath) {
     Write-Host "OK: $installerPath"
 } else {

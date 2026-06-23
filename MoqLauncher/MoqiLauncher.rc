@@ -14,10 +14,10 @@
 #undef APSTUDIO_READONLY_SYMBOLS
 
 /////////////////////////////////////////////////////////////////////////////
-// Chinese (Simplified, PRC) resources
+// Chinese (Traditional, Hong Kong) resources
 
-#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_CHS)
-LANGUAGE LANG_CHINESE, SUBLANG_CHINESE_SIMPLIFIED
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_CHT)
+LANGUAGE LANG_CHINESE, SUBLANG_CHINESE_HONGKONG
 
 #ifdef APSTUDIO_INVOKED
 /////////////////////////////////////////////////////////////////////////////
@@ -52,7 +52,7 @@ END
 // Icon with lowest ID value placed first to ensure application icon
 // remains consistent on all systems.
 
-IDI_MOQI_LAUNCHER       ICON    "..\\installer\\stage\\win32\\MoqiIM\\moqi-ime\\icons\\moqi.ico"
+IDI_MOQI_LAUNCHER       ICON    "TypeDuckLauncher.ico"
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -71,7 +71,7 @@ IDI_MOQI_LAUNCHER       ICON    "..\\installer\\stage\\win32\\MoqiIM\\moqi-ime\\
 // String Table
 //
 
-#endif    // Chinese (Simplified, PRC) resources
+#endif    // Chinese (Traditional, Hong Kong) resources
 /////////////////////////////////////////////////////////////////////////////
 
 

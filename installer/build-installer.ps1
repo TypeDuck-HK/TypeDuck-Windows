@@ -1,18 +1,19 @@
 #Requires -Version 5.1
 <#
 .SYNOPSIS
-  Compile MoqiTsf.iss with Inno Setup 6 (requires ISCC.exe on PATH or default path).
+  Compile the TypeDuck Windows IME installer with Inno Setup 6.
 
 .PARAMETER StageDir
   Root of the staged installer tree. Expected layout:
-    win32\MoqiIM\...
-    x64\MoqiIM\...
+    win32\TypeDuckIME\...
+    x64\TypeDuckIME\...
 
 .PARAMETER IssPath
   Optional path to MoqiTsf.iss (default: installer dir next to this script).
+  Legacy scaffold source compatibility: the script filename is not user-facing.
 
 .EXAMPLE
-  .\installer\build-installer.ps1 -StageDir D:\moqi-im-windows\installer\stage
+  pwsh -NoProfile -ExecutionPolicy Bypass -File .\installer\build-installer.ps1 -StageDir D:\typeduck-windows-ime\installer\stage
 #>
 param(
     [Parameter(Mandatory = $true)]
@@ -26,8 +27,8 @@ if (-not (Test-Path -LiteralPath $StageDir)) {
 }
 $StageDir = (Resolve-Path -LiteralPath $StageDir).Path
 
-$win32Root = Join-Path $StageDir 'win32\MoqiIM'
-$x64Root = Join-Path $StageDir 'x64\MoqiIM'
+$win32Root = Join-Path $StageDir 'win32\TypeDuckIME'
+$x64Root = Join-Path $StageDir 'x64\TypeDuckIME'
 if (-not (Test-Path -LiteralPath $win32Root)) {
     Write-Error "Stage win32 payload not found: $win32Root"
 }
@@ -36,12 +37,12 @@ if (-not (Test-Path -LiteralPath $x64Root)) {
 }
 
 $requiredPaths = @(
-    (Join-Path $win32Root 'MoqiLauncher.exe'),
-    (Join-Path $win32Root 'SetupHelper.exe'),
-    (Join-Path $win32Root 'MoqiTextService.dll'),
+    (Join-Path $win32Root 'TypeDuckLauncher.exe'),
+    (Join-Path $win32Root 'TypeDuckSetupHelper.exe'),
+    (Join-Path $win32Root 'TypeDuckTextService.dll'),
     (Join-Path $win32Root 'backends.json'),
-    (Join-Path $win32Root 'x64\MoqiTextService.dll'),
-    (Join-Path $x64Root 'MoqiTextService.dll')
+    (Join-Path $win32Root 'x64\TypeDuckTextService.dll'),
+    (Join-Path $x64Root 'TypeDuckTextService.dll')
 )
 foreach ($path in $requiredPaths) {
     if (-not (Test-Path -LiteralPath $path)) {
@@ -57,6 +58,7 @@ if (-not (Test-Path -LiteralPath $IssPath)) {
 }
 
 $candidates = @(
+    (Join-Path $env:LOCALAPPDATA 'Programs\Inno Setup 6\ISCC.exe'),
     (Join-Path ${env:ProgramFiles(x86)} 'Inno Setup 6\ISCC.exe'),
     (Join-Path $env:ProgramFiles 'Inno Setup 6\ISCC.exe'),
     'ISCC.exe'
@@ -89,5 +91,5 @@ if ($p.ExitCode -ne 0) {
 }
 
 $dist = Join-Path $PSScriptRoot 'dist'
-Write-Host "Output: $(Join-Path $dist 'moqi-im-windows-setup.exe')"
+Write-Host "Output: $(Join-Path $dist 'typeduck-windows-ime-setup.exe')"
 exit 0

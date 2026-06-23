@@ -1,5 +1,8 @@
 project(MoqiLauncher)
 
+# Legacy scaffold source compatibility: keep the internal target/source names
+# while deploying the launcher executable under the TypeDuck product name.
+
 # generate the resource file containing version info
 configure_file("version.rc.in" "version.rc" @ONLY)
 
@@ -50,6 +53,10 @@ add_executable(MoqiLauncher WIN32
     Utils.h
     # resources
     MoqiLauncher.rc
+)
+
+set_target_properties(MoqiLauncher PROPERTIES
+    OUTPUT_NAME "TypeDuckLauncher"
 )
 
 set_source_files_properties(${MOQI_PROTO_CPP} ${MOQI_PROTO_HDR} PROPERTIES GENERATED TRUE)

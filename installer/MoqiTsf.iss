@@ -1,12 +1,13 @@
-; Moqi IM for Windows — Inno Setup 6 wizard (x64 only).
-; Build: install Inno Setup 6, then run build-installer.ps1 -StageDir <stage root>
-; AppId / IME CLSID: keep stable across releases (ARP upgrade path).
+; TypeDuck Windows IME - Inno Setup 6 wizard (x64 only).
+; Build: install Inno Setup 6, then run build-installer.ps1 -StageDir <stage root>.
+; Source filename is kept as MoqiTsf.iss during the scaffold transition.
 
-#define MyAppName "墨奇输入法"
-#define MyAppPublisher "Moqi"
-#define MyAppURL "https://github.com/gaboolic/moqi-im-windows"
-#define MyAppId "{{C7A6A2D5-16C7-4BE4-8F52-E96D6D6A9E42}"
-#define ImeClsid "{{8F204C91-2D7A-4B3E-9E1F-6A5C0D8B2E7F}}"
+#define MyAppName "TypeDuck 粵語輸入法 / TypeDuck Cantonese IME"
+#define MyAppPublisher "TypeDuck"
+#define MyAppURL "https://www.typeduck.hk/"
+#define MyAppId "{{9B52CF20-1C5D-4C74-9F5D-9E66377C8F37}"
+#define ImeClsid "{{7D92985A-BC53-47B5-A5CC-6E47F86B9D18}}"
+#define LegacyMoqiImeClsid "{{8F204C91-2D7A-4B3E-9E1F-6A5C0D8B2E7F}}"
 
 #ifndef StageDir
   #define StageDir "..\stage"
@@ -20,7 +21,7 @@ AppPublisher={#MyAppPublisher}
 AppPublisherURL={#MyAppURL}
 AppSupportURL={#MyAppURL}
 AppUpdatesURL={#MyAppURL}
-DefaultDirName={autopf32}\MoqiIM
+DefaultDirName={autopf32}\TypeDuckIME
 DisableProgramGroupPage=yes
 PrivilegesRequired=admin
 ArchitecturesAllowed=x64
@@ -29,40 +30,47 @@ CloseApplications=yes
 RestartApplications=no
 WizardStyle=modern
 OutputDir=dist
-OutputBaseFilename=moqi-im-windows-setup
+OutputBaseFilename=typeduck-windows-ime-setup
 Compression=lzma2/max
 SolidCompression=yes
 WizardSizePercent=110,100
 DisableWelcomePage=no
 
 [Languages]
-; Use the vendored translation file so packaging does not depend on local Inno Setup language packs.
-Name: "chinesesimplified"; MessagesFile: ".\Inno-Setup-Chinese-Simplified-Translation\ChineseSimplified.isl"
+Name: "english"; MessagesFile: "compiler:Default.isl"
+; Traditional Chinese Hong Kong-compatible entry without the old Simplified-only
+; vendored chrome. This Inno install may not include ChineseTraditional.isl, so
+; TypeDuck-controlled copy below remains bilingual while standard chrome falls
+; back to Inno's English resource until a vetted Traditional pack is bundled.
+Name: "chinesetraditional"; MessagesFile: "compiler:Default.isl"
 
 [Files]
-Source: "{#StageDir}\win32\MoqiIM\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "{#StageDir}\win32\TypeDuckIME\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
 
 [Icons]
-Name: "{autoprograms}\{#MyAppName}\Uninstall"; Filename: "{uninstallexe}"
-Name: "{autoprograms}\{#MyAppName}\Logs"; Filename: "{win}\explorer.exe"; Parameters: """{localappdata}\MoqiIM\Log"""
+Name: "{autoprograms}\{#MyAppName}\解除安裝 / Uninstall"; Filename: "{uninstallexe}"
 
 [Run]
-Filename: "{app}\MoqiLauncher.exe"; Flags: nowait; Check: ShouldLaunchLauncher
+Filename: "{app}\TypeDuckLauncher.exe"; Flags: nowait; Check: ShouldLaunchLauncher
 
 [Registry]
 Root: HKCU; Subkey: "Software\Microsoft\Windows\CurrentVersion\Run"; \
-  ValueType: string; ValueName: "MoqiLauncher"; \
-  ValueData: """{app}\MoqiLauncher.exe"""; \
+  ValueType: string; ValueName: "TypeDuckLauncher"; \
+  ValueData: """{app}\TypeDuckLauncher.exe"""; \
   Flags: uninsdeletevalue
 
 [InstallDelete]
-Type: filesandordirs; Name: "{app}\moqi-ime"
 Type: filesandordirs; Name: "{app}\x64"
+; Legacy Moqi migration cleanup: remove only scaffold payload folders that conflict
+; with this TypeDuck install directory during the transition.
+Type: filesandordirs; Name: "{app}\moqi-ime"
 
 [Code]
 const
   SetupHelperExitSuccess = 0;
   SetupHelperExitRestartRequired = 2;
+  TypeDuckReregisterTaskName = 'TypeDuckIME-ReRegisterTSF';
+  StartupSubkey = 'Software\Microsoft\Windows\CurrentVersion\Run';
 
 var
   HelperInstallSucceeded: Boolean;
@@ -70,33 +78,51 @@ var
   HelperUninstallNeedsRestart: Boolean;
   HadExistingInstall: Boolean;
 
+function Bilingual(const Zh: String; const En: String): String;
+begin
+  Result := Zh + #13#10 + En;
+end;
+
 function ExistingImeInstallationPresent: Boolean;
 begin
   Result :=
-    FileExists(ExpandConstant('{app}\MoqiLauncher.exe')) or
-    FileExists(ExpandConstant('{syswow64}\MoqiTextService.dll')) or
-    FileExists(ExpandConstant('{sys}\MoqiTextService.dll')) or
+    FileExists(ExpandConstant('{app}\TypeDuckLauncher.exe')) or
+    FileExists(ExpandConstant('{syswow64}\TypeDuckTextService.dll')) or
+    FileExists(ExpandConstant('{sys}\TypeDuckTextService.dll')) or
     RegKeyExists(HKEY_LOCAL_MACHINE, 'SOFTWARE\Microsoft\CTF\TIP\{#ImeClsid}') or
     RegKeyExists(HKEY_CURRENT_USER, 'Software\Microsoft\CTF\TIP\{#ImeClsid}') or
     RegKeyExists(HKEY_CLASSES_ROOT, 'CLSID\{#ImeClsid}') or
     RegKeyExists(HKEY_CURRENT_USER, 'Software\Classes\CLSID\{#ImeClsid}');
 end;
 
-procedure RegPurgeMoqiResiduals;
+procedure DeleteRegistryTreeIfPresent(const RootKey: Integer; const Subkey: String);
+begin
+  if RegKeyExists(RootKey, Subkey) then
+    RegDeleteKeyIncludingSubkeys(RootKey, Subkey);
+end;
+
+procedure RegPurgeTypeDuckResiduals;
 var
   ClsidKey: String;
   TipKey: String;
 begin
   ClsidKey := 'CLSID\{#ImeClsid}';
   TipKey := 'SOFTWARE\Microsoft\CTF\TIP\{#ImeClsid}';
-  if RegKeyExists(HKEY_CLASSES_ROOT, ClsidKey) then
-    RegDeleteKeyIncludingSubkeys(HKEY_CLASSES_ROOT, ClsidKey);
-  if RegKeyExists(HKEY_LOCAL_MACHINE, TipKey) then
-    RegDeleteKeyIncludingSubkeys(HKEY_LOCAL_MACHINE, TipKey);
-  if RegKeyExists(HKEY_CURRENT_USER, 'Software\Microsoft\CTF\TIP\{#ImeClsid}') then
-    RegDeleteKeyIncludingSubkeys(HKEY_CURRENT_USER, 'Software\Microsoft\CTF\TIP\{#ImeClsid}');
-  if RegKeyExists(HKEY_CURRENT_USER, 'Software\Classes\CLSID\{#ImeClsid}') then
-    RegDeleteKeyIncludingSubkeys(HKEY_CURRENT_USER, 'Software\Classes\CLSID\{#ImeClsid}');
+  DeleteRegistryTreeIfPresent(HKEY_CLASSES_ROOT, ClsidKey);
+  DeleteRegistryTreeIfPresent(HKEY_LOCAL_MACHINE, TipKey);
+  DeleteRegistryTreeIfPresent(HKEY_CURRENT_USER, 'Software\Microsoft\CTF\TIP\{#ImeClsid}');
+  DeleteRegistryTreeIfPresent(HKEY_CURRENT_USER, 'Software\Classes\CLSID\{#ImeClsid}');
+  RegDeleteValue(HKEY_CURRENT_USER, StartupSubkey, 'TypeDuckLauncher');
+end;
+
+procedure RegPurgeLegacyMoqiResiduals;
+begin
+  // Legacy Moqi migration cleanup: allowlist only this scaffold CLSID/TIP/startup residue.
+  DeleteRegistryTreeIfPresent(HKEY_CLASSES_ROOT, 'CLSID\{#LegacyMoqiImeClsid}');
+  DeleteRegistryTreeIfPresent(HKEY_LOCAL_MACHINE, 'SOFTWARE\Microsoft\CTF\TIP\{#LegacyMoqiImeClsid}');
+  DeleteRegistryTreeIfPresent(HKEY_CURRENT_USER, 'Software\Microsoft\CTF\TIP\{#LegacyMoqiImeClsid}');
+  DeleteRegistryTreeIfPresent(HKEY_CURRENT_USER, 'Software\Classes\CLSID\{#LegacyMoqiImeClsid}');
+  RegDeleteValue(HKEY_CURRENT_USER, StartupSubkey, 'MoqiLauncher');
 end;
 
 procedure TryKillProcessImage(const ImageName: String);
@@ -107,23 +133,34 @@ begin
     '', SW_HIDE, ewWaitUntilTerminated, R);
 end;
 
-procedure StopMoqiProcesses;
+procedure StopTypeDuckProcesses;
 begin
-  TryKillProcessImage('MoqiLauncher.exe');
+  TryKillProcessImage('TypeDuckLauncher.exe');
 end;
 
-function GetSetupHelperPath: string;
+procedure DeleteTypeDuckReregisterTask;
+var
+  R: Integer;
 begin
-  Result := ExpandConstant('{app}\SetupHelper.exe');
+  Exec(ExpandConstant('{sys}\schtasks.exe'),
+    '/Delete /TN "' + TypeDuckReregisterTaskName + '" /F',
+    '', SW_HIDE, ewWaitUntilTerminated, R);
+end;
+
+function GetSetupHelperPath: String;
+begin
+  Result := ExpandConstant('{app}\TypeDuckSetupHelper.exe');
 end;
 
 procedure EnsureSetupHelperExists;
 begin
   if not FileExists(GetSetupHelperPath) then
-    RaiseException('SetupHelper.exe not found: ' + GetSetupHelperPath);
+    RaiseException(Bilingual(
+      '找不到 TypeDuck 安裝工具: ' + GetSetupHelperPath,
+      'TypeDuck setup helper not found: ' + GetSetupHelperPath));
 end;
 
-function RunSetupHelper(const Parameters: string; var ResultCode: Integer): Boolean;
+function RunSetupHelper(const Parameters: String; var ResultCode: Integer): Boolean;
 begin
   EnsureSetupHelperExists;
   Result := Exec(GetSetupHelperPath, Parameters, ExpandConstant('{app}'),
@@ -132,7 +169,7 @@ begin
     ResultCode := -1;
 end;
 
-function BuildInstallSetupHelperParameters(const Action: string): string;
+function BuildInstallSetupHelperParameters(const Action: String): String;
 begin
   Result := Action;
   if WizardSilent() then
@@ -140,7 +177,7 @@ begin
   Result := Result + ' --appdir "' + ExpandConstant('{app}') + '"';
 end;
 
-function BuildUninstallSetupHelperParameters(const Action: string): string;
+function BuildUninstallSetupHelperParameters(const Action: String): String;
 begin
   Result := Action;
   if UninstallSilent() then
@@ -148,9 +185,11 @@ begin
   Result := Result + ' --appdir "' + ExpandConstant('{app}') + '"';
 end;
 
-procedure HandleSetupHelperResult(const Operation: string; const ResultCode: Integer);
+procedure HandleSetupHelperResult(const Operation: String; const ResultCode: Integer);
 begin
-  RaiseException(Operation + ' failed (exit code ' + IntToStr(ResultCode) + ').');
+  RaiseException(Bilingual(
+    Operation + ' 失敗，結束碼: ' + IntToStr(ResultCode),
+    Operation + ' failed (exit code ' + IntToStr(ResultCode) + ').'));
 end;
 
 procedure CurStepChanged(CurStep: TSetupStep);
@@ -160,20 +199,23 @@ begin
   if CurStep = ssInstall then
   begin
     HadExistingInstall := ExistingImeInstallationPresent;
-    StopMoqiProcesses;
+    StopTypeDuckProcesses;
+    DeleteTypeDuckReregisterTask;
   end;
 
   if CurStep = ssPostInstall then
   begin
     if not RunSetupHelper(BuildInstallSetupHelperParameters('/i'), ResultCode) then
-      HandleSetupHelperResult('SetupHelper install', ResultCode);
+      HandleSetupHelperResult('TypeDuck setup-helper install / TypeDuck 安裝工具安裝', ResultCode);
 
     if ResultCode = SetupHelperExitSuccess then
     begin
       HelperInstallSucceeded := True;
       if HadExistingInstall then
         SuppressibleMsgBox(
-          '检测到这是一次覆盖安装。若当前会话里仍有旧的 TSF 实例，墨奇可能要在注销或重启 Windows 后才能立即恢复正常输入。',
+          Bilingual(
+            '偵測到覆蓋安裝。如果目前 Windows 工作階段仍有舊 TSF 實例，TypeDuck 可能需要登出或重啟 Windows 後才會即時恢復正常輸入。',
+            'An existing install was detected. If the current Windows session still has an old TSF instance loaded, TypeDuck may need sign-out or Windows restart before input resumes immediately.'),
           mbInformation, MB_OK, IDOK);
     end
     else if ResultCode = SetupHelperExitRestartRequired then
@@ -181,13 +223,14 @@ begin
       HelperInstallSucceeded := True;
       HelperInstallNeedsRestart := True;
       SuppressibleMsgBox(
-        '安装程序已更新应用文件，但 TSF DLL 当前仍被系统占用。' + #13#10#13#10 +
-        '请在安装完成后尽快重启 Windows。安装器已安排在系统重启后自动完成 TSF 注册。',
+        Bilingual(
+          '安裝器已更新 TypeDuck 應用程式檔案，但 TSF DLL 仍被 Windows 使用。請在安裝完成後盡快重啟 Windows；系統重啟後會自動完成 TSF 註冊。',
+          'The installer updated TypeDuck application files, but the TSF DLL is still in use by Windows. Please restart Windows after setup; TSF registration will finish automatically after reboot.'),
         mbInformation, MB_OK, IDOK);
     end;
     if (ResultCode <> SetupHelperExitSuccess) and
        (ResultCode <> SetupHelperExitRestartRequired) then
-      HandleSetupHelperResult('SetupHelper install', ResultCode);
+      HandleSetupHelperResult('TypeDuck setup-helper install / TypeDuck 安裝工具安裝', ResultCode);
   end;
 end;
 
@@ -207,20 +250,24 @@ var
 begin
   if CurUninstallStep = usUninstall then
   begin
-    StopMoqiProcesses;
+    StopTypeDuckProcesses;
+    DeleteTypeDuckReregisterTask;
     if not RunSetupHelper(BuildUninstallSetupHelperParameters('/u'), ResultCode) then
-      HandleSetupHelperResult('SetupHelper uninstall', ResultCode);
+      HandleSetupHelperResult('TypeDuck setup-helper uninstall / TypeDuck 安裝工具解除安裝', ResultCode);
     if ResultCode = SetupHelperExitRestartRequired then
       HelperUninstallNeedsRestart := True
     else if ResultCode <> SetupHelperExitSuccess then
-      HandleSetupHelperResult('SetupHelper uninstall', ResultCode);
+      HandleSetupHelperResult('TypeDuck setup-helper uninstall / TypeDuck 安裝工具解除安裝', ResultCode);
   end;
   if CurUninstallStep = usPostUninstall then
   begin
-    RegPurgeMoqiResiduals;
+    RegPurgeTypeDuckResiduals;
+    RegPurgeLegacyMoqiResiduals;
     if HelperUninstallNeedsRestart then
       SuppressibleMsgBox(
-        '部分 TSF DLL 已安排在系统重启后删除。请尽快重启 Windows，以完成卸载清理。',
+        Bilingual(
+          '部分 TypeDuck TSF DLL 已安排在 Windows 重啟後刪除。請盡快重啟 Windows，以完成解除安裝清理。',
+          'Some TypeDuck TSF DLL files were scheduled for deletion after Windows restarts. Please restart Windows soon to finish uninstall cleanup.'),
         mbInformation, MB_OK, IDOK);
   end;
 end;

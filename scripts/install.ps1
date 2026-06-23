@@ -1,14 +1,14 @@
 #Requires -Version 5.1
 <#
 .SYNOPSIS
-  Stage Moqi IM for Windows binaries and invoke the installer builder.
+  Stage TypeDuck Windows IME binaries and invoke the installer builder.
 
   Does not install files into Program Files directly. Instead it prepares an
   installer stage tree and calls installer\build-installer.ps1 to produce the
   setup executable.
 
 .PARAMETER RepoRoot
-  Root of moqi-im-windows (defaults to the parent directory of this script).
+  Root of the TypeDuck Windows IME scaffold checkout (defaults to the parent directory of this script).
 
 .PARAMETER Win32BuildDir
   CMake Win32 build directory (default: RepoRoot\build-vs32).
@@ -17,13 +17,13 @@
   CMake x64 build directory (default: RepoRoot\build-vs64).
 
 .PARAMETER MoqiImeSource
-  Path to the moqi-ime runtime tree to copy as backend.
+  Legacy Moqi scaffold compatibility: path to the transitional moqi-ime runtime tree to copy as backend.
   Default detection order:
     1. sibling ..\moqi-ime\scripts\build\moqi-ime
     2. sibling ..\moqi-ime
 
 .PARAMETER SkipMoqiImeCopy
-  If set, do not include the backend tree in the staged installer payload.
+  If set, do not include the transitional backend tree in the staged installer payload.
 
 .PARAMETER StageDir
   Installer staging directory (default: RepoRoot\installer\stage).
@@ -162,8 +162,8 @@ $X64BuildDir = [System.IO.Path]::GetFullPath($X64BuildDir)
 $StageDir = [System.IO.Path]::GetFullPath($StageDir)
 $IssPath = [System.IO.Path]::GetFullPath($IssPath)
 
-$stageWin32Root = Join-Path $StageDir "win32\MoqiIM"
-$stageX64Root = Join-Path $StageDir "x64\MoqiIM"
+$stageWin32Root = Join-Path $StageDir "win32\TypeDuckIME"
+$stageX64Root = Join-Path $StageDir "x64\TypeDuckIME"
 $stageWin32X64Root = Join-Path $stageWin32Root "x64"
 New-CleanDirectory -Path $StageDir
 New-Item -ItemType Directory -Path $stageWin32Root -Force | Out-Null
@@ -176,34 +176,34 @@ if (-not (Test-Path -LiteralPath $backends)) {
 }
 Copy-Item -LiteralPath $backends -Destination (Join-Path $stageWin32Root "backends.json") -Force
 
-$launcher = Resolve-ArtifactPath -Label "MoqiLauncher.exe" -Candidates @(
-    (Join-Path $Win32BuildDir "MoqiLauncher.exe"),
-    (Join-Path $Win32BuildDir "Release\MoqiLauncher.exe"),
-    (Join-Path $Win32BuildDir "MoqLauncher\Release\MoqiLauncher.exe")
+$launcher = Resolve-ArtifactPath -Label "TypeDuckLauncher.exe" -Candidates @(
+    (Join-Path $Win32BuildDir "TypeDuckLauncher.exe"),
+    (Join-Path $Win32BuildDir "Release\TypeDuckLauncher.exe"),
+    (Join-Path $Win32BuildDir "MoqLauncher\Release\TypeDuckLauncher.exe")
 )
-Copy-IfExists -Source $launcher -Destination (Join-Path $stageWin32Root "MoqiLauncher.exe")
+Copy-IfExists -Source $launcher -Destination (Join-Path $stageWin32Root "TypeDuckLauncher.exe")
 
-$setupHelper = Resolve-ArtifactPath -Label "SetupHelper.exe" -Candidates @(
-    (Join-Path $Win32BuildDir "SetupHelper.exe"),
-    (Join-Path $Win32BuildDir "Release\SetupHelper.exe"),
-    (Join-Path $Win32BuildDir "SetupHelper\Release\SetupHelper.exe")
+$setupHelper = Resolve-ArtifactPath -Label "TypeDuckSetupHelper.exe" -Candidates @(
+    (Join-Path $Win32BuildDir "TypeDuckSetupHelper.exe"),
+    (Join-Path $Win32BuildDir "Release\TypeDuckSetupHelper.exe"),
+    (Join-Path $Win32BuildDir "SetupHelper\Release\TypeDuckSetupHelper.exe")
 )
-Copy-IfExists -Source $setupHelper -Destination (Join-Path $stageWin32Root "SetupHelper.exe")
+Copy-IfExists -Source $setupHelper -Destination (Join-Path $stageWin32Root "TypeDuckSetupHelper.exe")
 
-$dll32 = Resolve-ArtifactPath -Label "Win32 MoqiTextService.dll" -Candidates @(
-    (Join-Path $Win32BuildDir "MoqiTextService.dll"),
-    (Join-Path $Win32BuildDir "Release\MoqiTextService.dll"),
-    (Join-Path $Win32BuildDir "MoqiTextService\Release\MoqiTextService.dll")
+$dll32 = Resolve-ArtifactPath -Label "Win32 TypeDuckTextService.dll" -Candidates @(
+    (Join-Path $Win32BuildDir "TypeDuckTextService.dll"),
+    (Join-Path $Win32BuildDir "Release\TypeDuckTextService.dll"),
+    (Join-Path $Win32BuildDir "MoqiTextService\Release\TypeDuckTextService.dll")
 )
-Copy-IfExists -Source $dll32 -Destination (Join-Path $stageWin32Root "MoqiTextService.dll")
+Copy-IfExists -Source $dll32 -Destination (Join-Path $stageWin32Root "TypeDuckTextService.dll")
 
-$dll64 = Resolve-ArtifactPath -Label "x64 MoqiTextService.dll" -Candidates @(
-    (Join-Path $X64BuildDir "MoqiTextService.dll"),
-    (Join-Path $X64BuildDir "Release\MoqiTextService.dll"),
-    (Join-Path $X64BuildDir "MoqiTextService\Release\MoqiTextService.dll")
+$dll64 = Resolve-ArtifactPath -Label "x64 TypeDuckTextService.dll" -Candidates @(
+    (Join-Path $X64BuildDir "TypeDuckTextService.dll"),
+    (Join-Path $X64BuildDir "Release\TypeDuckTextService.dll"),
+    (Join-Path $X64BuildDir "MoqiTextService\Release\TypeDuckTextService.dll")
 )
-Copy-IfExists -Source $dll64 -Destination (Join-Path $stageX64Root "MoqiTextService.dll")
-Copy-IfExists -Source $dll64 -Destination (Join-Path $stageWin32X64Root "MoqiTextService.dll")
+Copy-IfExists -Source $dll64 -Destination (Join-Path $stageX64Root "TypeDuckTextService.dll")
+Copy-IfExists -Source $dll64 -Destination (Join-Path $stageWin32X64Root "TypeDuckTextService.dll")
 
 if (-not $SkipMoqiImeCopy) {
     if (-not (Test-Path -LiteralPath $MoqiImeSource)) {
@@ -213,7 +213,7 @@ if (-not $SkipMoqiImeCopy) {
     Copy-MoqiImeRuntime -SourceRoot $MoqiImeSource -DestinationRoot $imeDest
 }
 else {
-    Write-Warning "Skipped copying moqi-ime backend; ensure the final installer payload is sufficient for your deployment."
+    Write-Warning "Skipped copying transitional moqi-ime backend; ensure the final TypeDuck installer payload is sufficient for registration testing."
 }
 
 $installerScript = Join-Path $RepoRoot "installer\build-installer.ps1"

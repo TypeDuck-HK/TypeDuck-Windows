@@ -20,20 +20,20 @@ VS_VERSION_INFO VERSIONINFO
 BEGIN
     BLOCK "StringFileInfo"
     BEGIN
-        BLOCK "080404b0"
+        BLOCK "0c0404b0"
         BEGIN
-            VALUE "CompanyName", "Moqi"
-            VALUE "FileDescription", "墨奇输入法"
+            VALUE "CompanyName", "TypeDuck"
+            VALUE "FileDescription", "TypeDuck 粵語輸入法 / TypeDuck Cantonese IME"
             VALUE "FileVersion", "@MOQI_VERSION_MAJOR@.@MOQI_VERSION_MINOR@.@MOQI_VERSION_PATCH@"
-            VALUE "InternalName", "MoqiLauncher.exe"
-            VALUE "LegalCopyright", "Copyright (C) 2013-2016 Moqi developers"
-            VALUE "OriginalFilename", "MoqiLauncher.exe"
-            VALUE "ProductName", "墨奇输入法"
+            VALUE "InternalName", "TypeDuckLauncher.exe"
+            VALUE "LegalCopyright", "Copyright (C) TypeDuck"
+            VALUE "OriginalFilename", "TypeDuckLauncher.exe"
+            VALUE "ProductName", "TypeDuck 粵語輸入法 / TypeDuck Cantonese IME"
             VALUE "ProductVersion", "@MOQI_VERSION_MAJOR@.@MOQI_VERSION_MINOR@.@MOQI_VERSION_PATCH@"
         END
     END
     BLOCK "VarFileInfo"
     BEGIN
-        VALUE "Translation", 0x804, 1200
+        VALUE "Translation", 0xC04, 1200
     END
 END
