@@ -2,13 +2,13 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-current_phase: 3
-current_phase_name: zh-HK TSF Registration and Installer Skeleton
-status: executing
-stopped_at: Completed 03-03-PLAN.md
-last_updated: "2026-06-23T17:00:21.606Z"
-last_activity: 2026-06-24
-last_activity_desc: Phase 3 Plan 03-03 VM installer verification completed
+current_phase: 4
+current_phase_name: TypeDuck Protocol and Typing MVP
+status: planning
+stopped_at: Phase 3 complete, ready to plan Phase 4
+last_updated: "2026-06-23T17:33:32.469Z"
+last_activity: 2026-06-23
+last_activity_desc: Phase 3 complete, transitioned to Phase 4
 progress:
   total_phases: 7
   completed_phases: 3
@@ -24,14 +24,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-06-23)
 
 **Core value:** Hong Kong users can install TypeDuck under Chinese (Traditional, Hong Kong) and type Cantonese with the same trusted behavior, bilingual settings, candidate details, and dictionary-like lookup experience as TypeDuck Web alpha.
-**Current focus:** Phase 3: zh-HK TSF Registration and Installer Skeleton
+**Current focus:** Phase 4: TypeDuck Protocol and Typing MVP
 
 ## Current Position
 
-Phase: 3 of 7 (zh-HK TSF Registration and Installer Skeleton)
-Plan: 3 of 3 executed; Phase 3 complete
-Status: Phase 3 complete; ready for Phase 4 planning
-Last activity: 2026-06-24 — Phase 3 Plan 03-03 VM installer verification completed
+Phase: 4 of 7 (TypeDuck Protocol and Typing MVP)
+Plan: Not started
+Status: Ready to plan Phase 4
+Last activity: 2026-06-23 — Phase 3 complete, transitioned to Phase 4
 
 Progress: [██████████] 100%
 
@@ -39,7 +39,7 @@ Progress: [██████████] 100%
 
 **Velocity:**
 
-- Total plans completed: 9
+- Total plans completed: 12
 - Average duration: 20 min
 - Total execution time: 1.7 hours
 
@@ -49,11 +49,12 @@ Progress: [██████████] 100%
 |-------|-------|-------|----------|
 | 01 | 2 | 22 min | 11 min |
 | 02 | 3 | - | - |
+| 3 | 3 | - | - |
 
 **Recent Trend:**
 
 - Last 5 plans: P01 5 min, P02 17 min, P03 10 min, P04 55 min, P05 13 min
-- Trend: Phase 2 engine runtime staging, adapter typing proof, and dictionary lookup payload proof are complete; zh-HK installer/TSF registration is next.
+- Trend: Phase 3 zh-HK installer/TSF registration is complete; Phase 4 protocol and typing MVP is next.
 
 *Updated after each plan completion*
 | Phase 01 P01 | 5 min | 2 tasks | 2 files |
@@ -98,6 +99,7 @@ Recent decisions affecting current work:
 - [Phase 03]: Plan 03-03 accepts VM registry/file/task evidence as automated zh-HK registration proof; the guest language list remained en-US, so a Settings screenshot remains optional product-review evidence.
 - [Phase 03]: Installer cleanup uses code-safe GUID constants in Pascal registry paths while retaining escaped GUID constants for Inno identity fields.
 - [Phase 03]: The VM verification harness never runs the installer on the host; install and uninstall actions run only through PowerShell Direct inside the named Hyper-V VM.
+
 ### Pending Todos
 
 None yet.
@@ -110,11 +112,11 @@ None yet.
 
 | Category | Item | Status | Deferred At |
 |----------|------|--------|-------------|
-| *(none)* | | | |
+| Installer localization | Installer language picker showed duplicate English entries; decide whether to bundle/vet Traditional Chinese Inno language resources or keep product-controlled bilingual strings only. | Deferred to installer/UI polish | Phase 3 UAT |
+| Installer shortcuts | Start Menu folder creation still warns on the bilingual path with a slash; correct shortcut folder naming in a later installer phase. | Deferred to installer/UI polish | Phase 3 UAT |
 
 ## Session Continuity
 
-Last session: 2026-06-23T17:00:21.378Z
-Stopped at: Completed 03-03-PLAN.md
+Last session: 2026-06-23T17:34:04.104Z
+Stopped at: Phase 3 complete, ready to plan Phase 4
 Resume file: None
-
