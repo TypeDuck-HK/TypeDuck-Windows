@@ -1,0 +1,106 @@
+{
+  "schema": "typeduck.phase04.protocol-contract",
+  "version": 1,
+  "phase": "04-typeduck-protocol-and-typing-mvp",
+  "requirements_covered": [
+    "PROTO-01",
+    "PROTO-02",
+    "PROTO-03",
+    "PROTO-04",
+    "PROTO-05",
+    "PROTO-06"
+  ],
+  "decisions_cited": [
+    "D-01",
+    "D-02",
+    "D-03",
+    "D-05",
+    "D-06",
+    "D-07",
+    "D-08",
+    "D-13",
+    "D-14",
+    "D-16"
+  ],
+  "transport": {
+    "boundary": "TSF client -> launcher named pipe -> backend stdio",
+    "protobuf_package": "moqi.protocol",
+    "compatibility_bridge": "Existing framed protobuf transport remains; TypeDuck semantics are explicit fields/messages.",
+    "max_client_frame_payload_bytes": null,
+    "max_backend_frame_payload_bytes": null
+  },
+  "phase_boundary": {
+    "raw_lookup_comments": "preserve byte-exact raw lookup-filter payloads",
+    "dictionary_ui_parsing": "deferred to Phase 5"
+  },
+  "cases": [
+    {
+      "id": "common-cantonese-input",
+      "requirement": "PROTO-06",
+      "decisions": ["D-01", "D-02", "D-03"],
+      "input": "nei",
+      "expected": {
+        "composition": "nei",
+        "candidate_text": "你",
+        "candidate_cursor": 0,
+        "page": {
+          "page_index": 0,
+          "page_size": 10,
+          "has_next": true,
+          "has_previous": false
+        }
+      }
+    },
+    {
+      "id": "raw-lookup-payload",
+      "requirement": "PROTO-04",
+      "decisions": ["D-05", "D-06", "D-07", "D-08"],
+      "candidate": {
+        "id": "nei-1",
+        "text": "你",
+        "input_code": "nei",
+        "jyutping": "nei5",
+        "comment": "\u000breverse\u000c\rmatch_input_buffer,honzi,jyutping,canonical_honzi,canonical_jyutping,components_honzi,components_jyutping,pron_label,lit_col_reading,pos,register,label,written_form,vernacular_form,collocation,eng,hin,urd,nep,ind\rnei,你,nei5,你,nei5,,,,,pronoun,,,,,,you (singular),,,,kamu",
+        "raw_lookup_comment": "\u000breverse\u000c\rmatch_input_buffer,honzi,jyutping,canonical_honzi,canonical_jyutping,components_honzi,components_jyutping,pron_label,lit_col_reading,pos,register,label,written_form,vernacular_form,collocation,eng,hin,urd,nep,ind\rnei,你,nei5,你,nei5,,,,,pronoun,,,,,,you (singular),,,,kamu"
+      }
+    },
+    {
+      "id": "reverse-lookup-marker",
+      "requirement": "PROTO-06",
+      "decisions": ["D-07", "D-08"],
+      "candidate": {
+        "id": "reverse-1",
+        "text": "好",
+        "raw_lookup_comment": "\u000breverse-marker\u000c\rhousam,好,hou2"
+      }
+    },
+    {
+      "id": "malformed-frame",
+      "requirement": "PROTO-02",
+      "decisions": ["D-13"],
+      "frame": {
+        "declared_payload_bytes": 4,
+        "payload_hex": "08ffffff",
+        "expected_error": "MalformedPayload"
+      }
+    },
+    {
+      "id": "backend-timeout",
+      "requirement": "PROTO-05",
+      "decisions": ["D-14", "D-16"],
+      "expected": {
+        "health": "DEGRADED",
+        "error_code": "BACKEND_TIMEOUT"
+      }
+    },
+    {
+      "id": "backend-restart",
+      "requirement": "PROTO-06",
+      "decisions": ["D-14", "D-16"],
+      "expected": {
+        "health": "RESTARTING",
+        "recoverable": true
+      }
+    }
+  ]
+}
