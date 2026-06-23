@@ -243,7 +243,7 @@
 
 **Dictionary lookup filter UX is not modeled in the protocol or UI:**
 - Problem: Current protocol has candidate text/comment fields and generic menu/buttons but no explicit dictionary lookup filter lifecycle, metadata, or interaction contract.
-- Blocks: TypeDuck dictionary lookup plugin behavior can only be squeezed into generic comments or menus, making parity and testing fragile.
+- Blocks: The documented lookup-filter CSV payload has no first-class parser/view-model path, making parity and testing fragile.
 
 ## Test Coverage Gaps
 

@@ -32,6 +32,7 @@ Hong Kong users can install TypeDuck under Chinese (Traditional, Hong Kong) and 
 
 - [ ] Integrate the Phase 2 TypeDuck-HK runtime proof into the Windows installer/runtime path.
 - [ ] Map Phase 2 lookup-filter raw payload evidence into TypeDuck protocol and native candidate/dictionary UI fields.
+- [ ] Remove transitional product reliance on backend `ime.json`; TypeDuck-owned code/config must ultimately own profile identity, settings entry points, and runtime capability contracts.
 - [ ] Replace Moqi product identity with TypeDuck identity across binaries, resources, installer, registry/profile metadata, data/log paths, and release artifacts.
 - [ ] Install/register the IME under Chinese (Traditional, Hong Kong), not Chinese (Simplified).
 - [ ] Mirror TypeDuck Web alpha settings in a native Windows settings dialog, with the language picker as the first priority.
@@ -86,6 +87,7 @@ Hong Kong users can install TypeDuck under Chinese (Traditional, Hong Kong) and 
 | Use moqi-ime only as an internal TypeDuck runtime proof adapter | Phase 2 proved TypeDuck-HK librime and lookup-filter behavior through the existing process boundary while keeping Moqi/fcitx/cloud/AI surfaces banned from product truth. | Accepted in Phase 2 |
 | Preserve raw lookup-filter payloads before designing final protocol/UI fields | Phase 2 captured the exact CSV columns and control-separator semantics so Phase 4/5 can map data without guessing. | Accepted in Phase 2 |
 | Run project PowerShell scripts with `pwsh` | PowerShell 7+ avoids character-encoding failures observed with Cantonese/Traditional Chinese literals and proof artifacts; future plans and verification commands should prefer `pwsh -NoProfile -ExecutionPolicy Bypass -File ...`. | Accepted after Phase 2 UAT |
+| Remove `ime.json` as product authority after transition | It can help bridge the Moqi scaffold, but the final TypeDuck product must not depend on backend JSON for Windows profile identity, settings entry points, or capability contracts. | Accepted before Phase 3 planning |
 
 ## Evolution
 

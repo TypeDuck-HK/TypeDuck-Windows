@@ -199,7 +199,7 @@ These notes are future consumer constraints only. They are not production change
 
 | Area | Current Windows Scaffold Limitation | Future Mapping Note |
 |------|-------------------------------------|---------------------|
-| Candidate data model | `proto/moqi.proto` has `CandidateEntry { text, comment }` and a flattened repeated candidate list shape | Phase 4/5 need structured candidate and dictionary fields rather than one comment string |
+| Candidate data model | `proto/moqi.proto` has `CandidateEntry { text, comment }` and a flattened repeated candidate list shape | Phase 4/5 need to preserve and parse the documented lookup-filter CSV payload into structured candidate and dictionary fields |
 | Native candidate visual tone | `MoqiTextService/MoqiCandidateWindow.cpp` currently uses white background, gray border, blue selected background, and Moqi log path text | Phase 5 should consume this fixture before restyling native candidate UI |
 | Preview utility | `Preview/main.cpp` uses Moqi preview title, Simplified sample candidates, and blue highlight | Preview can be useful later, but it is not Web alpha parity today |
 | Dictionary detail | Current native candidate window has no source-backed dictionary panel equivalent | Phase 5 needs a native dictionary panel surface or an explicitly accepted alternative |

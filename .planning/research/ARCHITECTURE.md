@@ -49,7 +49,7 @@ TypeDuckEngine.exe
 | TypeDuck engine client protocol | Stable boundary between TSF host and engine. Must be narrow, bounded, and versioned. | Reuse framed protobuf and named-pipe connection pattern in `proto/ProtoFraming.h`, `MoqiTextService/MoqiClient.cpp:1505`, and `MoqLauncher/BackendServer.cpp:292`. | Replace `moqi.protocol` with `typeduck.protocol.v1`; add dictionary lookup, candidate metadata, settings, capabilities, and protocol version fields. Remove cloud clipboard and generic Moqi UI customization. |
 | Launcher | Per-user process that isolates engine lifetime and avoids loading engine dependencies into every host app. | Keep `MoqLauncher/PipeServer.cpp` named pipe server, backend mapping, single-user pipe naming, and process supervision shape. | Rename namespaces, pipe path, mutex, data/log directories. Remove cloud clipboard listener in `MoqLauncher/PipeServer.cpp:678` and tray notifications unless product-required. |
 | TypeDuck engine host | Owns librime, schema deployment, dictionary lookup plugin, and user data. | Keep the backend process launch model in `MoqLauncher/BackendServer.cpp:171` and staged runtime payload shape in `scripts/install.ps1:165`. | New executable/package that embeds TypeDuck-HK librime and `rime-dictionary-lookup-filter`, exposes TypeDuck protocol, and persists settings in TypeDuck paths. |
-| Candidate and dictionary UI | Presents TypeDuck Web alpha candidate list and dictionary panel in native Win32/TSF-compatible UI. | Use `MoqiTextService/MoqiCandidateWindow.cpp` only as window ownership/TSF UI element scaffold. It currently has flat `text/comment` candidates and a 10-item TSF count cap in `MoqiTextService/MoqiCandidateWindow.cpp:319`. | Introduce `CandidateViewModel`, `DictionaryLookupViewModel`, and renderer code that supports Chinese text, Jyutping, part of speech, multilingual meanings, and "More Languages" sections. |
+| Candidate and dictionary UI | Presents TypeDuck Web alpha candidate list and dictionary panel in native Win32/TSF-compatible UI. | Use `MoqiTextService/MoqiCandidateWindow.cpp` only as window ownership/TSF UI element scaffold. It currently treats candidate metadata as opaque display data and has a 10-item TSF count cap in `MoqiTextService/MoqiCandidateWindow.cpp:319`. | Introduce `CandidateViewModel`, `DictionaryLookupViewModel`, and renderer code that parses the documented lookup-filter CSV payload into Chinese text, Jyutping, part of speech, multilingual meanings, and "More Languages" sections. |
 | Settings and about UI | Native dialog matching Web alpha settings and bilingual text. Must be callable during install and from IME configuration. | Current `MoqiTextService/MoqiImeModule.cpp:145` launches arbitrary backend `configTool` from `ime.json`. | Replace with first-party `TypeDuckSettings.exe` or dialog DLL entry, backed by a stable settings file and engine apply/redeploy command. Add About dialog and installer launch step. |
 | Installer and registration | Installs both TSF bitnesses, registers COM/TSF profile, stages runtime assets, launches settings. | Keep `SetupHelper/SetupHelper.cpp` dual-bitness copy/register mechanics and Inno + PowerShell staging. | Replace `installer/MoqiTsf.iss` Moqi identity, Simplified Chinese language file, `{autopf32}\MoqiIM`, `MoqiLauncher.exe`, and `MoqiTextService.dll` paths. Ensure zh-HK profile registration is deterministic. |
 
@@ -84,7 +84,7 @@ Replace `proto/moqi.proto` with a TypeDuck protocol or introduce `proto/typeduck
 | Area | Current Shape | Required TypeDuck Shape |
 |------|---------------|-------------------------|
 | Candidate list | `candidate_list` strings plus `CandidateEntry{text, comment}` in `proto/moqi.proto:73` and `proto/moqi.proto:158`. | `Candidate` with stable id, display text, input code, Jyutping, prompt/comment, source schema, quality flags, selection key, and optional lookup reference. |
-| Dictionary panel | Not modeled. Data can only be squeezed into `comment`. | `DictionaryLookup` payload with headword, jyutping readings, part-of-speech labels, English meaning, enabled-language meanings, notes, examples if available, and source/collation order from `rime-dictionary-lookup-filter`. |
+| Dictionary panel | Not modeled in the scaffold. Lookup-filter data arrives as documented CSV payload text that the current UI treats as an opaque payload field. | Parse and preserve the lookup-filter payload fields: headword, jyutping readings, part-of-speech labels, English meaning, enabled-language meanings, notes, and source/collation order from `rime-dictionary-lookup-filter`. |
 | Settings | Generic `CustomizeUi` colors/fonts plus legacy behavior toggles in `proto/moqi.proto:81`. | `SettingsSnapshot` matching Web alpha: display languages, candidate Jyutping, completion, correction, sentence/composition, learning, reverse lookup, full input code, Cangjie 5, Chinese typeface, page size. |
 | Settings mutation | Backend config tool launched from `ime.json` in `MoqiTextService/MoqiImeModule.cpp:145`. | `GetSettings`, `SetSettings`, `ApplySettings`, `DeploySchema`, and `RestartEngine` messages. Settings UI writes through TypeDuck settings service or engine RPC, not arbitrary JSON command launch. |
 | Feature discovery | Implicit by backend behavior. | `Capabilities` response on init: dictionary lookup available, plugin version, schema list, enabled languages, maximum page size, reverse lookup support. |
@@ -113,14 +113,13 @@ Settings change
 
 ## Dictionary Lookup Data Flow
 
-The dictionary lookup filter should be an engine-side enrichment step, not UI-side parsing of candidate comments.
+The dictionary lookup filter is the source of TypeDuck dictionary enrichment. Its documented CSV payload should be preserved across the engine/frontend boundary and parsed into renderer-neutral view data before display.
 
 1. `TypeDuckEngine.exe` receives a key event and passes it to the TypeDuck-HK librime session.
-2. Librime returns composition, page candidates, and candidate metadata.
-3. `rime-dictionary-lookup-filter` adds lookup records for the active candidate or page candidates.
-4. The engine converts Rime/plugin data into `Candidate` and `DictionaryLookup` protobuf messages.
-5. `TypeDuckTextService.dll` converts protobuf to a native `CandidatePanelViewModel`.
-6. `TypeDuckCandidateWindow` renders compact candidates and an optional dictionary panel with Web-alpha-equivalent fields.
+2. Librime returns composition, page candidates, and lookup-filter CSV payloads for candidates where dictionary data is available.
+3. The protocol/client layer preserves that payload and parses the documented columns and separators from `.planning/product/TYPEDUCK-LOOKUP-FILTER-RAW-CONTRACT.md`.
+4. `TypeDuckTextService.dll` maps parsed fields to a native `CandidatePanelViewModel`.
+5. `TypeDuckCandidateWindow` renders compact candidates and an optional dictionary panel with Web-alpha-equivalent fields.
 
 Do not let the Win32 renderer parse display strings such as `候選 詞性 meaning`. That makes localization and Web parity fragile. The renderer should receive already-separated fields and focus on layout, keyboard interaction, accessibility/TSF UI element reporting, and host-window positioning.
 
@@ -242,7 +241,7 @@ scripts/
 3. **Protocol v1 and dictionary lookup payload**
    - Add `typeduck.proto`, version handshake, frame caps, candidate metadata, dictionary lookup messages, and settings messages.
    - Migrate `MoqiTextService/MoqiClient.cpp` response handling into `TypeDuckProtocolAdapter`.
-   - Risk avoided: flattening dictionary records into candidate comments and blocking Web parity.
+   - Risk avoided: treating lookup-filter CSV payloads as opaque display strings and blocking Web parity.
 
 4. **Candidate and dictionary UI parity**
    - Build native view model and renderer around Web alpha structures: candidate, Jyutping, translations, part-of-speech, "More Languages".
@@ -279,12 +278,6 @@ scripts/
 **Why it is wrong:** TypeDuck must always install under Chinese (Traditional, Hong Kong). A missing engine payload should not silently unregister or misregister the Windows profile.
 **Do this instead:** Put TypeDuck profile constants in first-party Windows code and use engine metadata only for schemas/runtime capabilities.
 
-### Dictionary Data in Candidate Comments
-
-**What people do:** Store Jyutping, translation, part-of-speech, and multilingual meanings in one `comment` string.
-**Why it is wrong:** It cannot support the Web alpha dictionary panel cleanly, makes bilingual UI brittle, and blocks accessibility/testing.
-**Do this instead:** Use structured `DictionaryLookup` messages and renderer-neutral view models.
-
 ### In-Process Engine First
 
 **What people do:** Load librime and plugins directly inside the TSF DLL to avoid IPC.
@@ -318,7 +311,7 @@ scripts/
 
 - Start with registration/identity because engine and UI work are not useful if Windows installs the TIP under the wrong language or with Moqi identity.
 - Keep the launcher boundary through MVP. It is the least risky way to integrate the older TypeDuck-HK librime fork and plugin without destabilizing host apps.
-- Protocol work must precede dictionary UI. The UI cannot be made Web-alpha-equivalent if the engine only sends text/comment pairs.
+- Protocol work must precede dictionary UI. The UI cannot be made Web-alpha-equivalent if lookup-filter payloads are treated as opaque display strings instead of parsed field data.
 - Build a standalone candidate preview early. Native TSF UI debugging is slow, and the existing `Preview/main.cpp` target is a good place to lock layout, bilingual text, and dictionary panel behavior before live TSF integration.
 - Settings should follow engine/protocol basics but precede installer polish, because installer first-run must show the real settings UI and language picker.
 

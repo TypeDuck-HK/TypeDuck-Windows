@@ -11,7 +11,7 @@ TypeDuck Windows IME is a native Windows TSF Cantonese input method, not a conti
 
 The recommended approach is to preserve the out-of-process launcher boundary for v1 and put a new TypeDuck engine host behind it. That engine host should embed the TypeDuck-HK librime fork, package TypeDuck schemas/dictionaries, load `rime-dictionary-lookup-filter`, and emit structured candidate plus dictionary lookup payloads. TypeDuck Web alpha is the acceptance source for settings, candidate/dictionary UX, bilingual copy, visual tone, and display-language behavior.
 
-The major risks are building on the wrong identity, registering under the wrong Windows language, flattening dictionary data into old candidate comments, and polishing UI before the real engine/plugin data path exists. Mitigate these by locking a TypeDuck identity and Web parity contract first, proving librime/plugin output early, making zh-HK TSF registration deterministic in first-party Windows code, and versioning a TypeDuck protocol before rich candidate UI work.
+The major risks are building on the wrong identity, registering under the wrong Windows language, mishandling the lookup-filter CSV payload as opaque display text, and polishing UI before the real engine/plugin data path exists. Mitigate these by locking a TypeDuck identity and Web parity contract first, proving librime/plugin output early, making zh-HK TSF registration deterministic in first-party Windows code, and preserving/parsing the documented lookup-filter payload before rich candidate UI work.
 
 ## Key Findings
 
@@ -84,7 +84,7 @@ Use a layered architecture: keep a thin TSF DLL in host processes, route engine 
 1. **Deferring the engine boundary** — prove TypeDuck-HK librime plus lookup-filter output before candidate UI or settings depend on it.
 2. **Treating Moqi-to-TypeDuck as cosmetic rename** — create and audit a TypeDuck identity contract covering binaries, CLSIDs, GUIDs, paths, pipes, logs, registry, installer, resources, protocol, and artifacts.
 3. **Letting backend `ime.json` own zh-HK registration** — compile or stage TypeDuck profile identity in first-party Windows code so missing backend payloads cannot change the Windows language profile.
-4. **Squeezing dictionary lookup into candidate comments** — version the protocol and use typed `Candidate` and `DictionaryLookup` data structures before rendering the new UI.
+4. **Mishandling lookup-filter CSV payloads** — preserve the documented `rime-dictionary-lookup-filter` payload and map it into candidate/dictionary view data before rendering the new UI.
 5. **Building candidate UI without TSF host compatibility evidence** — use a preview harness for layout, but accept UI only after testing real host apps, DPI, focus, placement, and `ITfCandidateListUIElement` behavior.
 6. **Remembering Web alpha parity instead of encoding it** — capture dated settings inventories, screenshots, candidate fixtures, defaults, labels, and visual tokens early.
 7. **Shipping hidden scaffold features** — remove or compile-gate fcitx, WebDAV/cloud clipboard, AI, Moqi menus, Simplified-only strings, and arbitrary backend config-tool launch paths.
@@ -119,11 +119,11 @@ Based on research, use seven vertical phases. The order intentionally puts ident
 
 ### Phase 4: TypeDuck Protocol and Candidate/Dictionary Model
 
-**Rationale:** The old text/comment protocol cannot support TypeDuck dictionary parity, multilingual rows, settings, capabilities, or reliable IPC.
+**Rationale:** The old flat candidate protocol cannot support TypeDuck dictionary parity, multilingual rows, settings, capabilities, or reliable IPC.
 **Delivers:** `typeduck.proto`, protocol version handshake, max frame sizes, request deadlines, candidate metadata, dictionary lookup messages, settings/capabilities messages, mapper tests, malformed payload tests, and golden serialized fixtures from real engine output.
 **Uses:** Existing framed protobuf pattern, renamed pipe/client/server adapters, engine spike output.
 **Addresses:** Structured candidate metadata, dictionary/detail data, settings transport, page state, reverse lookup state.
-**Avoids:** Dictionary data flattened into comments; unbounded IPC framing; key-path blocking without deadlines.
+**Avoids:** Lookup-filter CSV payloads treated as opaque display text; unbounded IPC framing; key-path blocking without deadlines.
 **Research flag:** Needs focused protocol/security research during phase planning for frame caps, named-pipe ACLs, malformed input behavior, and TSF key-path latency.
 
 ### Phase 5: Candidate, Dictionary, Settings, and About UI Parity
@@ -152,7 +152,7 @@ Based on research, use seven vertical phases. The order intentionally puts ident
 ### Phase Ordering Rationale
 
 - Identity and parity contract come first because product naming, banned surfaces, zh-HK locale, bilingual copy, and Web alpha fixtures affect every later file touched.
-- Engine proof comes before rich UI because the UI needs real TypeDuck candidate and dictionary fields from librime plus lookup filter, not mocks or old Moqi comments.
+- Engine proof comes before rich UI because the UI needs real TypeDuck candidate and lookup-filter payload fields from librime, not mocks or legacy Moqi display strings.
 - TSF registration and installer skeleton happen early because correct installability is core product behavior, not packaging polish.
 - Protocol/model work precedes UI rendering so dictionary details, multilingual rows, Jyutping modes, settings, and paging are structured and testable.
 - UI follows protocol and engine because settings and candidate controls must map to real engine behavior.

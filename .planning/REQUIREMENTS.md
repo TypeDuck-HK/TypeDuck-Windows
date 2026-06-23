@@ -35,7 +35,7 @@
 - [ ] **PROTO-01**: TypeDuck TSF frontend and engine communicate through a versioned TypeDuck protocol rather than Moqi-shaped product messages.
 - [ ] **PROTO-02**: Protocol frames enforce maximum payload sizes and reject malformed or oversized frames without unbounded buffering.
 - [ ] **PROTO-03**: Protocol responses carry structured candidate data with candidate id, display text, input code, Jyutping, comments/prompts, translations, page info, and selection metadata.
-- [ ] **PROTO-04**: Protocol responses carry structured dictionary lookup data instead of flattening dictionary details into one comment string.
+- [ ] **PROTO-04**: Protocol/frontend handling preserves the documented lookup-filter CSV payload and maps it into structured dictionary lookup data for candidate UI consumption.
 - [ ] **PROTO-05**: Protocol supports settings snapshot, settings update, engine capability, deploy/reconfigure, and engine health/error messages required by the settings UI.
 - [ ] **PROTO-06**: Golden protocol fixtures cover common Cantonese input, dictionary lookup, reverse lookup, malformed payload, timeout, and engine restart cases.
 

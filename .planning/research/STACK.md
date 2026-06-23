@@ -92,7 +92,7 @@ Observed TypeDuck Web alpha files and behavior should drive implementation:
 
 1. Start with product identity and deterministic zh-HK profile registration before deep engine work, because all later install/runtime validation depends on correct identity.
 2. Establish the TypeDuck engine backend and schema/plugin packaging before candidate UI richness, because the UI needs real structured data.
-3. Extend the protocol and candidate view model before polishing rendering, so dictionary and multilingual data are not squeezed through comment strings.
+3. Extend the protocol and candidate view model before polishing rendering, so the documented lookup-filter CSV payload is preserved and parsed into stable candidate/dictionary fields.
 4. Build settings/about dialogs after core settings keys are wired to engine customization, with installer launch integration as its own acceptance path.
 5. Add tests/smoke scripts around installer/profile registration, protocol framing, and candidate view model before broader UI polish.
 

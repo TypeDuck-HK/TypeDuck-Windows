@@ -91,35 +91,7 @@ Phase 2: TSF profile registration and installer skeleton.
 
 ---
 
-### Pitfall 4: Squeezing Dictionary Lookup Data into Generic Candidate Comments
-
-**What goes wrong:**
-The TypeDuck dictionary experience cannot match Web alpha because translations, part-of-speech labels, reading notes, language rows, and lookup lifecycle are flattened into a single comment string. Later UI work cannot sort, hide, localize, test, or render fields independently.
-
-**Why it happens:**
-The existing protocol has simple candidate text/comment fields and generic menu/button paths. That shape is enough for compact IME comments but not enough for TypeDuck's dictionary panel.
-
-**How to avoid:**
-Version the TypeDuck protocol or engine data model before rendering the new panel. Add typed structures for pronunciation, display languages, definitions/translations, part-of-speech, reading notes, source language, more-language rows, reverse lookup metadata, page size, and pagination. Keep backward compatibility only if it does not degrade TypeDuck fields.
-
-**Warning signs:**
-- JSON blobs or delimiter-separated dictionary data are placed inside protobuf string fields.
-- UI tests assert rendered text only, not structured dictionary fields.
-- "More Languages" rows are hard-coded in the frontend.
-- Candidate paging and dictionary panel paging are confused.
-
-**Phase to address:**
-Phase 3: TypeDuck protocol and candidate/dictionary model.
-
-**Verification evidence to collect:**
-- Protobuf/schema diff with explicit TypeDuck dictionary fields and versioning.
-- Golden serialized response fixtures generated from real lookup filter output.
-- Unit tests mapping engine/plugin output to candidate view models.
-- Backward/invalid payload tests proving malformed dictionary data fails visibly, not silently.
-
----
-
-### Pitfall 5: Building Candidate UI Without TSF Host Compatibility Tests
+### Pitfall 4: Building Candidate UI Without TSF Host Compatibility Tests
 
 **What goes wrong:**
 The candidate/dictionary window looks correct in a preview tool but is misplaced, clipped, behind the host window, wrong on high DPI, broken in UI-less contexts, or unstable in Office, browsers, terminal, UWP/immersive apps, elevated apps, or multi-monitor setups.
@@ -147,7 +119,7 @@ Phase 4: Candidate and settings UI parity.
 
 ---
 
-### Pitfall 6: Web Alpha Parity Is Remembered, Not Encoded
+### Pitfall 5: Web Alpha Parity Is Remembered, Not Encoded
 
 **What goes wrong:**
 The Windows IME ships with settings or candidate behavior that "feels close" but diverges from TypeDuck Web alpha: missing Display Languages priority, wrong page size behavior, wrong Jyutping visibility, missing Cangjie v3/v5, missing input memory, different auto-completion/correction/composition semantics, wrong Chinese typeface, or incomplete reverse lookup.
@@ -175,7 +147,7 @@ Phase 0 for parity contract, then Phase 4 for UI implementation.
 
 ---
 
-### Pitfall 7: Treating Installer and Registration as End-of-Project Packaging
+### Pitfall 6: Treating Installer and Registration as End-of-Project Packaging
 
 **What goes wrong:**
 The IME works for developers but fails for users: wrong DLL bitness registered, old DLL locked until reboot, orphaned registry entries, broken upgrade/uninstall, missing startup launcher, forced process kill affects the wrong app, or settings dialog does not appear during installation.
@@ -204,7 +176,7 @@ Phase 2 for installer skeleton, Phase 6 for installer hardening and release veri
 
 ---
 
-### Pitfall 8: Shipping Hidden Scaffold Features
+### Pitfall 7: Shipping Hidden Scaffold Features
 
 **What goes wrong:**
 Users see or trigger fcitx references, cloud clipboard/WebDAV, AI controls, Moqi menus, Simplified Chinese installer/profile defaults, or excessive customization that TypeDuck did not ask for. Worse, cloud clipboard may still read clipboard text when config says enabled.
@@ -232,7 +204,7 @@ Phase 0 for source cleanup policy, Phase 5 for privacy/security hardening.
 
 ---
 
-### Pitfall 9: Leaving IPC Framing and Key-Path Blocking Unbounded
+### Pitfall 8: Leaving IPC Framing and Key-Path Blocking Unbounded
 
 **What goes wrong:**
 Malformed or oversized frames cause memory growth, stale async responses stall synchronous calls, backend restart disconnects all clients, or per-key named-pipe round trips make typing laggy. Cantonese input then feels unreliable even if the engine is correct.
@@ -260,7 +232,7 @@ Phase 3 for protocol hardening, Phase 6 for stress and release verification.
 
 ---
 
-### Pitfall 10: Keeping Tests at the Existing COM Helper Level
+### Pitfall 9: Keeping Tests at the Existing COM Helper Level
 
 **What goes wrong:**
 The rewrite appears complete but has no regression coverage for TypeDuck behavior: engine integration, dictionary lookup fields, zh-HK registration, bilingual UI strings, candidate placement, installer cleanup, protocol compatibility, and scaffold leakage are only manually checked.
@@ -288,7 +260,7 @@ Every phase, with a dedicated Phase 6 compatibility/release verification pass.
 
 ---
 
-### Pitfall 11: Underestimating the Older TypeDuck-HK librime Fork
+### Pitfall 10: Underestimating the Older TypeDuck-HK librime Fork
 
 **What goes wrong:**
 The project assumes modern librime APIs, build flags, plugin ABI, or dependency versions that the TypeDuck-HK fork does not support. The Windows build then fails late, or the lookup filter compiles but is not loaded at runtime.
@@ -316,7 +288,7 @@ Phase 1: Engine/runtime contract spike.
 
 ---
 
-### Pitfall 12: Logging and Diagnostics Leak Typed Content
+### Pitfall 11: Logging and Diagnostics Leak Typed Content
 
 **What goes wrong:**
 Debug logs, crash traces, or installer/runtime diagnostics capture candidate content, composition text, process paths, clipboard text, or other sensitive user context under TypeDuck-branded logs.
@@ -348,7 +320,6 @@ Phase 5: Privacy and security hardening.
 |----------|-------------------|----------------|-----------------|
 | Reusing Moqi names internally | Fewer rename edits | Broken side-by-side installs, wrong registry cleanup, confusing logs, product leakage | Only in untouched third-party history, never in product-owned runtime surfaces |
 | Keeping backend `ime.json` as profile source of truth | Faster registration reuse | zh-HK install depends on runtime payload and can silently fail | Never for TypeDuck profile identity |
-| Encoding dictionary data in comments | Avoids protocol changes | Blocks Web parity, localization, sorting, testing, and future UI changes | Never beyond throwaway spike fixtures |
 | Building UI directly in large legacy files | Fast first visual output | Hard-to-test rendering, protocol, and TSF state entanglement | Accept only for small adapter glue; new logic needs view models/helpers |
 | Deferring installer tests | More time for engine/UI | Users cannot install, upgrade, or uninstall reliably | Never after Phase 2 |
 | Keeping old protocol fields "unused" | Avoids backend/client coordination | Privacy risk and accidental feature resurrection | Only if compile-gated and verified unreachable |
@@ -416,7 +387,7 @@ Phase 5: Privacy and security hardening.
 | Wrong engine boundary chosen late | HIGH | Freeze UI work, define adapter boundary, preserve golden candidate fixtures, migrate protocol/view model before adding features |
 | Moqi identity leaked after partial rename | MEDIUM | Build identity inventory, run static audit, update installer/registry/pipe/log surfaces together, test side-by-side behavior |
 | zh-HK registration missing or wrong | HIGH | Move profile metadata to first-party constants, regenerate GUID/locale contract if needed, rebuild installer, clean orphaned registrations |
-| Dictionary metadata flattened into comments | HIGH | Introduce typed protocol, write migration mapper, update UI and tests to consume fields |
+| Lookup-filter payload treated as opaque display text | HIGH | Preserve the documented CSV payload, parse it into fields, and update UI/tests to consume those fields |
 | Candidate window fails in host apps | MEDIUM | Add host matrix, isolate placement code, add fallback positioning and screenshot evidence |
 | Installer fails upgrade/uninstall | HIGH | Reproduce in clean VM, capture registry/filesystem diff, fix SetupHelper idempotency, retest reboot path |
 | Legacy cloud/AI/WebDAV remains reachable | MEDIUM | Remove protocol handling and runtime listeners, audit config paths, add regression tests |
@@ -432,7 +403,7 @@ Phase 5: Privacy and security hardening.
 | Older librime fork underestimated | Phase 1: Engine/runtime contract spike | Pinned commits, CI build, runtime plugin-load proof |
 | Backend JSON owns zh-HK registration | Phase 2: TSF registration and installer skeleton | Clean VM zh-HK profile registration evidence |
 | Installer treated as final packaging | Phase 2 and Phase 6 | Install/upgrade/uninstall/reboot transcripts |
-| Dictionary data flattened | Phase 3: Protocol and candidate model | Typed protocol fixtures and mapper tests |
+| Lookup-filter payload mishandled | Phase 3: Protocol and candidate model | Payload preservation fixtures, parser tests, and view-model mapper tests |
 | IPC/key path remains fragile | Phase 3 and Phase 6 | Frame/sequence tests and typing latency measurements |
 | Candidate UI lacks TSF host testing | Phase 4: Candidate/settings UI parity | Host app screenshot matrix and UI element checks |
 | Hidden scaffold features ship | Phase 5: Privacy/security cleanup | Static/runtime audits for removed legacy surfaces |
