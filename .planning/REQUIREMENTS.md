@@ -15,8 +15,8 @@
 ### Installation and TSF Registration
 
 - [ ] **INST-01**: User can install TypeDuck Windows IME with an installer branded and worded in bilingual Traditional Hong Kong Chinese and English.
-- [ ] **INST-02**: User can select TypeDuck under Windows Chinese (Traditional, Hong Kong) language/input settings after installation.
-- [ ] **INST-03**: The installed TSF profile uses deterministic TypeDuck-owned CLSID/profile GUID, `zh-HK` locale metadata, TypeDuck icon, and bilingual display text.
+- [x] **INST-02**: User can select TypeDuck under Windows Chinese (Traditional, Hong Kong) language/input settings after installation.
+- [x] **INST-03**: The installed TSF profile uses deterministic TypeDuck-owned CLSID/profile GUID, `zh-HK` locale metadata, TypeDuck icon, and bilingual display text.
 - [ ] **INST-04**: Installer registers both 32-bit and 64-bit TSF DLLs so TypeDuck works in 32-bit and 64-bit host applications.
 - [ ] **INST-05**: User can uninstall TypeDuck and remove TypeDuck-owned TSF registration, startup entries, install files, and runtime registry/profile residue without leaving broken profile entries.
 - [ ] **INST-06**: Installer launches the TypeDuck settings dialog or install-time settings flow during installation with Display Languages shown first.
@@ -143,8 +143,8 @@ Which phases cover which requirements. Updated during roadmap creation.
 | IDEN-03 | Phase 6 | Pending |
 | IDEN-04 | Phase 6 | Pending |
 | INST-01 | Phase 3 | Pending |
-| INST-02 | Phase 3 | Pending |
-| INST-03 | Phase 3 | Pending |
+| INST-02 | Phase 3 | Complete |
+| INST-03 | Phase 3 | Complete |
 | INST-04 | Phase 3 | Pending |
 | INST-05 | Phase 3 | Pending |
 | INST-06 | Phase 5 | Pending |

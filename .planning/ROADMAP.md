@@ -81,11 +81,11 @@ Plans:
 
 **Verification Environment**: Requires clean Windows 10/11 VM or equivalent disposable Windows test environment evidence. Prefer Hyper-V checkpoint before installer tests. Code review/build checks are not enough for this phase.
 
-**Plans:** 0/3 plans complete
+**Plans:** 1/3 plans executed
 Plans:
 **Wave 1**
 
-- [ ] 03-01-PLAN.md — Make TypeDuck TSF identity and zh-HK profile registration first-party.
+- [x] 03-01-PLAN.md — Make TypeDuck TSF identity and zh-HK profile registration first-party.
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
@@ -94,6 +94,7 @@ Plans:
 **Wave 3** *(blocked on Wave 2 completion)*
 
 - [ ] 03-03-PLAN.md — Verify install, registration, dual-bitness behavior, and uninstall cleanup in the launched Hyper-V VM.
+
 **UI hint**: yes
 
 ### Phase 4: TypeDuck Protocol and Typing MVP
@@ -174,7 +175,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7
 |-------|----------------|--------|-----------|
 | 1. Identity and Web Parity Contract | 2/2 | Complete   | 2026-06-23 |
 | 2. Engine Runtime Contract Spike | 3/3 | Complete    | 2026-06-23 |
-| 3. zh-HK TSF Registration and Installer Skeleton | 0/3 | Ready to execute | - |
+| 3. zh-HK TSF Registration and Installer Skeleton | 1/3 | In Progress|  |
 | 4. TypeDuck Protocol and Typing MVP | 0/TBD | Not started | - |
 | 5. Candidate, Dictionary, Settings, and About UI Parity | 0/TBD | Not started | - |
 | 6. Privacy, Security, and Scaffold Cleanup | 0/TBD | Not started | - |

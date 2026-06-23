@@ -5,15 +5,15 @@ milestone_name: milestone
 current_phase: 3
 current_phase_name: zh-HK TSF Registration and Installer Skeleton
 status: executing
-stopped_at: Phase 3 planned
-last_updated: "2026-06-23T15:39:31.814Z"
+stopped_at: Completed 03-01-PLAN.md
+last_updated: "2026-06-23T15:56:56.942Z"
 last_activity: 2026-06-23
-last_activity_desc: Phase 02 complete, transitioned to Phase 3
+last_activity_desc: Phase 3 planned with 3 execution plans
 progress:
   total_phases: 7
   completed_phases: 2
   total_plans: 8
-  completed_plans: 5
+  completed_plans: 6
   percent: 29
 ---
 
@@ -33,7 +33,7 @@ Plan: 3 planned
 Status: Ready to execute
 Last activity: 2026-06-23 — Phase 3 planned with 3 execution plans
 
-Progress: [███░░░░░░░] 29%
+Progress: [████████░░] 75%
 
 ## Performance Metrics
 
@@ -61,6 +61,7 @@ Progress: [███░░░░░░░] 29%
 | Phase 02 P01 | 10 min | 3 tasks | 7 files |
 | Phase 02 P02 | 55min | 3 tasks | 9 files |
 | Phase 02 P03 | 13min | 3 tasks | 6 files |
+| Phase 03 P01 | 9 min | 3 tasks | 8 files |
 
 ## Accumulated Context
 
@@ -86,6 +87,9 @@ Recent decisions affecting current work:
 - [Phase 02]: Use the Plan 02-02 typing proof as ENG-05 source truth; no fabricated reverse-lookup rows were added when no leading \\v payload was observed.
 - [Phase 02]: Preserve lookup-filter candidate comments as raw payload evidence with escaped notation, UTF-8 bytes, code points, control counts, and SHA-256 hashes.
 - [Phase 02]: Keep Phase 2 lookup evidence raw-only; Phase 4 and Phase 5 map D-10 columns into structured protocol and native UI fields.
+- [Phase 03]: TypeDuck TSF identity is centralized in MoqiTextService/TypeDuckProfile.* using the Phase 3 CLSID/profile GUID contract. — Plan 03-01 moved CLSID/profile GUID/display/DLL constants out of backend metadata and into first-party source.
+- [Phase 03]: DllRegisterServer seeds the TypeDuck zh-HK profile before optional backend ime.json scanning. — Backend profile JSON may remain transition metadata but cannot replace or override the required TypeDuck profile.
+- [Phase 03]: The CMake target remains MoqiTextService while output/module identity is TypeDuckTextService.dll. — This keeps source churn low while satisfying deployed TSF DLL identity.
 
 ### Pending Todos
 
@@ -104,6 +108,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-06-23T14:58:08.516Z
-Stopped at: Phase 3 context gathered
-Resume file: .planning/phases/03-zh-hk-tsf-registration-and-installer-skeleton/03-CONTEXT.md
+Last session: 2026-06-23T15:56:06.832Z
+Stopped at: Completed 03-01-PLAN.md
+Resume file: None
