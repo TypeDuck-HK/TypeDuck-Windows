@@ -63,9 +63,9 @@ TEST(TypeDuckProtoFraming, MalformedPayloadDoesNotParseRequestOrResponse) {
   moqi::protocol::ServerResponse response;
 
   EXPECT_FALSE(Moqi::Proto::parsePayload(malformed, request));
-  EXPECT_FALSE(request.IsInitialized());
+  EXPECT_EQ(request.ByteSizeLong(), 0u);
   EXPECT_FALSE(Moqi::Proto::parsePayload(malformed, response));
-  EXPECT_FALSE(response.IsInitialized());
+  EXPECT_EQ(response.ByteSizeLong(), 0u);
 }
 
 TEST(TypeDuckProtocol, RawLookupSeparatorsSurviveCandidateComments) {

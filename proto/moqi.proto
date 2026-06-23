@@ -25,6 +25,11 @@ enum Method {
   METHOD_SELECT_CANDIDATE = 17;
   METHOD_CHANGE_PAGE = 18;
   METHOD_CLOUD_CLIPBOARD_UPLOAD = 19;
+  METHOD_TYPEDUCK_SETTINGS_SNAPSHOT = 100;
+  METHOD_TYPEDUCK_SETTINGS_UPDATE = 101;
+  METHOD_TYPEDUCK_DEPLOY = 102;
+  METHOD_TYPEDUCK_RECONFIGURE = 103;
+  METHOD_TYPEDUCK_HEALTH = 104;
 }
 
 enum ButtonType {
@@ -73,6 +78,100 @@ message PreservedKey {
 message CandidateEntry {
   string text = 1;
   string comment = 2;
+  string id = 3;
+  string input_code = 4;
+  string jyutping = 5;
+  string raw_lookup_comment = 6;
+  repeated string translations = 7;
+  repeated string prompts = 8;
+  optional uint32 source_index = 9;
+  optional bool selectable = 10;
+}
+
+message TypeDuckCandidatePage {
+  uint32 page_index = 1;
+  uint32 page_size = 2;
+  uint32 total_count = 3;
+  bool has_previous = 4;
+  bool has_next = 5;
+}
+
+message TypeDuckProtocolInfo {
+  // TYPEDUCK_PROTOCOL_VERSION is the canonical Phase 4 TypeDuck protocol version token.
+  // TYPE_DUCK_PROTOCOL_VERSION documents the compatibility bridge spelling used in planning.
+  uint32 version = 1;
+  string product = 2;
+  string compatibility_bridge = 3;
+}
+
+message TypeDuckSettingsSnapshot {
+  string language = 1;
+  string schema_id = 2;
+  string display_language = 3;
+  bool ascii_mode = 4;
+  bool traditional_hong_kong = 5;
+  uint32 candidate_page_size = 6;
+}
+
+message TypeDuckSettingsUpdate {
+  optional string language = 1;
+  optional string schema_id = 2;
+  optional string display_language = 3;
+  optional bool ascii_mode = 4;
+  optional bool traditional_hong_kong = 5;
+  optional uint32 candidate_page_size = 6;
+}
+
+message TypeDuckEngineCapability {
+  string name = 1;
+  bool supported = 2;
+  string version = 3;
+  string detail = 4;
+}
+
+message TypeDuckDeployRequest {
+  string runtime_path = 1;
+  string schema_id = 2;
+  bool force = 3;
+}
+
+message TypeDuckReconfigureRequest {
+  string schema_id = 1;
+  bool reload_user_dict = 2;
+  bool restart_backend = 3;
+}
+
+enum TypeDuckHealthStatus {
+  TYPEDUCK_HEALTH_STATUS_UNSPECIFIED = 0;
+  TYPEDUCK_HEALTH_OK = 1;
+  TYPEDUCK_HEALTH_DEGRADED = 2;
+  TYPEDUCK_HEALTH_RESTARTING = 3;
+  TYPEDUCK_HEALTH_FAILED = 4;
+}
+
+message TypeDuckEngineHealth {
+  TypeDuckHealthStatus status = 1;
+  string backend_name = 2;
+  string message = 3;
+  bool recoverable = 4;
+  uint32 restart_count = 5;
+}
+
+enum TypeDuckErrorCode {
+  TYPEDUCK_ERROR_UNSPECIFIED = 0;
+  TYPEDUCK_ERROR_MALFORMED_FRAME = 1;
+  TYPEDUCK_ERROR_PAYLOAD_TOO_LARGE = 2;
+  TYPEDUCK_ERROR_MALFORMED_PAYLOAD = 3;
+  TYPEDUCK_ERROR_BACKEND_TIMEOUT = 4;
+  TYPEDUCK_ERROR_BACKEND_RESTART = 5;
+  TYPEDUCK_ERROR_ENGINE_INIT_FAILED = 6;
+}
+
+message TypeDuckError {
+  TypeDuckErrorCode code = 1;
+  string message = 2;
+  bool recoverable = 3;
+  string detail = 4;
 }
 
 message AutoPairRule {
@@ -119,6 +218,7 @@ message TrayNotification {
 }
 
 message ClientRequest {
+  reserved 100;
   uint32 seq_num = 1;
   Method method = 2;
   optional string guid = 3;
@@ -145,9 +245,15 @@ message ClientRequest {
   optional int32 candidate_index = 24;
   optional bool page_backward = 25;
   optional string cloud_clipboard_text = 26;
+  optional TypeDuckProtocolInfo typeduck_protocol = 27;
+  optional TypeDuckSettingsSnapshot typeduck_settings_snapshot = 28;
+  optional TypeDuckSettingsUpdate typeduck_settings_update = 29;
+  optional TypeDuckDeployRequest typeduck_deploy_request = 30;
+  optional TypeDuckReconfigureRequest typeduck_reconfigure_request = 31;
 }
 
 message ServerResponse {
+  reserved 100;
   optional string client_id = 1;
   uint32 seq_num = 2;
   bool success = 3;
@@ -175,4 +281,11 @@ message ServerResponse {
   string error = 25;
   optional TrayNotification tray_notification = 26;
   repeated CandidateEntry candidate_entries = 27;
+  optional TypeDuckProtocolInfo typeduck_protocol = 28;
+  optional TypeDuckCandidatePage typeduck_candidate_page = 29;
+  optional TypeDuckSettingsSnapshot typeduck_settings_snapshot = 30;
+  optional TypeDuckSettingsUpdate typeduck_settings_update = 31;
+  repeated TypeDuckEngineCapability typeduck_capabilities = 32;
+  optional TypeDuckEngineHealth typeduck_engine_health = 33;
+  optional TypeDuckError typeduck_error = 34;
 }

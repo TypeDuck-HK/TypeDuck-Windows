@@ -26,8 +26,8 @@ add_definitions(
 )
 
 include_directories(
-    ${CMAKE_SOURCE_DIR}
     ${MOQI_GENERATED_PROTO_ROOT}
+    ${CMAKE_SOURCE_DIR}
     ${CMAKE_CURRENT_SOURCE_DIR}
     ${CMAKE_CURRENT_BINARY_DIR}
     ${jsoncpp_SOURCE_DIR}/include

@@ -52,6 +52,7 @@ if(MSVC)
     add_compile_options(
         $<$<COMPILE_LANGUAGE:CXX>:/utf-8>
         $<$<COMPILE_LANGUAGE:CXX>:/Zc:char8_t->
+        $<$<COMPILE_LANGUAGE:CXX>:/FS>
     )
 endif()
 
@@ -76,13 +77,18 @@ set(LIBUV_BUILD_BENCH OFF CACHE BOOL "" FORCE)
 
 set(protobuf_BUILD_TESTS OFF CACHE BOOL "" FORCE)
 set(protobuf_BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE)
-set(protobuf_BUILD_LIBUPB OFF CACHE BOOL "" FORCE)
+set(protobuf_BUILD_LIBUPB ON CACHE BOOL "" FORCE)
 set(protobuf_BUILD_PROTOBUF_BINARIES ON CACHE BOOL "" FORCE)
-set(protobuf_BUILD_PROTOC_BINARIES OFF CACHE BOOL "" FORCE)
+if(MOQI_PROTOC_EXECUTABLE)
+    set(protobuf_BUILD_PROTOC_BINARIES OFF CACHE BOOL "" FORCE)
+else()
+    set(protobuf_BUILD_PROTOC_BINARIES ON CACHE BOOL "" FORCE)
+endif()
 set(protobuf_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
 set(protobuf_INSTALL OFF CACHE BOOL "" FORCE)
+set(protobuf_MSVC_STATIC_RUNTIME OFF CACHE BOOL "" FORCE)
 set(ABSL_PROPAGATE_CXX_STD ON CACHE BOOL "" FORCE)
-set(ABSL_MSVC_STATIC_RUNTIME ON CACHE BOOL "" FORCE)
+set(ABSL_MSVC_STATIC_RUNTIME OFF CACHE BOOL "" FORCE)
 
 FetchContent_Declare(
     spdlog
@@ -119,6 +125,14 @@ else()
     set(MOQI_PROTOBUF_ABSL_INCLUDE_DIR "${protobuf_SOURCE_DIR}/third_party/abseil-cpp")
 endif()
 
+if(MSVC)
+    foreach(MOQI_PROTOBUF_TOOL_TARGET IN ITEMS libprotoc protoc)
+        if(TARGET ${MOQI_PROTOBUF_TOOL_TARGET})
+            target_compile_options(${MOQI_PROTOBUF_TOOL_TARGET} PRIVATE /MP1)
+        endif()
+    endforeach()
+endif()
+
 set(MOQI_GENERATED_PROTO_ROOT "${CMAKE_BINARY_DIR}/generated")
 set(MOQI_GENERATED_PROTO_DIR "${MOQI_GENERATED_PROTO_ROOT}/proto")
 set(MOQI_PROTO_SCHEMA "${CMAKE_CURRENT_SOURCE_DIR}/proto/moqi.proto")
@@ -130,12 +144,22 @@ if(NOT MOQI_PROTOC_EXECUTABLE)
     find_program(MOQI_PROTOC_EXECUTABLE NAMES protoc)
 endif()
 
+set(MOQI_PROTOC_COMMAND "")
+set(MOQI_PROTOC_DEPENDS "")
+
 if(MOQI_PROTOC_EXECUTABLE)
+    set(MOQI_PROTOC_COMMAND "${MOQI_PROTOC_EXECUTABLE}")
+elseif(TARGET protobuf::protoc)
+    set(MOQI_PROTOC_COMMAND "$<TARGET_FILE:protobuf::protoc>")
+    set(MOQI_PROTOC_DEPENDS protoc)
+endif()
+
+if(MOQI_PROTOC_COMMAND)
     add_custom_command(
         OUTPUT "${MOQI_PROTO_CPP}" "${MOQI_PROTO_HDR}"
         COMMAND "${CMAKE_COMMAND}" -E make_directory "${MOQI_GENERATED_PROTO_DIR}"
-        COMMAND "${MOQI_PROTOC_EXECUTABLE}" --proto_path=. "--cpp_out=${MOQI_GENERATED_PROTO_ROOT_PROTOC}" "proto/moqi.proto"
-        DEPENDS "${MOQI_PROTO_SCHEMA}"
+        COMMAND "${MOQI_PROTOC_COMMAND}" --proto_path=. "--cpp_out=${MOQI_GENERATED_PROTO_ROOT_PROTOC}" "proto/moqi.proto"
+        DEPENDS "${MOQI_PROTO_SCHEMA}" ${MOQI_PROTOC_DEPENDS}
         COMMENT "Generating C++ protobuf sources for moqi.proto"
         WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
         VERBATIM

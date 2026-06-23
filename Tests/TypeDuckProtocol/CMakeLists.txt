@@ -1,8 +1,8 @@
 add_executable(ProtoFraming_test ProtoFraming_test.cpp)
 
 target_include_directories(ProtoFraming_test PRIVATE
-  "${PROJECT_SOURCE_DIR}"
   "${MOQI_GENERATED_PROTO_ROOT}"
+  "${PROJECT_SOURCE_DIR}"
 )
 
 target_link_libraries(ProtoFraming_test

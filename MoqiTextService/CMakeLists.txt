@@ -10,8 +10,8 @@ set(CMAKE_CXX_STANDARD 20)
 configure_file("MoqiTextService.rc.in" "MoqiTextService.rc" @ONLY)
 
 include_directories(
-    ${CMAKE_SOURCE_DIR}
     ${MOQI_GENERATED_PROTO_ROOT}
+    ${CMAKE_SOURCE_DIR}
     ${MOQI_PROTOBUF_INCLUDE_DIR}
     ${MOQI_PROTOBUF_ABSL_INCLUDE_DIR}
     ${jsoncpp_SOURCE_DIR}/include
