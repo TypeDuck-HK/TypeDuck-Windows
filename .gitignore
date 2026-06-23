@@ -56,6 +56,8 @@ build64-*
 cmake-build-ninja
 
 installer/stage
+runtime/typeduck-phase02/
+.cache/typeduck-phase02/
 
 # GSD local research cache
 .planning/research/.cache/

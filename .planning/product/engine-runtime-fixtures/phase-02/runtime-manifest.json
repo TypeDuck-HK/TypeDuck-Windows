@@ -1,0 +1,439 @@
+﻿{
+    "manifestVersion":  1,
+    "generatedAtUtc":  "2026-06-23T11:38:25Z",
+    "stageRoot":  "D:\\VSProjects\\moqi-im-windows\\runtime\\typeduck-phase02",
+    "sources":  {
+                    "librimeRelease":  {
+                                           "url":  "https://github.com/TypeDuck-HK/librime/releases/download/v1.1.3/rime-TypeDuck-v1.1.3-Windows-msvc-x86.7z",
+                                           "archivePath":  ".cache\\typeduck-phase02\\rime-TypeDuck-v1.1.3-Windows-msvc-x86.7z",
+                                           "archiveSha256":  "f9043a8eeb65be4959d933c617ef5bb8fd17dc892d0d5a7e563043b52ac6f6dd",
+                                           "extractor":  "C:\\Program Files\\7-Zip\\7z.exe"
+                                       },
+                    "schema":  {
+                                   "url":  "https://github.com/TypeDuck-HK/schema",
+                                   "branch":  "aap2-alpha",
+                                   "commit":  "b5ab44e187d010fa13c71bd320c07259b224ae5b",
+                                   "path":  "third_party\\typeduck-schema"
+                               }
+                },
+    "runtime":  {
+                    "compatibilityShape":  "input_methods\\\\rime\\\\rime.dll",
+                    "rimeDll":  {
+                                    "path":  "input_methods\\rime\\rime.dll",
+                                    "kind":  "engine-dll",
+                                    "bytes":  2320384,
+                                    "sha256":  "4758c34daceb548a2aef54bb2e5a228baca1511efc07c43fbe84c5d35e7a6d4e"
+                                },
+                    "versionInfo":  {
+                                        "path":  "input_methods\\rime\\version-info.txt",
+                                        "kind":  "version-info",
+                                        "bytes":  88,
+                                        "sha256":  "334e0b40e9857ed1d9b235d42d196b873a74488c6f18c6426d9b246c3c84480c"
+                                    }
+                },
+    "lookupFilterPlugin":  {
+                               "path":  "input_methods\\rime\\rime.dll",
+                               "kind":  "lookup-filter-static-runtime",
+                               "bytes":  2320384,
+                               "sha256":  "4758c34daceb548a2aef54bb2e5a228baca1511efc07c43fbe84c5d35e7a6d4e",
+                               "source":  "https://github.com/TypeDuck-HK/rime-dictionary-lookup-filter",
+                               "commit":  "3671814d4e4aeab8d616ceea3c7f6d88e96bba02",
+                               "relation":  "Pinned TypeDuck-HK librime release version-info.txt records rime-dictionary-lookup-filter at this commit; the staged runtime artifact is the shipped rime.dll."
+                           },
+    "assets":  {
+                   "schemaFiles":  [
+                                       {
+                                           "path":  "input_methods\\rime\\cangjie3.schema.yaml",
+                                           "kind":  "schema",
+                                           "bytes":  180,
+                                           "sha256":  "e70485a951d9c14935548fc9042d63473b1449dc091b30d9318b4af4125c4c14"
+                                       },
+                                       {
+                                           "path":  "input_methods\\rime\\cangjie5.schema.yaml",
+                                           "kind":  "schema",
+                                           "bytes":  1738,
+                                           "sha256":  "cca347c4ebf8b0fd116978922b783a80e453de9d9d97843f27d3494392d7f251"
+                                       },
+                                       {
+                                           "path":  "input_methods\\rime\\common.custom.yaml",
+                                           "kind":  "schema",
+                                           "bytes":  333,
+                                           "sha256":  "6be99391e80c7f08df10cfaa4324b05058d8c6d3c64642ebbc08749d90456116"
+                                       },
+                                       {
+                                           "path":  "input_methods\\rime\\common.yaml",
+                                           "kind":  "schema",
+                                           "bytes":  957,
+                                           "sha256":  "b464b0f9a551ca01209b3279c40fc75194001baa0043367e84debe28774f22f0"
+                                       },
+                                       {
+                                           "path":  "input_methods\\rime\\default.custom.yaml",
+                                           "kind":  "schema",
+                                           "bytes":  444,
+                                           "sha256":  "44cddd84398821338a0f8b7bfc024bea59b75bd8c97e2a7c59b7ef489bca6686"
+                                       },
+                                       {
+                                           "path":  "input_methods\\rime\\default.yaml",
+                                           "kind":  "schema",
+                                           "bytes":  6978,
+                                           "sha256":  "64c59f2d37e763d6184b016c6ad5f957fc3c406b6e48f8e5af3855ec68955eac"
+                                       },
+                                       {
+                                           "path":  "input_methods\\rime\\include.yaml",
+                                           "kind":  "schema",
+                                           "bytes":  3352,
+                                           "sha256":  "73910e2481f6b813663dbdafcb4cd71b3f37bc38418b4285880b971cf2d87b63"
+                                       },
+                                       {
+                                           "path":  "input_methods\\rime\\jyut6ping3.schema.yaml",
+                                           "kind":  "schema",
+                                           "bytes":  2252,
+                                           "sha256":  "d24a101dfb86b8b77ce37710c072746f09d5fd265f635a767a351e8a67dcf348"
+                                       },
+                                       {
+                                           "path":  "input_methods\\rime\\jyut6ping3_mobile.schema.yaml",
+                                           "kind":  "schema",
+                                           "bytes":  429,
+                                           "sha256":  "b8cd5ac0bc6eb217eb59b8a4dbeaa52e79c3d0fcb0ea2352e25b986be8775bea"
+                                       },
+                                       {
+                                           "path":  "input_methods\\rime\\jyut6ping3_mobile_10keys.schema.yaml",
+                                           "kind":  "schema",
+                                           "bytes":  684,
+                                           "sha256":  "5c61a94b29833aa6fa577a9072d7deac31d740eb28c7d4394bb368d4e8515211"
+                                       },
+                                       {
+                                           "path":  "input_methods\\rime\\jyut6ping3_mobile_initial_final.schema.yaml",
+                                           "kind":  "schema",
+                                           "bytes":  822,
+                                           "sha256":  "c19eb4a0c679669b926dc4e1d9be3e3d8aa4b1a649b4ef7c949a160ec351e5a0"
+                                       },
+                                       {
+                                           "path":  "input_methods\\rime\\jyut6ping3_mobile_longpress.schema.yaml",
+                                           "kind":  "schema",
+                                           "bytes":  597,
+                                           "sha256":  "18e77d00531b42b5d058012fa892b8ad3f934d11e66d9ed9a6c5a94a445f0bf9"
+                                       },
+                                       {
+                                           "path":  "input_methods\\rime\\jyut6ping3_scolar.schema.yaml",
+                                           "kind":  "schema",
+                                           "bytes":  421,
+                                           "sha256":  "677dabff37f7fabc46f21e782ffc08b570adb0837b2b4840986a744ebc3fd575"
+                                       },
+                                       {
+                                           "path":  "input_methods\\rime\\loengfan.schema.yaml",
+                                           "kind":  "schema",
+                                           "bytes":  667,
+                                           "sha256":  "5fbf1371b8cfb8e62f45793614e3f1e6d65a510ec45643fb68bf0813f3a15e5e"
+                                       },
+                                       {
+                                           "path":  "input_methods\\rime\\loengfan_longpress.schema.yaml",
+                                           "kind":  "schema",
+                                           "bytes":  835,
+                                           "sha256":  "ba327578221511423c4087b3a410a03ae5d4100b37e0363f25428e451b3cc39e"
+                                       },
+                                       {
+                                           "path":  "input_methods\\rime\\luna_pinyin.schema.yaml",
+                                           "kind":  "schema",
+                                           "bytes":  994,
+                                           "sha256":  "7ac23ed995331a732973191a73a65e25b4d7cb177973aea31e24a6c00f831ccb"
+                                       },
+                                       {
+                                           "path":  "input_methods\\rime\\template.yaml",
+                                           "kind":  "schema",
+                                           "bytes":  1869,
+                                           "sha256":  "93014ca5514813279ba1214c79f6bf602ba9d4207eb55f97c87e142fe7672a03"
+                                       },
+                                       {
+                                           "path":  "input_methods\\rime\\weasel.yaml",
+                                           "kind":  "schema",
+                                           "bytes":  4162,
+                                           "sha256":  "6073ae0536589be223273127453f6e96a21e8b8e3f0b9bac2e80367e725ecf2b"
+                                       }
+                                   ],
+                   "dictionaries":  [
+                                        {
+                                            "path":  "input_methods\\rime\\cangjie3.dict.yaml",
+                                            "kind":  "dictionary",
+                                            "bytes":  424325,
+                                            "sha256":  "a22a36ad3cb488a978b43c829a065baf42d91575e8fdcad5e704b0587bc905cb"
+                                        },
+                                        {
+                                            "path":  "input_methods\\rime\\cangjie5.dict.yaml",
+                                            "kind":  "dictionary",
+                                            "bytes":  449659,
+                                            "sha256":  "abdc5416c62fc6de727ababcc4732c673a491ebe79fbe9d7caf2d6c35008efb8"
+                                        },
+                                        {
+                                            "path":  "input_methods\\rime\\essay.txt",
+                                            "kind":  "dictionary",
+                                            "bytes":  1843560,
+                                            "sha256":  "7a685cd6eb53c5a706cbb52179a0e1c591de9264d7f29a3941be0ca9aae05394"
+                                        },
+                                        {
+                                            "path":  "input_methods\\rime\\jyut6ping3.dict.yaml",
+                                            "kind":  "dictionary",
+                                            "bytes":  4601055,
+                                            "sha256":  "454253d032dbcdda155f9653b13e7be361a65e3af2b9482d4468fa8d33a93532"
+                                        },
+                                        {
+                                            "path":  "input_methods\\rime\\jyut6ping3_scolar.dict.yaml",
+                                            "kind":  "dictionary",
+                                            "bytes":  9231855,
+                                            "sha256":  "e6672d3285940210e6833b522b7110ac86afd7645187aca1eb44f39ca613aa66"
+                                        },
+                                        {
+                                            "path":  "input_methods\\rime\\loengfan.dict.yaml",
+                                            "kind":  "dictionary",
+                                            "bytes":  1897703,
+                                            "sha256":  "15bb7f016ac3b2509e0ef49db40222b380de5fafeda830dea85d568e5f082abd"
+                                        },
+                                        {
+                                            "path":  "input_methods\\rime\\luna_pinyin.dict.yaml",
+                                            "kind":  "dictionary",
+                                            "bytes":  471348,
+                                            "sha256":  "ae4fb7bd41ee0ddb6f52038ebdf8221ce52f363029e47cd402d7d57a4ea4d02e"
+                                        }
+                                    ],
+                   "opencc":  [
+                                  {
+                                      "path":  "input_methods\\rime\\opencc\\hk2s.json",
+                                      "kind":  "opencc",
+                                      "bytes":  677,
+                                      "sha256":  "2e796ccc70df15aaa6f6a52098ade1dbb0143ba0ad7d07a8f11a2cceef8ee77e"
+                                  },
+                                  {
+                                      "path":  "input_methods\\rime\\opencc\\HKVariantsRev.ocd2",
+                                      "kind":  "opencc",
+                                      "bytes":  4923,
+                                      "sha256":  "4cf112374ada4ab0e3bc21625bf97b9db75a62ec211eea9c77a25fe93b2f40aa"
+                                  },
+                                  {
+                                      "path":  "input_methods\\rime\\opencc\\HKVariantsRevPhrases.ocd2",
+                                      "kind":  "opencc",
+                                      "bytes":  7030,
+                                      "sha256":  "3594f5562797ffc2d32762e5dde2b90695192f7d1ce8a8fda032e1b05e7ad116"
+                                  },
+                                  {
+                                      "path":  "input_methods\\rime\\opencc\\TSCharacters.ocd2",
+                                      "kind":  "opencc",
+                                      "bytes":  46132,
+                                      "sha256":  "d6dc5d82837b631899f5e3be9c02162018b440c6f01e27190fd595c78ac0c32d"
+                                  },
+                                  {
+                                      "path":  "input_methods\\rime\\opencc\\TSPhrases.ocd2",
+                                      "kind":  "opencc",
+                                      "bytes":  9776,
+                                      "sha256":  "5a50521f8c831a436ea6cd297cba88fbe27f25d9b8e616ecf844cb1ab315c85b"
+                                  }
+                              ],
+                   "builtSchemas":  [
+                                        {
+                                            "path":  "input_methods\\rime\\build\\cangjie3.prism.bin",
+                                            "kind":  "built-schema",
+                                            "bytes":  351548,
+                                            "sha256":  "c4e7f3e9e30dc15162952a4f4d758e683ba48e71c226fd17441aba9b4d8fdc10"
+                                        },
+                                        {
+                                            "path":  "input_methods\\rime\\build\\cangjie3.reverse.bin",
+                                            "kind":  "built-schema",
+                                            "bytes":  298300,
+                                            "sha256":  "3ebf4df9f5c859b76f6bb80e1f26c13c8bb50e62f176fbdb4805c124061a7089"
+                                        },
+                                        {
+                                            "path":  "input_methods\\rime\\build\\cangjie3.schema.yaml",
+                                            "kind":  "built-schema",
+                                            "bytes":  7982,
+                                            "sha256":  "cbb6547305a51eea66f14e921374890edbc77baeb28c8c6207060e306eb2c483"
+                                        },
+                                        {
+                                            "path":  "input_methods\\rime\\build\\cangjie3.table.bin",
+                                            "kind":  "built-schema",
+                                            "bytes":  1042612,
+                                            "sha256":  "df2a53b7dd154bc4666b525288c9215995ef9b84e1f146cd38ceb8b639e3614c"
+                                        },
+                                        {
+                                            "path":  "input_methods\\rime\\build\\cangjie5.prism.bin",
+                                            "kind":  "built-schema",
+                                            "bytes":  376124,
+                                            "sha256":  "cd64c37535f87fa78715330558e3019f55859da337fc530a30b1fc26c02bf5e3"
+                                        },
+                                        {
+                                            "path":  "input_methods\\rime\\build\\cangjie5.reverse.bin",
+                                            "kind":  "built-schema",
+                                            "bytes":  313216,
+                                            "sha256":  "153f39870e7f67cea48922efe5c1a1c2add6cf5a45cb8ad057c73ab791918165"
+                                        },
+                                        {
+                                            "path":  "input_methods\\rime\\build\\cangjie5.schema.yaml",
+                                            "kind":  "built-schema",
+                                            "bytes":  7906,
+                                            "sha256":  "4c9298181a2ec0db4a202f0d1125f75837182388b4b80ac1fda9d34fde697af1"
+                                        },
+                                        {
+                                            "path":  "input_methods\\rime\\build\\cangjie5.table.bin",
+                                            "kind":  "built-schema",
+                                            "bytes":  1106260,
+                                            "sha256":  "9af0c338b730b56f1a57d8932ef25ec881a8a6650ce70c8fcb2a84c49cd262c9"
+                                        },
+                                        {
+                                            "path":  "input_methods\\rime\\build\\default.yaml",
+                                            "kind":  "built-schema",
+                                            "bytes":  6984,
+                                            "sha256":  "e5b4a52e8517b1631b196497acec1bdfa1854eb5b5ae7bae563c9bf92e7937cf"
+                                        },
+                                        {
+                                            "path":  "input_methods\\rime\\build\\jyut6ping3.reverse.bin",
+                                            "kind":  "built-schema",
+                                            "bytes":  183636,
+                                            "sha256":  "ef124a27b2a488976f29d55666c689272efffb77fe4a4c42e5de1b33bf1dac51"
+                                        },
+                                        {
+                                            "path":  "input_methods\\rime\\build\\jyut6ping3.table.bin",
+                                            "kind":  "built-schema",
+                                            "bytes":  4640704,
+                                            "sha256":  "4453c292b2b5e1530eec77a04585a864f14dfb5388af5014951265be3c88ce45"
+                                        },
+                                        {
+                                            "path":  "input_methods\\rime\\build\\jyut6ping3_10keys.prism.bin",
+                                            "kind":  "built-schema",
+                                            "bytes":  817152,
+                                            "sha256":  "1e3ba3ad4170bcb2b30a860fac8c813e895302412735664bb2fb74690b6bd051"
+                                        },
+                                        {
+                                            "path":  "input_methods\\rime\\build\\jyut6ping3_mobile.prism.bin",
+                                            "kind":  "built-schema",
+                                            "bytes":  261360,
+                                            "sha256":  "a8e4d7813976aa3fe8571062dcc43495bc722588d029eee75bcbc6fc90fd97c3"
+                                        },
+                                        {
+                                            "path":  "input_methods\\rime\\build\\jyut6ping3_mobile.schema.yaml",
+                                            "kind":  "built-schema",
+                                            "bytes":  9075,
+                                            "sha256":  "545baea09afcb9e75e03ab92250376c737380cca150049f27278f1b2dfe963a9"
+                                        },
+                                        {
+                                            "path":  "input_methods\\rime\\build\\jyut6ping3_mobile_10keys.schema.yaml",
+                                            "kind":  "built-schema",
+                                            "bytes":  8950,
+                                            "sha256":  "4b58a09a54c1006e3ad6ec7a44c9e4deccc4d2023fbfbe01b211c60ec97a21d4"
+                                        },
+                                        {
+                                            "path":  "input_methods\\rime\\build\\jyut6ping3_mobile_initial_final.prism.bin",
+                                            "kind":  "built-schema",
+                                            "bytes":  336848,
+                                            "sha256":  "e07bf40e93bdb9ab39770e98c5fae7d4c049ed2f34413b2b656c8ab71a125f65"
+                                        },
+                                        {
+                                            "path":  "input_methods\\rime\\build\\jyut6ping3_mobile_initial_final.schema.yaml",
+                                            "kind":  "built-schema",
+                                            "bytes":  8607,
+                                            "sha256":  "6bc55db9cca247cc4321e895960a7d508ad3a99401f56ca58ae10b80d644db2e"
+                                        },
+                                        {
+                                            "path":  "input_methods\\rime\\build\\jyut6ping3_mobile_longpress.prism.bin",
+                                            "kind":  "built-schema",
+                                            "bytes":  367968,
+                                            "sha256":  "31125d10ca79ea2d327d5f547641b686cc361c4810d8f63d79916ed37fd65975"
+                                        },
+                                        {
+                                            "path":  "input_methods\\rime\\build\\jyut6ping3_mobile_longpress.schema.yaml",
+                                            "kind":  "built-schema",
+                                            "bytes":  8795,
+                                            "sha256":  "6a8531e321c25f51281d7a21493af80f9c458e6b915fab932a975eec7514ec95"
+                                        },
+                                        {
+                                            "path":  "input_methods\\rime\\build\\jyut6ping3_scolar.prism.bin",
+                                            "kind":  "built-schema",
+                                            "bytes":  2494780,
+                                            "sha256":  "7abcac74591356ea21bb60e25e654fb82fb3968921bd594cc775726ccc76d6d8"
+                                        },
+                                        {
+                                            "path":  "input_methods\\rime\\build\\jyut6ping3_scolar.reverse.bin",
+                                            "kind":  "built-schema",
+                                            "bytes":  4450408,
+                                            "sha256":  "084e32badce2054d326c48259663db432ec5debf9923cc631c0b1a91844c687b"
+                                        },
+                                        {
+                                            "path":  "input_methods\\rime\\build\\jyut6ping3_scolar.schema.yaml",
+                                            "kind":  "built-schema",
+                                            "bytes":  584,
+                                            "sha256":  "7aa529c8c9b076137c1a53c8e86fb074ecba7526f81eabc477a5851f83f66a5b"
+                                        },
+                                        {
+                                            "path":  "input_methods\\rime\\build\\jyut6ping3_scolar.table.bin",
+                                            "kind":  "built-schema",
+                                            "bytes":  7414044,
+                                            "sha256":  "7f4ed89fce2af4df8e7d953ab30fdb6ede59b611adfc5d5529355343d0c4aa35"
+                                        },
+                                        {
+                                            "path":  "input_methods\\rime\\build\\loengfan.prism.bin",
+                                            "kind":  "built-schema",
+                                            "bytes":  159872,
+                                            "sha256":  "b9a908410a9e0b43967b82a5372a9707510d1f1bb215756b9749a30e97abb144"
+                                        },
+                                        {
+                                            "path":  "input_methods\\rime\\build\\loengfan.reverse.bin",
+                                            "kind":  "built-schema",
+                                            "bytes":  8400,
+                                            "sha256":  "8a67bae8a8fb58a798dcf5ff97bab04d334a7ac5f97f8fa507f3fcf9c0d1e2a0"
+                                        },
+                                        {
+                                            "path":  "input_methods\\rime\\build\\loengfan.schema.yaml",
+                                            "kind":  "built-schema",
+                                            "bytes":  8729,
+                                            "sha256":  "48b11c7b72b1cd427965d9d633e74ace0df7c5b307f90352c1bc5d3cd682c7bd"
+                                        },
+                                        {
+                                            "path":  "input_methods\\rime\\build\\loengfan.table.bin",
+                                            "kind":  "built-schema",
+                                            "bytes":  2068508,
+                                            "sha256":  "cb97954132124feebe98be7a79cdf2fd556cbfcadb6673401e1a12be42c43773"
+                                        },
+                                        {
+                                            "path":  "input_methods\\rime\\build\\loengfan_longpress.prism.bin",
+                                            "kind":  "built-schema",
+                                            "bytes":  218944,
+                                            "sha256":  "6d8bb41861c5d7deccd986c7f57edf9fa5a222af4becc69a314018aa2981b07c"
+                                        },
+                                        {
+                                            "path":  "input_methods\\rime\\build\\loengfan_longpress.schema.yaml",
+                                            "kind":  "built-schema",
+                                            "bytes":  8449,
+                                            "sha256":  "61c8870f78acb3d1e2ec47fbe473fdf1a55b26b2ed86ba6ccf5c792a77d52a1e"
+                                        },
+                                        {
+                                            "path":  "input_methods\\rime\\build\\luna_pinyin.prism.bin",
+                                            "kind":  "built-schema",
+                                            "bytes":  23816,
+                                            "sha256":  "f760bbc98584cb34ef9ebdd1a7c5d0577f458d6997c7962d6293f1dc7d2da7a1"
+                                        },
+                                        {
+                                            "path":  "input_methods\\rime\\build\\luna_pinyin.reverse.bin",
+                                            "kind":  "built-schema",
+                                            "bytes":  252868,
+                                            "sha256":  "ab37efb79811841b0b930c3cddd9d8d7cb759a2d75fca4dda293179e6f47adaa"
+                                        },
+                                        {
+                                            "path":  "input_methods\\rime\\build\\luna_pinyin.schema.yaml",
+                                            "kind":  "built-schema",
+                                            "bytes":  8234,
+                                            "sha256":  "821f325d699ceebe1d769829515c2cd37ec9c508d1954722d625f116847b2548"
+                                        },
+                                        {
+                                            "path":  "input_methods\\rime\\build\\luna_pinyin.table.bin",
+                                            "kind":  "built-schema",
+                                            "bytes":  472264,
+                                            "sha256":  "500b023dc3358be02611f8f0e0dd5d76d6fbff0e44732db4292b54ac4e8e6361"
+                                        }
+                                    ]
+               },
+    "commands":  {
+                     "deployer":  {
+                                      "command":  "D:\\VSProjects\\moqi-im-windows\\runtime\\typeduck-phase02\\engine\\bin\\rime_deployer.exe --build \"D:\\VSProjects\\moqi-im-windows\\runtime\\typeduck-phase02\\input_methods\\rime\\user\" \"D:\\VSProjects\\moqi-im-windows\\runtime\\typeduck-phase02\\input_methods\\rime\" \"D:\\VSProjects\\moqi-im-windows\\runtime\\typeduck-phase02\\input_methods\\rime\\build\"",
+                                      "exitCode":  0,
+                                      "stdout":  "",
+                                      "stderr":  ""
+                                  }
+                 }
+}

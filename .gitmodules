@@ -10,3 +10,7 @@
 [submodule "installer/Inno-Setup-Chinese-Simplified-Translation"]
 	path = installer/Inno-Setup-Chinese-Simplified-Translation
 	url = https://github.com/kira-96/Inno-Setup-Chinese-Simplified-Translation
+[submodule "third_party/typeduck-schema"]
+	path = third_party/typeduck-schema
+	url = https://github.com/TypeDuck-HK/schema
+	branch = aap2-alpha
