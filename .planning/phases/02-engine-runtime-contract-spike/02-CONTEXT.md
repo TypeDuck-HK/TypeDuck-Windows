@@ -28,12 +28,14 @@ This phase proves the TypeDuck engine/runtime path on Windows: TypeDuck-HK `rime
 ### Dictionary Output Contract
 - **D-09:** Phase 2 should prove raw lookup-filter CSV/comment output first, not invent a new structured TypeDuck candidate/dictionary schema yet.
 - **D-10:** The expected CSV/comment columns are: `match_input_buffer,honzi,jyutping,canonical_honzi,canonical_jyutping,components_honzi,components_jyutping,pron_label,lit_col_reading,pos,register,label,written_form,vernacular_form,collocation,eng,hin,urd,nep,ind`.
-- **D-11:** Later Phase 4/5 work maps those raw columns into protocol and UI fields. Phase 2 only needs to capture proof that the engine emits them for representative TypeDuck inputs.
+- **D-11:** The candidate comment format intentionally uses control-character separators. In escaped notation: optional leading `\v` marks reverse lookup; text before the first `\f` is the candidate note; dictionary entries follow only when the remaining payload starts with `\r`; each dictionary entry is one CSV row and entries are separated by `\r`. If the payload after the note does not start with `\r`, it is treated as `\f`-separated Jyutping-only pronunciation data instead.
+- **D-12:** CSV parsing follows standard comma separation with double-quoted fields and doubled quotes (`""`) inside quoted values. Empty fields are allowed. Do not strip or normalize `\v`, `\f`, or `\r` during Phase 2 evidence capture; they are part of the Web alpha-compatible payload format, not corrupt text.
+- **D-13:** Later Phase 4/5 work maps those raw columns into protocol and UI fields. Phase 2 only needs to capture proof that the engine emits them for representative TypeDuck inputs.
 
 ### Legacy Backend Limits
-- **D-12:** Using `moqi-ime` as a bridge does not allow shipping unchanged Moqi product behavior. Moqi/fcitx/cloud/AI surfaces remain banned from TypeDuck v1 user-visible behavior.
-- **D-13:** Do not treat legacy `moqi-ime` fallback behavior as valid product behavior. The bridge is acceptable only insofar as it loads TypeDuck-HK librime/schema assets and exposes the required TypeDuck engine evidence.
-- **D-14:** Broad protocol replacement, TypeDuck product naming, installer/runtime packaging cleanup, and visible UI removal belong to later mapped phases unless a minimal change is required to complete the engine proof.
+- **D-14:** Using `moqi-ime` as a bridge does not allow shipping unchanged Moqi product behavior. Moqi/fcitx/cloud/AI surfaces remain banned from TypeDuck v1 user-visible behavior.
+- **D-15:** Do not treat legacy `moqi-ime` fallback behavior as valid product behavior. The bridge is acceptable only insofar as it loads TypeDuck-HK librime/schema assets and exposes the required TypeDuck engine evidence.
+- **D-16:** Broad protocol replacement, TypeDuck product naming, installer/runtime packaging cleanup, and visible UI removal belong to later mapped phases unless a minimal change is required to complete the engine proof.
 
 ### the agent's Discretion
 The planner may choose the exact staging directory name and verification command shape, provided the staged tree clearly separates TypeDuck runtime assets from legacy Moqi product truth and records reproducible proof outputs.
@@ -104,6 +106,7 @@ The planner may choose the exact staging directory name and verification command
 - The middle-end is not required by TypeDuck-Web, but it is acceptable on Windows because it preserves process isolation and avoids immediate dual-bitness in-process DLL loading concerns.
 - Phase 2 documentation should say the replacement `rime.dll` is available from the TypeDuck-HK librime v1.1.3 release URL, not document how that release was produced.
 - The expected lookup-filter output contract is the explicit CSV column list from the TypeDuck schema/plugin path.
+- Preserve and test escaped control-character semantics in candidate comments: `\v` reverse-lookup marker, `\f` note/pronunciation separator, and `\r` dictionary CSV entry separator.
 
 </specifics>
 

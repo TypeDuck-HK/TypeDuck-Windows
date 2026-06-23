@@ -32,7 +32,7 @@
 | Both raw + typed | Store raw plugin output plus a best-effort structured JSON shape. | |
 
 **User's choice:** Raw comment/CSV contract first.
-**Notes:** User clarified that the CSV is already clearly specified with columns `match_input_buffer,honzi,jyutping,canonical_honzi,canonical_jyutping,components_honzi,components_jyutping,pron_label,lit_col_reading,pos,register,label,written_form,vernacular_form,collocation,eng,hin,urd,nep,ind`. Phase 2 should prove these are emitted; later phases map them into protocol/UI fields.
+**Notes:** User clarified that the CSV is already clearly specified with columns `match_input_buffer,honzi,jyutping,canonical_honzi,canonical_jyutping,components_honzi,components_jyutping,pron_label,lit_col_reading,pos,register,label,written_form,vernacular_form,collocation,eng,hin,urd,nep,ind`. Phase 2 should prove these are emitted; later phases map them into protocol/UI fields. The payload intentionally uses control-character separators: escaped `\v` for reverse lookup, escaped `\f` between candidate note and following data or Jyutping-only pronunciation chunks, and escaped `\r` to introduce/separate dictionary CSV entries. These should not be treated as corrupt text during planning or evidence capture.
 
 ---
 
