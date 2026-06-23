@@ -28,7 +28,7 @@
 - [x] **ENG-03**: Installed runtime includes the TypeDuck schemas, dictionaries, OpenCC assets, and built schema assets required to mirror TypeDuck Web alpha.
 - [x] **ENG-04**: TypeDuck engine runtime can produce Cantonese composition, candidate pages, Jyutping, and commit output from TypeDuck schema input.
 - [x] **ENG-05**: TypeDuck engine runtime can produce lookup-filter-backed dictionary data for candidates, including headword, Jyutping, part-of-speech, English meaning, reading notes, and enabled-language meanings when available.
-- [ ] **ENG-06**: Engine/runtime failure does not crash arbitrary TSF host applications; user receives a bounded degraded state or clean reset.
+- [x] **ENG-06**: Engine/runtime failure does not crash arbitrary TSF host applications; user receives a bounded degraded state or clean reset.
 
 ### Protocol and Data Model
 
@@ -45,7 +45,7 @@
 - [ ] **TYPE-02**: User can use candidate count per page according to the TypeDuck setting.
 - [ ] **TYPE-03**: User can use reverse lookup behavior consistent with TypeDuck Web alpha where supported by the engine.
 - [ ] **TYPE-04**: User can choose Cangjie Version 3 or Version 5 where TypeDuck Web alpha exposes that setting and the engine confirms support.
-- [ ] **TYPE-05**: Key handling remains responsive under normal typing; engine timeouts or restarts do not hang host applications.
+- [x] **TYPE-05**: Key handling remains responsive under normal typing; engine timeouts or restarts do not hang host applications.
 
 ### Candidate and Dictionary UI
 
@@ -153,7 +153,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | ENG-03 | Phase 2 | Complete |
 | ENG-04 | Phase 2 | Complete |
 | ENG-05 | Phase 2 | Complete |
-| ENG-06 | Phase 4 | Pending |
+| ENG-06 | Phase 4 | Complete |
 | PROTO-01 | Phase 4 | Complete |
 | PROTO-02 | Phase 4 | Complete |
 | PROTO-03 | Phase 4 | Complete |
@@ -164,7 +164,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | TYPE-02 | Phase 4 | Pending |
 | TYPE-03 | Phase 4 | Pending |
 | TYPE-04 | Phase 4 | Pending |
-| TYPE-05 | Phase 4 | Pending |
+| TYPE-05 | Phase 4 | Complete |
 | CAND-01 | Phase 5 | Pending |
 | CAND-02 | Phase 5 | Pending |
 | CAND-03 | Phase 5 | Pending |
