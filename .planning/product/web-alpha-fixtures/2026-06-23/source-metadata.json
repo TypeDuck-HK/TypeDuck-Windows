@@ -1,7 +1,7 @@
-{
+﻿{
   "captureDate": "2026-06-23",
-  "captureStatus": "partial",
-  "statusReason": "Source, runtime URL, settings screenshot, and candidate screenshot were captured. Dictionary panel behavior is source-backed, but the desktop dictionary-detail screenshot is partial because Playwright hover/touch automation did not display the dictionary panel reliably.",
+  "captureStatus": "complete-with-baseline-limitation",
+  "statusReason": "Source, runtime URL, baseline settings/candidate screenshots, and an additional multilingual Indonesian-main settings/candidate/dictionary screenshot set were captured. The original baseline dictionary-detail filename remains partial because the first automation did not move over a concrete candidate cell.",
   "alphaUrl": "http://localhost:5173/TypeDuck-Web/aap2-alpha/",
   "runtimeAvailability": {
     "status": "available",
@@ -66,14 +66,58 @@
         "status": "partial",
         "viewport": "1280x720",
         "limitation": "Candidate panel captured, but dictionary panel did not appear from controlled hover/move automation. A second touch-enabled attempt could not get a usable candidate button bounding box. Dictionary structure remains source-backed from DictionaryPanel.tsx and CandidateInfo.ts."
+      },
+      {
+        "file": "screenshots/settings-multilingual-indonesian-main-desktop-1280x720.png",
+        "status": "captured",
+        "viewport": "1280x720",
+        "evidence": "Runtime page with all Display Languages enabled and Indonesian selected as main language."
+      },
+      {
+        "file": "screenshots/candidate-multilingual-indonesian-main-desktop-1280x720.png",
+        "status": "captured",
+        "viewport": "1280x720",
+        "evidence": "Controlled textarea input `nei` with English, Hindi, Indonesian, Nepali, and Urdu enabled; Indonesian is the main language."
+      },
+      {
+        "file": "screenshots/dictionary-detail-multilingual-indonesian-main-desktop-1280x720.png",
+        "status": "captured",
+        "viewport": "1280x720",
+        "evidence": "Dictionary panel appeared after moving the mouse across the first candidate cell, matching the Web alpha anti-flicker behavior."
       }
     ]
   },
   "runtimeObservation": {
     "inputAttempt": "Typed `nei` into the Web alpha textarea through Playwright.",
     "candidatePanelVisible": true,
-    "candidatePanelText": "nei\u2038\n\u2039\n\u203a\n1.\t\nnei5\n\u4f60\n\t\t\nyou (singular)\n\t\u24d8\n2.\t\nnei4\n\u5c3c\n\t\t\nnun\n\t\u24d8\n3.\t\nnei1\n\u5462\n\t\t\u2192ni1\t\u24d8\n4.\t\nnei4\n\u59ae\n\t\t\nlittle girl\n\t\u24d8\n5.\t\nnei4\n\u5f4c\n\t\t\nfull; fill\n\t\u24d8\n6.\t\nnei5\n\u59b3\n\t\t\nyou\n\t\u24d8",
-    "dictionaryPanelVisible": false
+    "candidatePanelText": "nei‸\n‹\n›\n1.\t\nnei5\n你\n\t\t\nyou (singular)\n\tⓘ\n2.\t\nnei4\n尼\n\t\t\nnun\n\tⓘ\n3.\t\nnei1\n呢\n\t\t→ni1\tⓘ\n4.\t\nnei4\n妮\n\t\t\nlittle girl\n\tⓘ\n5.\t\nnei4\n彌\n\t\t\nfull; fill\n\tⓘ\n6.\t\nnei5\n妳\n\t\t\nyou\n\tⓘ",
+    "dictionaryPanelVisible": false,
+    "multilingualPreferenceAttempt": {
+      "displayLanguages": [
+        "eng",
+        "hin",
+        "ind",
+        "nep",
+        "urd"
+      ],
+      "mainLanguage": "ind",
+      "localStorage": {
+        "displayLanguages": "eng,hin,ind,nep,urd",
+        "mainLanguage": "ind"
+      },
+      "checkedLabels": [
+        "英語 English",
+        "印地語 Hindi",
+        "印尼語 Indonesian",
+        "尼泊爾語 Nepali",
+        "烏爾都語 Urdu",
+        "顯示 Always Show"
+      ]
+    },
+    "multilingualCandidatePanelText": "nei‸\n‹\n›\n1. nei5 你 you (singular) / kamu / आप / तपाईं / تم\n2. nei4 尼 nun / kamu\n3. nei1 呢 →ni1\n4. nei4 妮 little girl\n5. nei4 彌 full; fill / penuh\n6. nei5 妳 you / Kamu / आप / तपाईं / تم",
+    "multilingualDictionaryPanelVisible": true,
+    "multilingualDictionaryPanelText": "你nei5\nother 其他kamu\nMore Languages\nEnglish\tyou (singular)\nHindi\tआप\nNepali\tतपाईं\nUrdu\tتم",
+    "dictionaryHoverBehavior": "The Web alpha intentionally requires mouse movement over a candidate, not merely a stationary pointer, before showing the dictionary panel. Capture used multiple physical mouse moves across the first candidate cell."
   },
   "attemptedCommandsAndTools": [
     "git -C I:\\GitHub\\TypeDuck-Web rev-parse --short HEAD",
@@ -81,7 +125,8 @@
     "Invoke-WebRequest -Uri http://localhost:5173/TypeDuck-Web/aap2-alpha/ -UseBasicParsing -TimeoutSec 5",
     "Playwright Chromium launch with viewport 1280x720 and Chrome executable C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe",
     "Playwright textarea input `nei`, screenshot capture for settings and candidate panel",
-    "Playwright hover/mousemove/touchstart attempts for dictionary panel screenshot"
+    "Playwright hover/mousemove/touchstart attempts for dictionary panel screenshot",
+    "Playwright enabled all display languages, selected Indonesian as main language, typed `nei`, and moved the mouse over the first candidate cell before capturing the dictionary panel."
   ],
   "accessLimitations": [
     {
@@ -91,8 +136,8 @@
     },
     {
       "area": "dictionary screenshot",
-      "status": "partial",
-      "detail": "Runtime dictionary panel did not appear under automated hover/touch capture despite source-backed dictionary behavior."
+      "status": "baseline partial, multilingual captured",
+      "detail": "The original baseline dictionary-detail screenshot remained partial, but an additional multilingual Indonesian-main dictionary screenshot was captured after moving over a concrete candidate cell."
     }
   ],
   "privacyNotes": [

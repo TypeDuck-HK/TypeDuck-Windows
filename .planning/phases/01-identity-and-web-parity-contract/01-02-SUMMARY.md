@@ -11,7 +11,7 @@ provides:
   - Dated TypeDuck Web alpha fixture contract for VER-01
   - Source/runtime provenance JSON for the 2026-06-23 Web alpha capture
   - Settings, candidate-list, and dictionary-detail fixture JSON
-  - Settings and candidate-list desktop screenshots with dictionary screenshot status recorded as partial
+  - Settings and candidate-list desktop screenshots, plus additional multilingual Indonesian-main settings/candidate/dictionary screenshots
 affects: [phase-5-ui-parity, phase-7-release-verification]
 
 tech-stack:
@@ -30,11 +30,14 @@ key-files:
     - .planning/product/web-alpha-fixtures/2026-06-23/dictionary-detail-sample.json
     - .planning/product/web-alpha-fixtures/2026-06-23/screenshots/settings-desktop-1280x720.png
     - .planning/product/web-alpha-fixtures/2026-06-23/screenshots/candidate-desktop-1280x720.png
+    - .planning/product/web-alpha-fixtures/2026-06-23/screenshots/settings-multilingual-indonesian-main-desktop-1280x720.png
+    - .planning/product/web-alpha-fixtures/2026-06-23/screenshots/candidate-multilingual-indonesian-main-desktop-1280x720.png
+    - .planning/product/web-alpha-fixtures/2026-06-23/screenshots/dictionary-detail-multilingual-indonesian-main-desktop-1280x720.png
   modified: []
 
 key-decisions:
   - "The 2026-06-23 Web alpha fixture is source-backed at TypeDuck-Web commit db21054 with dirty-worktree status recorded."
-  - "Settings and candidate-list screenshots were captured at 1280x720; dictionary-detail screenshot status is partial because automation did not display the panel."
+  - "Settings and candidate-list baseline screenshots were captured at 1280x720; an additional multilingual Indonesian-main set captures settings, candidate list, and dictionary detail."
   - "Phase 5 and Phase 7 must refresh Web alpha fixtures if the alpha drifts before UI implementation or release verification."
 
 patterns-established:
@@ -51,7 +54,7 @@ status: complete
 
 # Phase 1 Plan 2: Web Alpha Fixture Contract Summary
 
-**Source-backed TypeDuck Web alpha fixtures for settings order, candidate presentation, dictionary fields, and dated visual references**
+**Source-backed TypeDuck Web alpha fixtures with baseline and multilingual Indonesian-main visual references**
 
 ## Performance
 
@@ -59,14 +62,14 @@ status: complete
 - **Started:** 2026-06-23T07:23:08Z
 - **Completed:** 2026-06-23T07:40:32Z
 - **Tasks:** 2
-- **Files modified:** 8
+- **Files modified:** 11
 
 ## Accomplishments
 
 - Created the dated VER-01 fixture contract at `.planning/product/TYPEDUCK-WEB-ALPHA-FIXTURES-2026-06-23.md`.
 - Captured source provenance from `I:\GitHub\TypeDuck-Web` at commit `db21054`, branch `aap2-alpha`, with dirty worktree status recorded.
 - Created small JSON fixtures for settings order/defaults, candidate-list presentation, and dictionary-detail structure.
-- Captured settings and candidate-list desktop screenshots at `1280x720`; recorded dictionary-detail screenshot as partial with the exact Playwright hover/touch limitation.
+- Captured settings and candidate-list desktop screenshots at `1280x720`, then added a multilingual Indonesian-main settings/candidate/dictionary screenshot set after moving the mouse over a concrete candidate cell.
 
 ## Task Commits
 
@@ -84,12 +87,15 @@ status: complete
 - `.planning/product/web-alpha-fixtures/2026-06-23/dictionary-detail-sample.json` - Dictionary panel field contract and partial screenshot status.
 - `.planning/product/web-alpha-fixtures/2026-06-23/screenshots/settings-desktop-1280x720.png` - Captured settings screenshot.
 - `.planning/product/web-alpha-fixtures/2026-06-23/screenshots/candidate-desktop-1280x720.png` - Captured candidate-list screenshot.
+- `.planning/product/web-alpha-fixtures/2026-06-23/screenshots/settings-multilingual-indonesian-main-desktop-1280x720.png` - Captured settings screenshot with all display languages enabled and Indonesian as main.
+- `.planning/product/web-alpha-fixtures/2026-06-23/screenshots/candidate-multilingual-indonesian-main-desktop-1280x720.png` - Captured candidate-list screenshot with multilingual definitions.
+- `.planning/product/web-alpha-fixtures/2026-06-23/screenshots/dictionary-detail-multilingual-indonesian-main-desktop-1280x720.png` - Captured dictionary-detail screenshot after moving over the first candidate cell.
 
 ## Decisions Made
 
 - Treat `db21054` plus dirty source status as the provenance for this fixture, not as a permanently clean product baseline.
-- Mark dictionary-detail screenshot capture partial instead of fabricating a visual reference from source structure.
-- Keep the fixture JSON ASCII-safe so the plan's Windows PowerShell validation commands parse consistently.
+- Preserve the original baseline screenshots and add multilingual screenshots rather than replacing prior evidence.
+- Use readable UTF-8 JSON with a BOM, and prefer `Get-Content -Raw -Encoding UTF8` for validation.
 
 ## Deviations from Plan
 
@@ -110,7 +116,7 @@ status: complete
 
 ## Issues Encountered
 
-- Dictionary-detail screenshot capture is partial: Playwright successfully captured settings and candidate-list states, but the dictionary panel did not appear under controlled hover/move/touch attempts. The dictionary field contract is still source-backed through `DictionaryPanel.tsx`, `CandidateInfo.ts`, `consts.ts`, and `index.css`.
+- Initial dictionary-detail screenshot capture was partial because the automation did not move across a concrete candidate cell. A follow-up capture succeeded by moving the mouse over the first candidate cell, matching the Web alpha anti-flicker behavior.
 
 ## Known Stubs
 
@@ -144,6 +150,9 @@ Phase 1 artifacts now cover IDEN-02 and VER-01. Phase 2 can proceed to the engin
 - Found `.planning/product/web-alpha-fixtures/2026-06-23/dictionary-detail-sample.json`
 - Found `.planning/product/web-alpha-fixtures/2026-06-23/screenshots/settings-desktop-1280x720.png`
 - Found `.planning/product/web-alpha-fixtures/2026-06-23/screenshots/candidate-desktop-1280x720.png`
+- Found `.planning/product/web-alpha-fixtures/2026-06-23/screenshots/settings-multilingual-indonesian-main-desktop-1280x720.png`
+- Found `.planning/product/web-alpha-fixtures/2026-06-23/screenshots/candidate-multilingual-indonesian-main-desktop-1280x720.png`
+- Found `.planning/product/web-alpha-fixtures/2026-06-23/screenshots/dictionary-detail-multilingual-indonesian-main-desktop-1280x720.png`
 - Found task commit `b835f77`
 - Found task commit `002873b`
 

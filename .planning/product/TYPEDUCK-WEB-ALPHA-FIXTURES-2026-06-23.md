@@ -21,7 +21,7 @@ This artifact records the TypeDuck Web alpha behavior and source evidence captur
 | Browser capture | Playwright with Google Chrome |
 | Browser executable | `C:\Program Files\Google\Chrome\Application\chrome.exe` |
 | Viewport | 1280x720, device scale factor 1 |
-| Overall fixture status | Partial: source evidence, runtime URL, settings screenshot, and candidate screenshot captured; dictionary screenshot is partial/blocked by automation limits |
+| Overall fixture status | Complete with baseline limitation: source evidence, runtime URL, baseline settings/candidate screenshots, and an additional multilingual Indonesian-main settings/candidate/dictionary screenshot set were captured |
 
 Supporting assets:
 
@@ -32,6 +32,9 @@ Supporting assets:
 - `web-alpha-fixtures/2026-06-23/screenshots/settings-desktop-1280x720.png` - captured
 - `web-alpha-fixtures/2026-06-23/screenshots/candidate-desktop-1280x720.png` - captured
 - `web-alpha-fixtures/2026-06-23/screenshots/dictionary-detail-desktop-1280x720.png` - partial/blocked, no file created because the dictionary panel did not appear under controlled Playwright hover/touch attempts
+- `web-alpha-fixtures/2026-06-23/screenshots/settings-multilingual-indonesian-main-desktop-1280x720.png` - captured with all Display Languages enabled and Indonesian selected as main
+- `web-alpha-fixtures/2026-06-23/screenshots/candidate-multilingual-indonesian-main-desktop-1280x720.png` - captured with all Display Languages enabled and Indonesian selected as main
+- `web-alpha-fixtures/2026-06-23/screenshots/dictionary-detail-multilingual-indonesian-main-desktop-1280x720.png` - captured after physically moving the mouse over the first candidate cell
 
 ## Settings
 
@@ -57,6 +60,7 @@ Display Languages behavior:
 - Selecting a main display language also enables that language.
 - The main-language marker is `⬑ 主要語言 Main Language`.
 - The Web alpha language set for VER-01 is English, Hindi, Indonesian, Nepali, and Urdu.
+- Additional multilingual screenshot coverage enables all five languages and selects Indonesian (`印尼語 Indonesian`) as the main language.
 - Full machine-readable detail is in `web-alpha-fixtures/2026-06-23/settings-order.json`.
 
 ## Candidate List
@@ -66,6 +70,7 @@ Source-backed by `I:\GitHub\TypeDuck-Web\src\CandidatePanel.tsx`, `Candidate.tsx
 Visual reference:
 
 - `web-alpha-fixtures/2026-06-23/screenshots/candidate-desktop-1280x720.png`
+- `web-alpha-fixtures/2026-06-23/screenshots/candidate-multilingual-indonesian-main-desktop-1280x720.png`
 - Viewport: 1280x720
 - Status: captured
 
@@ -85,6 +90,7 @@ Candidate presentation contract:
 - Candidate panel shows active input buffer text.
 - Candidate rows include selection label, Jyutping when enabled, Chinese candidate text, note/full input code when relevant, enabled display-language definitions or canonical/label text, and an info indicator when dictionary data is available.
 - Default display-language definitions show English only because `displayLanguages` defaults to English.
+- With all Display Languages enabled and Indonesian selected as main, candidate rows show Indonesian definitions in the main position and additional enabled-language rows for English, Hindi, Nepali, and Urdu when data is present.
 - Candidate page size defaults to 6 and is configurable from 4 through 10.
 - Web alpha visual tone uses a light panel, base-400 border, warm amber highlight, HK-aware font stacks, compact rows, and restrained rounded corners.
 - Full machine-readable detail is in `web-alpha-fixtures/2026-06-23/candidate-list-sample.json`.
@@ -96,9 +102,10 @@ Source-backed by `I:\GitHub\TypeDuck-Web\src\DictionaryPanel.tsx`, `CandidateInf
 Visual reference:
 
 - `web-alpha-fixtures/2026-06-23/screenshots/dictionary-detail-desktop-1280x720.png`
+- `web-alpha-fixtures/2026-06-23/screenshots/dictionary-detail-multilingual-indonesian-main-desktop-1280x720.png`
 - Viewport: 1280x720
-- Status: partial/blocked
-- Limitation: Playwright captured the candidate panel, but the dictionary panel did not appear from controlled hover/move automation. A second touch-enabled attempt could not get a usable candidate button bounding box. Do not fabricate a dictionary screenshot from memory or source structure.
+- Status: baseline partial, multilingual captured
+- Limitation: The original baseline dictionary-detail screenshot remains partial because the first automation did not move across a concrete candidate cell. The multilingual Indonesian-main dictionary screenshot was captured after physically moving the mouse across the first candidate cell, which matches the Web alpha behavior that prevents flicker when the pointer is merely resting on candidates during typing.
 
 Dictionary fields the Windows UI must be able to represent when engine data exists:
 
@@ -120,7 +127,8 @@ Sample source-backed entry anchored to the runtime `nei` candidate list:
 - Headword: 你
 - Jyutping: `nei5`
 - English meaning: `you (singular)`
-- More Languages: source-backed structure supports Hindi, Indonesian, Nepali, and Urdu rows when those display languages are enabled and populated.
+- Indonesian main definition in multilingual capture: `kamu`
+- More Languages runtime capture: English `you (singular)`, Hindi `आप`, Nepali `तपाईं`, Urdu `تم`.
 
 Full machine-readable detail is in `web-alpha-fixtures/2026-06-23/dictionary-detail-sample.json`.
 
@@ -138,9 +146,17 @@ Captured status for this run:
 |------------|--------|-------------------|
 | Settings | captured | `web-alpha-fixtures/2026-06-23/screenshots/settings-desktop-1280x720.png` |
 | Candidate list | captured | `web-alpha-fixtures/2026-06-23/screenshots/candidate-desktop-1280x720.png` |
-| Dictionary detail | partial/blocked | No screenshot file created; automation could not display the dictionary panel. Source-backed dictionary fixture remains available. |
+| Dictionary detail | partial/blocked baseline | No baseline screenshot file created; the first automation did not move across a concrete candidate cell. |
+| Settings, multilingual Indonesian main | captured | `web-alpha-fixtures/2026-06-23/screenshots/settings-multilingual-indonesian-main-desktop-1280x720.png` |
+| Candidate list, multilingual Indonesian main | captured | `web-alpha-fixtures/2026-06-23/screenshots/candidate-multilingual-indonesian-main-desktop-1280x720.png` |
+| Dictionary detail, multilingual Indonesian main | captured | `web-alpha-fixtures/2026-06-23/screenshots/dictionary-detail-multilingual-indonesian-main-desktop-1280x720.png` |
 
 Blocked/partial metadata is acceptable for Phase 1 when capture is unavailable or unreliable, provided the exact attempted source and limitation are recorded. This artifact records that limitation in `source-metadata.json` and `dictionary-detail-sample.json`.
+
+Dictionary capture interaction note:
+
+- The Web alpha intentionally requires actual mouse movement over a candidate before showing the dictionary panel. This prevents flicker while typing if the pointer happens to be resting on later candidates.
+- The successful capture moved the mouse across the first candidate cell after typing `nei`.
 
 Visual token evidence from `tailwind.config.ts` and `index.css`:
 
@@ -186,6 +202,7 @@ These notes are future consumer constraints only. They are not production change
 - Refresh this fixture before Phase 5 UI implementation because the Web alpha can drift.
 - Refresh again before Phase 7 release verification if user-facing Web alpha behavior or visuals changed.
 - Always record capture date, source path, commit/hash, dirty status, runtime URL, viewport, browser/tool, screenshots, and limitations.
+- Validate readable UTF-8 JSON with `Get-Content -Raw -Encoding UTF8 -LiteralPath <file> | ConvertFrom-Json` in Windows PowerShell. The JSON files are also saved with a UTF-8 BOM for compatibility with the original plan checks.
 - Use controlled sample input only. Do not capture personal typed content or local user data.
 - If runtime, source, screenshot, candidate, or dictionary evidence is unavailable, mark the affected section blocked or partial with the exact attempted source.
 - Do not treat Moqi, fcitx, WebDAV/cloud clipboard, AI controls, Simplified-only copy, generic backend config tools, excessive customization, or legacy Moqi backend behavior as acceptable TypeDuck parity.

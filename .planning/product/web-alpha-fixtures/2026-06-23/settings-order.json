@@ -1,4 +1,4 @@
-{
+﻿{
   "captureDate": "2026-06-23",
   "status": "source-backed",
   "sourceEvidence": [
@@ -14,19 +14,19 @@
     }
   ],
   "displayLanguageBehavior": {
-    "sectionLabel": "\u986f\u793a\u8a9e\u8a00 Display Languages",
+    "sectionLabel": "顯示語言 Display Languages",
     "order": 1,
     "defaultEnabledLanguages": [
       "eng"
     ],
     "defaultMainLanguage": "eng",
     "mainLanguageBehavior": "Selecting a main language also enables that display language.",
-    "mainLanguageMarker": "\u2b11 \u4e3b\u8981\u8a9e\u8a00 Main Language",
+    "mainLanguageMarker": "⬑ 主要語言 Main Language",
     "languages": [
       {
         "id": "eng",
         "code": "en",
-        "label": "\u82f1\u8a9e English",
+        "label": "英語 English",
         "name": "English",
         "defaultEnabled": true,
         "defaultMain": true
@@ -34,7 +34,7 @@
       {
         "id": "hin",
         "code": "hi",
-        "label": "\u5370\u5730\u8a9e Hindi",
+        "label": "印地語 Hindi",
         "name": "Hindi",
         "defaultEnabled": false,
         "defaultMain": false
@@ -42,7 +42,7 @@
       {
         "id": "ind",
         "code": "id",
-        "label": "\u5370\u5c3c\u8a9e Indonesian",
+        "label": "印尼語 Indonesian",
         "name": "Indonesian",
         "defaultEnabled": false,
         "defaultMain": false
@@ -50,7 +50,7 @@
       {
         "id": "nep",
         "code": "ne",
-        "label": "\u5c3c\u6cca\u723e\u8a9e Nepali",
+        "label": "尼泊爾語 Nepali",
         "name": "Nepali",
         "defaultEnabled": false,
         "defaultMain": false
@@ -58,7 +58,7 @@
       {
         "id": "urd",
         "code": "ur",
-        "label": "\u70cf\u723e\u90fd\u8a9e Urdu",
+        "label": "烏爾都語 Urdu",
         "name": "Urdu",
         "defaultEnabled": false,
         "defaultMain": false
@@ -69,7 +69,7 @@
     {
       "order": 1,
       "id": "displayLanguages",
-      "label": "\u986f\u793a\u8a9e\u8a00 Display Languages",
+      "label": "顯示語言 Display Languages",
       "control": "radio checkbox list",
       "default": {
         "enabled": [
@@ -78,17 +78,17 @@
         "main": "eng"
       },
       "options": [
-        "\u82f1\u8a9e English",
-        "\u5370\u5730\u8a9e Hindi",
-        "\u5370\u5c3c\u8a9e Indonesian",
-        "\u5c3c\u6cca\u723e\u8a9e Nepali",
-        "\u70cf\u723e\u90fd\u8a9e Urdu"
+        "英語 English",
+        "印地語 Hindi",
+        "印尼語 Indonesian",
+        "尼泊爾語 Nepali",
+        "烏爾都語 Urdu"
       ]
     },
     {
       "order": 2,
       "id": "pageSize",
-      "label": "\u6bcf\u9801\u5019\u9078\u8a5e\u6578\u91cf No. of Candidates Per Page",
+      "label": "每頁候選詞數量 No. of Candidates Per Page",
       "control": "range",
       "default": 6,
       "min": 4,
@@ -107,97 +107,97 @@
     {
       "order": 3,
       "id": "isHeiTypeface",
-      "label": "\u4e2d\u6587\u5b57\u9ad4 Chinese Typeface",
+      "label": "中文字體 Chinese Typeface",
       "control": "segmented",
       "default": false,
       "options": [
         {
           "value": false,
-          "label": "\u5b8b\u9ad4 Sung"
+          "label": "宋體 Sung"
         },
         {
           "value": true,
-          "label": "\u9ed1\u9ad4 Hei"
+          "label": "黑體 Hei"
         }
       ]
     },
     {
       "order": 4,
       "id": "showRomanization",
-      "label": "\u5019\u9078\u8a5e\u7cb5\u62fc Candidates Jyutping",
+      "label": "候選詞粵拼 Candidates Jyutping",
       "control": "radio list",
       "default": "always",
       "options": [
         {
           "value": "always",
-          "label": "\u986f\u793a Always Show"
+          "label": "顯示 Always Show"
         },
         {
           "value": "reverse_only",
-          "label": "\u50c5\u53cd\u67e5 Only in Reverse Lookup"
+          "label": "僅反查 Only in Reverse Lookup"
         },
         {
           "value": "never",
-          "label": "\u96b1\u85cf Hide"
+          "label": "隱藏 Hide"
         }
       ]
     },
     {
       "order": 5,
       "id": "enableCompletion",
-      "label": "\u81ea\u52d5\u5b8c\u6210 Auto-completion",
+      "label": "自動完成 Auto-completion",
       "control": "toggle",
       "default": true
     },
     {
       "order": 6,
       "id": "enableCorrection",
-      "label": "\u81ea\u52d5\u6821\u6b63 Auto-correction",
+      "label": "自動校正 Auto-correction",
       "control": "toggle",
       "default": false
     },
     {
       "order": 7,
       "id": "enableSentence",
-      "label": "\u81ea\u52d5\u7d44\u8a5e Auto-composition",
+      "label": "自動組詞 Auto-composition",
       "control": "toggle",
       "default": true
     },
     {
       "order": 8,
       "id": "enableLearning",
-      "label": "\u8f38\u5165\u8a18\u61b6 Input Memory",
+      "label": "輸入記憶 Input Memory",
       "control": "toggle",
       "default": true
     },
     {
       "order": 9,
       "id": "reverseLookupHeader",
-      "label": "\u53cd\u67e5\u8a2d\u5b9a Reverse Lookup Settings",
+      "label": "反查設定 Reverse Lookup Settings",
       "control": "section heading",
       "default": null
     },
     {
       "order": 10,
       "id": "showReverseCode",
-      "label": "\u986f\u793a\u5b8c\u6574\u8f38\u5165\u78bc Show Full Input Code",
+      "label": "顯示完整輸入碼 Show Full Input Code",
       "control": "toggle",
       "default": true
     },
     {
       "order": 11,
       "id": "isCangjie5",
-      "label": "\u5009\u9821\u7248\u672c Cangjie Version",
+      "label": "倉頡版本 Cangjie Version",
       "control": "segmented",
       "default": true,
       "options": [
         {
           "value": false,
-          "label": "\u4e09\u4ee3 Version 3"
+          "label": "三代 Version 3"
         },
         {
           "value": true,
-          "label": "\u4e94\u4ee3 Version 5"
+          "label": "五代 Version 5"
         }
       ]
     }
@@ -206,5 +206,20 @@
     "screenshot": "screenshots/settings-desktop-1280x720.png",
     "status": "captured",
     "viewport": "1280x720"
-  }
+  },
+  "multilingualDisplayLanguageCapture": {
+    "status": "captured",
+    "screenshot": "screenshots/settings-multilingual-indonesian-main-desktop-1280x720.png",
+    "viewport": "1280x720",
+    "enabledLanguages": [
+      "eng",
+      "hin",
+      "ind",
+      "nep",
+      "urd"
+    ],
+    "mainLanguage": "ind",
+    "mainLanguageLabel": "印尼語 Indonesian"
+  },
+  "validationNote": "JSON is stored as readable UTF-8 with BOM for Windows PowerShell 5.1 compatibility. Prefer Get-Content -Raw -Encoding UTF8 when validating."
 }

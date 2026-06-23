@@ -1,4 +1,4 @@
-{
+﻿{
   "captureDate": "2026-06-23",
   "status": "runtime-and-source-backed",
   "runtimeEvidence": {
@@ -6,7 +6,22 @@
     "viewport": "1280x720",
     "input": "nei",
     "screenshot": "screenshots/candidate-desktop-1280x720.png",
-    "candidatePanelVisible": true
+    "candidatePanelVisible": true,
+    "additionalScreenshots": [
+      {
+        "file": "screenshots/candidate-multilingual-indonesian-main-desktop-1280x720.png",
+        "status": "captured",
+        "viewport": "1280x720",
+        "displayLanguages": [
+          "eng",
+          "hin",
+          "ind",
+          "nep",
+          "urd"
+        ],
+        "mainLanguage": "ind"
+      }
+    ]
   },
   "sourceEvidence": [
     {
@@ -31,8 +46,8 @@
       "shownInCandidatePanel": true
     },
     "pageNavigation": {
-      "prevButton": "\u2039",
-      "nextButton": "\u203a",
+      "prevButton": "‹",
+      "nextButton": "›",
       "source": "CandidatePanel.tsx"
     },
     "candidateColumns": [
@@ -52,7 +67,7 @@
   "sampleCandidates": [
     {
       "label": "1.",
-      "text": "\u4f60",
+      "text": "你",
       "jyutping": "nei5",
       "englishMeaning": "you (singular)",
       "hasDictionaryIndicator": true,
@@ -60,7 +75,7 @@
     },
     {
       "label": "2.",
-      "text": "\u5c3c",
+      "text": "尼",
       "jyutping": "nei4",
       "englishMeaning": "nun",
       "hasDictionaryIndicator": true,
@@ -68,15 +83,15 @@
     },
     {
       "label": "3.",
-      "text": "\u5462",
+      "text": "呢",
       "jyutping": "nei1",
-      "canonicalReference": "\u2192ni1",
+      "canonicalReference": "→ni1",
       "hasDictionaryIndicator": true,
       "runtimeObserved": true
     },
     {
       "label": "4.",
-      "text": "\u59ae",
+      "text": "妮",
       "jyutping": "nei4",
       "englishMeaning": "little girl",
       "hasDictionaryIndicator": true,
@@ -84,7 +99,7 @@
     },
     {
       "label": "5.",
-      "text": "\u5f4c",
+      "text": "彌",
       "jyutping": "nei4",
       "englishMeaning": "full; fill",
       "hasDictionaryIndicator": true,
@@ -92,7 +107,7 @@
     },
     {
       "label": "6.",
-      "text": "\u59b3",
+      "text": "妳",
       "jyutping": "nei5",
       "englishMeaning": "you",
       "hasDictionaryIndicator": true,
@@ -110,5 +125,42 @@
     "background": "#ffffff candidate panel background in light theme",
     "fontStack": "HK-aware sans/serif plus Chiron Sung HK and Chiron Hei HK tokens"
   },
-  "limitations": []
+  "limitations": [],
+  "multilingualPresentation": {
+    "status": "captured",
+    "behavior": "When all display languages are enabled and Indonesian is main, candidate rows show Indonesian definitions in the main definition position and additional enabled language definitions in grouped columns.",
+    "sampleRows": [
+      {
+        "text": "你",
+        "jyutping": "nei5",
+        "indonesian": "kamu",
+        "english": "you (singular)",
+        "hindi": "आप",
+        "nepali": "तपाईं",
+        "urdu": "تم"
+      },
+      {
+        "text": "尼",
+        "jyutping": "nei4",
+        "indonesian": "kamu",
+        "english": "nun"
+      },
+      {
+        "text": "彌",
+        "jyutping": "nei4",
+        "indonesian": "penuh",
+        "english": "full; fill"
+      },
+      {
+        "text": "妳",
+        "jyutping": "nei5",
+        "indonesian": "Kamu",
+        "english": "you",
+        "hindi": "आप",
+        "nepali": "तपाईं",
+        "urdu": "تم"
+      }
+    ]
+  },
+  "validationNote": "JSON is stored as readable UTF-8 with BOM for Windows PowerShell 5.1 compatibility. Prefer Get-Content -Raw -Encoding UTF8 when validating."
 }
