@@ -32,7 +32,7 @@ The existing Moqi code is useful scaffolding for TSF registration, candidate win
 
 - C++20 - Windows TSF text service, launcher, setup helper, preview utility, and libIME2 integration in `MoqiTextService/`, `MoqLauncher/`, `SetupHelper/`, `Preview/`, and `libIME2/src/`.
 - C - vendored libuv Windows event-loop/process/pipe implementation in `libuv/src/`.
-- PowerShell 5.1 - build, staging, installer packaging, icon generation, and install scripts in `scripts/*.ps1` and `installer/build-installer.ps1`.
+- PowerShell scripts - build, staging, installer packaging, icon generation, and install scripts in `scripts/*.ps1` and `installer/build-installer.ps1`; invoke `.ps1` files with `pwsh` for Unicode-safe execution.
 - Inno Setup Pascal Script - graphical installer and registry/process orchestration in `installer/MoqiTsf.iss`.
 - Protocol Buffers schema - frontend/backend IPC contract in `proto/moqi.proto`.
 - Go - external legacy backend language for the sibling `moqi-ime` runtime referenced by `README.md`, `.github/workflows/nightly.yml`, `.github/workflows/release.yml`, and `scripts/_all_in_package.ps1`; no Go source lives in this repo.
@@ -89,7 +89,7 @@ The existing Moqi code is useful scaffolding for TSF registration, candidate win
 
 ## Platform Requirements
 
-- Windows with Visual Studio 2022, Windows SDK, CMake 3.21+, PowerShell 5.1, git submodules, and Inno Setup 6 for installer output (`README.md`, `scripts/build.ps1`, `installer/README.txt`).
+- Windows with Visual Studio 2022, Windows SDK, CMake 3.21+, PowerShell 7+ (`pwsh`) for running `.ps1` scripts, git submodules, and Inno Setup 6 for installer output (`README.md`, `scripts/build.ps1`, `installer/README.txt`).
 - A `protoc.exe` path must be discoverable through `MOQI_PROTOC_EXECUTABLE`, `MOQI_PROTOBUF_ROOT`, `find_program(protoc)`, or CMake FetchContent protobuf build (`CMakeLists.txt`).
 - Full package builds expect a sibling legacy backend checkout at `..\moqi-ime` unless `-MoqiImeRoot` or `-MoqiImeSource` is provided (`scripts/_all_in_package.ps1`, `scripts/install.ps1`).
 - Installed payload currently targets `%ProgramFiles(x86)%\MoqiIM` via Inno Setup (`installer/MoqiTsf.iss`).
@@ -109,6 +109,7 @@ The existing Moqi code is useful scaffolding for TSF registration, candidate win
 - Keep implementation/header pairs side by side in the owning module directory: `MoqiTextService/MoqiClient.cpp` with `MoqiTextService/MoqiClient.h`, `MoqLauncher/PipeClient.cpp` with `MoqLauncher/PipeClient.h`.
 - Use lowercase for protocol/source schema files: `proto/moqi.proto`, `proto/ProtoFraming.h` is the small hand-written framing helper around generated protobuf code.
 - Use PowerShell verb-noun script names for build/package automation: `scripts/build.ps1`, `scripts/install.ps1`, `scripts/generate-glyph-icon.ps1`.
+- Run project `.ps1` scripts with `pwsh`, not Windows PowerShell `powershell.exe`, to avoid character-encoding failures with Cantonese/Traditional Chinese evidence, paths, and literals. When documenting verification commands, prefer `pwsh -NoProfile -ExecutionPolicy Bypass -File ...`.
 - Treat Moqi-branded filenames and user-facing text as legacy scaffold for replacement, not product naming to preserve: `MoqiTextService/MoqiClient.cpp`, `MoqLauncher/PipeServer.cpp`, `installer/MoqiTsf.iss`, `backends.json`.
 - Existing C++ uses lower camelCase for methods and free functions: `waitForRpcConnection()` in `MoqiTextService/MoqiClient.cpp`, `formatCodePoints()` in `MoqiTextService/MoqiClient.cpp`, `getPipeName()` in `MoqLauncher/PipeServer.cpp`.
 - Windows entry points and callbacks keep Win32 naming/signatures: `wWinMain()` in `SetupHelper/SetupHelper.cpp`, `CALLBACK Client::onAsyncPollTimer()` in `MoqiTextService/MoqiClient.cpp`, `DllRegisterServer()` in `MoqiTextService/DllEntry.cpp`.
@@ -146,6 +147,7 @@ The existing Moqi code is useful scaffolding for TSF registration, candidate win
 - RPC and pipe failures generally return `false`, close the pipe, and reset text service state: `Client::callRpcMethod()` and `Client::closeRpcConnection()` in `MoqiTextService/MoqiClient.cpp`.
 - Exceptions are used sparingly around operations that can fail during setup/logging: `MoqLauncher/PipeSecurity.cpp`, `MoqLauncher/PipeServer.cpp`, and PowerShell scripts in `scripts/build.ps1` and `scripts/install.ps1`.
 - PowerShell scripts set `$ErrorActionPreference = "Stop"` and throw on failed external commands: `scripts/build.ps1`, `scripts/install.ps1`, `scripts/_all_in_package.ps1`.
+- Execute PowerShell scripts through `pwsh`; do not use `powershell` in new plans, verification commands, or developer docs unless explicitly testing Windows PowerShell compatibility.
 
 ## Logging
 
