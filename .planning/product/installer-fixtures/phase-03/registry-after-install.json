@@ -1,0 +1,479 @@
+{
+  "label": "after-install",
+  "capturedAt": "2026-06-23T16:55:53Z",
+  "os": {
+    "caption": "Microsoft Windows 10 Pro",
+    "version": "10.0.19045",
+    "buildNumber": "19045",
+    "osArchitecture": "64-bit"
+  },
+  "expected": {
+    "clsid": "{7D92985A-BC53-47B5-A5CC-6E47F86B9D18}",
+    "profileGuid": "{C6E8F5DF-6504-44F9-B7CF-17A195373A83}",
+    "locale": "zh-HK",
+    "displayName": "TypeDuck 粵語輸入法 / TypeDuck Cantonese IME"
+  },
+  "registry": {
+    "hklmTip": {
+      "path": "HKLM:\\SOFTWARE\\Microsoft\\CTF\\TIP\\{7D92985A-BC53-47B5-A5CC-6E47F86B9D18}",
+      "exists": true,
+      "values": {
+        "Enable": "1"
+      },
+      "children": [
+        {
+          "path": "Microsoft.PowerShell.Core\\Registry::HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\CTF\\TIP\\{7D92985A-BC53-47B5-A5CC-6E47F86B9D18}\\Category",
+          "exists": true,
+          "values": {},
+          "children": [
+            {
+              "path": "Microsoft.PowerShell.Core\\Registry::HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\CTF\\TIP\\{7D92985A-BC53-47B5-A5CC-6E47F86B9D18}\\Category\\Category",
+              "exists": true,
+              "values": {},
+              "children": [
+                {
+                  "path": "Microsoft.PowerShell.Core\\Registry::HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\CTF\\TIP\\{7D92985A-BC53-47B5-A5CC-6E47F86B9D18}\\Category\\Category\\{046B8C80-1647-40F7-9B21-B93B81AABC1B}",
+                  "exists": true,
+                  "values": {},
+                  "children": [
+                    {
+                      "path": "Microsoft.PowerShell.Core\\Registry::HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\CTF\\TIP\\{7D92985A-BC53-47B5-A5CC-6E47F86B9D18}\\Category\\Category\\{046B8C80-1647-40F7-9B21-B93B81AABC1B}\\{7D92985A-BC53-47B5-A5CC-6E47F86B9D18}",
+                      "exists": true,
+                      "values": {},
+                      "children": []
+                    }
+                  ]
+                },
+                {
+                  "path": "Microsoft.PowerShell.Core\\Registry::HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\CTF\\TIP\\{7D92985A-BC53-47B5-A5CC-6E47F86B9D18}\\Category\\Category\\{13A016DF-560B-46CD-947A-4C3AF1E0E35D}",
+                  "exists": true,
+                  "values": {},
+                  "children": [
+                    {
+                      "path": "Microsoft.PowerShell.Core\\Registry::HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\CTF\\TIP\\{7D92985A-BC53-47B5-A5CC-6E47F86B9D18}\\Category\\Category\\{13A016DF-560B-46CD-947A-4C3AF1E0E35D}\\{7D92985A-BC53-47B5-A5CC-6E47F86B9D18}",
+                      "exists": true,
+                      "values": {},
+                      "children": []
+                    }
+                  ]
+                },
+                {
+                  "path": "Microsoft.PowerShell.Core\\Registry::HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\CTF\\TIP\\{7D92985A-BC53-47B5-A5CC-6E47F86B9D18}\\Category\\Category\\{24AF3031-852D-40A2-BC09-8992898CE722}",
+                  "exists": true,
+                  "values": {},
+                  "children": [
+                    {
+                      "path": "Microsoft.PowerShell.Core\\Registry::HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\CTF\\TIP\\{7D92985A-BC53-47B5-A5CC-6E47F86B9D18}\\Category\\Category\\{24AF3031-852D-40A2-BC09-8992898CE722}\\{7D92985A-BC53-47B5-A5CC-6E47F86B9D18}",
+                      "exists": true,
+                      "values": {},
+                      "children": []
+                    }
+                  ]
+                },
+                {
+                  "path": "Microsoft.PowerShell.Core\\Registry::HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\CTF\\TIP\\{7D92985A-BC53-47B5-A5CC-6E47F86B9D18}\\Category\\Category\\{25504FB4-7BAB-4BC1-9C69-CF81890F0EF5}",
+                  "exists": true,
+                  "values": {},
+                  "children": [
+                    {
+                      "path": "Microsoft.PowerShell.Core\\Registry::HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\CTF\\TIP\\{7D92985A-BC53-47B5-A5CC-6E47F86B9D18}\\Category\\Category\\{25504FB4-7BAB-4BC1-9C69-CF81890F0EF5}\\{7D92985A-BC53-47B5-A5CC-6E47F86B9D18}",
+                      "exists": true,
+                      "values": {},
+                      "children": []
+                    }
+                  ]
+                },
+                {
+                  "path": "Microsoft.PowerShell.Core\\Registry::HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\CTF\\TIP\\{7D92985A-BC53-47B5-A5CC-6E47F86B9D18}\\Category\\Category\\{34745C63-B2F0-4784-8B67-5E12C8701A31}",
+                  "exists": true,
+                  "values": {},
+                  "children": [
+                    {
+                      "path": "Microsoft.PowerShell.Core\\Registry::HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\CTF\\TIP\\{7D92985A-BC53-47B5-A5CC-6E47F86B9D18}\\Category\\Category\\{34745C63-B2F0-4784-8B67-5E12C8701A31}\\{7D92985A-BC53-47B5-A5CC-6E47F86B9D18}",
+                      "exists": true,
+                      "values": {},
+                      "children": []
+                    }
+                  ]
+                },
+                {
+                  "path": "Microsoft.PowerShell.Core\\Registry::HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\CTF\\TIP\\{7D92985A-BC53-47B5-A5CC-6E47F86B9D18}\\Category\\Category\\{364215D9-75BC-11D7-A6EF-00065B84435C}",
+                  "exists": true,
+                  "values": {},
+                  "children": [
+                    {
+                      "path": "Microsoft.PowerShell.Core\\Registry::HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\CTF\\TIP\\{7D92985A-BC53-47B5-A5CC-6E47F86B9D18}\\Category\\Category\\{364215D9-75BC-11D7-A6EF-00065B84435C}\\{7D92985A-BC53-47B5-A5CC-6E47F86B9D18}",
+                      "exists": true,
+                      "values": {},
+                      "children": []
+                    }
+                  ]
+                },
+                {
+                  "path": "Microsoft.PowerShell.Core\\Registry::HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\CTF\\TIP\\{7D92985A-BC53-47B5-A5CC-6E47F86B9D18}\\Category\\Category\\{364215DA-75BC-11D7-A6EF-00065B84435C}",
+                  "exists": true,
+                  "values": {},
+                  "children": [
+                    {
+                      "path": "Microsoft.PowerShell.Core\\Registry::HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\CTF\\TIP\\{7D92985A-BC53-47B5-A5CC-6E47F86B9D18}\\Category\\Category\\{364215DA-75BC-11D7-A6EF-00065B84435C}\\{7D92985A-BC53-47B5-A5CC-6E47F86B9D18}",
+                      "exists": true,
+                      "values": {},
+                      "children": []
+                    }
+                  ]
+                },
+                {
+                  "path": "Microsoft.PowerShell.Core\\Registry::HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\CTF\\TIP\\{7D92985A-BC53-47B5-A5CC-6E47F86B9D18}\\Category\\Category\\{49D2F9CE-1F5E-11D7-A6D3-00065B84435C}",
+                  "exists": true,
+                  "values": {},
+                  "children": [
+                    {
+                      "path": "Microsoft.PowerShell.Core\\Registry::HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\CTF\\TIP\\{7D92985A-BC53-47B5-A5CC-6E47F86B9D18}\\Category\\Category\\{49D2F9CE-1F5E-11D7-A6D3-00065B84435C}\\{7D92985A-BC53-47B5-A5CC-6E47F86B9D18}",
+                      "exists": true,
+                      "values": {},
+                      "children": []
+                    }
+                  ]
+                },
+                {
+                  "path": "Microsoft.PowerShell.Core\\Registry::HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\CTF\\TIP\\{7D92985A-BC53-47B5-A5CC-6E47F86B9D18}\\Category\\Category\\{49D2F9CF-1F5E-11D7-A6D3-00065B84435C}",
+                  "exists": true,
+                  "values": {},
+                  "children": [
+                    {
+                      "path": "Microsoft.PowerShell.Core\\Registry::HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\CTF\\TIP\\{7D92985A-BC53-47B5-A5CC-6E47F86B9D18}\\Category\\Category\\{49D2F9CF-1F5E-11D7-A6D3-00065B84435C}\\{7D92985A-BC53-47B5-A5CC-6E47F86B9D18}",
+                      "exists": true,
+                      "values": {},
+                      "children": []
+                    }
+                  ]
+                },
+                {
+                  "path": "Microsoft.PowerShell.Core\\Registry::HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\CTF\\TIP\\{7D92985A-BC53-47B5-A5CC-6E47F86B9D18}\\Category\\Category\\{534C48C1-0607-4098-A521-4FC899C73E90}",
+                  "exists": true,
+                  "values": {},
+                  "children": [
+                    {
+                      "path": "Microsoft.PowerShell.Core\\Registry::HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\CTF\\TIP\\{7D92985A-BC53-47B5-A5CC-6E47F86B9D18}\\Category\\Category\\{534C48C1-0607-4098-A521-4FC899C73E90}\\{7D92985A-BC53-47B5-A5CC-6E47F86B9D18}",
+                      "exists": true,
+                      "values": {},
+                      "children": []
+                    }
+                  ]
+                },
+                {
+                  "path": "Microsoft.PowerShell.Core\\Registry::HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\CTF\\TIP\\{7D92985A-BC53-47B5-A5CC-6E47F86B9D18}\\Category\\Category\\{565FB8D8-6BD4-4CA1-B223-0F2CCB8F4F96}",
+                  "exists": true,
+                  "values": {},
+                  "children": [
+                    {
+                      "path": "Microsoft.PowerShell.Core\\Registry::HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\CTF\\TIP\\{7D92985A-BC53-47B5-A5CC-6E47F86B9D18}\\Category\\Category\\{565FB8D8-6BD4-4CA1-B223-0F2CCB8F4F96}\\{7D92985A-BC53-47B5-A5CC-6E47F86B9D18}",
+                      "exists": true,
+                      "values": {},
+                      "children": []
+                    }
+                  ]
+                },
+                {
+                  "path": "Microsoft.PowerShell.Core\\Registry::HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\CTF\\TIP\\{7D92985A-BC53-47B5-A5CC-6E47F86B9D18}\\Category\\Category\\{7C6A82AE-B0D7-4F14-A745-14F28B009D61}",
+                  "exists": true,
+                  "values": {},
+                  "children": [
+                    {
+                      "path": "Microsoft.PowerShell.Core\\Registry::HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\CTF\\TIP\\{7D92985A-BC53-47B5-A5CC-6E47F86B9D18}\\Category\\Category\\{7C6A82AE-B0D7-4F14-A745-14F28B009D61}\\{7D92985A-BC53-47B5-A5CC-6E47F86B9D18}",
+                      "exists": true,
+                      "values": {},
+                      "children": []
+                    }
+                  ]
+                },
+                {
+                  "path": "Microsoft.PowerShell.Core\\Registry::HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\CTF\\TIP\\{7D92985A-BC53-47B5-A5CC-6E47F86B9D18}\\Category\\Category\\{85F9794B-4D19-40D8-8864-4E747371A66D}",
+                  "exists": true,
+                  "values": {},
+                  "children": [
+                    {
+                      "path": "Microsoft.PowerShell.Core\\Registry::HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\CTF\\TIP\\{7D92985A-BC53-47B5-A5CC-6E47F86B9D18}\\Category\\Category\\{85F9794B-4D19-40D8-8864-4E747371A66D}\\{7D92985A-BC53-47B5-A5CC-6E47F86B9D18}",
+                      "exists": true,
+                      "values": {},
+                      "children": []
+                    }
+                  ]
+                },
+                {
+                  "path": "Microsoft.PowerShell.Core\\Registry::HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\CTF\\TIP\\{7D92985A-BC53-47B5-A5CC-6E47F86B9D18}\\Category\\Category\\{9B7BE3A9-E8AB-4D47-A8FE-254FA423436D}",
+                  "exists": true,
+                  "values": {},
+                  "children": [
+                    {
+                      "path": "Microsoft.PowerShell.Core\\Registry::HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\CTF\\TIP\\{7D92985A-BC53-47B5-A5CC-6E47F86B9D18}\\Category\\Category\\{9B7BE3A9-E8AB-4D47-A8FE-254FA423436D}\\{7D92985A-BC53-47B5-A5CC-6E47F86B9D18}",
+                      "exists": true,
+                      "values": {},
+                      "children": []
+                    }
+                  ]
+                },
+                {
+                  "path": "Microsoft.PowerShell.Core\\Registry::HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\CTF\\TIP\\{7D92985A-BC53-47B5-A5CC-6E47F86B9D18}\\Category\\Category\\{B95F181B-EA4C-4AF1-8056-7C321ABBB091}",
+                  "exists": true,
+                  "values": {},
+                  "children": [
+                    {
+                      "path": "Microsoft.PowerShell.Core\\Registry::HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\CTF\\TIP\\{7D92985A-BC53-47B5-A5CC-6E47F86B9D18}\\Category\\Category\\{B95F181B-EA4C-4AF1-8056-7C321ABBB091}\\{7D92985A-BC53-47B5-A5CC-6E47F86B9D18}",
+                      "exists": true,
+                      "values": {},
+                      "children": []
+                    }
+                  ]
+                },
+                {
+                  "path": "Microsoft.PowerShell.Core\\Registry::HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\CTF\\TIP\\{7D92985A-BC53-47B5-A5CC-6E47F86B9D18}\\Category\\Category\\{CCF05DD7-4A87-11D7-A6E2-00065B84435C}",
+                  "exists": true,
+                  "values": {},
+                  "children": [
+                    {
+                      "path": "Microsoft.PowerShell.Core\\Registry::HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\CTF\\TIP\\{7D92985A-BC53-47B5-A5CC-6E47F86B9D18}\\Category\\Category\\{CCF05DD7-4A87-11D7-A6E2-00065B84435C}\\{7D92985A-BC53-47B5-A5CC-6E47F86B9D18}",
+                      "exists": true,
+                      "values": {},
+                      "children": []
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "path": "Microsoft.PowerShell.Core\\Registry::HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\CTF\\TIP\\{7D92985A-BC53-47B5-A5CC-6E47F86B9D18}\\Category\\Item",
+              "exists": true,
+              "values": {},
+              "children": [
+                {
+                  "path": "Microsoft.PowerShell.Core\\Registry::HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\CTF\\TIP\\{7D92985A-BC53-47B5-A5CC-6E47F86B9D18}\\Category\\Item\\{7D92985A-BC53-47B5-A5CC-6E47F86B9D18}",
+                  "exists": true,
+                  "values": {},
+                  "children": [
+                    {
+                      "path": "Microsoft.PowerShell.Core\\Registry::HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\CTF\\TIP\\{7D92985A-BC53-47B5-A5CC-6E47F86B9D18}\\Category\\Item\\{7D92985A-BC53-47B5-A5CC-6E47F86B9D18}\\{046B8C80-1647-40F7-9B21-B93B81AABC1B}",
+                      "exists": true,
+                      "values": {},
+                      "children": []
+                    },
+                    {
+                      "path": "Microsoft.PowerShell.Core\\Registry::HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\CTF\\TIP\\{7D92985A-BC53-47B5-A5CC-6E47F86B9D18}\\Category\\Item\\{7D92985A-BC53-47B5-A5CC-6E47F86B9D18}\\{13A016DF-560B-46CD-947A-4C3AF1E0E35D}",
+                      "exists": true,
+                      "values": {},
+                      "children": []
+                    },
+                    {
+                      "path": "Microsoft.PowerShell.Core\\Registry::HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\CTF\\TIP\\{7D92985A-BC53-47B5-A5CC-6E47F86B9D18}\\Category\\Item\\{7D92985A-BC53-47B5-A5CC-6E47F86B9D18}\\{24AF3031-852D-40A2-BC09-8992898CE722}",
+                      "exists": true,
+                      "values": {},
+                      "children": []
+                    },
+                    {
+                      "path": "Microsoft.PowerShell.Core\\Registry::HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\CTF\\TIP\\{7D92985A-BC53-47B5-A5CC-6E47F86B9D18}\\Category\\Item\\{7D92985A-BC53-47B5-A5CC-6E47F86B9D18}\\{25504FB4-7BAB-4BC1-9C69-CF81890F0EF5}",
+                      "exists": true,
+                      "values": {},
+                      "children": []
+                    },
+                    {
+                      "path": "Microsoft.PowerShell.Core\\Registry::HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\CTF\\TIP\\{7D92985A-BC53-47B5-A5CC-6E47F86B9D18}\\Category\\Item\\{7D92985A-BC53-47B5-A5CC-6E47F86B9D18}\\{34745C63-B2F0-4784-8B67-5E12C8701A31}",
+                      "exists": true,
+                      "values": {},
+                      "children": []
+                    },
+                    {
+                      "path": "Microsoft.PowerShell.Core\\Registry::HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\CTF\\TIP\\{7D92985A-BC53-47B5-A5CC-6E47F86B9D18}\\Category\\Item\\{7D92985A-BC53-47B5-A5CC-6E47F86B9D18}\\{364215D9-75BC-11D7-A6EF-00065B84435C}",
+                      "exists": true,
+                      "values": {},
+                      "children": []
+                    },
+                    {
+                      "path": "Microsoft.PowerShell.Core\\Registry::HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\CTF\\TIP\\{7D92985A-BC53-47B5-A5CC-6E47F86B9D18}\\Category\\Item\\{7D92985A-BC53-47B5-A5CC-6E47F86B9D18}\\{364215DA-75BC-11D7-A6EF-00065B84435C}",
+                      "exists": true,
+                      "values": {},
+                      "children": []
+                    },
+                    {
+                      "path": "Microsoft.PowerShell.Core\\Registry::HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\CTF\\TIP\\{7D92985A-BC53-47B5-A5CC-6E47F86B9D18}\\Category\\Item\\{7D92985A-BC53-47B5-A5CC-6E47F86B9D18}\\{49D2F9CE-1F5E-11D7-A6D3-00065B84435C}",
+                      "exists": true,
+                      "values": {},
+                      "children": []
+                    },
+                    {
+                      "path": "Microsoft.PowerShell.Core\\Registry::HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\CTF\\TIP\\{7D92985A-BC53-47B5-A5CC-6E47F86B9D18}\\Category\\Item\\{7D92985A-BC53-47B5-A5CC-6E47F86B9D18}\\{49D2F9CF-1F5E-11D7-A6D3-00065B84435C}",
+                      "exists": true,
+                      "values": {},
+                      "children": []
+                    },
+                    {
+                      "path": "Microsoft.PowerShell.Core\\Registry::HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\CTF\\TIP\\{7D92985A-BC53-47B5-A5CC-6E47F86B9D18}\\Category\\Item\\{7D92985A-BC53-47B5-A5CC-6E47F86B9D18}\\{534C48C1-0607-4098-A521-4FC899C73E90}",
+                      "exists": true,
+                      "values": {},
+                      "children": []
+                    },
+                    {
+                      "path": "Microsoft.PowerShell.Core\\Registry::HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\CTF\\TIP\\{7D92985A-BC53-47B5-A5CC-6E47F86B9D18}\\Category\\Item\\{7D92985A-BC53-47B5-A5CC-6E47F86B9D18}\\{565FB8D8-6BD4-4CA1-B223-0F2CCB8F4F96}",
+                      "exists": true,
+                      "values": {},
+                      "children": []
+                    },
+                    {
+                      "path": "Microsoft.PowerShell.Core\\Registry::HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\CTF\\TIP\\{7D92985A-BC53-47B5-A5CC-6E47F86B9D18}\\Category\\Item\\{7D92985A-BC53-47B5-A5CC-6E47F86B9D18}\\{7C6A82AE-B0D7-4F14-A745-14F28B009D61}",
+                      "exists": true,
+                      "values": {},
+                      "children": []
+                    },
+                    {
+                      "path": "Microsoft.PowerShell.Core\\Registry::HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\CTF\\TIP\\{7D92985A-BC53-47B5-A5CC-6E47F86B9D18}\\Category\\Item\\{7D92985A-BC53-47B5-A5CC-6E47F86B9D18}\\{85F9794B-4D19-40D8-8864-4E747371A66D}",
+                      "exists": true,
+                      "values": {},
+                      "children": []
+                    },
+                    {
+                      "path": "Microsoft.PowerShell.Core\\Registry::HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\CTF\\TIP\\{7D92985A-BC53-47B5-A5CC-6E47F86B9D18}\\Category\\Item\\{7D92985A-BC53-47B5-A5CC-6E47F86B9D18}\\{9B7BE3A9-E8AB-4D47-A8FE-254FA423436D}",
+                      "exists": true,
+                      "values": {},
+                      "children": []
+                    },
+                    {
+                      "path": "Microsoft.PowerShell.Core\\Registry::HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\CTF\\TIP\\{7D92985A-BC53-47B5-A5CC-6E47F86B9D18}\\Category\\Item\\{7D92985A-BC53-47B5-A5CC-6E47F86B9D18}\\{B95F181B-EA4C-4AF1-8056-7C321ABBB091}",
+                      "exists": true,
+                      "values": {},
+                      "children": []
+                    },
+                    {
+                      "path": "Microsoft.PowerShell.Core\\Registry::HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\CTF\\TIP\\{7D92985A-BC53-47B5-A5CC-6E47F86B9D18}\\Category\\Item\\{7D92985A-BC53-47B5-A5CC-6E47F86B9D18}\\{CCF05DD7-4A87-11D7-A6E2-00065B84435C}",
+                      "exists": true,
+                      "values": {},
+                      "children": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "path": "Microsoft.PowerShell.Core\\Registry::HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\CTF\\TIP\\{7D92985A-BC53-47B5-A5CC-6E47F86B9D18}\\LanguageProfile",
+          "exists": true,
+          "values": {},
+          "children": [
+            {
+              "path": "Microsoft.PowerShell.Core\\Registry::HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\CTF\\TIP\\{7D92985A-BC53-47B5-A5CC-6E47F86B9D18}\\LanguageProfile\\0x00000c04",
+              "exists": true,
+              "values": {},
+              "children": [
+                {
+                  "path": "Microsoft.PowerShell.Core\\Registry::HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\CTF\\TIP\\{7D92985A-BC53-47B5-A5CC-6E47F86B9D18}\\LanguageProfile\\0x00000c04\\{C6E8F5DF-6504-44F9-B7CF-17A195373A83}",
+                  "exists": true,
+                  "values": {
+                    "Description": "TypeDuck 粵語輸入法 / TypeDuck Cantonese IME",
+                    "IconFile": "C:\\Windows\\System32\\TypeDuckTextService.dll",
+                    "IconIndex": "1",
+                    "Enable": "1",
+                    "HiddenInSettingUI": "0",
+                    "SubItemInSettingUI": "0"
+                  },
+                  "children": []
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "hkcuTip": {
+      "path": "HKCU:\\Software\\Microsoft\\CTF\\TIP\\{7D92985A-BC53-47B5-A5CC-6E47F86B9D18}",
+      "exists": true,
+      "values": {},
+      "children": [
+        {
+          "path": "Microsoft.PowerShell.Core\\Registry::HKEY_CURRENT_USER\\Software\\Microsoft\\CTF\\TIP\\{7D92985A-BC53-47B5-A5CC-6E47F86B9D18}\\LanguageProfile",
+          "exists": true,
+          "values": {},
+          "children": [
+            {
+              "path": "Microsoft.PowerShell.Core\\Registry::HKEY_CURRENT_USER\\Software\\Microsoft\\CTF\\TIP\\{7D92985A-BC53-47B5-A5CC-6E47F86B9D18}\\LanguageProfile\\0x00000c04",
+              "exists": true,
+              "values": {},
+              "children": [
+                {
+                  "path": "Microsoft.PowerShell.Core\\Registry::HKEY_CURRENT_USER\\Software\\Microsoft\\CTF\\TIP\\{7D92985A-BC53-47B5-A5CC-6E47F86B9D18}\\LanguageProfile\\0x00000c04\\{C6E8F5DF-6504-44F9-B7CF-17A195373A83}",
+                  "exists": true,
+                  "values": {
+                    "Enable": "1"
+                  },
+                  "children": []
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "hkcrClsid": {
+      "path": "Registry::HKEY_CLASSES_ROOT\\CLSID\\{7D92985A-BC53-47B5-A5CC-6E47F86B9D18}",
+      "exists": true,
+      "values": {
+        "(default)": "TypeDuckTextService"
+      },
+      "children": [
+        {
+          "path": "Microsoft.PowerShell.Core\\Registry::HKEY_CLASSES_ROOT\\CLSID\\{7D92985A-BC53-47B5-A5CC-6E47F86B9D18}\\InprocServer32",
+          "exists": true,
+          "values": {
+            "(default)": "C:\\Windows\\System32\\TypeDuckTextService.dll",
+            "ThreadingModel": "Apartment"
+          },
+          "children": []
+        }
+      ]
+    },
+    "hkcuClsid": {
+      "path": "HKCU:\\Software\\Classes\\CLSID\\{7D92985A-BC53-47B5-A5CC-6E47F86B9D18}",
+      "exists": false,
+      "values": {},
+      "children": []
+    },
+    "runTypeDuckLauncher": "\"C:\\Program Files (x86)\\TypeDuckIME\\TypeDuckLauncher.exe\""
+  },
+  "files": {
+    "installDir": {
+      "path": "C:\\Program Files (x86)\\TypeDuckIME",
+      "exists": true
+    },
+    "win32Dll": {
+      "path": "C:\\Windows\\SysWOW64\\TypeDuckTextService.dll",
+      "exists": true,
+      "sha256": "e9c071cad308cb5eaeba81f24c33a4a60b3fa0ecebf2716f0dc5a162c44ee181",
+      "length": 1764864,
+      "lastWriteTimeUtc": "2026-06-23T15:52:18Z"
+    },
+    "x64Dll": {
+      "path": "C:\\Windows\\System32\\TypeDuckTextService.dll",
+      "exists": true,
+      "sha256": "f95eb050bfbca9d80238e20c558a7ce0409184dfcc1fe829616c207e82c4d32d",
+      "length": 2057216,
+      "lastWriteTimeUtc": "2026-06-23T15:52:36Z"
+    }
+  },
+  "scheduledTask": {
+    "exists": false,
+    "taskName": "TypeDuckIME-ReRegisterTSF"
+  },
+  "languageList": {
+    "languageTag": "en-US",
+    "inputMethodTips": [
+      "0409:00000409"
+    ]
+  },
+  "uninstallEntries": {
+    "key": "HKEY_LOCAL_MACHINE\\Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\{9B52CF20-1C5D-4C74-9F5D-9E66377C8F37}_is1",
+    "displayName": "TypeDuck 粵語輸入法 / TypeDuck Cantonese IME version 1.0.0",
+    "uninstallString": "\"C:\\Program Files (x86)\\TypeDuckIME\\unins000.exe\"",
+    "quietUninstallString": "\"C:\\Program Files (x86)\\TypeDuckIME\\unins000.exe\" /SILENT"
+  },
+  "PSComputerName": "My Virtual Machine",
+  "RunspaceId": "e4e83c2f-b95f-4680-b141-c03cc2b23ebe",
+  "PSShowComputerName": true
+}
