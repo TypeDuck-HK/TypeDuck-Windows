@@ -1,14 +1,16 @@
 # TypeDuck Engine Runtime Contract
 
 **Capture date:** 2026-06-23  
-**Requirement traceability:** ENG-01, ENG-02, ENG-03  
-**Decision traceability:** D-01, D-02, D-03, D-04, D-05, D-06, D-07, D-08, D-14, D-15, D-16
+**Requirement traceability:** ENG-01, ENG-02, ENG-03, ENG-04, ENG-05  
+**Decision traceability:** D-01, D-02, D-03, D-04, D-05, D-06, D-07, D-08, D-09, D-10, D-11, D-12, D-13, D-14, D-15, D-16
 
 ## Purpose
 
 This contract records the Phase 2 developer runtime staging slice for TypeDuck Windows IME. It proves that the pinned TypeDuck-HK librime release, TypeDuck schema branch, lookup-filter provenance, dictionaries, OpenCC assets, and built schema outputs can be shaped into a Windows runtime tree for later adapter and engine probes.
 
 Phase 2 uses the current `moqi-ime` runtime shape only as internal compatibility adapter evidence per D-01 and D-02. It is not product truth, does not approve legacy Moqi fallback behavior, and does not introduce final installer packaging, TSF registration, protocol, settings, or visible UI copy per D-14, D-15, and D-16.
+
+Raw lookup-filter payload evidence and the ENG-05 handoff are recorded in `.planning/product/TYPEDUCK-LOOKUP-FILTER-RAW-CONTRACT.md`.
 
 ## Locked Inputs
 
@@ -61,6 +63,21 @@ The contract validator is:
 powershell -NoProfile -ExecutionPolicy Bypass -File scripts\Test-TypeDuckRuntimeContract.ps1 -RepoRoot . -StageRoot .\runtime\typeduck-phase02 -ManifestPath .planning\product\engine-runtime-fixtures\phase-02\runtime-manifest.json
 ```
 
+## Lookup-Filter Raw Payload Evidence
+
+The raw lookup-filter contract is:
+
+`.planning/product/TYPEDUCK-LOOKUP-FILTER-RAW-CONTRACT.md`
+
+It links the Plan 02-02 `typing-proof.json` candidate comments to:
+
+- `.planning/product/engine-runtime-fixtures/phase-02/lookup-filter-raw-comments.ndjson`
+- `.planning/product/engine-runtime-fixtures/phase-02/lookup-filter-csv-rows.csv`
+- `.planning/product/engine-runtime-fixtures/phase-02/lookup-filter-validation.json`
+- `scripts/Test-TypeDuckLookupPayload.ps1`
+
+This evidence preserves D-10 column order and D-11/D-12 raw `\v`, `\f`, `\r`, quoted CSV, doubled-quote, and empty-field semantics without defining final protocol or UI mappings.
+
 ## Boundary Notes
 
 - D-03 compatibility work is intentionally deferred to the adapter proof. If the current adapter's expected `rime_api` surface is incompatible with TypeDuck-HK librime, first determine the librime version currently used by the Moqi adapter, retrieve the upstream `rime_api` file for that version from `https://github.com/rime/librime`, diff it against `https://github.com/TypeDuck-HK/librime`, and inspect relevant upstream commits modifying the Rime API before patching.
@@ -70,4 +87,4 @@ powershell -NoProfile -ExecutionPolicy Bypass -File scripts\Test-TypeDuckRuntime
 
 ## Verification Status
 
-As of this capture, `scripts\Stage-TypeDuckRuntime.ps1` produces a manifest that passes `scripts\Test-TypeDuckRuntimeContract.ps1` for ENG-01, ENG-02, and ENG-03 staging evidence. ENG-04 and ENG-05 remain owned by later Phase 2 plans that run typing and lookup-filter payload probes against this staged runtime.
+As of this capture, `scripts\Stage-TypeDuckRuntime.ps1` produces a manifest that passes `scripts\Test-TypeDuckRuntimeContract.ps1` for ENG-01, ENG-02, and ENG-03 staging evidence. `scripts\Invoke-TypeDuckEngineProof.ps1` records ENG-04 typing evidence in `typing-proof.json`, and `scripts\Test-TypeDuckLookupPayload.ps1` records ENG-05 lookup-filter evidence in `lookup-filter-validation.json`.
