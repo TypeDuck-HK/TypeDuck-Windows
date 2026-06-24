@@ -27,10 +27,11 @@ Hong Kong users can install TypeDuck under Chinese (Traditional, Hong Kong) and 
 - ✓ The 2026-06-23 TypeDuck Web alpha fixture set captures settings, candidate, dictionary-panel, reverse lookup, provenance, and source-code layout authority for downstream parity work.
 - ✓ Phase 2 proved the pinned TypeDuck-HK librime release, schema branch, lookup-filter provenance, dictionaries, OpenCC assets, and built schema artifacts in a Windows-shaped staged runtime.
 - ✓ Phase 2 proved Cantonese composition, candidate pages, Jyutping/comment data, commit output, and raw lookup-filter dictionary payload evidence through the internal moqi-ime adapter boundary.
+- ✓ Phase 4 proved the Windows typing MVP through bounded protocol/static guards, rebuilt installer packaging, and live VM user acceptance that TypeDuck typing works instead of ASCII fallback.
+- ✓ Phase 4 established that schema packaging belongs in the sibling `moqi-ime` runtime build; `moqi-im-windows` should consume packaged runtime assets rather than carry a schema submodule.
 
 ### Active
 
-- [ ] Integrate the Phase 2 TypeDuck-HK runtime proof into the Windows installer/runtime path.
 - [ ] Map Phase 2 lookup-filter raw payload evidence into TypeDuck protocol and native candidate/dictionary UI fields.
 - [ ] Remove transitional product reliance on backend `ime.json`; TypeDuck-owned code/config must ultimately own profile identity, settings entry points, and runtime capability contracts.
 - [ ] Replace Moqi product identity with TypeDuck identity across binaries, resources, installer, registry/profile metadata, data/log paths, and release artifacts.
@@ -98,6 +99,8 @@ Hong Kong users can install TypeDuck under Chinese (Traditional, Hong Kong) and 
 | Run project PowerShell scripts with `pwsh` | PowerShell 7+ avoids character-encoding failures observed with Cantonese/Traditional Chinese literals and proof artifacts; future plans and verification commands should prefer `pwsh -NoProfile -ExecutionPolicy Bypass -File ...`. | Accepted after Phase 2 UAT |
 | Remove `ime.json` as product authority after transition | It can help bridge the Moqi scaffold, but the final TypeDuck product must not depend on backend JSON for Windows profile identity, settings entry points, or capability contracts. | Accepted before Phase 3 planning |
 | Use disposable Windows VM evidence for Windows-integrated phases | TSF registration, system DLL registration, host-app candidate placement, and installed launcher behavior cannot be proven by code-only tests. | Accepted before Phase 3 planning |
+| Close Phase 4 on live VM UAT plus static guards | The user installed the rebuilt installer in the VM and confirmed TypeDuck typing and schema replacement worked; deeper launcher fault-injection probes are valuable but not blocking for this MVP phase. | Accepted in Phase 4 |
+| Keep TypeDuck schemas in the sibling runtime build | Schema filtering, prebuild with `rime_deployer.exe --build`, and packaged `build` artifacts belong to `moqi-ime`; this repo should not add a schema submodule. | Accepted in Phase 4 |
 
 ## Evolution
 
@@ -115,4 +118,4 @@ After each milestone:
 4. Confirm candidate/dictionary display against TypeDuck Web alpha.
 
 ---
-*Last updated: 2026-06-23 after Phase 2 verification*
+*Last updated: 2026-06-24 after Phase 4 verification*

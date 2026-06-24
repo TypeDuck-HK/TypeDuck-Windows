@@ -78,6 +78,7 @@ set(LIBUV_BUILD_BENCH OFF CACHE BOOL "" FORCE)
 set(protobuf_BUILD_TESTS OFF CACHE BOOL "" FORCE)
 set(protobuf_BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE)
 set(protobuf_BUILD_LIBUPB ON CACHE BOOL "" FORCE)
+set(protobuf_WITH_ZLIB OFF CACHE BOOL "" FORCE)
 set(protobuf_BUILD_PROTOBUF_BINARIES ON CACHE BOOL "" FORCE)
 if(MOQI_PROTOC_EXECUTABLE)
     set(protobuf_BUILD_PROTOC_BINARIES OFF CACHE BOOL "" FORCE)
@@ -89,6 +90,25 @@ set(protobuf_INSTALL OFF CACHE BOOL "" FORCE)
 set(protobuf_MSVC_STATIC_RUNTIME OFF CACHE BOOL "" FORCE)
 set(ABSL_PROPAGATE_CXX_STD ON CACHE BOOL "" FORCE)
 set(ABSL_MSVC_STATIC_RUNTIME OFF CACHE BOOL "" FORCE)
+
+function(moqi_apply_project_msvc_runtime Dir)
+    if(NOT MSVC OR NOT IS_DIRECTORY "${Dir}")
+        return()
+    endif()
+
+    get_property(MOQI_RUNTIME_TARGETS DIRECTORY "${Dir}" PROPERTY BUILDSYSTEM_TARGETS)
+    foreach(MOQI_RUNTIME_TARGET IN LISTS MOQI_RUNTIME_TARGETS)
+        get_target_property(MOQI_RUNTIME_TARGET_TYPE "${MOQI_RUNTIME_TARGET}" TYPE)
+        if(NOT MOQI_RUNTIME_TARGET_TYPE STREQUAL "INTERFACE_LIBRARY")
+            set_property(TARGET "${MOQI_RUNTIME_TARGET}" PROPERTY MSVC_RUNTIME_LIBRARY "${CMAKE_MSVC_RUNTIME_LIBRARY}")
+        endif()
+    endforeach()
+
+    get_property(MOQI_RUNTIME_SUBDIRS DIRECTORY "${Dir}" PROPERTY SUBDIRECTORIES)
+    foreach(MOQI_RUNTIME_SUBDIR IN LISTS MOQI_RUNTIME_SUBDIRS)
+        moqi_apply_project_msvc_runtime("${MOQI_RUNTIME_SUBDIR}")
+    endforeach()
+endfunction()
 
 FetchContent_Declare(
     spdlog
@@ -123,6 +143,16 @@ else()
     FetchContent_MakeAvailable(protobuf)
     set(MOQI_PROTOBUF_INCLUDE_DIR "${protobuf_SOURCE_DIR}/src")
     set(MOQI_PROTOBUF_ABSL_INCLUDE_DIR "${protobuf_SOURCE_DIR}/third_party/abseil-cpp")
+endif()
+
+if(MSVC)
+    foreach(MOQI_DEP_RUNTIME_DIR IN ITEMS
+        "${CMAKE_BINARY_DIR}/abseil"
+        "${CMAKE_BINARY_DIR}/protobuf"
+        "${CMAKE_BINARY_DIR}/_deps/absl-build"
+        "${CMAKE_BINARY_DIR}/_deps/protobuf-build")
+        moqi_apply_project_msvc_runtime("${MOQI_DEP_RUNTIME_DIR}")
+    endforeach()
 endif()
 
 if(MSVC)

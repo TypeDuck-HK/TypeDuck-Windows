@@ -2,38 +2,38 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-current_phase: 4
-current_phase_name: TypeDuck Protocol and Typing MVP
-status: planning
-stopped_at: Phase 4 context gathered
-last_updated: "2026-06-23T21:16:19.425Z"
-last_activity: 2026-06-23
-last_activity_desc: Phase 3 complete, transitioned to Phase 4
+current_phase: 5
+current_phase_name: Candidate, Dictionary, Settings, and About UI Parity
+status: ready_for_discussion
+stopped_at: Phase 4 complete; ready for Phase 5
+last_updated: "2026-06-24T00:24:19Z"
+last_activity: 2026-06-24
+last_activity_desc: Phase 4 complete after live VM typing UAT and TypeDuck schema packaging closeout
 progress:
   total_phases: 7
-  completed_phases: 3
+  completed_phases: 4
   total_plans: 12
-  completed_plans: 11
-  percent: 43
+  completed_plans: 12
+  percent: 57
 ---
 
 # Project State
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-06-23)
+See: .planning/PROJECT.md (updated 2026-06-24)
 
 **Core value:** Hong Kong users can install TypeDuck under Chinese (Traditional, Hong Kong) and type Cantonese with the same trusted behavior, bilingual settings, candidate details, and dictionary-like lookup experience as TypeDuck Web alpha.
-**Current focus:** Phase 4: TypeDuck Protocol and Typing MVP
+**Current focus:** Phase 5: Candidate, Dictionary, Settings, and About UI Parity
 
 ## Current Position
 
-Phase: 4 of 7 (TypeDuck Protocol and Typing MVP)
+Phase: 5 of 7 (Candidate, Dictionary, Settings, and About UI Parity)
 Plan: Not started
-Status: Ready to plan Phase 4
-Last activity: 2026-06-23 — Phase 3 complete, transitioned to Phase 4
+Status: Ready to discuss/plan Phase 5
+Last activity: 2026-06-24 — Phase 4 complete after live VM typing UAT and TypeDuck schema packaging closeout
 
-Progress: [██████████] 100%
+Progress: [######----] 57%
 
 ## Performance Metrics
 
@@ -54,7 +54,7 @@ Progress: [██████████] 100%
 **Recent Trend:**
 
 - Last 5 plans: P01 5 min, P02 17 min, P03 10 min, P04 55 min, P05 13 min
-- Trend: Phase 3 zh-HK installer/TSF registration is complete; Phase 4 protocol and typing MVP is next.
+- Trend: Phase 4 typing MVP is accepted on live VM user evidence; Phase 5 native candidate/settings/About UI parity is next.
 
 *Updated after each plan completion*
 | Phase 01 P01 | 5 min | 2 tasks | 2 files |
@@ -68,6 +68,7 @@ Progress: [██████████] 100%
 | Phase 04 P01 | 120 | 3 tasks | 9 files |
 | Phase 04 P02 | 90 | 3 tasks | 10 files |
 | Phase 04 P03 | 145 | 3 tasks | 7 files |
+| Phase 04 P04 | live debug/UAT | 3 tasks | installer/backend/schema |
 
 ## Accumulated Context
 
@@ -102,6 +103,9 @@ Recent decisions affecting current work:
 - [Phase 03]: Plan 03-03 accepts VM registry/file/task evidence as automated zh-HK registration proof; the guest language list remained en-US, so a Settings screenshot remains optional product-review evidence.
 - [Phase 03]: Installer cleanup uses code-safe GUID constants in Pascal registry paths while retaining escaped GUID constants for Inno identity fields.
 - [Phase 03]: The VM verification harness never runs the installer on the host; install and uninstall actions run only through PowerShell Direct inside the named Hyper-V VM.
+- [Phase 04]: Close typing MVP on live VM user UAT plus static/protocol guards; strict launcher fault-injection proof remains Phase 7 verification debt.
+- [Phase 04]: TypeDuck schema packaging belongs in the sibling moqi-ime runtime build; moqi-im-windows consumes the packaged runtime and does not need a schema submodule.
+- [Phase 04]: Bundle prebuilt Rime `build` artifacts produced by `rime_deployer.exe --build` on a filtered TypeDuck-HK schema source.
 
 ### Pending Todos
 
@@ -118,9 +122,12 @@ None yet.
 | Installer localization | Installer language picker showed duplicate English entries; decide whether to bundle/vet Traditional Chinese Inno language resources or keep product-controlled bilingual strings only. | Deferred to installer/UI polish | Phase 3 UAT |
 | Installer shortcuts | Start Menu folder creation still warns on the bilingual path with a slash; correct shortcut folder naming in a later installer phase. | Deferred to installer/UI polish | Phase 3 UAT |
 | Installed payload cleanup | Installed `backends.json` still references `moqi-ime` and `moqi-ime\\server.exe` inside `C:\Program Files (x86)\TypeDuckIME`; Phase 4/6 should remove or replace this scaffold manifest with a TypeDuck-owned runtime contract. | Deferred to protocol/scaffold cleanup | Phase 3 UAT |
+| Typing MVP proof harness | `scripts\Test-TypeDuckTypingMvpProof.ps1 -Strict` still expects executable launcher fault-injection probes; Phase 4 is accepted on static guards plus live VM UAT, and deeper probes should move to release verification. | Deferred to compatibility/release verification | Phase 4 closeout |
+| Settings-backed schema customization | `common.custom.yaml` should be generated and updated by frontend settings instead of treated as static packaged data. | Deferred to settings UI | Phase 4 closeout |
+| Residual Moqi paths | Logs/config still use legacy paths such as `%LOCALAPPDATA%\MoqiIM`; product-owned path cleanup belongs with broader scaffold cleanup. | Deferred to scaffold cleanup | Phase 4 closeout |
 
 ## Session Continuity
 
-Last session: 2026-06-23T18:03:34.059Z
-Stopped at: Phase 4 context gathered
-Resume file: .planning/phases/04-typeduck-protocol-and-typing-mvp/04-CONTEXT.md
+Last session: 2026-06-24T00:24:19Z
+Stopped at: Phase 4 complete; ready for Phase 5
+Resume file: .planning/phases/04-typeduck-protocol-and-typing-mvp/04-VERIFICATION.md

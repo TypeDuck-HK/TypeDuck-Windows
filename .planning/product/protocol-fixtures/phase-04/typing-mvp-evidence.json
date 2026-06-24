@@ -452,18 +452,16 @@
     }
   ],
   "windows_smoke": {
-    "status": "blocked",
-    "command": "New-PSSession -VMName <vm> -Credential <runtime credential>; Invoke-Command { OS and interactivity probe }",
-    "timestamp": "2026-06-23T21:44:15Z",
-    "artifact_path": ".planning\\product\\protocol-fixtures\\phase-04\\typing-mvp-artifacts\\windows-smoke-vm-direct.json",
-    "observed_outcome": "PowerShell Direct connectivity was checked, but the session is non-interactive and cannot prove real TSF host-process typing.",
+    "status": "accepted_user_uat",
+    "command": "Manual VM install and typing smoke performed by user; see UAT artifact.",
+    "timestamp": "2026-06-24T00:24:19Z",
+    "artifact_path": ".planning\\product\\protocol-fixtures\\phase-04\\typing-mvp-artifacts\\windows-smoke-user-uat.json",
+    "observed_outcome": "User installed the rebuilt installer in the VM, confirmed TypeDuck no longer outputs ASCII, and confirmed the TypeDuck schema drop-in replacement works. Strict automated launcher fault-injection remains Phase 7 debt.",
     "observations": {
-      "composition": false,
-      "candidates": false,
-      "paging": false,
-      "numeric_selection": false,
-      "commit": false,
-      "bounded_recovery": false
+      "ascii_fallback_fixed": true,
+      "typing_worked": true,
+      "typeduck_schema_drop_in_worked": true,
+      "detailed_paging_numeric_and_recovery_matrix": "deferred_to_phase_7"
     },
     "vm": {
       "name": "My Virtual Machine",

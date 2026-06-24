@@ -1,0 +1,23 @@
+{
+  "artifact_type": "human-uat",
+  "id": "windows-smoke-user-uat",
+  "status": "accepted",
+  "timestamp": "2026-06-24T00:24:19Z",
+  "environment": {
+    "vm": "current launched VM",
+    "install_method": "manual user install",
+    "installer": "D:\\VSProjects\\moqi-im-windows\\installer\\dist\\typeduck-windows-ime-setup.exe",
+    "installer_sha256": "3F09C9BD16A62B09CB44F0A356DC23A120D71FF5466FD80C3492F54185773A4B"
+  },
+  "observations": {
+    "ascii_fallback_fixed": true,
+    "typing_worked": true,
+    "typeduck_schema_drop_in_worked": true,
+    "schema_payload_prebuilt": true
+  },
+  "notes": [
+    "User reported the rebuilt installer worked in the VM after the launcher/path fix.",
+    "User then confirmed the TypeDuck schema drop-in replacement worked.",
+    "Detailed paging, numeric-selection, launcher fault-injection, and host-app matrix coverage remains Phase 7 verification debt."
+  ]
+}

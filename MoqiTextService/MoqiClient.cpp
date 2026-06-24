@@ -1796,7 +1796,7 @@ bool Client::ensureLauncherRunning() {
   }
 
   std::wstring launcherPath = module->programDir();
-  launcherPath += L"\\MoqiLauncher.exe";
+  launcherPath += L"\\TypeDuckLauncher.exe";
   const DWORD attrs = ::GetFileAttributesW(launcherPath.c_str());
   if (attrs == INVALID_FILE_ATTRIBUTES || (attrs & FILE_ATTRIBUTE_DIRECTORY)) {
     return false;

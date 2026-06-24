@@ -16,7 +16,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 1: Identity and Web Parity Contract** - TypeDuck identity, banned-surface rules, and dated Web alpha acceptance fixtures are locked before implementation spreads. (completed 2026-06-23)
 - [x] **Phase 2: Engine Runtime Contract Spike** - The TypeDuck-HK librime fork, lookup-filter plugin, and TypeDuck runtime assets are proven on Windows. (completed 2026-06-23)
 - [x] **Phase 3: zh-HK TSF Registration and Installer Skeleton** - TypeDuck installs, registers, unregisters, and appears under Chinese (Traditional, Hong Kong). (completed 2026-06-24)
-- [ ] **Phase 4: TypeDuck Protocol and Typing MVP** - TSF, launcher, and engine communicate with a bounded TypeDuck protocol that supports real Cantonese typing behavior.
+- [x] **Phase 4: TypeDuck Protocol and Typing MVP** - TSF, launcher, and engine communicate with a bounded TypeDuck protocol that supports real Cantonese typing behavior. (completed 2026-06-24)
 - [ ] **Phase 5: Candidate, Dictionary, Settings, and About UI Parity** - Users see and configure the TypeDuck Web alpha experience in native Windows surfaces.
 - [ ] **Phase 6: Privacy, Security, and Scaffold Cleanup** - Off-scope Moqi/fcitx/cloud/AI behavior is removed or gated, diagnostics are safe, and visible strings are audited.
 - [ ] **Phase 7: Compatibility and Release Verification** - The v1 installer and IME are verified across Windows install paths, host apps, DPI, bitness, protocol recovery, and release artifacts.
@@ -112,12 +112,12 @@ Plans:
 
 **Verification Environment**: Mostly code-testable through protocol, parser, engine-adapter, frame-bound, timeout, and fixture tests. Once TSF typing is wired, include a targeted Windows VM smoke test for real host-process typing responsiveness.
 
-**Plans**: 3/4 plans executed
+**Plans**: 4/4 plans complete
 
 - [x] 04-01-PLAN.md
 - [x] 04-02-PLAN.md
 - [x] 04-03-PLAN.md
-- [ ] 04-04-PLAN.md
+- [x] 04-04-PLAN.md
 
 ### Phase 5: Candidate, Dictionary, Settings, and About UI Parity
 

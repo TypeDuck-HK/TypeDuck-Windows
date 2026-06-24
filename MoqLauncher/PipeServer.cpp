@@ -653,9 +653,18 @@ void PipeServer::createShellNotifyIcon() {
     shellNotifyIconData_.hIcon = ::LoadIcon(NULL, IDI_APPLICATION);
   }
 
-  wcscpy_s(shellNotifyIconData_.szTip, L"墨奇输入法");
+  wcscpy_s(shellNotifyIconData_.szTip,
+           L"TypeDuck 粵語輸入法 / TypeDuck Cantonese IME");
 
-  ::Shell_NotifyIcon(NIM_ADD, &shellNotifyIconData_);
+  if (!::Shell_NotifyIcon(NIM_ADD, &shellNotifyIconData_)) {
+    logger_->warn("Failed to add TypeDuck tray icon: GetLastError={}",
+                  ::GetLastError());
+    return;
+  }
+  if (!::Shell_NotifyIcon(NIM_SETVERSION, &shellNotifyIconData_)) {
+    logger_->warn("Failed to set TypeDuck tray icon version: GetLastError={}",
+                  ::GetLastError());
+  }
 }
 
 void PipeServer::destroyShellNotifyIcon() {
@@ -697,14 +706,14 @@ void PipeServer::showPopupMenu() const {
   // FIXME: make this translatable later
   bool debugEnabled = logLevel_ <= spdlog::level::debug;
   ::AppendMenu(hmenu, MF_STRING | MF_ENABLED | (debugEnabled ? MF_CHECKED : 0),
-               ID_ENABLE_DEBUG_LOG, L"开启调试");
+               ID_ENABLE_DEBUG_LOG, L"開啟除錯 / Enable Debug");
   ::AppendMenu(hmenu, MF_STRING | MF_ENABLED, ID_SHOW_DEBUG_LOGS,
-               L"打开日志");
+               L"開啟記錄 / Open Logs");
   ::AppendMenu(hmenu, MF_SEPARATOR, 0, 0);
   ::AppendMenu(hmenu, MF_STRING | MF_ENABLED, ID_RESTART_Moqi_BACKENDS,
-               L"重启墨奇引擎");
+               L"重新啟動 TypeDuck 引擎 / Restart TypeDuck Engine");
   ::AppendMenu(hmenu, MF_STRING | MF_ENABLED, ID_EXIT_Moqi,
-               L"退出墨奇引擎");
+               L"結束 TypeDuck / Exit TypeDuck");
 
   ::SetForegroundWindow(hwnd_);
   ::TrackPopupMenu(hmenu, TPM_LEFTALIGN | TPM_BOTTOMALIGN, pos.x, pos.y, 0,
@@ -807,8 +816,10 @@ void PipeServer::runGuiThread() {
 
   WNDCLASSEX wndClass;
   auto wndClassAtom = registerWndClass(wndClass);
-  hwnd_ = ::CreateWindowEx(0, LPCTSTR(wndClassAtom), L"墨奇输入法", 0, 0, 0, 0, 0,
-                           HWND_DESKTOP, NULL, wndClass.hInstance, this);
+  hwnd_ = ::CreateWindowEx(0, LPCTSTR(wndClassAtom),
+                           L"TypeDuck 粵語輸入法 / TypeDuck Cantonese IME", 0,
+                           0, 0, 0, 0, HWND_DESKTOP, NULL, wndClass.hInstance,
+                           this);
 
   if (hwnd_ != nullptr) {
     if (::AddClipboardFormatListener(hwnd_)) {
