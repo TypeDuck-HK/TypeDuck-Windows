@@ -146,38 +146,45 @@ foreach ($staleName in @("settings-two-column-layout.bmp", "vm-about-dialog.bmp"
     Add-Violation $staleEvidence "Evidence manifest still references stale screenshot: $staleName"
   }
 }
+foreach ($staleSlotName in @("settingsTwoColumn", "aboutDialog")) {
+  if ((Get-Content -Raw -Encoding UTF8 -LiteralPath $manifestPath) -match "`"$staleSlotName`"\s*:") {
+    Add-Violation $staleEvidence "Evidence manifest still exposes stale slot name: $staleSlotName"
+  }
+}
 if ($ExpectRed -eq "RejectedUatBehavior") {
   Write-Host "PASS RED: RejectedUatBehavior aggregate guard proved rejected child guards are active."
   exit 0
 }
 
 Assert-True ($staleEvidence.Count -eq 0) "Stale Phase 5 evidence is still accepted: $($staleEvidence -join '; ')"
-Assert-File $runtimeProvenancePath "Missing runtime/Web provenance record: $runtimeProvenancePath"
-$runtimeProvenance = Get-JsonFile $runtimeProvenancePath
-Assert-True ($runtimeProvenance.schemaVersion -ge 1) "Runtime provenance must declare schemaVersion >= 1."
-Assert-True ($runtimeProvenance.repositories.windows.path -eq $repo) "Runtime provenance must record this Windows repo path."
-Assert-True ($runtimeProvenance.repositories.backend.path -eq $backend) "Runtime provenance must record the sibling backend path."
-Assert-True ($runtimeProvenance.repositories.typeDuckWeb.path -eq "I:\GitHub\TypeDuck-Web") "Runtime provenance must record the TypeDuck-Web path."
-Assert-True ($runtimeProvenance.webAlphaFixture.sourceMetadata -eq ".planning/product/web-alpha-fixtures/2026-06-23/source-metadata.json") "Runtime provenance must link the Web alpha fixture metadata."
-Assert-True ($runtimeProvenance.lookupFilter.commit -eq "3671814d4e4aeab8d616ceea3c7f6d88e96bba02") "Runtime provenance must include the Phase 2 lookup-filter commit."
-if (Test-Path -LiteralPath $runtimeProvenance.repositories.backend.path -PathType Container) {
-  $currentBackendHead = (& git -C $runtimeProvenance.repositories.backend.path rev-parse HEAD).Trim()
-  Assert-True ($currentBackendHead -eq $runtimeProvenance.repositories.backend.head) "Runtime provenance backend HEAD is stale: $($runtimeProvenance.repositories.backend.head) vs $currentBackendHead."
-}
-if (Test-Path -LiteralPath $runtimeProvenance.repositories.typeDuckWeb.path -PathType Container) {
-  $currentWebHead = (& git -C $runtimeProvenance.repositories.typeDuckWeb.path rev-parse HEAD).Trim()
-  Assert-True ($currentWebHead -eq $runtimeProvenance.repositories.typeDuckWeb.head) "Runtime provenance TypeDuck-Web HEAD is stale: $($runtimeProvenance.repositories.typeDuckWeb.head) vs $currentWebHead."
-}
-if ($runtimeProvenance.PSObject.Properties.Name -contains "artifacts") {
-  foreach ($artifact in $runtimeProvenance.artifacts) {
-    if ($artifact.PSObject.Properties.Name -contains "path" -and $artifact.PSObject.Properties.Name -contains "sha256") {
-      $artifactPath = [string] $artifact.path
-      if (-not [System.IO.Path]::IsPathRooted($artifactPath)) {
-        $artifactPath = Join-Path $repo $artifactPath
+if ((Test-Path -LiteralPath $runtimeProvenancePath -PathType Leaf) -or ($ExpectRed -ne "VmEvidenceMissing")) {
+  Assert-File $runtimeProvenancePath "Missing runtime/Web provenance record: $runtimeProvenancePath"
+  $runtimeProvenance = Get-JsonFile $runtimeProvenancePath
+  Assert-True ($runtimeProvenance.schemaVersion -ge 1) "Runtime provenance must declare schemaVersion >= 1."
+  Assert-True ($runtimeProvenance.repositories.windows.path -eq $repo) "Runtime provenance must record this Windows repo path."
+  Assert-True ($runtimeProvenance.repositories.backend.path -eq $backend) "Runtime provenance must record the sibling backend path."
+  Assert-True ($runtimeProvenance.repositories.typeDuckWeb.path -eq "I:\GitHub\TypeDuck-Web") "Runtime provenance must record the TypeDuck-Web path."
+  Assert-True ($runtimeProvenance.webAlphaFixture.sourceMetadata -eq ".planning/product/web-alpha-fixtures/2026-06-23/source-metadata.json") "Runtime provenance must link the Web alpha fixture metadata."
+  Assert-True ($runtimeProvenance.lookupFilter.commit -eq "3671814d4e4aeab8d616ceea3c7f6d88e96bba02") "Runtime provenance must include the Phase 2 lookup-filter commit."
+  if (Test-Path -LiteralPath $runtimeProvenance.repositories.backend.path -PathType Container) {
+    $currentBackendHead = (& git -C $runtimeProvenance.repositories.backend.path rev-parse HEAD).Trim()
+    Assert-True ($currentBackendHead -eq $runtimeProvenance.repositories.backend.head) "Runtime provenance backend HEAD is stale: $($runtimeProvenance.repositories.backend.head) vs $currentBackendHead."
+  }
+  if (Test-Path -LiteralPath $runtimeProvenance.repositories.typeDuckWeb.path -PathType Container) {
+    $currentWebHead = (& git -C $runtimeProvenance.repositories.typeDuckWeb.path rev-parse HEAD).Trim()
+    Assert-True ($currentWebHead -eq $runtimeProvenance.repositories.typeDuckWeb.head) "Runtime provenance TypeDuck-Web HEAD is stale: $($runtimeProvenance.repositories.typeDuckWeb.head) vs $currentWebHead."
+  }
+  if ($runtimeProvenance.PSObject.Properties.Name -contains "artifacts") {
+    foreach ($artifact in $runtimeProvenance.artifacts) {
+      if ($artifact.PSObject.Properties.Name -contains "path" -and $artifact.PSObject.Properties.Name -contains "sha256") {
+        $artifactPath = [string] $artifact.path
+        if (-not [System.IO.Path]::IsPathRooted($artifactPath)) {
+          $artifactPath = Join-Path $repo $artifactPath
+        }
+        Assert-File $artifactPath "Runtime provenance artifact is missing: $($artifact.path)"
+        $actualHash = (Get-FileHash -Algorithm SHA256 -LiteralPath $artifactPath).Hash
+        Assert-True ($actualHash -eq $artifact.sha256) "Runtime provenance artifact hash is stale for $($artifact.path): expected $($artifact.sha256), got $actualHash."
       }
-      Assert-File $artifactPath "Runtime provenance artifact is missing: $($artifact.path)"
-      $actualHash = (Get-FileHash -Algorithm SHA256 -LiteralPath $artifactPath).Hash
-      Assert-True ($actualHash -eq $artifact.sha256) "Runtime provenance artifact hash is stale for $($artifact.path): expected $($artifact.sha256), got $actualHash."
     }
   }
 }
@@ -193,8 +200,9 @@ Assert-True ($manifest.package.legacyMoqiAssetScan.status -in @("passed", "verif
 $requiredVmSlots = @(
   "installerFirstRunSettings",
   "postInstallSettingsEntryPoint",
+  "settingsApplyPersistence",
   "settingsPersistenceAfterRestart",
-  "aboutDialog",
+  "separateAboutExecutable",
   "notepadCandidateNei",
   "browserCandidateHousam",
   "movementReveal",
@@ -218,8 +226,7 @@ $requiredPreviewScreenshots = @(
   "candidateMultilingual",
   "dictionaryDetail",
   "compoundHousam",
-  "reverseLookupCangjie",
-  "settingsApplyPersistence"
+  "reverseLookupCangjie"
 )
 $requiredPackageSlots = @(
   "installer",
