@@ -5,7 +5,7 @@
 
 **Date:** 2026-06-24T00:46:20Z
 **Phase:** 5-Candidate, Dictionary, Settings, and About UI Parity
-**Areas discussed:** Semantic theme tokens, Qt versus native rendering, bundled appearance theme file ownership, theme JSON shape, source-code-backed layout, settings dialog, About dialog, icon usage, settings/dictionary gray areas
+**Areas discussed:** Semantic theme tokens, Qt versus native rendering, bundled appearance theme file ownership, theme JSON shape, source-code-backed layout, settings dialog, About dialog, icon usage, candidate data parsing, settings persistence and Rime side effects, settings/dictionary gray areas
 
 ---
 
@@ -110,6 +110,35 @@
 
 **User's choice:** Icon asset mapping is locked.
 **Notes:** These paths are current source locations under `D:\VSProjects\moqi-ime\icons`; implementation should move/copy assets into semantically appropriate TypeDuck resources as needed.
+
+---
+
+## Candidate Data Parsing
+
+| Option | Description | Selected |
+|--------|-------------|----------|
+| Parse deeply in protocol/transport | Converts raw lookup comments early and passes structured dictionary data through many layers. | |
+| Parse near rendering | Keep raw payload through transport and parse into `CandidateInfo` / `CandidateEntry` near native rendering/view-model creation. | ✓ |
+| Use readable control parser | Use a helper like TypeDuck Web `ConsumedString` before CSV parsing. | ✓ |
+| Hard-code mapping constants | Keep TypeDuck's language, part-of-speech, register, label, and layout maps in constants like Web `consts.ts`. | ✓ |
+
+**User's choice:** Parse/store data as `CandidateInfo` and `CandidateEntry`; parse near rendering; use a `ConsumedString`-style helper; hard-coded mappings are expected.
+**Notes:** This preserves raw comment transport from Phase 4 while making the Phase 5 rendering model mirror TypeDuck Web.
+
+---
+
+## Settings Persistence And Rime Side Effects
+
+| Setting group | Current TypeDuck Web behavior | Captured decision |
+|---------------|-------------------------------|-------------------|
+| `displayLanguages`, `mainLanguage`, `isHeiTypeface`, `showRomanization`, `showReverseCode` | UI preferences stored from `DEFAULT_PREFERENCES`; no Rime YAML customization. | Persist in TypeDuck JSON only; use for rendering/settings. |
+| `pageSize` | `api.cpp` customizes `menu/page_size` in `default.custom.yaml`. | Generate/update `default.custom.yaml` side effect. |
+| `enableCompletion`, `enableCorrection`, `enableSentence`, `enableLearning`, `isCangjie5` | `worker.ts` maps these into the `api.cpp` options bitfield for `common.custom.yaml` `__patch`. | Generate/update `common.custom.yaml` side effect. |
+| Cangjie roots | Web always includes `common:/show_cangjie_roots` in the `common.custom.yaml` patch list. | Preserve unless later Web source changes. |
+| Redeploy | Web calls `Rime.customize(...)` then `Rime.deploy()`. | Redeploy/reconfigure after customization. |
+
+**User's choice:** Do not treat `common.custom.yaml` as persistence state; save JSON following frontend `DEFAULT_PREFERENCES` shape. Reuse `api.cpp` behavior if possible and redeploy after customization.
+**Notes:** Confirmed against current `I:\GitHub\TypeDuck-Web\src\worker.ts`, `src\hooks.ts`, `src\consts.ts`, and `wasm\api.cpp`.
 
 ---
 

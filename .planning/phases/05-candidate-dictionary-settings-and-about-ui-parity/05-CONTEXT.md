@@ -39,7 +39,7 @@ This phase makes the visible TypeDuck Windows experience native and Web-alpha-al
 - **D-17:** The same TypeDuck settings dialog must open during installation and after installation, with Display Languages first and Web alpha order mirrored.
 - **D-18:** Follow exactly the same two-column settings layout as TypeDuck Web. This is a layout parity requirement, not a loose visual suggestion.
 - **D-19:** Whether settings save immediately or require a Confirm button is left to the planner/implementer. The chosen behavior must be clear, bilingual where user-facing, and must not create mismatched install-time versus post-install settings behavior.
-- **D-20:** Settings persistence should be TypeDuck-owned and should ultimately generate/update the runtime configuration needed by the backend, including `common.custom.yaml` or equivalent schema customization, instead of treating candidate count and schema settings as static packaged data.
+- **D-20:** Settings persistence should be TypeDuck-owned and should ultimately generate/update the runtime configuration needed by the backend, including generated `common.custom.yaml` / `default.custom.yaml` side effects or equivalent schema customization, instead of treating candidate count and schema settings as static packaged data.
 - **D-21:** The Web alpha settings set is the Phase 5 scope: Display Languages, main display language, No. of Candidates Per Page 4-10, Chinese Typeface Sung/Hei, Candidates Jyutping modes, Auto-completion, Auto-correction, Auto-composition, Input Memory, Reverse Lookup Settings, Show Full Input Code, and Cangjie Version 3/5 where supported.
 - **D-22:** Capability-gated settings should remain visible only when TypeDuck can explain support cleanly. Engine-backed settings may be disabled with bilingual explanatory text if the engine reports unsupported or unavailable behavior.
 
@@ -77,8 +77,22 @@ L"This input method is developed by the Department of Linguistics and Modern Lan
 - **D-36:** Preview harness screenshots are useful for layout iteration, but acceptance requires VM or equivalent Windows evidence for candidate placement, focus behavior, settings entry points, installer-first-run settings, high DPI, multi-monitor, UI-less/imperfect composition rectangles, and representative host apps.
 - **D-37:** Add focused automated tests where possible: theme JSON schema/loader, duplicate theme-file package behavior, settings persistence, lookup payload parser, candidate/dictionary view-model mapping, About resource/text/link presence, icon assignment, and banned Moqi theme/string leakage in Phase 5 surfaces.
 
+### Candidate Data Parsing Style
+- **D-38:** Parse and store lookup-filter display data as native equivalents of TypeDuck Web's `CandidateInfo` and `CandidateEntry`. These names are intentionally product/domain terms and should guide the C++ view-model shape.
+- **D-39:** Parse raw lookup comments near rendering/view-model creation, not far upstream in the protocol, launcher, or backend transport path. Do not pass fully structured dictionary data through unrelated layers when the raw comment plus basic candidate fields are enough to preserve the boundary.
+- **D-40:** Use a small helper like TypeDuck Web's `ConsumedString` for initial control-character parsing (`\v`, first `\f`, optional leading `\r`) so the parser remains readable and testable.
+- **D-41:** Hard-coded mappings equivalent to TypeDuck Web `consts.ts` are expected and acceptable for Phase 5: language codes/names/labels, Jyutping visibility labels, definition layout, other-data row labels, pronunciation labels, literary/colloquial readings, registers, parts of speech, labels, and check columns.
+
+### Settings State and Rime Side Effects
+- **D-42:** Persist settings in a TypeDuck-owned JSON file shaped like TypeDuck Web `DEFAULT_PREFERENCES`, not in `common.custom.yaml`. The JSON preferences file is the Windows source of truth; Rime custom YAML files are generated side effects for the engine.
+- **D-43:** Follow the current TypeDuck Web settings side-effect split: interface-only settings do not update Rime YAML. These are `displayLanguages`, `mainLanguage`, `isHeiTypeface`, `showRomanization`, and `showReverseCode`.
+- **D-44:** Rime engine settings must be applied through the same conceptual path as TypeDuck Web `wasm/api.cpp` where possible: use the levers/custom-settings API instead of hand-writing YAML when available in the Windows runtime.
+- **D-45:** `pageSize` updates `default.custom.yaml` by customizing `menu/page_size`; it is the one Web-alpha preference that maps to `default.custom.yaml`.
+- **D-46:** `enableCompletion`, `enableCorrection`, `enableSentence`, `enableLearning`, and `isCangjie5` update `common.custom.yaml` through the `__patch` list. The current Web mapping is: always include `common:/show_cangjie_roots`; include `common:/disable_completion` when `enableCompletion` is false; include `common:/enable_correction` when `enableCorrection` is true; include `common:/disable_sentence` when `enableSentence` is false; include `common:/disable_learning` when `enableLearning` is false; include `common:/use_cangjie3` when `isCangjie5` is false.
+- **D-47:** After any customization that changes Rime custom settings, redeploy/reconfigure the engine before expecting behavior to change. TypeDuck Web calls `Rime.customize(...)` and then `Rime.deploy()`; Windows should preserve the same semantic order and expose a bounded failure state if deploy fails.
+
 ### the agent's Discretion
-The planner may choose the exact implementation split, drawing API, internal C++ view-model names, JSON schema field names, and settings save-vs-confirm behavior, provided the result stays native/focus-safe for the candidate popup, uses semantic theme names, keeps fonts outside `themes`, keeps only light/dark palettes, treats `input_methods/rime/appearance_themes.json` as canonical after compatibility is proven, mirrors the Web alpha settings/candidate/dictionary behavior from source code, and preserves the exact About/icon decisions above.
+The planner may choose the exact implementation split, drawing API, internal C++ view-model names, JSON schema field names, and settings save-vs-confirm behavior, provided the result stays native/focus-safe for the candidate popup, uses semantic theme names, keeps fonts outside `themes`, keeps only light/dark palettes, treats `input_methods/rime/appearance_themes.json` as canonical after compatibility is proven, mirrors the Web alpha settings/candidate/dictionary behavior from source code, keeps parsing near rendering, persists JSON preferences as source of truth, applies Rime YAML only as generated side effects, redeploys after customization, and preserves the exact About/icon decisions above.
 
 </decisions>
 
@@ -111,10 +125,17 @@ The planner may choose the exact implementation split, drawing API, internal C++
 - `I:\GitHub\TypeDuck-Web\src\Preferences.tsx` - Settings labels, order, controls, Display Languages behavior, and exact two-column layout source.
 - `I:\GitHub\TypeDuck-Web\src\App.tsx` - Surrounding Web alpha page structure around the settings component.
 - `I:\GitHub\TypeDuck-Web\src\consts.ts` - Language labels/codes, defaults, Jyutping modes, definition layout, dictionary labels, register, and part-of-speech maps.
+- `I:\GitHub\TypeDuck-Web\src\CandidateInfo.ts` - Source model for `CandidateInfo`, `CandidateEntry`, near-rendering comment parsing, dictionary-field mapping, and row helper methods.
+- `I:\GitHub\TypeDuck-Web\src\utils.ts` - `ConsumedString` and CSV parsing helpers that should inspire the native parser shape.
+- `I:\GitHub\TypeDuck-Web\src\hooks.ts` - `usePreferences()` persistence behavior following `DEFAULT_PREFERENCES`.
+- `I:\GitHub\TypeDuck-Web\src\worker.ts` - Current settings-to-customize bitfield mapping and deploy call path.
+- `I:\GitHub\TypeDuck-Web\src\types.ts` - Split between `RimePreferences` and `InterfacePreferences`.
 - `I:\GitHub\TypeDuck-Web\src\CandidatePanel.tsx` - Candidate panel structure, dictionary reveal state, page nav, and movement-triggered hide/show behavior.
 - `I:\GitHub\TypeDuck-Web\src\Candidate.tsx` - Candidate row table structure, Jyutping visibility, main-language definitions, canonical references, and dictionary indicator.
 - `I:\GitHub\TypeDuck-Web\src\DictionaryPanel.tsx` - Dictionary entry head/body/table/More Languages rendering.
 - `I:\GitHub\TypeDuck-Web\src\index.css` - Candidate/dictionary panel CSS, font stacks, sizing, border, highlight, and table styling.
+- `I:\GitHub\TypeDuck-Web\wasm\api.cpp` - `customize()` and `deploy()` source for `default.custom.yaml`, `common.custom.yaml`, levers API use, and redeploy semantics.
+- `I:\GitHub\TypeDuck-Web\schema\common.yaml` - Shows `__patch: common.custom:/patch?`, confirming `common.custom.yaml` patch consumption.
 - `I:\GitHub\TypeDuck-Web\tailwind.config.ts` - Palette values and font token source only; do not copy Tailwind token names blindly into Windows theme JSON.
 
 ### Windows Frontend Code
@@ -130,6 +151,7 @@ The planner may choose the exact implementation split, drawing API, internal C++
 - `D:\VSProjects\moqi-ime\input_methods\rime\appearance_themes.json` - Current embedded builtin theme source file to replace with TypeDuck light/dark semantic theme contract.
 - `D:\VSProjects\moqi-ime\input_methods\rime\appearance_themes.go` - Current loader search order, embedded fallback, theme registry, and theme application hooks.
 - `D:\VSProjects\moqi-ime\input_methods\rime\appearance_config.go` - Current appearance/settings persistence, customize UI map, candidate count config write, and scaffold customization surface.
+- `D:\VSProjects\moqi-ime\input_methods\rime\rime.go` - Existing backend style/defaults and engine option handling that may need alignment with TypeDuck preferences.
 - `D:\VSProjects\moqi-ime\scripts\build.ps1` - Current package step that copies `appearance_themes.json` into both `input_methods/rime` and `input_methods/rime/data`.
 - `D:\VSProjects\moqi-ime\icons\About_Banner.bmp` - Required top About dialog banner source asset.
 - `D:\VSProjects\moqi-ime\icons\Credit_Logos.bmp` - Required About dialog credit/logo source asset.
@@ -154,6 +176,9 @@ The planner may choose the exact implementation split, drawing API, internal C++
 - `MoqiTextService/MoqiCandidateWindow.cpp`: Already has a non-activating topmost popup, owner normalization, double-buffered GDI painting, rounded clipping, row measurement, mouse hit testing, wheel paging, and selection click handling. This is the right starting point for native TypeDuck candidate/dictionary rendering.
 - `MoqiTextService/MoqiTextService.cpp`: Already creates fonts, owns candidate page state, updates the candidate window, and applies backend UI customization values.
 - `proto/moqi.proto`: Already carries structured `CandidateEntry` fields, `TypeDuckCandidatePage`, settings snapshot/update, capabilities, health, and error messages from Phase 4.
+- `I:\GitHub\TypeDuck-Web\src\CandidateInfo.ts`: Provides the intended data model shape and proves parsing can live next to rendering-facing view models rather than deep in transport.
+- `I:\GitHub\TypeDuck-Web\src\utils.ts`: Provides a compact `ConsumedString` pattern for readable control-character parsing.
+- `I:\GitHub\TypeDuck-Web\wasm\api.cpp`: Provides the current TypeDuck Web levers/custom-settings behavior for settings that affect Rime files and deploy.
 - `D:\VSProjects\moqi-ime\input_methods\rime\appearance_themes.go`: Already supports embedded builtin themes, filesystem override loading, user theme merge, and theme application into backend style fields.
 - `D:\VSProjects\moqi-ime\input_methods\rime\appearance_config.go`: Already writes local appearance config and exposes `customizeUIMap()` to the Windows frontend, though much of its scaffold customization is broader than TypeDuck v1.
 - `D:\VSProjects\moqi-ime\icons\About_Banner.bmp` and `D:\VSProjects\moqi-ime\icons\Credit_Logos.bmp`: Existing source assets for the About dialog, but implementation should move/copy them into a semantically appropriate TypeDuck resource/assets location.
@@ -165,12 +190,15 @@ The planner may choose the exact implementation split, drawing API, internal C++
 - Backend theme data currently lives in the sibling `moqi-ime` runtime and is copied into this repo's installer stage; Phase 5 may need coordinated changes across both repos.
 - The current appearance theme JSON is scaffold/Moqi-oriented, Simplified-labeled, and overly broad. It conflicts with the TypeDuck scope of Web-alpha parity and limited customization.
 - TypeDuck Web uses table markup for candidates and dictionary details, but the native implementation can represent the same structure with measured rows/columns and semantic view models instead of an actual toolkit table widget.
+- TypeDuck Web splits preferences into Rime-affecting preferences and interface-only preferences. Windows should keep the same conceptual split even if it uses a native JSON file instead of browser local storage.
+- `common.custom.yaml` is consumed as a Rime patch side effect, not as the settings state database. Treating it as the source of truth would lose UI-only preferences and make Web parity brittle.
 - Phase 1 verification already locks source-code-backed layout authority: screenshots prove visual sufficiency, while implementation details must be checked against TypeDuck Web source and `.planning/product` fixtures.
 - The current TypeDuck icon/bitmap assets live in the sibling backend `icons` directory; Phase 5 should treat that as a source location, not the final semantic resource organization.
 
 ### Integration Points
 - Candidate/dictionary view-model mapping connects `proto::CandidateEntry.raw_lookup_comment` and structured candidate fields to native row/dictionary rendering.
-- Settings UI connects installer `[Run]` or setup flow, post-install entry point, TypeDuck-owned local storage, backend settings update protocol, and generated Rime custom config.
+- Settings UI connects installer `[Run]` or setup flow, post-install entry point, TypeDuck-owned JSON preferences, backend settings update protocol, generated Rime custom config, and redeploy/reconfigure.
+- Rime-affecting settings connect `pageSize` to `default.custom.yaml` and the option patch list to `common.custom.yaml`; interface-only settings connect only to JSON persistence and native rendering.
 - About UI connects resource packaging, exact bilingual content, external link opening, executable/icon resources, and product attribution.
 - Icon assignment connects CMake/resources for `TypeDuckLauncher.exe`, `TypeDuckSetupHelper.exe`, backend `server.exe`, TSF profile/input-picker icon metadata, and installer/uninstaller branding.
 - Theme JSON changes connect the sibling backend source, backend loader search order, installer staging, and frontend `CustomizeUi`/native rendering tokens.
@@ -187,6 +215,9 @@ The planner may choose the exact implementation split, drawing API, internal C++
 - User direction: About dialog must use `About_Banner.bmp`, exact provided bilingual text, `Credit_Logos.bmp`, and the four specified links.
 - User direction: TypeDuck icon assignments are fixed: `TypeDuck_Transparent.ico` for executables except installer/uninstaller, `TypeDuck_Small.ico` for system input method picker, and `TypeDuck.ico` for installer/uninstaller/branding.
 - User direction: legacy Moqi images `moqi.png`, `mo.ico`, `mo.png`, and `moqi.ico` must not be used anywhere.
+- User direction: data should be parsed and stored as `CandidateInfo` and `CandidateEntry`; parsing should happen near rendering; use a helper like TypeDuck Web `ConsumedString`; hard-coded mapping tables like `consts.ts` are expected.
+- User direction: save settings as JSON following TypeDuck Web `DEFAULT_PREFERENCES`; do not treat `common.custom.yaml` as persistence state; use Rime custom YAML only as generated side effects and remember to redeploy after customization.
+- Current TypeDuck Web setting evidence: `pageSize` writes `menu/page_size` via `default.custom.yaml`; `enableCompletion`, `enableCorrection`, `enableSentence`, `enableLearning`, `isCangjie5`, and always-show Cangjie roots write `common.custom.yaml` patch items; `displayLanguages`, `mainLanguage`, `isHeiTypeface`, `showRomanization`, and `showReverseCode` are interface-only preferences.
 - Advice captured: the table layout is not complicated enough to justify Qt for the candidate/dictionary popup. Treat it as native measured layout unless implementation proves a concrete blocker.
 - Advice captured: keep `input_methods/rime/appearance_themes.json` as the canonical bundled theme file and treat the `input_methods/rime/data/appearance_themes.json` copy as temporary compatibility baggage.
 - Current evidence: the two staged copies are byte-identical at SHA-256 `C0F877B9FF6F9FFC8802FD717560EB13B05A47987A0ECC4C56CD789A6DE01F4C`, and `D:\VSProjects\moqi-ime\scripts\build.ps1` currently copies the same source file to both paths.
