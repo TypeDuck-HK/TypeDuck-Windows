@@ -54,6 +54,7 @@ Source: "{#StageDir}\win32\TypeDuckIME\*"; DestDir: "{app}"; Flags: ignoreversio
 Name: "{autoprograms}\{#MyAppName}\解除安裝 / Uninstall"; Filename: "{uninstallexe}"
 
 [Run]
+Filename: "{app}\TypeDuckSettings.exe"; Description: "開啟 TypeDuck 設定 / Open TypeDuck Settings"; Flags: postinstall nowait skipifsilent; Check: ShouldLaunchSettings
 Filename: "{app}\TypeDuckLauncher.exe"; Flags: nowait; Check: ShouldLaunchLauncher
 
 [Registry]
@@ -246,6 +247,11 @@ begin
 end;
 
 function ShouldLaunchLauncher(): Boolean;
+begin
+  Result := HelperInstallSucceeded and (not HelperInstallNeedsRestart);
+end;
+
+function ShouldLaunchSettings(): Boolean;
 begin
   Result := HelperInstallSucceeded and (not HelperInstallNeedsRestart);
 end;

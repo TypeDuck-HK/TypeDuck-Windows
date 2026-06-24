@@ -185,14 +185,29 @@ Copy-IfExists -Source $launcher -Destination (Join-Path $stageWin32Root "TypeDuc
 
 $setupHelper = Resolve-ArtifactPath -Label "TypeDuckSetupHelper.exe" -Candidates @(
     (Join-Path $Win32BuildDir "TypeDuckSetupHelper.exe"),
+    (Join-Path $Win32BuildDir "Debug\TypeDuckSetupHelper.exe"),
     (Join-Path $Win32BuildDir "Release\TypeDuckSetupHelper.exe"),
+    (Join-Path $Win32BuildDir "SetupHelper\Debug\TypeDuckSetupHelper.exe"),
     (Join-Path $Win32BuildDir "SetupHelper\Release\TypeDuckSetupHelper.exe")
 )
 Copy-IfExists -Source $setupHelper -Destination (Join-Path $stageWin32Root "TypeDuckSetupHelper.exe")
 
+$settingsExe = Resolve-ArtifactPath -Label "TypeDuckSettings.exe" -Candidates @(
+    (Join-Path $Win32BuildDir "TypeDuckSettings.exe"),
+    (Join-Path $Win32BuildDir "Debug\TypeDuckSettings.exe"),
+    (Join-Path $Win32BuildDir "Release\TypeDuckSettings.exe"),
+    (Join-Path $Win32BuildDir "TypeDuckSettings\Debug\TypeDuckSettings.exe"),
+    (Join-Path $Win32BuildDir "TypeDuckSettings\Release\TypeDuckSettings.exe"),
+    (Join-Path $RepoRoot "build-vs32-settings-ui\TypeDuckSettings\Debug\TypeDuckSettings.exe"),
+    (Join-Path $RepoRoot "build-vs32-settings-ui\TypeDuckSettings\Release\TypeDuckSettings.exe")
+)
+Copy-IfExists -Source $settingsExe -Destination (Join-Path $stageWin32Root "TypeDuckSettings.exe")
+
 $dll32 = Resolve-ArtifactPath -Label "Win32 TypeDuckTextService.dll" -Candidates @(
     (Join-Path $Win32BuildDir "TypeDuckTextService.dll"),
+    (Join-Path $Win32BuildDir "Debug\TypeDuckTextService.dll"),
     (Join-Path $Win32BuildDir "Release\TypeDuckTextService.dll"),
+    (Join-Path $Win32BuildDir "MoqiTextService\Debug\TypeDuckTextService.dll"),
     (Join-Path $Win32BuildDir "MoqiTextService\Release\TypeDuckTextService.dll")
 )
 Copy-IfExists -Source $dll32 -Destination (Join-Path $stageWin32Root "TypeDuckTextService.dll")

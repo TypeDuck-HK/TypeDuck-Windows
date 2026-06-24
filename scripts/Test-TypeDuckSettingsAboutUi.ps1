@@ -46,6 +46,9 @@ $mainPath = Join-Path $repo "TypeDuckSettings/main.cpp"
 $rcPath = Join-Path $repo "TypeDuckSettings/TypeDuckSettings.rc"
 $resourcePath = Join-Path $repo "TypeDuckSettings/resource.h"
 $preferencesPath = Join-Path $repo "MoqLauncher/TypeDuckPreferences.cpp"
+$installScriptPath = Join-Path $repo "scripts/install.ps1"
+$packageScriptPath = Join-Path $repo "scripts/_all_in_package.ps1"
+$installerPath = Join-Path $repo "installer/MoqiTsf.iss"
 $settingsOrderPath = Join-Path $repo ".planning/product/web-alpha-fixtures/2026-06-23/settings-order.json"
 
 Assert-True (Test-Path -LiteralPath $settingsCmakePath) "TypeDuckSettings/CMakeLists.txt is missing."
@@ -53,16 +56,34 @@ Assert-True (Test-Path -LiteralPath $windowPath) "TypeDuckSettingsWindow.cpp is 
 Assert-True (Test-Path -LiteralPath $mainPath) "TypeDuckSettings main.cpp is missing."
 Assert-True (Test-Path -LiteralPath $rcPath) "TypeDuckSettings.rc is missing."
 Assert-True (Test-Path -LiteralPath $resourcePath) "TypeDuckSettings resource.h is missing."
+Assert-True (Test-Path -LiteralPath $installScriptPath) "scripts/install.ps1 is missing."
+Assert-True (Test-Path -LiteralPath $packageScriptPath) "scripts/_all_in_package.ps1 is missing."
+Assert-True (Test-Path -LiteralPath $installerPath) "installer/MoqiTsf.iss is missing."
 
 $settingsCmake = Get-Content -Raw -Encoding UTF8 -LiteralPath $settingsCmakePath
 $window = Get-Content -Raw -Encoding UTF8 -LiteralPath $windowPath
 $preferences = Get-Content -Raw -Encoding UTF8 -LiteralPath $preferencesPath
+$installScript = Get-Content -Raw -Encoding UTF8 -LiteralPath $installScriptPath
+$packageScript = Get-Content -Raw -Encoding UTF8 -LiteralPath $packageScriptPath
+$installer = Get-Content -Raw -Encoding UTF8 -LiteralPath $installerPath
 $fixture = Get-Content -Raw -Encoding UTF8 -LiteralPath $settingsOrderPath | ConvertFrom-Json
 
 Assert-Text $topCmake "add_subdirectory\(.+TypeDuckSettings" "Top-level CMake must include TypeDuckSettings."
 Assert-Text $settingsCmake "add_executable\(TypeDuckSettings\s+WIN32" "TypeDuckSettings must be a native Win32 executable."
 Assert-Text $settingsCmake "MoqLauncher/TypeDuckPreferences\.cpp" "Settings executable must reuse TypeDuckPreferences."
 Assert-Text $settingsCmake "TypeDuckSettingsVersion\.h\.in" "TypeDuckSettings must generate a version header from version.txt-derived CMake values."
+Assert-Text $installScript "Resolve-ArtifactPath\s+-Label\s+`"TypeDuckSettings\.exe`"" "Installer staging must resolve TypeDuckSettings.exe."
+Assert-Text $installScript '\$settingsExe\s*=\s*Resolve-ArtifactPath' "Installer staging must assign the resolved TypeDuckSettings.exe artifact."
+Assert-Text $installScript 'Copy-IfExists\s+-Source\s+\$settingsExe' "Installer staging must copy TypeDuckSettings.exe from the resolved artifact."
+Assert-Text $installScript 'Join-Path\s+\$stageWin32Root\s+"TypeDuckSettings\.exe"' "Installer staging must place TypeDuckSettings.exe in the app payload root."
+Assert-Text $installer "Filename:\s+`"\{app\}\\TypeDuckSettings\.exe`"" "Installer must launch TypeDuckSettings.exe during setup."
+Assert-Text $installer "Description:\s+`"開啟 TypeDuck 設定 / Open TypeDuck Settings`"" "Installer settings launch description must be bilingual."
+Assert-Text $installer "function\s+ShouldLaunchSettings\(\):\s+Boolean" "Installer settings launch must be gated by a dedicated function."
+Assert-Ordered $installer @(
+  "Filename:\s+`"\{app\}\\TypeDuckSettings\.exe`"",
+  "Filename:\s+`"\{app\}\\TypeDuckLauncher\.exe`""
+) "Installer run order"
+Assert-Text $packageScript "scripts\\install\.ps1" "All-in package script must continue to route packaging through scripts/install.ps1."
 
 $combined = "$topCmake`n$settingsCmake`n$window"
 Assert-True ($combined -notmatch "find_package\s*\(\s*Qt|Qt[0-9]::|QApplication|#include\s*<Q") "TypeDuckSettings must not use Qt."
