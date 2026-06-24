@@ -74,7 +74,10 @@ Assert-Contains $testPath 'MoqiTextService/TypeDuckCandidateInfo\.h' "CandidateI
 Assert-Contains $testPath 'PreservesLookupFilterControlSeparatorSemantics' "D-11 separator test"
 Assert-Contains $testPath 'ParsesCsvRowsWithLookupFilterHeaderOrderAndQuotes' "D-12 CSV test"
 Assert-Contains $testPath 'MapsNeiToCandidateDictionaryAndMoreLanguages' "CAND-02/CAND-03 nei test"
+Assert-Contains $testPath 'MapsHouToMultipleReadingRows' "CAND-02 hou multi-reading test"
 Assert-Contains $testPath 'MapsCompoundHousamToMultipleDictionaryEntries' "D-33 compound test"
+Assert-Contains $testPath 'RejectsBracketedPartOfSpeechPresentation' "CAND-06 POS pill data contract test"
+Assert-Contains $testPath 'CarriesReverseLookupInputBufferAndMultilingualRows' "CAND-03 reverse lookup multilingual test"
 Assert-Contains $testPath 'CarriesJyutpingVisibilityAndTypefacePreferences' "CAND-04/CAND-05 preference test"
 
 $forbiddenFiles = @(
@@ -115,6 +118,9 @@ Assert-Contains $windowHeaderPath 'diagnosticRawComment' "Raw comments limited t
 Assert-Contains $windowHeaderPath 'displayText\(\)|displayComment\(\)' "Visible candidate rows derived from CandidateInfo"
 Assert-Contains $windowSourcePath 'CandidateInfo' "Candidate window consumes CandidateInfo"
 Assert-Contains $windowSourcePath 'setDisplayPreferences' "Candidate window accepts settings-derived display preferences"
+Assert-Contains $fixturePath '"hou"' "Candidate parity fixture includes hou sample"
+Assert-Contains $fixturePath '"reverse-lookup"' "Candidate parity fixture includes reverse lookup sample"
+Assert-Contains $fixturePath '"runtimeParity"' "Candidate parity fixture includes runtime parity section"
 
 if ($Strict) {
   $buildDir = Join-Path $Root "build-vs32"
