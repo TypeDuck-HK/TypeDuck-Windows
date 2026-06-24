@@ -173,19 +173,26 @@ Plans:
 **Gap Closure Wave 9** *(blocked on Wave 8 guard/provenance alignment)*
 
 - [ ] 05-10-PLAN.md — Repair candidate data parity, multi-row dictionary rendering, POS pills, multilingual rows, and visual metrics.
-- [ ] 05-11-PLAN.md — Repair settings layout/copy, move About to a separate executable, and clean icon packaging/stamping.
 
-**Gap Closure Wave 10** *(blocked on candidate and settings/About/icon repairs)*
+**Gap Closure Wave 10** *(blocked on Wave 9 candidate/runtime repairs)*
 
-- [ ] 05-12-PLAN.md — Rebuild the fixed package and refresh automated/package/preview evidence.
+- [ ] 05-11-PLAN.md — Repair settings layout/copy and move About to a separate executable.
 
-**Gap Closure Wave 11** *(blocked on automated/package evidence refresh)*
+**Gap Closure Wave 11** *(blocked on Wave 10 settings/About repairs)*
 
-- [ ] 05-13-PLAN.md — Capture and approve required Windows VM/manual evidence.
+- [ ] 05-12-PLAN.md — Clean icon packaging/stamping and remove legacy raw icon leakage.
 
-**Gap Closure Wave 12** *(blocked on VM/manual evidence approval)*
+**Gap Closure Wave 12** *(blocked on candidate, settings/About, and icon repairs)*
 
-- [ ] 05-14-PLAN.md — Write the final 05-06 evidence summary and close the UAT gap record.
+- [ ] 05-13-PLAN.md — Rebuild the fixed package and refresh automated/package/preview evidence.
+
+**Gap Closure Wave 13** *(blocked on automated/package evidence refresh)*
+
+- [ ] 05-14-PLAN.md — Capture and approve required Windows VM/manual evidence.
+
+**Gap Closure Wave 14** *(blocked on VM/manual evidence approval)*
+
+- [ ] 05-15-PLAN.md — Write the final 05-06 evidence summary and close the UAT gap record.
 
 **UI hint**: yes
 
