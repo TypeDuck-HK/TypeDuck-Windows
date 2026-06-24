@@ -49,7 +49,7 @@
 
 ### Candidate and Dictionary UI
 
-- [ ] **CAND-01**: User sees a native candidate panel styled to match TypeDuck Web alpha visual tone: light neutral surface, warm amber highlight/accent, compact rows, readable HK Chinese/English font stack, and restrained rounded controls.
+- [x] **CAND-01**: User sees a native candidate panel styled to match TypeDuck Web alpha visual tone: light neutral surface, warm amber highlight/accent, compact rows, readable HK Chinese/English font stack, and restrained rounded controls.
 - [ ] **CAND-02**: User sees each candidate's Chinese text and relevant input code/Jyutping/comment/translation fields according to settings and available engine data.
 - [ ] **CAND-03**: User can inspect a selected or highlighted candidate's dictionary-like detail panel with headword, Jyutping, part-of-speech labels, English meaning, reading notes, and More Languages rows when available.
 - [ ] **CAND-04**: User can configure Jyutping visibility with the Web alpha modes: Always Show, Only in Reverse Lookup, and Hide.
@@ -74,7 +74,7 @@
 
 - [ ] **LANG-01**: Every user-facing installer, settings, About, tray/menu, candidate UI, error, and status string is bilingual in Traditional Hong Kong Chinese and English.
 - [ ] **LANG-02**: User-facing Chinese text uses Traditional Hong Kong wording, not Simplified Chinese wording or Simplified-only installer chrome.
-- [ ] **LANG-03**: TypeDuck display-language labels and dictionary language names match TypeDuck Web alpha unless the Web alpha changes and the project context is updated.
+- [x] **LANG-03**: TypeDuck display-language labels and dictionary language names match TypeDuck Web alpha unless the Web alpha changes and the project context is updated.
 
 ### Privacy, Security, and Diagnostics
 
@@ -165,7 +165,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | TYPE-03 | Phase 4 | Complete |
 | TYPE-04 | Phase 4 | Complete |
 | TYPE-05 | Phase 4 | Complete |
-| CAND-01 | Phase 5 | Pending |
+| CAND-01 | Phase 5 | Complete |
 | CAND-02 | Phase 5 | Pending |
 | CAND-03 | Phase 5 | Pending |
 | CAND-04 | Phase 5 | Pending |
@@ -184,7 +184,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | SET-10 | Phase 5 | Pending |
 | LANG-01 | Phase 6 | Pending |
 | LANG-02 | Phase 6 | Pending |
-| LANG-03 | Phase 5 | Pending |
+| LANG-03 | Phase 5 | Complete |
 | SEC-01 | Phase 6 | Pending |
 | SEC-02 | Phase 6 | Pending |
 | SEC-03 | Phase 6 | Pending |

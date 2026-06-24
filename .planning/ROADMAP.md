@@ -135,11 +135,11 @@ Plans:
 
 **Verification Environment**: Requires Windows VM or equivalent Windows test machine evidence for real TSF candidate placement, focus behavior, settings entry points, installer-first-run settings, high DPI, and representative host apps. Preview harness screenshots are helpful but insufficient alone.
 
-**Plans**: 8 plans
+**Plans**: 1/8 plans executed
 Plans:
 **Wave 1**
 
-- [ ] 05-01-PLAN.md — Establish the TypeDuck semantic theme/font contract from existing Web alpha evidence.
+- [x] 05-01-PLAN.md — Establish the TypeDuck semantic theme/font contract from existing Web alpha evidence.
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
@@ -165,6 +165,7 @@ Plans:
 **Wave 7** *(blocked on Wave 4 candidate UI plus Wave 5/6 launch and packaging completion)*
 
 - [ ] 05-06-PLAN.md — Collect automated package checks and Windows VM evidence for Phase 5 UI parity.
+
 **UI hint**: yes
 
 ### Phase 6: Privacy, Security, and Scaffold Cleanup
@@ -211,6 +212,6 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7
 | 2. Engine Runtime Contract Spike | 3/3 | Complete    | 2026-06-23 |
 | 3. zh-HK TSF Registration and Installer Skeleton | 3/3 | Complete    | 2026-06-24 |
 | 4. TypeDuck Protocol and Typing MVP | 3/4 | In Progress|  |
-| 5. Candidate, Dictionary, Settings, and About UI Parity | 0/8 | Not started | - |
+| 5. Candidate, Dictionary, Settings, and About UI Parity | 1/8 | In Progress|  |
 | 6. Privacy, Security, and Scaffold Cleanup | 0/TBD | Not started | - |
 | 7. Compatibility and Release Verification | 0/TBD | Not started | - |

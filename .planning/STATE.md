@@ -4,17 +4,17 @@ milestone: v1.0
 milestone_name: milestone
 current_phase: 5
 current_phase_name: Candidate, Dictionary, Settings, and About UI Parity
-status: ready_for_discussion
-stopped_at: Phase 5 context gathered
-last_updated: "2026-06-24T00:48:40.306Z"
+status: in_progress
+stopped_at: Completed 05-01-PLAN.md
+last_updated: "2026-06-24T03:18:44.387Z"
 last_activity: 2026-06-24
-last_activity_desc: Phase 4 complete after live VM typing UAT and TypeDuck schema packaging closeout
+last_activity_desc: Completed Phase 5 Plan 01 semantic theme foundation
 progress:
   total_phases: 7
   completed_phases: 4
-  total_plans: 12
-  completed_plans: 12
-  percent: 57
+  total_plans: 20
+  completed_plans: 13
+  percent: 65
 ---
 
 # Project State
@@ -29,17 +29,17 @@ See: .planning/PROJECT.md (updated 2026-06-24)
 ## Current Position
 
 Phase: 5 of 7 (Candidate, Dictionary, Settings, and About UI Parity)
-Plan: Not started
-Status: Ready to discuss/plan Phase 5
-Last activity: 2026-06-24 — Phase 4 complete after live VM typing UAT and TypeDuck schema packaging closeout
+Plan: 2 of 8 (05-02 next)
+Status: Phase 5 in progress; Plan 05-01 complete
+Last activity: 2026-06-24 — Completed Phase 5 Plan 01 semantic theme foundation
 
-Progress: [######----] 57%
+Progress: [#######---] 65%
 
 ## Performance Metrics
 
 **Velocity:**
 
-- Total plans completed: 12
+- Total plans completed: 13
 - Average duration: 20 min
 - Total execution time: 1.7 hours
 
@@ -69,6 +69,7 @@ Progress: [######----] 57%
 | Phase 04 P02 | 90 | 3 tasks | 10 files |
 | Phase 04 P03 | 145 | 3 tasks | 7 files |
 | Phase 04 P04 | live debug/UAT | 3 tasks | installer/backend/schema |
+| Phase 05-candidate-dictionary-settings-and-about-ui-parity P01 | 8 min | 2 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -106,6 +107,9 @@ Recent decisions affecting current work:
 - [Phase 04]: Close typing MVP on live VM user UAT plus static/protocol guards; strict launcher fault-injection proof remains Phase 7 verification debt.
 - [Phase 04]: TypeDuck schema packaging belongs in the sibling moqi-ime runtime build; moqi-im-windows consumes the packaged runtime and does not need a schema submodule.
 - [Phase 04]: Bundle prebuilt Rime `build` artifacts produced by `rime_deployer.exe --build` on a filtered TypeDuck-HK schema source.
+- [Phase 05 Plan 01]: Canonical TypeDuck appearance themes live at `D:/VSProjects/moqi-ime/input_methods/rime/appearance_themes.json`; the data-path copy is compatibility only and must remain byte-identical.
+- [Phase 05 Plan 01]: Theme JSON uses native semantic palette roles with top-level fonts; backend code maps those roles into existing runtime appearance fields.
+- [Phase 05 Plan 01]: `scripts/Test-TypeDuckAppearanceTheme.ps1` is the focused guard for theme schema, loader path order, and package-copy drift.
 
 ### Pending Todos
 
@@ -128,6 +132,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-06-24T00:48:40.298Z
-Stopped at: Phase 5 context gathered
-Resume file: .planning/phases/05-candidate-dictionary-settings-and-about-ui-parity/05-CONTEXT.md
+Last session: 2026-06-24T03:18:44.379Z
+Stopped at: Completed 05-01-PLAN.md
+Resume file: None
