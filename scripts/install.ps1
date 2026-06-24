@@ -299,8 +299,10 @@ function Copy-MoqiImeRuntime {
 
     $bannedLegacyIconNames = @("moqi.png", "mo.ico", "mo.png", "moqi.ico")
     $files = Get-ChildItem -Path $SourceRoot -Recurse -Force -File | Where-Object {
+        $relativePath = $_.FullName.Substring($SourceRoot.Length).TrimStart('\', '/')
         $_.Extension -ne ".go" -and
         $_.FullName -notmatch '[\\/]\.git(?:[\\/]|$)' -and
+        $relativePath -notmatch '^input_methods[\\/]rime[\\/]icon\.ico$' -and
         ($bannedLegacyIconNames -notcontains $_.Name.ToLowerInvariant())
     }
     foreach ($file in $files) {
@@ -339,10 +341,6 @@ New-CleanDirectory -Path $StageDir
 New-Item -ItemType Directory -Path $stageWin32Root -Force | Out-Null
 New-Item -ItemType Directory -Path $stageX64Root -Force | Out-Null
 New-Item -ItemType Directory -Path $stageWin32X64Root -Force | Out-Null
-
-Copy-IfExists -Source $transparentIcon -Destination (Join-Path $stageWin32Root "TypeDuck_Transparent.ico")
-Copy-IfExists -Source $smallIcon -Destination (Join-Path $stageWin32Root "TypeDuck_Small.ico")
-Copy-IfExists -Source $productIcon -Destination (Join-Path $stageWin32Root "TypeDuck.ico")
 
 $backends = Join-Path $RepoRoot "backends.json"
 if (-not (Test-Path -LiteralPath $backends)) {

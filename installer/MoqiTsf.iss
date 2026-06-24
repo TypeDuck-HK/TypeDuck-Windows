@@ -39,7 +39,7 @@ SolidCompression=yes
 WizardSizePercent=110,100
 DisableWelcomePage=no
 SetupIconFile=..\TypeDuckSettings\assets\TypeDuck.ico
-UninstallDisplayIcon={app}\TypeDuck.ico
+UninstallDisplayIcon={uninstallexe}
 
 [Languages]
 Name: "english"; MessagesFile: "compiler:Default.isl"
