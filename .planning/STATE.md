@@ -5,16 +5,16 @@ milestone_name: milestone
 current_phase: 5
 current_phase_name: Candidate, Dictionary, Settings, and About UI Parity
 status: in_progress
-stopped_at: Completed 05-02-PLAN.md
-last_updated: "2026-06-24T03:36:36.208Z"
+stopped_at: Completed 05-03-PLAN.md
+last_updated: "2026-06-24T04:10:26.717Z"
 last_activity: 2026-06-24
-last_activity_desc: Completed Phase 5 Plan 01 semantic theme foundation
+last_activity_desc: Completed Phase 5 Plan 03 settings persistence and Rime customization
 progress:
   total_phases: 7
   completed_phases: 4
   total_plans: 20
-  completed_plans: 14
-  percent: 57
+  completed_plans: 15
+  percent: 75
 ---
 
 # Project State
@@ -29,11 +29,11 @@ See: .planning/PROJECT.md (updated 2026-06-24)
 ## Current Position
 
 Phase: 5 of 7 (Candidate, Dictionary, Settings, and About UI Parity)
-Plan: 3 of 8 (05-02 next)
-Status: Phase 5 in progress; Plan 05-01 complete
-Last activity: 2026-06-24 — Completed Phase 5 Plan 01 semantic theme foundation
+Plan: 4 of 8 (05-04 next)
+Status: Phase 5 in progress; Plan 05-03 complete
+Last activity: 2026-06-24 — Completed Phase 5 Plan 03 settings persistence and Rime customization
 
-Progress: [#######---] 65%
+Progress: [████████░░] 75%
 
 ## Performance Metrics
 
@@ -71,6 +71,7 @@ Progress: [#######---] 65%
 | Phase 04 P04 | live debug/UAT | 3 tasks | installer/backend/schema |
 | Phase 05-candidate-dictionary-settings-and-about-ui-parity P01 | 8 min | 2 tasks | 4 files |
 | Phase 05-candidate-dictionary-settings-and-about-ui-parity P02 | 12 min | 3 tasks | 10 files |
+| Phase 05-candidate-dictionary-settings-and-about-ui-parity P03 | 27min | 3 tasks | 17 files |
 
 ## Accumulated Context
 
@@ -114,6 +115,9 @@ Recent decisions affecting current work:
 - [Phase 05]: TypeDuck lookup-filter parsing lives in MoqiTextService/TypeDuckCandidateInfo.* and is invoked at the candidate-window boundary, not in launcher/protocol/backend transport. — Preserves D-39 and keeps raw backend comments at the renderer trust boundary.
 - [Phase 05]: Native display-language, Jyutping visibility, typeface, dictionary label, register, and part-of-speech maps mirror TypeDuck Web consts.ts. — Maintains LANG-03 and candidate/dictionary parity with the Web alpha source.
 - [Phase 05]: The current candidate window consumes structured fields but exact dictionary panel drawing and placement remain in later Phase 5 rendering plans. — Plan 05-02 owns the parser/view-model foundation; Plan 05-04 owns visual rendering.
+- [Phase 05]: 05-03: TypeDuck settings JSON is saved before generated Rime side effects so deploy failure does not erase the readable source of truth.
+- [Phase 05]: 05-03: Only Rime-affecting TypeDuck settings generate default/common custom YAML; interface-only settings remain JSON/native UI state.
+- [Phase 05]: 05-03: TypeDuck-HK librime uses the reviewed generated-YAML bridge because the Web levers/custom-settings API is not exposed in this fork.
 
 ### Pending Todos
 
@@ -136,6 +140,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-06-24T03:36:19.121Z
-Stopped at: Completed 05-02-PLAN.md
+Last session: 2026-06-24T04:10:26.708Z
+Stopped at: Completed 05-03-PLAN.md
 Resume file: None

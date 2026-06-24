@@ -61,13 +61,13 @@
 
 - [ ] **SET-01**: User can open a TypeDuck settings dialog from the installer flow.
 - [ ] **SET-02**: User can open the same TypeDuck settings dialog after installation from a TypeDuck configuration entry point.
-- [ ] **SET-03**: Settings dialog mirrors TypeDuck Web alpha settings and order, with Display Languages first.
-- [ ] **SET-04**: User can enable display languages from the Web alpha language set: English, Hindi, Indonesian, Nepali, and Urdu.
-- [ ] **SET-05**: User can choose one main display language from the enabled display languages.
-- [ ] **SET-06**: User can configure number of candidates per page using the Web alpha-supported range.
-- [ ] **SET-07**: User can configure Auto-completion, Auto-correction, Auto-composition, and Input Memory where engine support is available.
-- [ ] **SET-08**: User can configure Reverse Lookup Settings and Show Full Input Code where engine support is available.
-- [ ] **SET-09**: Settings persist locally under TypeDuck-owned storage and apply to subsequent TypeDuck IME sessions.
+- [x] **SET-03**: Settings dialog mirrors TypeDuck Web alpha settings and order, with Display Languages first.
+- [x] **SET-04**: User can enable display languages from the Web alpha language set: English, Hindi, Indonesian, Nepali, and Urdu.
+- [x] **SET-05**: User can choose one main display language from the enabled display languages.
+- [x] **SET-06**: User can configure number of candidates per page using the Web alpha-supported range.
+- [x] **SET-07**: User can configure Auto-completion, Auto-correction, Auto-composition, and Input Memory where engine support is available.
+- [x] **SET-08**: User can configure Reverse Lookup Settings and Show Full Input Code where engine support is available.
+- [x] **SET-09**: Settings persist locally under TypeDuck-owned storage and apply to subsequent TypeDuck IME sessions.
 - [ ] **SET-10**: User can open an About dialog showing TypeDuck Windows IME identity, version, and relevant engine/schema attribution in bilingual text.
 
 ### Language and Copy
@@ -174,13 +174,13 @@ Which phases cover which requirements. Updated during roadmap creation.
 | CAND-07 | Phase 5 | Pending |
 | SET-01 | Phase 5 | Pending |
 | SET-02 | Phase 5 | Pending |
-| SET-03 | Phase 5 | Pending |
-| SET-04 | Phase 5 | Pending |
-| SET-05 | Phase 5 | Pending |
-| SET-06 | Phase 5 | Pending |
-| SET-07 | Phase 5 | Pending |
-| SET-08 | Phase 5 | Pending |
-| SET-09 | Phase 5 | Pending |
+| SET-03 | Phase 5 | Complete |
+| SET-04 | Phase 5 | Complete |
+| SET-05 | Phase 5 | Complete |
+| SET-06 | Phase 5 | Complete |
+| SET-07 | Phase 5 | Complete |
+| SET-08 | Phase 5 | Complete |
+| SET-09 | Phase 5 | Complete |
 | SET-10 | Phase 5 | Pending |
 | LANG-01 | Phase 6 | Pending |
 | LANG-02 | Phase 6 | Pending |
