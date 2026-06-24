@@ -135,7 +135,7 @@ Plans:
 
 **Verification Environment**: Requires Windows VM or equivalent Windows test machine evidence for real TSF candidate placement, focus behavior, settings entry points, installer-first-run settings, high DPI, and representative host apps. Preview harness screenshots are helpful but insufficient alone.
 
-**Plans**: 10/15 plans executed
+**Plans**: 11/15 plans executed
 Plans:
 **Wave 1**
 
@@ -180,7 +180,7 @@ Plans:
 
 **Gap Closure Wave 11** *(blocked on Wave 10 settings/About repairs)*
 
-- [ ] 05-12-PLAN.md — Clean icon packaging/stamping and remove legacy raw icon leakage.
+- [x] 05-12-PLAN.md — Clean icon packaging/stamping and remove legacy raw icon leakage.
 
 **Gap Closure Wave 12** *(blocked on candidate, settings/About, and icon repairs)*
 
@@ -240,6 +240,6 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7
 | 2. Engine Runtime Contract Spike | 3/3 | Complete    | 2026-06-23 |
 | 3. zh-HK TSF Registration and Installer Skeleton | 3/3 | Complete    | 2026-06-24 |
 | 4. TypeDuck Protocol and Typing MVP | 3/4 | In Progress|  |
-| 5. Candidate, Dictionary, Settings, and About UI Parity | 10/15 | In Progress|  |
+| 5. Candidate, Dictionary, Settings, and About UI Parity | 11/15 | In Progress|  |
 | 6. Privacy, Security, and Scaffold Cleanup | 0/TBD | Not started | - |
 | 7. Compatibility and Release Verification | 0/TBD | Not started | - |
