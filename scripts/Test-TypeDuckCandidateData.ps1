@@ -111,7 +111,10 @@ Assert-Contains $sourcePath 'LANGUAGE_LABELS|languageLabel' "D-41 language label
 Assert-Contains $sourcePath 'kMaxRawCommentLength|kMaxCsvRowLength|kMaxCsvFieldLength' "Bounded untrusted parser limits"
 Assert-Contains $windowHeaderPath 'TypeDuckCandidateInfo\.h' "Candidate window CandidateInfo boundary"
 Assert-Contains $windowHeaderPath 'DisplayPreferences' "Candidate window display preferences"
+Assert-Contains $windowHeaderPath 'diagnosticRawComment' "Raw comments limited to diagnostic storage"
+Assert-Contains $windowHeaderPath 'displayText\(\)|displayComment\(\)' "Visible candidate rows derived from CandidateInfo"
 Assert-Contains $windowSourcePath 'CandidateInfo' "Candidate window consumes CandidateInfo"
+Assert-Contains $windowSourcePath 'setDisplayPreferences' "Candidate window accepts settings-derived display preferences"
 
 if ($Strict) {
   $buildDir = Join-Path $Root "build-vs32"

@@ -433,6 +433,13 @@ STDMETHODIMP CandidateWindow::GetCurrentPage(UINT* puPage) {
 }
 
 void CandidateWindow::add(CandidateUiItem item, wchar_t selKey) {
+    wchar_t label[] = L"?.";
+    label[0] = selKey;
+    const std::wstring rawComment = item.comment;
+    item.diagnosticRawComment = rawComment;
+    item.displayPreferences = displayPreferences_;
+    item.candidateInfo = TypeDuck::CandidateInfo(
+        label, item.text, rawComment);
     items_.push_back(std::move(item));
     selKeys_.push_back(selKey);
 }
@@ -577,6 +584,17 @@ void CandidateWindow::setCommentHighlightColor(COLORREF color) {
     }
 }
 
+void CandidateWindow::setDisplayPreferences(TypeDuck::DisplayPreferences preferences) {
+    displayPreferences_ = std::move(preferences);
+    for (auto& item : items_) {
+        item.displayPreferences = displayPreferences_;
+    }
+    recalculateSize();
+    if (isVisible()) {
+        ::InvalidateRect(hwnd_, NULL, TRUE);
+    }
+}
+
 void CandidateWindow::syncOwner(Ime::EditSession* session) {
     if (!hwnd_) {
         return;
@@ -668,14 +686,16 @@ void CandidateWindow::recalculateSize() {
 
         SIZE candidateSize = {};
         const CandidateUiItem& item = items_[i];
-        ::GetTextExtentPoint32W(hdc, item.text.c_str(), static_cast<int>(item.text.length()), &candidateSize);
+        const std::wstring itemText = item.displayText();
+        const std::wstring itemComment = item.displayComment();
+        ::GetTextExtentPoint32W(hdc, itemText.c_str(), static_cast<int>(itemText.length()), &candidateSize);
         itemTextWidths_[i] = static_cast<int>(candidateSize.cx);
         textWidth_ = (std::max)(textWidth_, static_cast<int>(candidateSize.cx));
         int candidateHeight = static_cast<int>(candidateSize.cy);
-        if (!item.comment.empty() && commentFont_) {
+        if (!itemComment.empty() && commentFont_) {
             SIZE commentSize = {};
             ::SelectObject(hdc, commentFont_);
-            ::GetTextExtentPoint32W(hdc, item.comment.c_str(), static_cast<int>(item.comment.length()), &commentSize);
+            ::GetTextExtentPoint32W(hdc, itemComment.c_str(), static_cast<int>(itemComment.length()), &commentSize);
             ::SelectObject(hdc, font_);
             itemCommentWidths_[i] = static_cast<int>(commentSize.cx);
             commentWidth_ = (std::max)(commentWidth_, static_cast<int>(commentSize.cx));
@@ -887,13 +907,15 @@ void CandidateWindow::paintItem(HDC hdc, int index, int x, int y) {
 
     ::SetTextColor(hdc, textColor);
     const CandidateUiItem& item = items_[index];
+    const std::wstring itemText = item.displayText();
+    const std::wstring itemComment = item.displayComment();
     HGDIOBJ oldFont = ::SelectObject(hdc, font_);
-    ::DrawTextW(hdc, item.text.c_str(), static_cast<int>(item.text.length()), &textRc,
+    ::DrawTextW(hdc, itemText.c_str(), static_cast<int>(itemText.length()), &textRc,
                 DT_LEFT | DT_VCENTER | DT_SINGLELINE | DT_NOPREFIX);
-    if (!item.comment.empty() && commentFont_) {
+    if (!itemComment.empty() && commentFont_) {
         ::SelectObject(hdc, commentFont_);
         ::SetTextColor(hdc, commentColor);
-        ::DrawTextW(hdc, item.comment.c_str(), static_cast<int>(item.comment.length()), &commentRc,
+        ::DrawTextW(hdc, itemComment.c_str(), static_cast<int>(itemComment.length()), &commentRc,
                     DT_LEFT | DT_VCENTER | DT_SINGLELINE | DT_NOPREFIX);
     }
     ::SelectObject(hdc, oldFont);

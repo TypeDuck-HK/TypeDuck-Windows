@@ -6,6 +6,7 @@
 
 #include <LibIME2/src/ComObject.h>
 #include <LibIME2/src/ImeWindow.h>
+#include "TypeDuckCandidateInfo.h"
 
 #include <string>
 #include <vector>
@@ -19,9 +20,21 @@ namespace Moqi {
 struct CandidateUiItem {
     std::wstring text;
     std::wstring comment;
+    std::wstring diagnosticRawComment;
+    TypeDuck::CandidateInfo candidateInfo;
+    TypeDuck::DisplayPreferences displayPreferences;
+
+    std::wstring displayText() const {
+        return candidateInfo.displayCandidateText(displayPreferences);
+    }
+
+    std::wstring displayComment() const {
+        return candidateInfo.displayComment(displayPreferences);
+    }
 
     bool operator==(const CandidateUiItem& other) const {
-        return text == other.text && comment == other.comment;
+        return text == other.text && comment == other.comment &&
+               diagnosticRawComment == other.diagnosticRawComment;
     }
 
     bool operator!=(const CandidateUiItem& other) const {
@@ -29,10 +42,12 @@ struct CandidateUiItem {
     }
 
     std::wstring combinedText() const {
-        if (comment.empty()) {
-            return text;
+        const std::wstring visibleText = displayText();
+        const std::wstring visibleComment = displayComment();
+        if (visibleComment.empty()) {
+            return visibleText;
         }
-        return text + L" " + comment;
+        return visibleText + L" " + visibleComment;
     }
 };
 
@@ -71,6 +86,7 @@ public:
     void setHighlightTextColor(COLORREF color);
     void setCommentColor(COLORREF color);
     void setCommentHighlightColor(COLORREF color);
+    void setDisplayPreferences(TypeDuck::DisplayPreferences preferences);
     void syncOwner(Ime::EditSession* session);
     void recalculateSize() override;
 
@@ -129,6 +145,7 @@ private:
     std::vector<int> itemTextWidths_;
     std::vector<int> itemCommentWidths_;
     std::vector<int> itemWidths_;
+    TypeDuck::DisplayPreferences displayPreferences_;
     int currentSel_;
     int pressedSel_;
     bool draggingWindow_;
