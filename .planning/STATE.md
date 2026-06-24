@@ -5,16 +5,16 @@ milestone_name: milestone
 current_phase: 5
 current_phase_name: Candidate, Dictionary, Settings, and About UI Parity
 status: executing
-stopped_at: Completed 05-10-PLAN.md
-last_updated: "2026-06-24T07:56:57.537Z"
+stopped_at: Completed 05-11-PLAN.md
+last_updated: "2026-06-24T08:11:18.702Z"
 last_activity: 2026-06-24
-last_activity_desc: Completed Phase 5 Plan 08 icon and About resource packaging
+last_activity_desc: Completed Phase 5 Plan 11 settings/About gap closure
 progress:
   total_phases: 7
   completed_phases: 4
   total_plans: 27
-  completed_plans: 21
-  percent: 57
+  completed_plans: 22
+  percent: 81
 ---
 
 # Project State
@@ -29,11 +29,11 @@ See: .planning/PROJECT.md (updated 2026-06-24)
 ## Current Position
 
 Phase: 5 of 7 (Candidate, Dictionary, Settings, and About UI Parity)
-Plan: 8 of 8 (05-06 next)
-Status: Phase 5 in progress; Plan 05-08 complete
-Last activity: 2026-06-24 — Completed Phase 5 Plan 08 icon and About resource packaging
+Plan: 11 of 15 (05-12 next)
+Status: Phase 5 in progress; Plan 05-11 complete
+Last activity: 2026-06-24 — Completed Phase 5 Plan 11 settings/About gap closure
 
-Progress: [██████████] 95%
+Progress: [████████░░] 81%
 
 ## Performance Metrics
 
@@ -78,6 +78,7 @@ Progress: [██████████] 95%
 | Phase 05-candidate-dictionary-settings-and-about-ui-parity P08 | 13 min | 2 tasks | 13 files |
 | Phase 05-candidate-dictionary-settings-and-about-ui-parity P09 | 8 min | 3 tasks | 6 files |
 | Phase 05-candidate-dictionary-settings-and-about-ui-parity P10 | 15 min | 3 tasks | 17 files |
+| Phase 05-candidate-dictionary-settings-and-about-ui-parity P11 | 45min | 2 tasks | 8 files |
 
 ## Accumulated Context
 
@@ -143,6 +144,9 @@ Recent decisions affecting current work:
 - [Phase 05-candidate-dictionary-settings-and-about-ui-parity]: 05-10: VM candidate screenshots from stale external TypeDuck 1.1.2 runtime are not accepted as current package evidence.
 - [Phase 05-candidate-dictionary-settings-and-about-ui-parity]: 05-10: Candidate transport remains pass-through; raw_lookup_comment is parsed only at the CandidateInfo renderer boundary.
 - [Phase 05-candidate-dictionary-settings-and-about-ui-parity]: 05-10: Candidate preview BMPs are guarded source-backed iteration evidence and must cite runtime-provenance before use.
+- [Phase 05]: 05-11: About is now a separate first-party Win32 executable; Settings no longer links or launches the About dialog. — Closes UAT gap 8 and removes the broken Settings-panel About button path.
+- [Phase 05]: 05-11: About Start Menu access uses two concrete shortcuts, TypeDuck About and TypeDuck 關於, rather than a slash-delimited shortcut filename. — Windows shortcut filenames should not rely on a literal slash for a product entry point.
+- [Phase 05]: 05-11: TypeDuckAbout.exe is staged in this plan, while new executable icon stamping remains 05-12 scope. — Keeps 05-11 inside settings/About accessibility and copy scope.
 
 ### Pending Todos
 
@@ -165,6 +169,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-06-24T07:56:57.320Z
-Stopped at: Completed 05-10-PLAN.md
+Last session: 2026-06-24T08:10:35.329Z
+Stopped at: Completed 05-11-PLAN.md
 Resume file: None
