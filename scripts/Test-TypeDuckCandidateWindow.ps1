@@ -76,6 +76,7 @@ foreach ($file in $tsfPopupFiles) {
 Assert-Contains $candidateInfoHeader 'struct CandidateInfo' "CandidateInfo model"
 Assert-Contains $candidateInfoHeader 'struct CandidateEntry' "CandidateEntry model"
 Assert-Contains $candidateInfoSource 'kMaxRawCommentLength|kMaxCsvRowLength|kMaxCsvFieldLength' "bounded candidate parser"
+Assert-Contains $candidateInfoSource 'formattedPartsOfSpeech' "structured part-of-speech mapping"
 Assert-Contains $previewSource 'TypeDuckCandidateInfo\.h' "preview CandidateInfo model include"
 Assert-Contains $previewSource 'MakeNeiSample|MakeHousamSample|MakeReverseLookupSample|MakeMultilingualIndonesianSample' "source-backed preview samples"
 Assert-Contains $previewSource 'CandidateInfo' "preview CandidateInfo usage"
@@ -89,7 +90,10 @@ $productionAnchors = @(
   @{ Path = $windowSource; Pattern = 'paintPageNavigation|drawPageNavigation'; Description = 'page navigation rendering' },
   @{ Path = $windowSource; Pattern = 'paintCandidateRow|drawCandidateRow'; Description = 'source-backed candidate row rendering' },
   @{ Path = $windowSource; Pattern = 'paintDictionaryPanel|drawDictionaryPanel'; Description = 'dictionary side panel rendering' },
+  @{ Path = $windowSource; Pattern = 'paintPartOfSpeechPills|drawPartOfSpeechPills'; Description = 'part-of-speech pill rendering' },
+  @{ Path = $windowSource; Pattern = 'kPosPillBorder|kPosPillText|kPosPillBackground'; Description = 'part-of-speech pill theme colors' },
   @{ Path = $windowSource; Pattern = 'More Languages'; Description = 'dictionary More Languages rendering' },
+  @{ Path = $windowSource; Pattern = 'entryRowCount|matchedEntries'; Description = 'multi-row candidate detail rendering' },
   @{ Path = $windowSource; Pattern = 'movementRevealThreshold_|kMovementRevealThreshold'; Description = 'movement-triggered dictionary reveal threshold' },
   @{ Path = $windowSource; Pattern = 'actualPointerMovement|mouseMoveCount|dictionaryMoveCount'; Description = 'actual pointer movement counter' },
   @{ Path = $windowHeader; Pattern = 'dictionaryRevealIndex_|dictionaryPanel'; Description = 'dictionary panel state' },
@@ -119,6 +123,11 @@ if ($missing.Count -gt 0) {
 }
 
 if ($Strict) {
+  Assert-NotContains $windowSource 'L"\\\[" \+ part|body \+= L"\\\["|\\[[^\\]]*形容詞' "literal bracketed POS rendering in native candidate window"
+  Assert-NotContains $previewSource 'L"\\\[" \+ pos|body \+= L"\\\["|\\[[^\\]]*形容詞' "literal bracketed POS rendering in preview harness"
+  Assert-Contains $windowSource 'DT_VCENTER|candidateBaseline|baselineAligned' "candidate row baseline alignment guard"
+  Assert-Contains $windowSource 'DT_CALCRECT|GetTextExtentPoint32W' "input buffer measured text guard"
+  Assert-Contains $previewSource 'candidate-data-contract|runtime-provenance|TypeDuck-1\.1\.2' "preview provenance/divergence documentation anchors"
   Assert-Contains $windowSource 'WS_EX_NOACTIVATE|MA_NOACTIVATE|SWP_NOACTIVATE' "focus-safe non-activating popup behavior"
   Assert-Contains $windowSource 'TrackMouseEvent|WM_MOUSELEAVE' "mouse leave tracking"
   Assert-Contains $windowSource 'GetDpiForWindow|LOGPIXELSX|scalePx' "DPI-aware sizing"
