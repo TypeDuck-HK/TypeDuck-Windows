@@ -1,0 +1,66 @@
+[
+  {
+    "name": "candidate-parity-final",
+    "command": "pwsh -NoProfile -ExecutionPolicy Bypass -File D:\\VSProjects\\moqi-ime\\scripts\\Test-TypeDuckCandidateParity.ps1 -RepoRoot D:\\VSProjects\\moqi-ime -WindowsRepoRoot D:\\VSProjects\\moqi-im-windows -Strict",
+    "exitCode": 0,
+    "status": "passed",
+    "startedAt": "2026-06-24T08:37:55Z",
+    "recordedAt": "2026-06-24T08:37:56Z"
+  },
+  {
+    "name": "appearance-theme-final",
+    "command": "pwsh -NoProfile -ExecutionPolicy Bypass -File scripts\\Test-TypeDuckAppearanceTheme.ps1 -RepoRoot . -BackendRoot D:\\VSProjects\\moqi-ime -Strict",
+    "exitCode": 0,
+    "status": "passed",
+    "startedAt": "2026-06-24T08:37:56Z",
+    "recordedAt": "2026-06-24T08:37:56Z"
+  },
+  {
+    "name": "candidate-data-final",
+    "command": "pwsh -NoProfile -ExecutionPolicy Bypass -File scripts\\Test-TypeDuckCandidateData.ps1 -RepoRoot . -Strict",
+    "exitCode": 0,
+    "status": "passed",
+    "startedAt": "2026-06-24T08:37:56Z",
+    "recordedAt": "2026-06-24T08:37:56Z"
+  },
+  {
+    "name": "candidate-window-final",
+    "command": "pwsh -NoProfile -ExecutionPolicy Bypass -File scripts\\Test-TypeDuckCandidateWindow.ps1 -RepoRoot . -Strict",
+    "exitCode": 0,
+    "status": "passed",
+    "startedAt": "2026-06-24T08:37:56Z",
+    "recordedAt": "2026-06-24T08:37:57Z"
+  },
+  {
+    "name": "settings-persistence-final",
+    "command": "pwsh -NoProfile -ExecutionPolicy Bypass -File scripts\\Test-TypeDuckSettingsPersistence.ps1 -RepoRoot . -BackendRoot D:\\VSProjects\\moqi-ime -Strict",
+    "exitCode": 0,
+    "status": "passed",
+    "startedAt": "2026-06-24T08:37:57Z",
+    "recordedAt": "2026-06-24T08:37:57Z"
+  },
+  {
+    "name": "settings-about-final",
+    "command": "pwsh -NoProfile -ExecutionPolicy Bypass -File scripts\\Test-TypeDuckSettingsAboutUi.ps1 -RepoRoot . -BackendRoot D:\\VSProjects\\moqi-ime -Strict",
+    "exitCode": 0,
+    "status": "passed",
+    "startedAt": "2026-06-24T08:37:57Z",
+    "recordedAt": "2026-06-24T08:37:58Z"
+  },
+  {
+    "name": "icon-packaging-final",
+    "command": "pwsh -NoProfile -ExecutionPolicy Bypass -File scripts\\Test-TypeDuckIconPackaging.ps1 -RepoRoot . -BackendRoot D:\\VSProjects\\moqi-ime -Strict",
+    "exitCode": 0,
+    "status": "passed",
+    "startedAt": "2026-06-24T08:37:58Z",
+    "recordedAt": "2026-06-24T08:37:59Z"
+  },
+  {
+    "name": "aggregate-evidence-final",
+    "command": "pwsh -NoProfile -ExecutionPolicy Bypass -File scripts\\Test-TypeDuckPhase05UiEvidence.ps1 -RepoRoot . -BackendRoot D:\\VSProjects\\moqi-ime -Strict -ExpectRed VmEvidenceMissing",
+    "exitCode": 0,
+    "status": "passed",
+    "startedAt": "2026-06-24T08:37:59Z",
+    "recordedAt": "2026-06-24T08:38:03Z"
+  }
+]

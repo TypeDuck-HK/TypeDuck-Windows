@@ -1,0 +1,51 @@
+[
+  {
+    "sample": "nei",
+    "path": ".planning\\product\\ui-fixtures\\phase-05\\candidate-preview\\nei-light.bmp",
+    "bytes": 2034038,
+    "sha256": "3D4EE4AED8C9BC453EF324B14AC63B1FABD5E119A251CF70CAC61FAB71B3DE75",
+    "recordedAt": "2026-06-24T08:34:52Z"
+  },
+  {
+    "sample": "multilingual",
+    "path": ".planning\\product\\ui-fixtures\\phase-05\\candidate-preview\\multilingual-indonesian-main.bmp",
+    "bytes": 2034038,
+    "sha256": "7011E64B3B6856DE794F8F9D5129131AEAF747A8FDDFA6C95D7834F7AE77B06B",
+    "recordedAt": "2026-06-24T08:34:52Z"
+  },
+  {
+    "sample": "housam",
+    "path": ".planning\\product\\ui-fixtures\\phase-05\\candidate-preview\\housam-compound.bmp",
+    "bytes": 2034038,
+    "sha256": "F609B4B3A07724B4C1B1D0253BD91A78EADD4E0FFB65E9E5FB3A3B7ACE23AB1C",
+    "recordedAt": "2026-06-24T08:34:52Z"
+  },
+  {
+    "sample": "reverse",
+    "path": ".planning\\product\\ui-fixtures\\phase-05\\candidate-preview\\reverse-cangjie-onf.bmp",
+    "bytes": 2034038,
+    "sha256": "8CE8C278DA8610EBF7644DB7266D70602290D9CF157EBB97A091099430A66E06",
+    "recordedAt": "2026-06-24T08:34:52Z"
+  },
+  {
+    "sample": "edge",
+    "path": ".planning\\product\\ui-fixtures\\phase-05\\candidate-preview\\edge-clamp.bmp",
+    "bytes": 2034038,
+    "sha256": "62E13060C970DCD0414F327E542979442E98882858A10AB5896DC239AE7C7BE7",
+    "recordedAt": "2026-06-24T08:34:52Z"
+  },
+  {
+    "sample": "dpi",
+    "path": ".planning\\product\\ui-fixtures\\phase-05\\candidate-preview\\high-dpi.bmp",
+    "bytes": 4576518,
+    "sha256": "7DC2C5FB9D75290AB86907CD4766BF1220B61D58AB659D06F7FF80CE94CB5BFD",
+    "recordedAt": "2026-06-24T08:34:52Z"
+  },
+  {
+    "sample": "fallback",
+    "path": ".planning\\product\\ui-fixtures\\phase-05\\candidate-preview\\fallback-anchor.bmp",
+    "bytes": 2034038,
+    "sha256": "59DEE68EBDEED20991202D19D41E87387602FD583A25E9018F033607C74EA743",
+    "recordedAt": "2026-06-24T08:34:52Z"
+  }
+]

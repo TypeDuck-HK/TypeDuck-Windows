@@ -1,18 +1,28 @@
 {
   "schemaVersion": 1,
-  "capturedAt": "2026-06-24T07:53:00Z",
-  "purpose": "Phase 5 retry evidence provenance before rebuilds or VM screenshots are accepted.",
+  "capturedAt": "2026-06-24T08:38:38Z",
+  "purpose": "Phase 5 Plan 05-13 rebuilt package, runtime, preview, and guard provenance before VM/manual UAT.",
   "repositories": {
     "windows": {
       "path": "D:\\VSProjects\\moqi-im-windows",
       "branch": "main",
-      "head": "97636eabba81728cc16ddd6f6e18fd7bb29390ac",
-      "statusShort": [],
-      "notes": "Shared worktree after Task 2 cleanup commit; this plan's provenance and summary commits are expected to follow this recorded base."
+      "head": "fab3b4c8708d698bf255bc39edea363b4edc27e8",
+      "statusShort": [
+        " M .planning/product/ui-fixtures/phase-05/phase05-ui-evidence.json",
+        " M .planning/product/ui-fixtures/phase-05/screenshots/candidate-baseline-nei.bmp",
+        " M .planning/product/ui-fixtures/phase-05/screenshots/candidate-multilingual-indonesian-main.bmp",
+        " M .planning/product/ui-fixtures/phase-05/screenshots/dictionary-detail-housam-compound.bmp",
+        " M .planning/product/ui-fixtures/phase-05/screenshots/dictionary-detail-multilingual.bmp",
+        " M .planning/product/ui-fixtures/phase-05/screenshots/reverse-lookup-cangjie-onf.bmp",
+        "?? .planning/product/ui-fixtures/phase-05/05-13-build-command-results.json",
+        "?? .planning/product/ui-fixtures/phase-05/05-13-preview-capture-results.json"
+      ],
+      "notes": "Shared worktree after 05-12; 05-13 evidence files are expected as working tree changes until committed."
     },
     "backend": {
       "path": "D:\\VSProjects\\moqi-ime",
-      "head": "f792eb3c04bc795855cdaed3eeb495353f545000",
+      "branch": "main",
+      "head": "2a54521ad32d8de322a6dad6de7821274b51512d",
       "statusShort": [
         " M go.mod",
         " M input_methods/rime/icons/chi.ico",
@@ -38,12 +48,12 @@
         "?? icons/TypeDuck_Small.ico",
         "?? icons/TypeDuck_Transparent.ico"
       ],
-      "notes": "Dirty sibling runtime state is intentionally recorded because UAT gap 15 rejected unproven external-source assumptions."
+      "notes": "Dirty sibling runtime state is intentionally recorded; 05-13 rebuilt scripts/build/moqi-ime from this source state."
     },
     "typeDuckWeb": {
       "path": "I:\\GitHub\\TypeDuck-Web",
+      "branch": "aap2-alpha",
       "head": "db21054315b6d92942bc0f32fd5437ecc42191b4",
-      "fixtureShortCommit": "db21054",
       "statusShort": [
         " M .gitignore",
         " M README.md",
@@ -51,7 +61,8 @@
         " M schema",
         " M scripts/build_schema.ts"
       ],
-      "notes": "Dirty Web alpha authority is recorded before retry evidence; layout authority remains the 2026-06-23 fixture metadata."
+      "notes": "Dirty Web alpha authority is recorded; layout authority remains the 2026-06-23 fixture metadata.",
+      "fixtureShortCommit": "db21054"
     }
   },
   "webAlphaFixture": {
@@ -73,11 +84,11 @@
     "relation": "Phase 2 runtime-manifest records the TypeDuck-HK librime release version-info.txt lookup-filter commit and ties it to the staged rime.dll artifact."
   },
   "candidateRuntimeDiagnosis": {
-    "capturedAt": "2026-06-24T07:48:30Z",
+    "capturedAt": "2026-06-24T08:36:48Z",
     "purpose": "Plan 05-10 candidate parity guard and VM-versus-preview divergence diagnosis.",
     "expectedRuntime": {
       "serverPath": "D:\\VSProjects\\moqi-ime\\scripts\\build\\moqi-ime\\server.exe",
-      "serverSha256": "8058863ADEDF373826ABB877186E3ADF6F6292CD3B734F273E8AF28D752E305C",
+      "serverSha256": "058CDC6C2D1E9DA30C002C13F50842CECE22955BBD302FBC5FE9FC53180A9511",
       "rimeDllPath": "D:\\VSProjects\\moqi-ime\\scripts\\build\\moqi-ime\\input_methods\\rime\\rime.dll",
       "rimeDllSha256": "5783B84916FEFC0DD5DDA28F1D7292A9CA86C75F05132947FE816178B916C04B",
       "lookupFilterCommit": "3671814d4e4aeab8d616ceea3c7f6d88e96bba02",
@@ -85,12 +96,12 @@
     },
     "bitnessAndInstallPaths": {
       "win32BuildTextService": {
-        "path": "D:\\VSProjects\\moqi-im-windows\\build-vs32\\MoqiTextService\\Debug\\TypeDuckTextService.dll",
-        "sha256": "B4BEE861E5643F253A068269220616AAF0FDA0184091E4D88800CE3A4951F5DF"
+        "path": "D:\\VSProjects\\moqi-im-windows\\build-vs32\\MoqiTextService\\Release\\TypeDuckTextService.dll",
+        "sha256": "76B9DF959B3BE16D73D90DB4D45CADA11041270E194D09A072029ED6FB19A888"
       },
       "x64BuildTextService": {
-        "path": "D:\\VSProjects\\moqi-im-windows\\build-vs64\\MoqiTextService\\Debug\\TypeDuckTextService.dll",
-        "sha256": "EECE3300C70529870C1AA4B66727201F8800BC45D1E8CE74E06A7D13478AE354"
+        "path": "D:\\VSProjects\\moqi-im-windows\\build-vs64\\MoqiTextService\\Release\\TypeDuckTextService.dll",
+        "sha256": "3B66940D17DC20E9F51CF9126734D625F7580DF2D393B626D7D587F6BABFBDAE"
       },
       "hostInstalledTypeDuckImePackage": {
         "path": "C:\\Program Files (x86)\\TypeDuckIME\\moqi-ime",
@@ -140,8 +151,8 @@
     {
       "kind": "backend-server",
       "path": "D:\\VSProjects\\moqi-ime\\scripts\\build\\moqi-ime\\server.exe",
-      "bytes": 9475072,
-      "sha256": "8058863ADEDF373826ABB877186E3ADF6F6292CD3B734F273E8AF28D752E305C"
+      "bytes": 9729024,
+      "sha256": "058CDC6C2D1E9DA30C002C13F50842CECE22955BBD302FBC5FE9FC53180A9511"
     },
     {
       "kind": "typeduck-librime",
@@ -160,6 +171,60 @@
       "path": "D:\\VSProjects\\moqi-ime\\scripts\\build\\moqi-ime\\input_methods\\rime\\data\\build\\jyut6ping3.schema.yaml",
       "bytes": 10572,
       "sha256": "8E2581B0B3A42B20E692B256E441E950E06D9A0D5DE2FEE30B7C390DAFF152BF"
+    },
+    {
+      "kind": "installer",
+      "path": "installer/dist/typeduck-windows-ime-setup.exe",
+      "bytes": 22692039,
+      "sha256": "59757083C0B11A7D9676C1AE86B9176A4FF8382AB12283DFE5690DCB64F55CE5"
+    },
+    {
+      "kind": "staged-launcher-exe",
+      "path": "installer/stage/win32/TypeDuckIME/TypeDuckLauncher.exe",
+      "bytes": 2225664,
+      "sha256": "27C7E6DB01600F9DA24DED26A28D4238AEC0FDC4DDEB334401AAB013C280D7E3"
+    },
+    {
+      "kind": "staged-settings-exe",
+      "path": "installer/stage/win32/TypeDuckIME/TypeDuckSettings.exe",
+      "bytes": 1135104,
+      "sha256": "DEE125499941E8C271C3CF2B3109915DDD69FFF24F1D7327BA114AA86A4977C5"
+    },
+    {
+      "kind": "staged-about-exe",
+      "path": "installer/stage/win32/TypeDuckIME/TypeDuckAbout.exe",
+      "bytes": 901120,
+      "sha256": "3D4953C7385C4C52859E9D635E0AE9B4D65ECC72C77BE26B7262AD3062FA0597"
+    },
+    {
+      "kind": "staged-setup-helper-exe",
+      "path": "installer/stage/win32/TypeDuckIME/TypeDuckSetupHelper.exe",
+      "bytes": 433152,
+      "sha256": "9145BD02B0EF52BAEC9CF5AC612978F1D09192E2D1C18D0E715A1ED467552AD1"
+    },
+    {
+      "kind": "staged-win32-textservice-dll",
+      "path": "installer/stage/win32/TypeDuckIME/TypeDuckTextService.dll",
+      "bytes": 1993728,
+      "sha256": "76B9DF959B3BE16D73D90DB4D45CADA11041270E194D09A072029ED6FB19A888"
+    },
+    {
+      "kind": "staged-x64-textservice-dll",
+      "path": "installer/stage/win32/TypeDuckIME/x64/TypeDuckTextService.dll",
+      "bytes": 2301440,
+      "sha256": "3B66940D17DC20E9F51CF9126734D625F7580DF2D393B626D7D587F6BABFBDAE"
+    },
+    {
+      "kind": "staged-backend-server-stamped",
+      "path": "installer/stage/win32/TypeDuckIME/moqi-ime/server.exe",
+      "bytes": 9860608,
+      "sha256": "CDC22CA095593FE26E81B85B5171D9B1F965B793BFCA7F9BC99EA7BD0B78ABFD"
+    },
+    {
+      "kind": "staged-typeduck-librime",
+      "path": "installer/stage/win32/TypeDuckIME/moqi-ime/input_methods/rime/rime.dll",
+      "bytes": 3749376,
+      "sha256": "5783B84916FEFC0DD5DDA28F1D7292A9CA86C75F05132947FE816178B916C04B"
     },
     {
       "kind": "windows-executable-icon",
@@ -197,5 +262,157 @@
       "bytes": 130138,
       "sha256": "ECA986DB6D23F91FC9507AFE385D13A9BBE68B7BA36F9B5BAFF008502BC0B76A"
     }
-  ]
+  ],
+  "commandResults": {
+    "prebuildParityAttempt": {
+      "command": "pwsh -NoProfile -ExecutionPolicy Bypass -File D:\\VSProjects\\moqi-ime\\scripts\\Test-TypeDuckCandidateParity.ps1 -RepoRoot D:\\VSProjects\\moqi-ime -WindowsRepoRoot D:\\VSProjects\\moqi-im-windows -Strict",
+      "exitCode": 1,
+      "status": "failed-before-provenance-refresh",
+      "recordedAt": "2026-06-24T08:32:16Z",
+      "reason": "Prebuild server.exe hash was stale versus runtime-provenance expected hash; final parity is rerun after rebuild/provenance refresh."
+    },
+    "build": [
+      {
+        "name": "backend-build",
+        "command": "pwsh -NoProfile -ExecutionPolicy Bypass -File D:\\VSProjects\\moqi-ime\\scripts\\build.ps1 -RepoRoot D:\\VSProjects\\moqi-ime -RimeDataSource I:\\GitHub\\TypeDuck-Web\\schema",
+        "exitCode": 0,
+        "status": "passed",
+        "startedAt": "2026-06-24T08:32:48Z",
+        "recordedAt": "2026-06-24T08:32:51Z"
+      },
+      {
+        "name": "windows-build-release",
+        "command": "pwsh -NoProfile -ExecutionPolicy Bypass -File scripts\\build.ps1 -RepoRoot . -Configuration Release",
+        "exitCode": 0,
+        "status": "passed",
+        "startedAt": "2026-06-24T08:32:51Z",
+        "recordedAt": "2026-06-24T08:33:49Z"
+      },
+      {
+        "name": "stage-and-package",
+        "command": "pwsh -NoProfile -ExecutionPolicy Bypass -File scripts\\install.ps1 -RepoRoot . -MoqiImeSource D:\\VSProjects\\moqi-ime\\scripts\\build\\moqi-ime",
+        "exitCode": 0,
+        "status": "passed",
+        "startedAt": "2026-06-24T08:33:49Z",
+        "recordedAt": "2026-06-24T08:34:05Z"
+      }
+    ],
+    "previewCaptures": [
+      {
+        "sample": "nei",
+        "path": ".planning\\product\\ui-fixtures\\phase-05\\candidate-preview\\nei-light.bmp",
+        "bytes": 2034038,
+        "sha256": "3D4EE4AED8C9BC453EF324B14AC63B1FABD5E119A251CF70CAC61FAB71B3DE75",
+        "recordedAt": "2026-06-24T08:34:52Z"
+      },
+      {
+        "sample": "multilingual",
+        "path": ".planning\\product\\ui-fixtures\\phase-05\\candidate-preview\\multilingual-indonesian-main.bmp",
+        "bytes": 2034038,
+        "sha256": "7011E64B3B6856DE794F8F9D5129131AEAF747A8FDDFA6C95D7834F7AE77B06B",
+        "recordedAt": "2026-06-24T08:34:52Z"
+      },
+      {
+        "sample": "housam",
+        "path": ".planning\\product\\ui-fixtures\\phase-05\\candidate-preview\\housam-compound.bmp",
+        "bytes": 2034038,
+        "sha256": "F609B4B3A07724B4C1B1D0253BD91A78EADD4E0FFB65E9E5FB3A3B7ACE23AB1C",
+        "recordedAt": "2026-06-24T08:34:52Z"
+      },
+      {
+        "sample": "reverse",
+        "path": ".planning\\product\\ui-fixtures\\phase-05\\candidate-preview\\reverse-cangjie-onf.bmp",
+        "bytes": 2034038,
+        "sha256": "8CE8C278DA8610EBF7644DB7266D70602290D9CF157EBB97A091099430A66E06",
+        "recordedAt": "2026-06-24T08:34:52Z"
+      },
+      {
+        "sample": "edge",
+        "path": ".planning\\product\\ui-fixtures\\phase-05\\candidate-preview\\edge-clamp.bmp",
+        "bytes": 2034038,
+        "sha256": "62E13060C970DCD0414F327E542979442E98882858A10AB5896DC239AE7C7BE7",
+        "recordedAt": "2026-06-24T08:34:52Z"
+      },
+      {
+        "sample": "dpi",
+        "path": ".planning\\product\\ui-fixtures\\phase-05\\candidate-preview\\high-dpi.bmp",
+        "bytes": 4576518,
+        "sha256": "7DC2C5FB9D75290AB86907CD4766BF1220B61D58AB659D06F7FF80CE94CB5BFD",
+        "recordedAt": "2026-06-24T08:34:52Z"
+      },
+      {
+        "sample": "fallback",
+        "path": ".planning\\product\\ui-fixtures\\phase-05\\candidate-preview\\fallback-anchor.bmp",
+        "bytes": 2034038,
+        "sha256": "59DEE68EBDEED20991202D19D41E87387602FD583A25E9018F033607C74EA743",
+        "recordedAt": "2026-06-24T08:34:52Z"
+      }
+    ],
+    "finalGuards": [
+      {
+        "name": "candidate-parity-final",
+        "command": "pwsh -NoProfile -ExecutionPolicy Bypass -File D:\\VSProjects\\moqi-ime\\scripts\\Test-TypeDuckCandidateParity.ps1 -RepoRoot D:\\VSProjects\\moqi-ime -WindowsRepoRoot D:\\VSProjects\\moqi-im-windows -Strict",
+        "exitCode": 0,
+        "status": "passed",
+        "startedAt": "2026-06-24T08:37:55Z",
+        "recordedAt": "2026-06-24T08:37:56Z"
+      },
+      {
+        "name": "appearance-theme-final",
+        "command": "pwsh -NoProfile -ExecutionPolicy Bypass -File scripts\\Test-TypeDuckAppearanceTheme.ps1 -RepoRoot . -BackendRoot D:\\VSProjects\\moqi-ime -Strict",
+        "exitCode": 0,
+        "status": "passed",
+        "startedAt": "2026-06-24T08:37:56Z",
+        "recordedAt": "2026-06-24T08:37:56Z"
+      },
+      {
+        "name": "candidate-data-final",
+        "command": "pwsh -NoProfile -ExecutionPolicy Bypass -File scripts\\Test-TypeDuckCandidateData.ps1 -RepoRoot . -Strict",
+        "exitCode": 0,
+        "status": "passed",
+        "startedAt": "2026-06-24T08:37:56Z",
+        "recordedAt": "2026-06-24T08:37:56Z"
+      },
+      {
+        "name": "candidate-window-final",
+        "command": "pwsh -NoProfile -ExecutionPolicy Bypass -File scripts\\Test-TypeDuckCandidateWindow.ps1 -RepoRoot . -Strict",
+        "exitCode": 0,
+        "status": "passed",
+        "startedAt": "2026-06-24T08:37:56Z",
+        "recordedAt": "2026-06-24T08:37:57Z"
+      },
+      {
+        "name": "settings-persistence-final",
+        "command": "pwsh -NoProfile -ExecutionPolicy Bypass -File scripts\\Test-TypeDuckSettingsPersistence.ps1 -RepoRoot . -BackendRoot D:\\VSProjects\\moqi-ime -Strict",
+        "exitCode": 0,
+        "status": "passed",
+        "startedAt": "2026-06-24T08:37:57Z",
+        "recordedAt": "2026-06-24T08:37:57Z"
+      },
+      {
+        "name": "settings-about-final",
+        "command": "pwsh -NoProfile -ExecutionPolicy Bypass -File scripts\\Test-TypeDuckSettingsAboutUi.ps1 -RepoRoot . -BackendRoot D:\\VSProjects\\moqi-ime -Strict",
+        "exitCode": 0,
+        "status": "passed",
+        "startedAt": "2026-06-24T08:37:57Z",
+        "recordedAt": "2026-06-24T08:37:58Z"
+      },
+      {
+        "name": "icon-packaging-final",
+        "command": "pwsh -NoProfile -ExecutionPolicy Bypass -File scripts\\Test-TypeDuckIconPackaging.ps1 -RepoRoot . -BackendRoot D:\\VSProjects\\moqi-ime -Strict",
+        "exitCode": 0,
+        "status": "passed",
+        "startedAt": "2026-06-24T08:37:58Z",
+        "recordedAt": "2026-06-24T08:37:59Z"
+      },
+      {
+        "name": "aggregate-evidence-final",
+        "command": "pwsh -NoProfile -ExecutionPolicy Bypass -File scripts\\Test-TypeDuckPhase05UiEvidence.ps1 -RepoRoot . -BackendRoot D:\\VSProjects\\moqi-ime -Strict -ExpectRed VmEvidenceMissing",
+        "exitCode": 0,
+        "status": "passed",
+        "startedAt": "2026-06-24T08:37:59Z",
+        "recordedAt": "2026-06-24T08:38:03Z"
+      }
+    ]
+  }
 }
