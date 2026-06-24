@@ -390,6 +390,7 @@ $aboutExe = Resolve-ArtifactPath -Label "TypeDuckAbout.exe" -Candidates @(
     (Join-Path $RepoRoot "build-vs32-settings-ui\TypeDuckSettings\Release\TypeDuckAbout.exe")
 )
 Copy-IfExists -Source $aboutExe -Destination (Join-Path $stageWin32Root "TypeDuckAbout.exe")
+Set-WindowsExecutableIcon -ExecutablePath (Join-Path $stageWin32Root "TypeDuckAbout.exe") -IconPath $transparentIcon
 
 $dll32 = Resolve-ArtifactPath -Label "Win32 TypeDuckTextService.dll" -Candidates @(
     (Join-Path $Win32BuildDir "TypeDuckTextService.dll"),
