@@ -35,6 +35,7 @@
 #include <spdlog/spdlog.h>
 
 #include "UvPipe.h"
+#include "TypeDuckPreferences.h"
 #include "proto/moqi.pb.h"
 #include "../proto/ProtoFraming.h"
 
@@ -66,6 +67,8 @@ public:
 	std::shared_ptr<spdlog::logger>& logger();
 
 	void handleClientMessage(PipeClient* client, const moqi::protocol::ClientRequest& request);
+
+	TypeDuck::ApplyResult applyTypeDuckPreferences(const TypeDuck::RimeSideEffects& effects);
 
 	void uploadCloudClipboardText(const std::string& utf8Text);
 

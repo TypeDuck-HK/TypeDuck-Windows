@@ -296,14 +296,18 @@ ApplyResult applyPreferences(const std::filesystem::path& path,
   if (!validation.ok) {
     return {false, validation.message};
   }
+  const auto saved = savePreferences(path, validation.preferences);
+  if (!saved.ok) {
+    return {false, saved.message};
+  }
   if (applyRime) {
     const auto applied = applyRime(rimeSideEffects(validation.preferences));
     if (!applied.ok) {
       return {false, applied.message.empty() ? kApplyFailureMessage : applied.message};
     }
+    return {true, applied.message.empty() ? "設定已套用 / Settings applied" : applied.message};
   }
-  const auto saved = savePreferences(path, validation.preferences);
-  return {saved.ok, saved.ok ? "設定已儲存 / Settings saved" : saved.message};
+  return {true, "設定已儲存 / Settings saved"};
 }
 
 } // namespace Moqi::TypeDuck

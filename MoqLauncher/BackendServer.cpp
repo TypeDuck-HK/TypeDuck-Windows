@@ -27,6 +27,8 @@
 #include <chrono>  // C++ 11 clock functions
 #include <codecvt> // for utf8 conversion
 #include <cstring>
+#include <cstdlib>
+#include <filesystem>
 #include <fstream>
 #include <locale> // for wstring_convert
 #include <map>
@@ -50,6 +52,50 @@ static wstring_convert<codecvt_utf8<wchar_t>> utf8Codec;
 static constexpr auto MAX_RESPONSE_WAITING_TIME =
     30; // if a backend is non-responsive for 30 seconds, it's considered dead
 static constexpr uint32_t RIME_DEPLOY_COMMAND_ID = 10;
+
+namespace {
+
+std::filesystem::path rimeUserDir() {
+  const wchar_t* appData = _wgetenv(L"APPDATA");
+  if (appData == nullptr || appData[0] == L'\0') {
+    return {};
+  }
+  return std::filesystem::path(appData) / L"Moqi" / L"Rime";
+}
+
+bool writeUtf8File(const std::filesystem::path& path, const std::string& content) {
+  std::error_code ec;
+  std::filesystem::create_directories(path.parent_path(), ec);
+  if (ec) {
+    return false;
+  }
+  std::ofstream stream(path, std::ios::binary | std::ios::trunc);
+  if (!stream.is_open()) {
+    return false;
+  }
+  stream << content;
+  return stream.good();
+}
+
+std::string defaultCustomYaml(const TypeDuck::RimeSideEffects& effects) {
+  std::ostringstream content;
+  content << "config_version: '" << effects.pageSize << "'\n"
+          << "patch:\n"
+          << "  " << effects.defaultCustomPath << ": " << effects.pageSize << "\n";
+  return content.str();
+}
+
+std::string commonCustomYaml(const TypeDuck::RimeSideEffects& effects) {
+  std::ostringstream content;
+  content << "patch:\n"
+          << "  " << effects.commonPatchKey << ":\n";
+  for (const auto& patch : effects.commonPatches) {
+    content << "    - " << patch << "\n";
+  }
+  return content.str();
+}
+
+} // namespace
 
 static DWORD trayNotificationInfoFlags(moqi::protocol::TrayNotificationIcon icon) {
   switch (icon) {
@@ -145,6 +191,40 @@ void BackendServer::handleClientMessage(PipeClient *client,
     return;
   }
   stdinPipe_->write(std::move(framedMessage));
+}
+
+TypeDuck::ApplyResult BackendServer::applyTypeDuckPreferences(
+    const TypeDuck::RimeSideEffects& effects) {
+  const auto userDir = rimeUserDir();
+  if (userDir.empty()) {
+    return {false, "設定已儲存，但找不到 Rime 使用者目錄 / Settings were saved, but the Rime user directory was unavailable"};
+  }
+  if (!writeUtf8File(userDir / effects.defaultCustomFile, defaultCustomYaml(effects)) ||
+      !writeUtf8File(userDir / effects.commonCustomFile, commonCustomYaml(effects))) {
+    return {false, "設定已儲存，但 Rime 自訂設定未能寫入 / Settings were saved, but Rime custom settings could not be written"};
+  }
+
+  if (!isProcessRunning() && !startProcess()) {
+    return {false, "設定已儲存，但 TypeDuck 後端未能啟動 / Settings were saved, but the TypeDuck backend could not start"};
+  }
+  if (stdinPipe_ == nullptr) {
+    return {false, "設定已儲存，但 TypeDuck 後端未能接收重新部署指令 / Settings were saved, but the TypeDuck backend could not receive redeploy"};
+  }
+
+  moqi::protocol::ClientRequest request;
+  request.set_method(moqi::protocol::METHOD_ON_COMMAND);
+  request.set_client_id("settings");
+  request.set_command_id(RIME_DEPLOY_COMMAND_ID);
+
+  std::string framedMessage;
+  if (!Proto::serializeMessageBounded(
+          request, framedMessage, Proto::kMaxBackendFramePayloadBytes)) {
+    return {false, "設定已儲存，但重新部署指令未能建立 / Settings were saved, but the redeploy request could not be created"};
+  }
+
+  pipeServer_->enqueueTrayNotification(L"TypeDuck", L"正在重新部署 / Redeploying...", NIIF_INFO);
+  stdinPipe_->write(std::move(framedMessage));
+  return {true, "設定已套用 / Settings applied"};
 }
 
 void BackendServer::uploadCloudClipboardText(const std::string& utf8Text) {

@@ -346,8 +346,13 @@ bool PipeClient::handleTypeDuckSettingsRequest(
         auto applied = TypeDuck::applyPreferences(
             path,
             preferences,
-            [](const TypeDuck::RimeSideEffects&) {
-                return TypeDuck::ApplyResult{true, "設定已套用 / Settings applied"};
+            [this](const TypeDuck::RimeSideEffects& effects) {
+                if (backend_ == nullptr) {
+                    return TypeDuck::ApplyResult{
+                        false,
+                        "設定已儲存，但 TypeDuck 後端未連線 / Settings were saved, but the TypeDuck backend was not connected"};
+                }
+                return backend_->applyTypeDuckPreferences(effects);
             });
         if (!applied.ok) {
             writeTypeDuckSettingsResponse(request, false, applied.message);
