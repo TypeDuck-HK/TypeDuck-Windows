@@ -216,6 +216,7 @@ add_subdirectory("${PROJECT_SOURCE_DIR}/jsoncpp")
 
 add_subdirectory("${PROJECT_SOURCE_DIR}/libIME2")
 add_subdirectory("${PROJECT_SOURCE_DIR}/libuv")
+add_subdirectory("${PROJECT_SOURCE_DIR}/Tests/TypeDuckCandidateData")
 add_subdirectory("${PROJECT_SOURCE_DIR}/Tests/TypeDuckProtocol")
 add_subdirectory("${PROJECT_SOURCE_DIR}/MoqiTextService")
 add_subdirectory("${PROJECT_SOURCE_DIR}/Preview")

@@ -1,0 +1,73 @@
+{
+  "captureDate": "2026-06-23",
+  "phase": "05",
+  "plan": "05-02",
+  "status": "source-and-runtime-backed",
+  "sourceContracts": [
+    ".planning/product/TYPEDUCK-LOOKUP-FILTER-RAW-CONTRACT.md",
+    ".planning/product/web-alpha-fixtures/2026-06-23/candidate-list-sample.json",
+    ".planning/product/web-alpha-fixtures/2026-06-23/dictionary-detail-sample.json",
+    "I:/GitHub/TypeDuck-Web/src/CandidateInfo.ts",
+    "I:/GitHub/TypeDuck-Web/src/utils.ts",
+    "I:/GitHub/TypeDuck-Web/src/consts.ts"
+  ],
+  "lookupFilterHeader": [
+    "match_input_buffer",
+    "honzi",
+    "jyutping",
+    "canonical_honzi",
+    "canonical_jyutping",
+    "components_honzi",
+    "components_jyutping",
+    "pron_label",
+    "lit_col_reading",
+    "pos",
+    "register",
+    "label",
+    "written_form",
+    "vernacular_form",
+    "collocation",
+    "eng",
+    "hin",
+    "urd",
+    "nep",
+    "ind"
+  ],
+  "controlSeparators": {
+    "leadingReverseLookupMarker": "\u000b",
+    "noteSeparator": "\u000c",
+    "dictionaryRowSeparator": "\u000d"
+  },
+  "sampleRows": [
+    {
+      "input": "nei",
+      "candidate": "你",
+      "rawCommentEscaped": "note\\f\\r1,你,nei5,,,,,,,oth,,,,,,you (singular),आप,تم,तपाईं,kamu",
+      "expected": {
+        "headword": "你",
+        "jyutping": "nei5",
+        "english": "you (singular)",
+        "indonesian": "kamu",
+        "dictionaryIndicator": true
+      }
+    },
+    {
+      "input": "housam",
+      "candidate": "好心你",
+      "rawCommentEscaped": "\\f\\r1,好心,hou2 sam1,,,,,,,adj|adv,yue,,拜托,,,kind; come on,दयालु,نرم دل,दयालु,baik hati\\r1,你,nei5,,,,,,,oth,,,,,,you (singular),आप,تم,तपाईं,kamu",
+      "expected": {
+        "entryCount": 2,
+        "mainLanguage": "ind",
+        "headwords": ["好心", "你"],
+        "moreLanguages": ["eng", "hin", "nep", "urd"]
+      }
+    }
+  ],
+  "settingsPreferences": {
+    "defaultDisplayLanguages": ["eng"],
+    "multilingualDisplayLanguages": ["eng", "hin", "ind", "nep", "urd"],
+    "mainLanguage": "ind",
+    "jyutpingVisibilityModes": ["always", "reverse_only", "never"],
+    "chineseTypefaces": ["sung", "hei"]
+  }
+}
