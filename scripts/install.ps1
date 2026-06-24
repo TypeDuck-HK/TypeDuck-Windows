@@ -178,7 +178,9 @@ Copy-Item -LiteralPath $backends -Destination (Join-Path $stageWin32Root "backen
 
 $launcher = Resolve-ArtifactPath -Label "TypeDuckLauncher.exe" -Candidates @(
     (Join-Path $Win32BuildDir "TypeDuckLauncher.exe"),
+    (Join-Path $Win32BuildDir "Debug\TypeDuckLauncher.exe"),
     (Join-Path $Win32BuildDir "Release\TypeDuckLauncher.exe"),
+    (Join-Path $Win32BuildDir "MoqLauncher\Debug\TypeDuckLauncher.exe"),
     (Join-Path $Win32BuildDir "MoqLauncher\Release\TypeDuckLauncher.exe")
 )
 Copy-IfExists -Source $launcher -Destination (Join-Path $stageWin32Root "TypeDuckLauncher.exe")
