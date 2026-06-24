@@ -135,7 +135,7 @@ Plans:
 
 **Verification Environment**: Requires Windows VM or equivalent Windows test machine evidence for real TSF candidate placement, focus behavior, settings entry points, installer-first-run settings, high DPI, and representative host apps. Preview harness screenshots are helpful but insufficient alone.
 
-**Plans**: 7/8 plans executed
+**Plans**: 7/14 plans executed; 6 gap-closure plans created for rejected UAT retry
 Plans:
 **Wave 1**
 
@@ -165,6 +165,27 @@ Plans:
 **Wave 7** *(blocked on Wave 4 candidate UI plus Wave 5/6 launch and packaging completion)*
 
 - [ ] 05-06-PLAN.md — Collect automated package checks and Windows VM evidence for Phase 5 UI parity.
+
+**Gap Closure Wave 8** *(blocked on Wave 6 packaging completion)*
+
+- [ ] 05-09-PLAN.md — Align rejected-UAT guards, remove stale evidence slots, and record runtime/Web provenance.
+
+**Gap Closure Wave 9** *(blocked on Wave 8 guard/provenance alignment)*
+
+- [ ] 05-10-PLAN.md — Repair candidate data parity, multi-row dictionary rendering, POS pills, multilingual rows, and visual metrics.
+- [ ] 05-11-PLAN.md — Repair settings layout/copy, move About to a separate executable, and clean icon packaging/stamping.
+
+**Gap Closure Wave 10** *(blocked on candidate and settings/About/icon repairs)*
+
+- [ ] 05-12-PLAN.md — Rebuild the fixed package and refresh automated/package/preview evidence.
+
+**Gap Closure Wave 11** *(blocked on automated/package evidence refresh)*
+
+- [ ] 05-13-PLAN.md — Capture and approve required Windows VM/manual evidence.
+
+**Gap Closure Wave 12** *(blocked on VM/manual evidence approval)*
+
+- [ ] 05-14-PLAN.md — Write the final 05-06 evidence summary and close the UAT gap record.
 
 **UI hint**: yes
 
