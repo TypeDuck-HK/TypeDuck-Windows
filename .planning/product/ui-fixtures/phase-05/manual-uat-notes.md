@@ -47,3 +47,9 @@ Phase 5 remains rejected. Retry execution should first close the UAT gaps, then 
 - `settingsTwoColumn` / `settings-two-column-layout.bmp` is no longer an accepted evidence slot because the cropped screenshot was rejected.
 - `aboutDialog` / `vm-about-dialog.bmp` is no longer an accepted evidence slot because the screenshot was incorrect and About is moving to a separate executable.
 - Required retry slots are now explicit in `phase05-ui-evidence.json`: `settingsApplyPersistence`, `settingsPersistenceAfterRestart`, and `separateAboutExecutable`.
+
+## Runtime and Source Provenance
+
+- Retry evidence must cite `.planning/product/ui-fixtures/phase-05/runtime-provenance.json`.
+- The provenance file records exact heads and dirty states for `D:\VSProjects\moqi-im-windows`, `D:\VSProjects\moqi-ime`, and `I:\GitHub\TypeDuck-Web`.
+- Runtime acceptance is tied to hashed `server.exe`, `rime.dll`, `appearance_themes.json`, built `jyut6ping3.schema.yaml`, TypeDuck icon sources, the Phase 2 runtime manifest, and the 2026-06-23 Web alpha fixture metadata.

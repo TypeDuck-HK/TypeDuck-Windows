@@ -1,0 +1,149 @@
+{
+  "schemaVersion": 1,
+  "capturedAt": "2026-06-24T07:53:00Z",
+  "purpose": "Phase 5 retry evidence provenance before rebuilds or VM screenshots are accepted.",
+  "repositories": {
+    "windows": {
+      "path": "D:\\VSProjects\\moqi-im-windows",
+      "branch": "main",
+      "head": "97636eabba81728cc16ddd6f6e18fd7bb29390ac",
+      "statusShort": [],
+      "notes": "Shared worktree after Task 2 cleanup commit; this plan's provenance and summary commits are expected to follow this recorded base."
+    },
+    "backend": {
+      "path": "D:\\VSProjects\\moqi-ime",
+      "head": "f792eb3c04bc795855cdaed3eeb495353f545000",
+      "statusShort": [
+        " M go.mod",
+        " M input_methods/rime/icons/chi.ico",
+        " M input_methods/rime/icons/chi_full_capsoff.ico",
+        " M input_methods/rime/icons/chi_full_capson.ico",
+        " M input_methods/rime/icons/chi_half_capsoff.ico",
+        " M input_methods/rime/icons/chi_half_capson.ico",
+        " M input_methods/rime/icons/config.ico",
+        " M input_methods/rime/icons/eng.ico",
+        " M input_methods/rime/icons/eng_full_capsoff.ico",
+        " M input_methods/rime/icons/eng_full_capson.ico",
+        " M input_methods/rime/icons/eng_half_capsoff.ico",
+        " M input_methods/rime/icons/eng_half_capson.ico",
+        " M input_methods/rime/icons/full.ico",
+        " M input_methods/rime/icons/half.ico",
+        " M input_methods/rime/icons/zh.ico",
+        " M input_methods/rime/ime.json",
+        " M input_methods/rime/librime.go",
+        "?? icons/About_Banner.bmp",
+        "?? icons/Credit_Logos.bmp",
+        "?? icons/Installer.bmp",
+        "?? icons/TypeDuck.ico",
+        "?? icons/TypeDuck_Small.ico",
+        "?? icons/TypeDuck_Transparent.ico"
+      ],
+      "notes": "Dirty sibling runtime state is intentionally recorded because UAT gap 15 rejected unproven external-source assumptions."
+    },
+    "typeDuckWeb": {
+      "path": "I:\\GitHub\\TypeDuck-Web",
+      "head": "db21054315b6d92942bc0f32fd5437ecc42191b4",
+      "fixtureShortCommit": "db21054",
+      "statusShort": [
+        " M .gitignore",
+        " M README.md",
+        " m librime",
+        " M schema",
+        " M scripts/build_schema.ts"
+      ],
+      "notes": "Dirty Web alpha authority is recorded before retry evidence; layout authority remains the 2026-06-23 fixture metadata."
+    }
+  },
+  "webAlphaFixture": {
+    "sourceMetadata": ".planning/product/web-alpha-fixtures/2026-06-23/source-metadata.json",
+    "captureDate": "2026-06-23",
+    "alphaUrl": "http://localhost:5173/TypeDuck-Web/aap2-alpha/",
+    "layoutAuthority": [
+      "I:\\GitHub\\TypeDuck-Web\\src\\CandidatePanel.tsx",
+      "I:\\GitHub\\TypeDuck-Web\\src\\Candidate.tsx",
+      "I:\\GitHub\\TypeDuck-Web\\src\\DictionaryPanel.tsx",
+      "I:\\GitHub\\TypeDuck-Web\\src\\Preferences.tsx",
+      "I:\\GitHub\\TypeDuck-Web\\src\\index.css"
+    ]
+  },
+  "lookupFilter": {
+    "source": "https://github.com/TypeDuck-HK/rime-dictionary-lookup-filter",
+    "commit": "3671814d4e4aeab8d616ceea3c7f6d88e96bba02",
+    "evidence": ".planning/product/engine-runtime-fixtures/phase-02/runtime-manifest.json",
+    "relation": "Phase 2 runtime-manifest records the TypeDuck-HK librime release version-info.txt lookup-filter commit and ties it to the staged rime.dll artifact."
+  },
+  "artifacts": [
+    {
+      "kind": "web-fixture-metadata",
+      "path": ".planning/product/web-alpha-fixtures/2026-06-23/source-metadata.json",
+      "bytes": 10638,
+      "sha256": "22DE07C8A814934E3E63AF495454A6B496CA7AD8C52BF20C7D06A5D7FAA47B29"
+    },
+    {
+      "kind": "phase-2-runtime-manifest",
+      "path": ".planning/product/engine-runtime-fixtures/phase-02/runtime-manifest.json",
+      "bytes": 31676,
+      "sha256": "71EA765798DD204AFC6E6B690325C8D2879AE0ACFB24AB5BC02571FA06D63C01"
+    },
+    {
+      "kind": "backend-server",
+      "path": "D:\\VSProjects\\moqi-ime\\scripts\\build\\moqi-ime\\server.exe",
+      "bytes": 9475072,
+      "sha256": "8058863ADEDF373826ABB877186E3ADF6F6292CD3B734F273E8AF28D752E305C"
+    },
+    {
+      "kind": "typeduck-librime",
+      "path": "D:\\VSProjects\\moqi-ime\\scripts\\build\\moqi-ime\\input_methods\\rime\\rime.dll",
+      "bytes": 3749376,
+      "sha256": "5783B84916FEFC0DD5DDA28F1D7292A9CA86C75F05132947FE816178B916C04B"
+    },
+    {
+      "kind": "typeduck-theme",
+      "path": "D:\\VSProjects\\moqi-ime\\scripts\\build\\moqi-ime\\input_methods\\rime\\appearance_themes.json",
+      "bytes": 5549,
+      "sha256": "9BF5742799556BF948900DB9A40B6778DA4CB78669E08F4848CC5D8BB0633E18"
+    },
+    {
+      "kind": "typeduck-built-schema",
+      "path": "D:\\VSProjects\\moqi-ime\\scripts\\build\\moqi-ime\\input_methods\\rime\\data\\build\\jyut6ping3.schema.yaml",
+      "bytes": 10572,
+      "sha256": "8E2581B0B3A42B20E692B256E441E950E06D9A0D5DE2FEE30B7C390DAFF152BF"
+    },
+    {
+      "kind": "windows-executable-icon",
+      "path": "TypeDuckSettings/assets/TypeDuck_Transparent.ico",
+      "bytes": 131157,
+      "sha256": "8439C9E7CE063BB1D019AEBCF9D615D28D97A764B58C89A0AF44C89AF8D75D9D"
+    },
+    {
+      "kind": "windows-input-picker-icon",
+      "path": "TypeDuckSettings/assets/TypeDuck_Small.ico",
+      "bytes": 123155,
+      "sha256": "A68AEF1B1527CF5F100DDA9E15751E32ACF3E2DADF1B47DCA8EA9CA184105B97"
+    },
+    {
+      "kind": "windows-installer-icon",
+      "path": "TypeDuckSettings/assets/TypeDuck.ico",
+      "bytes": 130138,
+      "sha256": "ECA986DB6D23F91FC9507AFE385D13A9BBE68B7BA36F9B5BAFF008502BC0B76A"
+    },
+    {
+      "kind": "backend-executable-icon-source",
+      "path": "D:\\VSProjects\\moqi-ime\\icons\\TypeDuck_Transparent.ico",
+      "bytes": 131157,
+      "sha256": "8439C9E7CE063BB1D019AEBCF9D615D28D97A764B58C89A0AF44C89AF8D75D9D"
+    },
+    {
+      "kind": "backend-input-picker-icon-source",
+      "path": "D:\\VSProjects\\moqi-ime\\icons\\TypeDuck_Small.ico",
+      "bytes": 123155,
+      "sha256": "A68AEF1B1527CF5F100DDA9E15751E32ACF3E2DADF1B47DCA8EA9CA184105B97"
+    },
+    {
+      "kind": "backend-installer-icon-source",
+      "path": "D:\\VSProjects\\moqi-ime\\icons\\TypeDuck.ico",
+      "bytes": 130138,
+      "sha256": "ECA986DB6D23F91FC9507AFE385D13A9BBE68B7BA36F9B5BAFF008502BC0B76A"
+    }
+  ]
+}
