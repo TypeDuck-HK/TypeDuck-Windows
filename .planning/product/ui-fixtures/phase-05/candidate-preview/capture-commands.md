@@ -1,6 +1,6 @@
 # TypeDuck Candidate Preview Capture Commands
 
-These preview scenarios are source-backed by the 2026-06-23 TypeDuck Web alpha fixtures and by `MoqiTextService/TypeDuckCandidateInfo.*`. They are iteration aids only; Plan 05-06 owns real TSF host-app proof.
+These preview scenarios are source-backed by the 2026-06-23 TypeDuck Web alpha fixtures and by `MoqiTextService/TypeDuckCandidateInfo.*`. They are iteration aids only; Plan 05-06 owns real TSF host-app proof. Runtime acceptance evidence must cite `runtime-provenance.json`; captures from stale TypeDuck 1.1.2 external runtime paths are not accepted as current package evidence.
 
 Run after building `MoqiCandidatePreview`:
 

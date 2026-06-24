@@ -83,6 +83,7 @@ Assert-Contains $previewSource 'CandidateInfo' "preview CandidateInfo usage"
 Assert-Contains $previewSource 'SavePreviewCaptureCommand|--capture' "documented preview screenshot capture path"
 Assert-Contains $previewCmake 'TypeDuckCandidateInfo\.cpp' "preview CandidateInfo CMake wiring"
 Assert-Contains $captureDoc 'nei|housam|reverse|multilingual' "candidate preview capture scenarios"
+Assert-Contains $captureDoc 'stale TypeDuck 1\.1\.2|runtime-provenance' "candidate preview VM divergence note"
 
 $productionAnchors = @(
   @{ Path = $windowSource; Pattern = 'kTypeDuckCandidatePanelRenderer'; Description = 'TypeDuck candidate renderer marker' },
@@ -123,6 +124,23 @@ if ($missing.Count -gt 0) {
 }
 
 if ($Strict) {
+  $requiredCaptures = @(
+    "nei-light.bmp",
+    "multilingual-indonesian-main.bmp",
+    "housam-compound.bmp",
+    "reverse-cangjie-onf.bmp",
+    "edge-clamp.bmp",
+    "high-dpi.bmp",
+    "fallback-anchor.bmp"
+  )
+  foreach ($capture in $requiredCaptures) {
+    $capturePath = Join-Path $fixtureDir $capture
+    Assert-File $capturePath
+    $captureItem = Get-Item -LiteralPath $capturePath
+    if ($captureItem.Length -lt 100000) {
+      throw "Candidate preview capture looks empty or truncated: $capturePath ($($captureItem.Length) bytes)"
+    }
+  }
   Assert-NotContains $windowSource 'L"\\\[" \+ part|body \+= L"\\\["|\\[[^\\]]*形容詞' "literal bracketed POS rendering in native candidate window"
   Assert-NotContains $previewSource 'L"\\\[" \+ pos|body \+= L"\\\["|\\[[^\\]]*形容詞' "literal bracketed POS rendering in preview harness"
   Assert-Contains $windowSource 'DT_VCENTER|candidateBaseline|baselineAligned' "candidate row baseline alignment guard"

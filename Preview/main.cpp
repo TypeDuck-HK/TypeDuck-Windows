@@ -782,6 +782,7 @@ std::wstring optionValue(const std::wstring& commandLine, const std::wstring& op
 void SavePreviewCaptureCommand(const std::wstring&) {
   // Marker used by scripts/Test-TypeDuckCandidateWindow.ps1 to keep documented
   // capture support tied to this executable.
+  (void)kPreviewSourceContract;
 }
 
 } // namespace
