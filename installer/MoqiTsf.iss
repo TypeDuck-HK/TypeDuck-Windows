@@ -38,6 +38,8 @@ Compression=lzma2/max
 SolidCompression=yes
 WizardSizePercent=110,100
 DisableWelcomePage=no
+SetupIconFile=..\TypeDuckSettings\assets\TypeDuck.ico
+UninstallDisplayIcon={app}\TypeDuck.ico
 
 [Languages]
 Name: "english"; MessagesFile: "compiler:Default.isl"

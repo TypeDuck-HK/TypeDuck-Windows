@@ -142,10 +142,35 @@ Assert-SameFileHash $product $backendProduct "TypeDuck.ico must be staged from t
 
 $settingsRc = Get-FileText (Join-Path $repo "TypeDuckSettings/TypeDuckSettings.rc")
 $settingsResource = Get-FileText (Join-Path $repo "TypeDuckSettings/resource.h")
+$textServiceRc = Get-FileText (Join-Path $repo "MoqiTextService/MoqiTextService.rc.in")
+$typeDuckProfile = Get-FileText (Join-Path $repo "MoqiTextService/TypeDuckProfile.cpp")
+$launcherRc = Get-FileText (Join-Path $repo "MoqLauncher/MoqiLauncher.rc")
+$setupHelperCmake = Get-FileText (Join-Path $repo "SetupHelper/CMakeLists.txt")
+$setupHelperRc = Get-FileText (Join-Path $repo "SetupHelper/SetupHelper.rc")
+$installer = Get-FileText (Join-Path $repo "installer/MoqiTsf.iss")
+$installScript = Get-FileText (Join-Path $repo "scripts/install.ps1")
+$packageScript = Get-FileText (Join-Path $repo "scripts/_all_in_package.ps1")
 $about = Get-FileText (Join-Path $repo "TypeDuckSettings/TypeDuckAboutDialog.cpp")
 
 Assert-Text $settingsResource "IDI_TYPEDUCK_SETTINGS" "Settings icon resource id must remain addressable."
 Assert-Text $settingsRc "IDI_TYPEDUCK_SETTINGS\s+ICON\s+`"assets/TypeDuck_Transparent\.ico`"" "TypeDuckSettings executable must use TypeDuck_Transparent.ico."
+Assert-Text $launcherRc "IDI_MOQI_LAUNCHER\s+ICON\s+`"\.\./TypeDuckSettings/assets/TypeDuck_Transparent\.ico`"" "TypeDuckLauncher executable must use TypeDuck_Transparent.ico."
+Assert-Text $setupHelperCmake "SetupHelper\.rc" "TypeDuckSetupHelper must compile a resource script."
+Assert-Text $setupHelperRc "TypeDuck_Transparent\.ico" "TypeDuckSetupHelper executable must use TypeDuck_Transparent.ico."
+Assert-Text $installScript '\$transparentIcon\s*=\s*Join-Path\s+\$iconSourceRoot\s+"TypeDuck_Transparent\.ico"' "Staging must resolve TypeDuck_Transparent.ico from product assets."
+Assert-Text $installScript 'Set-WindowsExecutableIcon\s+-ExecutablePath\s+\(Join-Path\s+\$stageWin32Root\s+"TypeDuckLauncher\.exe"\)\s+-IconPath\s+\$transparentIcon' "Staging must stamp TypeDuckLauncher.exe with TypeDuck_Transparent.ico."
+Assert-Text $installScript 'Set-WindowsExecutableIcon\s+-ExecutablePath\s+\(Join-Path\s+\$stageWin32Root\s+"TypeDuckSetupHelper\.exe"\)\s+-IconPath\s+\$transparentIcon' "Staging must stamp TypeDuckSetupHelper.exe with TypeDuck_Transparent.ico."
+Assert-Text $installScript 'Set-WindowsExecutableIcon\s+-ExecutablePath\s+\(Join-Path\s+\$stageWin32Root\s+"TypeDuckSettings\.exe"\)\s+-IconPath\s+\$transparentIcon' "Staging must stamp TypeDuckSettings.exe with TypeDuck_Transparent.ico."
+Assert-Text $installScript 'Set-WindowsExecutableIcon\s+-ExecutablePath\s+\$backendServer\s+-IconPath\s+\$transparentIcon' "Staging must stamp packaged moqi-ime/server.exe with TypeDuck_Transparent.ico."
+
+Assert-Text $textServiceRc "IDI_TYPEDUCK_PROFILE\s+ICON\s+`"\.\./TypeDuckSettings/assets/TypeDuck_Small\.ico`"" "TSF DLL profile resource must use TypeDuck_Small.ico."
+Assert-Text $typeDuckProfile "TypeDuck_Small\.ico" "First-party TypeDuck profile must prefer the staged TypeDuck_Small.ico."
+Assert-Text $typeDuckProfile "programDirEnvVar\(\)" "Profile icon lookup must use the installed TypeDuck program directory."
+
+Assert-Text $installer "SetupIconFile=\.\.\\TypeDuckSettings\\assets\\TypeDuck\.ico" "Installer setup icon must use TypeDuck.ico."
+Assert-Text $installer "UninstallDisplayIcon=\{app\}\\TypeDuck\.ico" "Uninstaller/broad product icon must use TypeDuck.ico."
+Assert-Text $installScript 'TypeDuck\.ico' "Staging must copy TypeDuck.ico into the app payload."
+Assert-Text $packageScript "scripts\\install\.ps1" "All-in package must continue routing final packaging through scripts/install.ps1."
 
 Assert-Ordered $about @(
   "kAboutBodyText",
@@ -173,7 +198,8 @@ Assert-Ordered $about @(
   "aboutLinks"
 ) "About D-23/D-27 packaged resource order"
 
-$packagingText = @($settingsRc, $about) -join "`n"
+$installScriptForBannedScan = $installScript -replace '\$bannedLegacyIconNames\s*=\s*@\("moqi\.png",\s*"mo\.ico",\s*"mo\.png",\s*"moqi\.ico"\)', ''
+$packagingText = @($settingsRc, $textServiceRc, $typeDuckProfile, $launcherRc, $setupHelperRc, $installer, $installScriptForBannedScan, $packageScript, $about) -join "`n"
 foreach ($banned in @("moqi\.png", "mo\.ico", "mo\.png", "moqi\.ico")) {
   Assert-NotText $packagingText $banned "Banned legacy Moqi image reference found in Phase 5 resource packaging: $banned"
 }
@@ -192,6 +218,12 @@ if ($stageHasPlanIcons) {
   Assert-ExecutableContainsIcon (Join-Path $stageRoot "TypeDuckSetupHelper.exe") $transparent "Staged TypeDuckSetupHelper.exe does not contain TypeDuck_Transparent.ico image data."
   Assert-ExecutableContainsIcon (Join-Path $stageRoot "TypeDuckSettings.exe") $transparent "Staged TypeDuckSettings.exe does not contain TypeDuck_Transparent.ico image data."
   Assert-ExecutableContainsIcon (Join-Path $stageRoot "moqi-ime/server.exe") $transparent "Staged moqi-ime/server.exe does not contain TypeDuck_Transparent.ico image data."
+  foreach ($bannedName in @("moqi.png", "mo.ico", "mo.png", "moqi.ico")) {
+    $bannedStageFile = Get-ChildItem -LiteralPath $stageRoot -Recurse -Force -File -ErrorAction SilentlyContinue |
+      Where-Object { $_.Name -ieq $bannedName } |
+      Select-Object -First 1
+    Assert-True ($null -eq $bannedStageFile) "Banned legacy Moqi image was staged: $($bannedStageFile.FullName)"
+  }
 }
 
 $installerOutput = Join-Path $repo "installer/dist/typeduck-windows-ime-setup.exe"

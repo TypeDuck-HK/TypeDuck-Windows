@@ -2,6 +2,7 @@ project(SetupHelper)
 
 add_executable(SetupHelper WIN32
     SetupHelper.cpp
+    SetupHelper.rc
 )
 
 set_target_properties(SetupHelper PROPERTIES

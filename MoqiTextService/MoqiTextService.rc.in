@@ -52,6 +52,8 @@ END
 // Icon with lowest ID value placed first to ensure application icon
 // remains consistent on all systems.
 
+IDI_TYPEDUCK_PROFILE ICON "../TypeDuckSettings/assets/TypeDuck_Small.ico"
+
 /////////////////////////////////////////////////////////////////////////////
 //
 // Version

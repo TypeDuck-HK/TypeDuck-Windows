@@ -88,6 +88,169 @@ function Resolve-ArtifactPath {
     return $selected.FullName
 }
 
+function Initialize-ResourceUpdater {
+    if ("TypeDuck.ResourceUpdater.NativeMethods" -as [type]) {
+        return
+    }
+
+    Add-Type -TypeDefinition @"
+using System;
+using System.Runtime.InteropServices;
+
+namespace TypeDuck.ResourceUpdater {
+  public static class NativeMethods {
+    [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+    public static extern IntPtr BeginUpdateResource(string pFileName, bool bDeleteExistingResources);
+
+    [DllImport("kernel32.dll", SetLastError = true)]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    public static extern bool UpdateResource(IntPtr hUpdate, IntPtr lpType, IntPtr lpName, ushort wLanguage, byte[] lpData, uint cbData);
+
+    [DllImport("kernel32.dll", SetLastError = true)]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    public static extern bool EndUpdateResource(IntPtr hUpdate, bool fDiscard);
+  }
+}
+"@
+}
+
+function Get-ResourceIntPtr {
+    param([int] $Value)
+    return [IntPtr]::new($Value)
+}
+
+function Convert-IcoToResourcePayloads {
+    param([string] $IconPath)
+
+    $bytes = [System.IO.File]::ReadAllBytes($IconPath)
+    $stream = [System.IO.MemoryStream]::new($bytes)
+    $reader = [System.IO.BinaryReader]::new($stream)
+    try {
+        $reserved = $reader.ReadUInt16()
+        $type = $reader.ReadUInt16()
+        $count = $reader.ReadUInt16()
+        if ($reserved -ne 0 -or $type -ne 1 -or $count -le 0) {
+            throw "Invalid .ico file: $IconPath"
+        }
+
+        $entries = @()
+        for ($i = 0; $i -lt $count; $i++) {
+            $entry = [ordered]@{
+                Width = $reader.ReadByte()
+                Height = $reader.ReadByte()
+                ColorCount = $reader.ReadByte()
+                Reserved = $reader.ReadByte()
+                Planes = $reader.ReadUInt16()
+                BitCount = $reader.ReadUInt16()
+                BytesInResource = $reader.ReadUInt32()
+                ImageOffset = $reader.ReadUInt32()
+                ResourceId = $i + 1
+            }
+            $entries += [pscustomobject]$entry
+        }
+
+        $images = @()
+        foreach ($entry in $entries) {
+            $image = New-Object byte[] ([int] $entry.BytesInResource)
+            [Array]::Copy($bytes, [int] $entry.ImageOffset, $image, 0, [int] $entry.BytesInResource)
+            $images += [pscustomobject]@{
+                Id = [int] $entry.ResourceId
+                Data = $image
+            }
+        }
+
+        $groupStream = [System.IO.MemoryStream]::new()
+        $writer = [System.IO.BinaryWriter]::new($groupStream)
+        try {
+            $writer.Write([UInt16]0)
+            $writer.Write([UInt16]1)
+            $writer.Write([UInt16]$count)
+            foreach ($entry in $entries) {
+                $writer.Write([byte] $entry.Width)
+                $writer.Write([byte] $entry.Height)
+                $writer.Write([byte] $entry.ColorCount)
+                $writer.Write([byte] 0)
+                $writer.Write([UInt16] $entry.Planes)
+                $writer.Write([UInt16] $entry.BitCount)
+                $writer.Write([UInt32] $entry.BytesInResource)
+                $writer.Write([UInt16] $entry.ResourceId)
+            }
+            $writer.Flush()
+            return [pscustomobject]@{
+                Group = $groupStream.ToArray()
+                Images = $images
+            }
+        }
+        finally {
+            $writer.Dispose()
+            $groupStream.Dispose()
+        }
+    }
+    finally {
+        $reader.Dispose()
+        $stream.Dispose()
+    }
+}
+
+function Set-WindowsExecutableIcon {
+    param(
+        [string] $ExecutablePath,
+        [string] $IconPath
+    )
+
+    if (-not (Test-Path -LiteralPath $ExecutablePath)) {
+        throw "Executable not found for icon update: $ExecutablePath"
+    }
+    if (-not (Test-Path -LiteralPath $IconPath)) {
+        throw "Icon file not found for icon update: $IconPath"
+    }
+
+    Initialize-ResourceUpdater
+    $payload = Convert-IcoToResourcePayloads -IconPath $IconPath
+    $handle = [TypeDuck.ResourceUpdater.NativeMethods]::BeginUpdateResource($ExecutablePath, $false)
+    if ($handle -eq [IntPtr]::Zero) {
+        throw "BeginUpdateResource failed for $ExecutablePath (Win32 $([Runtime.InteropServices.Marshal]::GetLastWin32Error()))"
+    }
+
+    $committed = $false
+    try {
+        foreach ($image in $payload.Images) {
+            $ok = [TypeDuck.ResourceUpdater.NativeMethods]::UpdateResource(
+                $handle,
+                (Get-ResourceIntPtr 3),
+                (Get-ResourceIntPtr $image.Id),
+                0,
+                $image.Data,
+                [uint32] $image.Data.Length)
+            if (-not $ok) {
+                throw "UpdateResource RT_ICON failed for $ExecutablePath (Win32 $([Runtime.InteropServices.Marshal]::GetLastWin32Error()))"
+            }
+        }
+
+        $groupOk = [TypeDuck.ResourceUpdater.NativeMethods]::UpdateResource(
+            $handle,
+            (Get-ResourceIntPtr 14),
+            (Get-ResourceIntPtr 1),
+            0,
+            $payload.Group,
+            [uint32] $payload.Group.Length)
+        if (-not $groupOk) {
+            throw "UpdateResource RT_GROUP_ICON failed for $ExecutablePath (Win32 $([Runtime.InteropServices.Marshal]::GetLastWin32Error()))"
+        }
+
+        if (-not [TypeDuck.ResourceUpdater.NativeMethods]::EndUpdateResource($handle, $false)) {
+            throw "EndUpdateResource failed for $ExecutablePath (Win32 $([Runtime.InteropServices.Marshal]::GetLastWin32Error()))"
+        }
+        $committed = $true
+        Write-Host "Applied icon: $IconPath -> $ExecutablePath"
+    }
+    finally {
+        if (-not $committed -and $handle -ne [IntPtr]::Zero) {
+            [void] [TypeDuck.ResourceUpdater.NativeMethods]::EndUpdateResource($handle, $true)
+        }
+    }
+}
+
 function Resolve-MoqiImeSource {
     param(
         [string] $RepoRoot,
@@ -134,8 +297,11 @@ function Copy-MoqiImeRuntime {
         New-Item -ItemType Directory -Path $targetDir -Force | Out-Null
     }
 
+    $bannedLegacyIconNames = @("moqi.png", "mo.ico", "mo.png", "moqi.ico")
     $files = Get-ChildItem -Path $SourceRoot -Recurse -Force -File | Where-Object {
-        $_.Extension -ne ".go" -and $_.FullName -notmatch '[\\/]\.git(?:[\\/]|$)'
+        $_.Extension -ne ".go" -and
+        $_.FullName -notmatch '[\\/]\.git(?:[\\/]|$)' -and
+        ($bannedLegacyIconNames -notcontains $_.Name.ToLowerInvariant())
     }
     foreach ($file in $files) {
         $relativePath = $file.FullName.Substring($SourceRoot.Length).TrimStart('\', '/')
@@ -165,10 +331,18 @@ $IssPath = [System.IO.Path]::GetFullPath($IssPath)
 $stageWin32Root = Join-Path $StageDir "win32\TypeDuckIME"
 $stageX64Root = Join-Path $StageDir "x64\TypeDuckIME"
 $stageWin32X64Root = Join-Path $stageWin32Root "x64"
+$iconSourceRoot = Join-Path $RepoRoot "TypeDuckSettings\assets"
+$transparentIcon = Join-Path $iconSourceRoot "TypeDuck_Transparent.ico"
+$smallIcon = Join-Path $iconSourceRoot "TypeDuck_Small.ico"
+$productIcon = Join-Path $iconSourceRoot "TypeDuck.ico"
 New-CleanDirectory -Path $StageDir
 New-Item -ItemType Directory -Path $stageWin32Root -Force | Out-Null
 New-Item -ItemType Directory -Path $stageX64Root -Force | Out-Null
 New-Item -ItemType Directory -Path $stageWin32X64Root -Force | Out-Null
+
+Copy-IfExists -Source $transparentIcon -Destination (Join-Path $stageWin32Root "TypeDuck_Transparent.ico")
+Copy-IfExists -Source $smallIcon -Destination (Join-Path $stageWin32Root "TypeDuck_Small.ico")
+Copy-IfExists -Source $productIcon -Destination (Join-Path $stageWin32Root "TypeDuck.ico")
 
 $backends = Join-Path $RepoRoot "backends.json"
 if (-not (Test-Path -LiteralPath $backends)) {
@@ -184,6 +358,7 @@ $launcher = Resolve-ArtifactPath -Label "TypeDuckLauncher.exe" -Candidates @(
     (Join-Path $Win32BuildDir "MoqLauncher\Release\TypeDuckLauncher.exe")
 )
 Copy-IfExists -Source $launcher -Destination (Join-Path $stageWin32Root "TypeDuckLauncher.exe")
+Set-WindowsExecutableIcon -ExecutablePath (Join-Path $stageWin32Root "TypeDuckLauncher.exe") -IconPath $transparentIcon
 
 $setupHelper = Resolve-ArtifactPath -Label "TypeDuckSetupHelper.exe" -Candidates @(
     (Join-Path $Win32BuildDir "TypeDuckSetupHelper.exe"),
@@ -193,6 +368,7 @@ $setupHelper = Resolve-ArtifactPath -Label "TypeDuckSetupHelper.exe" -Candidates
     (Join-Path $Win32BuildDir "SetupHelper\Release\TypeDuckSetupHelper.exe")
 )
 Copy-IfExists -Source $setupHelper -Destination (Join-Path $stageWin32Root "TypeDuckSetupHelper.exe")
+Set-WindowsExecutableIcon -ExecutablePath (Join-Path $stageWin32Root "TypeDuckSetupHelper.exe") -IconPath $transparentIcon
 
 $settingsExe = Resolve-ArtifactPath -Label "TypeDuckSettings.exe" -Candidates @(
     (Join-Path $Win32BuildDir "TypeDuckSettings.exe"),
@@ -204,6 +380,7 @@ $settingsExe = Resolve-ArtifactPath -Label "TypeDuckSettings.exe" -Candidates @(
     (Join-Path $RepoRoot "build-vs32-settings-ui\TypeDuckSettings\Release\TypeDuckSettings.exe")
 )
 Copy-IfExists -Source $settingsExe -Destination (Join-Path $stageWin32Root "TypeDuckSettings.exe")
+Set-WindowsExecutableIcon -ExecutablePath (Join-Path $stageWin32Root "TypeDuckSettings.exe") -IconPath $transparentIcon
 
 $dll32 = Resolve-ArtifactPath -Label "Win32 TypeDuckTextService.dll" -Candidates @(
     (Join-Path $Win32BuildDir "TypeDuckTextService.dll"),
@@ -228,6 +405,8 @@ if (-not $SkipMoqiImeCopy) {
     }
     $imeDest = Join-Path $stageWin32Root "moqi-ime"
     Copy-MoqiImeRuntime -SourceRoot $MoqiImeSource -DestinationRoot $imeDest
+    $backendServer = Join-Path $imeDest "server.exe"
+    Set-WindowsExecutableIcon -ExecutablePath $backendServer -IconPath $transparentIcon
 }
 else {
     Write-Warning "Skipped copying transitional moqi-ime backend; ensure the final TypeDuck installer payload is sufficient for registration testing."
