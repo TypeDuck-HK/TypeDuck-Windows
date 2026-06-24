@@ -32,6 +32,9 @@ constexpr COLORREF kDisabledText = RGB(168, 160, 148);           // disabled_tex
 constexpr COLORREF kLinkText = RGB(151, 102, 31);                // link_text
 constexpr COLORREF kSelectedBackground = RGB(254, 220, 156);     // selection_background
 constexpr COLORREF kSelectedText = RGB(36, 34, 30);
+constexpr COLORREF kPosPillBackground = RGB(246, 243, 237);
+constexpr COLORREF kPosPillBorder = RGB(180, 171, 157);
+constexpr COLORREF kPosPillText = RGB(86, 79, 69);
 constexpr int kDefaultCandidateSpacing = 20;
 constexpr int kTypeDuckCandidatePanelRenderer = 1;
 constexpr int kMovementRevealThreshold = 2;
@@ -929,6 +932,11 @@ void CandidateWindow::paintInputBuffer(HDC hdc, const RECT& panelRc) {
     activeRc.right = (std::min)(activeRc.right,
         activeRc.left + scalePx(18) + static_cast<int>(preedit_.length()) * scalePx(10));
 
+    SIZE inputTextSize = {};
+    ::SelectObject(hdc, font_);
+    ::GetTextExtentPoint32W(hdc, preedit_.c_str(), static_cast<int>(preedit_.length()), &inputTextSize);
+    activeRc.right = (std::min)(preeditRc.right, activeRc.left + scalePx(18) + static_cast<int>(inputTextSize.cx));
+
     HBRUSH inputBrush = ::CreateSolidBrush(kInputBufferBackground);
     HRGN activeRgn = ::CreateRoundRectRgn(activeRc.left, activeRc.top, activeRc.right + 1,
                                           activeRc.bottom + 1, scalePx(5) * 2, scalePx(5) * 2);
@@ -1006,6 +1014,7 @@ void CandidateWindow::paintCandidateRow(HDC hdc, int index, const RECT& rowRc) {
     wchar_t selKey[] = L"?.";
     selKey[0] = selKeys_[index];
     const COLORREF oldColor = ::SetTextColor(hdc, selColor);
+    // candidateBaselineAligned: labels, Jyutping, Honzi, and definitions share vertical centering.
     ::DrawTextW(hdc, selKey, 2, &selRc, DT_LEFT | DT_VCENTER | DT_SINGLELINE | DT_NOPREFIX);
 
     const CandidateUiItem& item = items_[index];
@@ -1135,13 +1144,12 @@ void CandidateWindow::paintDictionaryEntry(
                 DT_LEFT | DT_VCENTER | DT_SINGLELINE | DT_NOPREFIX | DT_END_ELLIPSIS);
     y = headRc.bottom + scalePx(4);
 
+    const int bodyTop = y;
+    const int bodyBottom = y + scalePx(34);
+    int bodyX = panelRc.left + padX;
+    paintPartOfSpeechPills(hdc, bodyX, bodyTop + scalePx(5), right, entry.formattedPartsOfSpeech());
+
     std::wstring body;
-    for (const auto& part : entry.formattedPartsOfSpeech()) {
-        if (!body.empty()) {
-            body += L"  ";
-        }
-        body += L"[" + part + L"]";
-    }
     for (const auto& reg : entry.formattedRegister()) {
         if (!body.empty()) {
             body += L"  ";
@@ -1169,7 +1177,7 @@ void CandidateWindow::paintDictionaryEntry(
             body += mainDefinition;
         }
     }
-    RECT bodyRc = {panelRc.left + padX, y, right, y + scalePx(34)};
+    RECT bodyRc = {bodyX, bodyTop, right, bodyBottom};
     ::SetTextColor(hdc, kDefinitionText);
     ::DrawTextW(hdc, body.c_str(), static_cast<int>(body.length()), &bodyRc,
                 DT_LEFT | DT_WORDBREAK | DT_NOPREFIX | DT_END_ELLIPSIS);
@@ -1211,6 +1219,49 @@ void CandidateWindow::paintDictionaryEntry(
     y += scalePx(14);
 }
 
+void CandidateWindow::paintPartOfSpeechPills(
+    HDC hdc,
+    int& x,
+    int y,
+    int maxRight,
+    const std::vector<std::wstring>& values) {
+    if (values.empty()) {
+        return;
+    }
+
+    HGDIOBJ oldFont = ::SelectObject(hdc, commentFont_ ? commentFont_ : font_);
+    HPEN borderPen = ::CreatePen(PS_SOLID, (std::max)(1, scalePx(1)), kPosPillBorder);
+    HBRUSH fillBrush = ::CreateSolidBrush(kPosPillBackground);
+    HGDIOBJ oldPen = ::SelectObject(hdc, borderPen);
+    HGDIOBJ oldBrush = ::SelectObject(hdc, fillBrush);
+    const int gap = scalePx(5);
+    const int padX = scalePx(5);
+    const int pillHeight = scalePx(22);
+
+    for (const auto& value : values) {
+        SIZE textSize = {};
+        ::GetTextExtentPoint32W(hdc, value.c_str(), static_cast<int>(value.length()), &textSize);
+        const int pillWidth = static_cast<int>(textSize.cx) + padX * 2;
+        if (x + pillWidth > maxRight) {
+            break;
+        }
+
+        ::RoundRect(hdc, x, y, x + pillWidth, y + pillHeight,
+                    scalePx(4) * 2, scalePx(4) * 2);
+        RECT textRc = {x + padX, y, x + pillWidth - padX, y + pillHeight};
+        ::SetTextColor(hdc, kPosPillText);
+        ::DrawTextW(hdc, value.c_str(), static_cast<int>(value.length()), &textRc,
+                    DT_CENTER | DT_VCENTER | DT_SINGLELINE | DT_NOPREFIX | DT_END_ELLIPSIS);
+        x += pillWidth + gap;
+    }
+
+    ::SelectObject(hdc, oldBrush);
+    ::SelectObject(hdc, oldPen);
+    ::SelectObject(hdc, oldFont);
+    ::DeleteObject(fillBrush);
+    ::DeleteObject(borderPen);
+}
+
 void CandidateWindow::paintPreeditCursor(HDC hdc, const RECT& preeditRc) {
     if (preedit_.empty()) {
         return;
@@ -1221,7 +1272,7 @@ void CandidateWindow::paintPreeditCursor(HDC hdc, const RECT& preeditRc) {
     if (cursor > 0) {
         ::GetTextExtentPoint32W(hdc, preedit_.c_str(), cursor, &beforeSize);
     }
-    const int cursorX = preeditRc.left + static_cast<int>(beforeSize.cx);
+    const int cursorX = (std::min)(preeditRc.right - 1, preeditRc.left + static_cast<int>(beforeSize.cx));
     const int cursorWidth = 2;
     RECT cursorRc = {
         cursorX,

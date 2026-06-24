@@ -34,6 +34,11 @@ constexpr COLORREF kPronunciationText = RGB(102, 93, 82);       // pronunciation
 constexpr COLORREF kDefinitionText = RGB(78, 72, 63);           // definition_text
 constexpr COLORREF kDisabledText = RGB(168, 160, 148);          // disabled_text
 constexpr COLORREF kLinkText = RGB(151, 102, 31);               // link_text
+constexpr COLORREF kPosPillBackground = RGB(246, 243, 237);
+constexpr COLORREF kPosPillBorder = RGB(180, 171, 157);
+constexpr COLORREF kPosPillText = RGB(86, 79, 69);
+constexpr wchar_t kPreviewSourceContract[] =
+    L"candidate-data-contract runtime-provenance TypeDuck-1.1.2 divergence excluded";
 
 struct PreviewCandidate {
   std::wstring label;
@@ -253,6 +258,47 @@ void drawText(HDC hdc, const std::wstring& text, RECT rect, COLORREF color, UINT
   SetTextColor(hdc, color);
   DrawTextW(hdc, text.c_str(), static_cast<int>(text.size()), &rect,
             format | DT_NOPREFIX);
+}
+
+void drawPartOfSpeechPills(
+    HDC hdc,
+    const PreviewScenario& scenario,
+    int& x,
+    int y,
+    int maxRight,
+    const std::vector<std::wstring>& values) {
+  if (values.empty()) {
+    return;
+  }
+
+  HPEN pen = CreatePen(PS_SOLID, (std::max)(1, scale(scenario, 1)), kPosPillBorder);
+  HBRUSH brush = CreateSolidBrush(kPosPillBackground);
+  HGDIOBJ oldPen = SelectObject(hdc, pen);
+  HGDIOBJ oldBrush = SelectObject(hdc, brush);
+  const int gap = scale(scenario, 5);
+  const int padX = scale(scenario, 5);
+  const int height = scale(scenario, 22);
+
+  for (const auto& value : values) {
+    SIZE textSize = {};
+    GetTextExtentPoint32W(hdc, value.c_str(), static_cast<int>(value.size()), &textSize);
+    const int width = static_cast<int>(textSize.cx) + padX * 2;
+    if (x + width > maxRight) {
+      break;
+    }
+
+    RoundRect(hdc, x, y, x + width, y + height,
+              scale(scenario, 4) * 2, scale(scenario, 4) * 2);
+    RECT textRc = {x + padX, y, x + width - padX, y + height};
+    drawText(hdc, value, textRc, kPosPillText,
+             DT_CENTER | DT_VCENTER | DT_SINGLELINE | DT_END_ELLIPSIS);
+    x += width + gap;
+  }
+
+  SelectObject(hdc, oldBrush);
+  SelectObject(hdc, oldPen);
+  DeleteObject(brush);
+  DeleteObject(pen);
 }
 
 bool writeBitmapFile(const std::wstring& path, HBITMAP bitmap, int width, int height) {
@@ -515,8 +561,11 @@ private:
     RECT inputRc = {panel.left + pad, panel.top + pad,
                     panel.right - scale(scenario_, 82), panel.top + scale(scenario_, 48)};
     RECT activeRc = inputRc;
-    activeRc.right = activeRc.left + scale(scenario_, 18) +
-        static_cast<int>(scenario_.inputBuffer.size()) * scale(scenario_, 10);
+    SIZE inputSize = {};
+    GetTextExtentPoint32W(hdc, scenario_.inputBuffer.c_str(),
+                          static_cast<int>(scenario_.inputBuffer.size()), &inputSize);
+    activeRc.right = (std::min)(inputRc.right, activeRc.left + scale(scenario_, 18) +
+        static_cast<int>(inputSize.cx));
     frameRoundRect(hdc, activeRc, scale(scenario_, 5),
                    kInputBufferBackground, kInputBufferBackground);
     SelectObject(hdc, bodyFont_);
@@ -610,11 +659,11 @@ private:
       y += scale(scenario_, 58);
 
       RECT bodyRc = {panel.left + padX, y, panel.right - padX, y + scale(scenario_, 28)};
+      int bodyX = bodyRc.left;
+      SelectObject(hdc, smallFont_);
+      drawPartOfSpeechPills(hdc, scenario_, bodyX, y + scale(scenario_, 3),
+                             bodyRc.right, entry.formattedPartsOfSpeech());
       std::wstring body;
-      for (const auto& pos : entry.formattedPartsOfSpeech()) {
-        if (!body.empty()) body += L"  ";
-        body += L"[" + pos + L"]";
-      }
       for (const auto& reg : entry.formattedRegister()) {
         if (!body.empty()) body += L"  ";
         body += reg;
@@ -630,7 +679,7 @@ private:
           body += mainDefinition;
         }
       }
-      SelectObject(hdc, smallFont_);
+      bodyRc.left = bodyX;
       drawText(hdc, body, bodyRc, kDefinitionText,
                DT_LEFT | DT_VCENTER | DT_SINGLELINE | DT_END_ELLIPSIS);
       y += scale(scenario_, 34);

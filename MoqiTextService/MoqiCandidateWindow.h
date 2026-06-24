@@ -102,6 +102,7 @@ private:
     void paintCandidateRow(HDC hdc, int index, const RECT& rowRc);
     void paintDictionaryPanel(HDC hdc, const RECT& panelRc, const TypeDuck::CandidateInfo& info);
     void paintDictionaryEntry(HDC hdc, int& y, const RECT& panelRc, const TypeDuck::CandidateEntry& entry);
+    void paintPartOfSpeechPills(HDC hdc, int& x, int y, int maxRight, const std::vector<std::wstring>& values);
     void paintItem(HDC hdc, int index, int x, int y);
     void itemRect(int index, RECT& rect) const;
     int itemWidth(int index) const;
