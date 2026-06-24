@@ -22,6 +22,14 @@ std::wstring NeiCanonicalRow() {
   return L"1,呢,nei1,,ni1,,,,,part,yue,,這,,,this,(particle),(particle),,(imbuhan kata)";
 }
 
+std::wstring HouGoodRow() {
+  return L"1,好,hou2,,,,,,,adj,yue,,,,,good; well,अच्छा,اچھا,राम्रो,baik";
+}
+
+std::wstring HouFondRow() {
+  return L"1,好,hou3,,,,,,,v,yue,,,,,to like; to be fond of,,,,suka";
+}
+
 std::wstring HousamRow() {
   return L"1,好心,hou2 sam1,,,,,,,adj|adv,yue,,拜托,,,kind; come on,दयालु,نرم دل,दयालु,baik hati";
 }
@@ -87,6 +95,22 @@ TEST(TypeDuckCandidateInfoTest, MapsNeiToCandidateDictionaryAndMoreLanguages) {
   EXPECT_EQ(otherLanguages[0].value, L"you (singular)");
 }
 
+TEST(TypeDuckCandidateInfoTest, MapsHouToMultipleReadingRows) {
+  const CandidateInfo info(L"1.", L"好", L"\f\r" + HouGoodRow() + L"\r" + HouFondRow());
+  const DisplayPreferences prefs = MultilingualIndonesianPreferences();
+
+  const auto matchedEntries = info.matchedEntries();
+  ASSERT_EQ(matchedEntries.size(), 2u);
+  EXPECT_EQ(matchedEntries[0].honzi, L"好");
+  EXPECT_EQ(matchedEntries[0].jyutping, L"hou2");
+  EXPECT_EQ(matchedEntries[0].definition(DisplayLanguage::English), L"good; well");
+  EXPECT_EQ(matchedEntries[1].honzi, L"好");
+  EXPECT_EQ(matchedEntries[1].jyutping, L"hou3");
+  EXPECT_EQ(matchedEntries[1].definition(DisplayLanguage::English),
+            L"to like; to be fond of");
+  EXPECT_TRUE(info.hasDictionaryEntry(prefs));
+}
+
 TEST(TypeDuckCandidateInfoTest, MapsCompoundHousamToMultipleDictionaryEntries) {
   const CandidateInfo info(L"2.", L"好心你", L"\f\r" + HousamRow() + L"\r" + HousamNeiRow());
   const DisplayPreferences prefs = MultilingualIndonesianPreferences();
@@ -101,6 +125,35 @@ TEST(TypeDuckCandidateInfoTest, MapsCompoundHousamToMultipleDictionaryEntries) {
   EXPECT_EQ(info.entries[0].otherData()[0].value, L"拜托");
   EXPECT_EQ(info.entries[0].definition(prefs.mainLanguage), L"baik hati");
   EXPECT_EQ(info.entries[1].honzi, L"你");
+}
+
+TEST(TypeDuckCandidateInfoTest, RejectsBracketedPartOfSpeechPresentation) {
+  const CandidateInfo info(L"1.", L"好心", L"\f\r" + HousamRow());
+
+  ASSERT_EQ(info.entries.size(), 1u);
+  const auto partsOfSpeech = info.entries[0].formattedPartsOfSpeech();
+  ASSERT_EQ(partsOfSpeech.size(), 2u);
+  EXPECT_EQ(partsOfSpeech[0], L"adjective 形容詞");
+  EXPECT_EQ(partsOfSpeech[1], L"adverb 副詞");
+  for (const auto& value : partsOfSpeech) {
+    EXPECT_EQ(value.find(L"["), std::wstring::npos);
+    EXPECT_EQ(value.find(L"]"), std::wstring::npos);
+  }
+}
+
+TEST(TypeDuckCandidateInfoTest, CarriesReverseLookupInputBufferAndMultilingualRows) {
+  const CandidateInfo info(L"1.", L"你", L"\vonf〔倉頡五代〕（人弓火）\f\r" + NeiRow());
+  const DisplayPreferences prefs = MultilingualIndonesianPreferences();
+
+  EXPECT_TRUE(info.isReverseLookup);
+  EXPECT_EQ(info.note, L"onf〔倉頡五代〕（人弓火）");
+  ASSERT_EQ(info.entries.size(), 1u);
+  const auto otherLanguages = info.entries[0].otherLanguages(prefs);
+  ASSERT_EQ(otherLanguages.size(), 4u);
+  EXPECT_EQ(otherLanguages[0].name, L"English");
+  EXPECT_EQ(otherLanguages[1].name, L"Hindi");
+  EXPECT_EQ(otherLanguages[2].name, L"Nepali");
+  EXPECT_EQ(otherLanguages[3].name, L"Urdu");
 }
 
 TEST(TypeDuckCandidateInfoTest, CarriesJyutpingVisibilityAndTypefacePreferences) {

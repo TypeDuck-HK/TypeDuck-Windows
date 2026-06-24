@@ -40,6 +40,17 @@
   },
   "sampleRows": [
     {
+      "input": "hou",
+      "candidate": "好",
+      "rawCommentEscaped": "\\f\\r1,好,hou2,,,,,,,adj,yue,,,,,good; well,अच्छा,اچھا,राम्रो,baik\\r1,好,hou3,,,,,,,v,yue,,,,,to like; to be fond of,,,,suka",
+      "expected": {
+        "entryCount": 2,
+        "readings": ["hou2", "hou3"],
+        "english": ["good; well", "to like; to be fond of"],
+        "dictionaryIndicator": true
+      }
+    },
+    {
       "input": "nei",
       "candidate": "你",
       "rawCommentEscaped": "note\\f\\r1,你,nei5,,,,,,,oth,,,,,,you (singular),आप,تم,तपाईं,kamu",
@@ -63,6 +74,47 @@
       }
     }
   ],
+  "runtimeParity": {
+    "authority": [
+      ".planning/product/web-alpha-fixtures/2026-06-23/candidate-list-sample.json",
+      ".planning/product/web-alpha-fixtures/2026-06-23/dictionary-detail-sample.json",
+      ".planning/product/ui-fixtures/phase-05/runtime-provenance.json"
+    ],
+    "transport": {
+      "requiredStructuredPayload": "ServerResponse.candidate_entries[].raw_lookup_comment",
+      "rendererBoundary": "MoqiTextService/TypeDuckCandidateInfo.cpp",
+      "forbiddenSubstitution": "legacy Moqi candidate text or comments"
+    },
+    "samples": [
+      {
+        "input": "hou",
+        "candidateOrderPrefix": ["好"],
+        "requiredReadings": ["hou2", "hou3"]
+      },
+      {
+        "input": "housam",
+        "candidateOrderPrefix": ["好心", "好心你"],
+        "requiredCompoundRows": ["好心", "你"]
+      },
+      {
+        "input": "nei",
+        "candidateOrderPrefix": ["你", "尼", "呢", "妮", "彌", "妳"],
+        "requiredReadings": ["nei5", "nei4", "nei1"]
+      },
+      {
+        "scenario": "multilingual",
+        "input": "multilingual",
+        "displayLanguages": ["eng", "hin", "ind", "nep", "urd"],
+        "mainLanguage": "ind"
+      },
+      {
+        "scenario": "reverse-lookup",
+        "input": "reverse-lookup",
+        "buffer": "onf〔倉頡五代〕（人弓火）",
+        "targetCandidate": "你"
+      }
+    ]
+  },
   "settingsPreferences": {
     "defaultDisplayLanguages": ["eng"],
     "multilingualDisplayLanguages": ["eng", "hin", "ind", "nep", "urd"],

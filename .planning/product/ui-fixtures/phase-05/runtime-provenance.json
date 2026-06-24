@@ -72,6 +72,58 @@
     "evidence": ".planning/product/engine-runtime-fixtures/phase-02/runtime-manifest.json",
     "relation": "Phase 2 runtime-manifest records the TypeDuck-HK librime release version-info.txt lookup-filter commit and ties it to the staged rime.dll artifact."
   },
+  "candidateRuntimeDiagnosis": {
+    "capturedAt": "2026-06-24T07:48:30Z",
+    "purpose": "Plan 05-10 candidate parity guard and VM-versus-preview divergence diagnosis.",
+    "expectedRuntime": {
+      "serverPath": "D:\\VSProjects\\moqi-ime\\scripts\\build\\moqi-ime\\server.exe",
+      "serverSha256": "8058863ADEDF373826ABB877186E3ADF6F6292CD3B734F273E8AF28D752E305C",
+      "rimeDllPath": "D:\\VSProjects\\moqi-ime\\scripts\\build\\moqi-ime\\input_methods\\rime\\rime.dll",
+      "rimeDllSha256": "5783B84916FEFC0DD5DDA28F1D7292A9CA86C75F05132947FE816178B916C04B",
+      "lookupFilterCommit": "3671814d4e4aeab8d616ceea3c7f6d88e96bba02",
+      "schema": "jyut6ping3 / TypeDuck aap2-alpha"
+    },
+    "bitnessAndInstallPaths": {
+      "win32BuildTextService": {
+        "path": "D:\\VSProjects\\moqi-im-windows\\build-vs32\\MoqiTextService\\Debug\\TypeDuckTextService.dll",
+        "sha256": "B4BEE861E5643F253A068269220616AAF0FDA0184091E4D88800CE3A4951F5DF"
+      },
+      "x64BuildTextService": {
+        "path": "D:\\VSProjects\\moqi-im-windows\\build-vs64\\MoqiTextService\\Debug\\TypeDuckTextService.dll",
+        "sha256": "EECE3300C70529870C1AA4B66727201F8800BC45D1E8CE74E06A7D13478AE354"
+      },
+      "hostInstalledTypeDuckImePackage": {
+        "path": "C:\\Program Files (x86)\\TypeDuckIME\\moqi-ime",
+        "status": "missing on host during diagnosis"
+      },
+      "hostSystemTsfDlls": {
+        "sysWow64": "missing C:\\Windows\\SysWOW64\\TypeDuckTextService.dll during diagnosis",
+        "system32": "missing C:\\Windows\\System32\\TypeDuckTextService.dll during diagnosis"
+      }
+    },
+    "runningProcesses": [
+      {
+        "process": "TypeDuckServer.exe",
+        "pid": 1968,
+        "path": "C:\\Program Files (x86)\\Rime\\TypeDuck-1.1.2\\TypeDuckServer.exe",
+        "fileVersion": "1.1.2",
+        "sha256": "24FCD4D463C8FC7272B735BFB0EAD40B2E20B0C2E712EB4C3B66905AA14AC031",
+        "loadedRimeDll": "C:\\Program Files (x86)\\Rime\\TypeDuck-1.1.2\\rime.dll",
+        "status": "stale external runtime, not the current TypeDuck-HK package under test"
+      }
+    ],
+    "launcherBackendTransport": {
+      "MoqLauncher\\BackendServer.cpp": "forwards framed backend protobuf responses without candidate rewriting",
+      "MoqLauncher\\PipeClient.cpp": "forwards client requests to the mapped backend; settings requests are the only launcher-handled exception",
+      "MoqiTextService\\MoqiClient.cpp": "prefers candidate_entries[].raw_lookup_comment over display comment and passes it to CandidateInfo at the renderer boundary",
+      "legacyMoqiInterception": "not found in the candidate_entries/raw_lookup_comment path"
+    },
+    "vmVsPreviewDivergence": {
+      "rootCause": "The observed host had a stale external TypeDuck 1.1.2 Weasel-style TypeDuckServer.exe running from C:\\Program Files (x86)\\Rime\\TypeDuck-1.1.2 while the candidate preview screenshots were generated from the local Phase 5 CandidateInfo fixtures and current TypeDuck-HK runtime hashes. The current TypeDuckIME package path and host TSF DLL paths were missing on the host, so that VM/host candidate panel could not be treated as evidence for the current package.",
+      "fixOrDisposition": "Current acceptance evidence must use the packaged TypeDuckIME launcher/backend/runtime with rime.dll SHA-256 5783B84916FEFC0DD5DDA28F1D7292A9CA86C75F05132947FE816178B916C04B, or explicitly reject stale TypeDuck-1.1.2 captures. No installer was run on the host during this diagnosis.",
+      "disposition": "not-accepted-as-current-evidence"
+    }
+  },
   "artifacts": [
     {
       "kind": "web-fixture-metadata",
