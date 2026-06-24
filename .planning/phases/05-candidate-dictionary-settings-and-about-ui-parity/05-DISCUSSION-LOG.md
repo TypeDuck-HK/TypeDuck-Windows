@@ -5,7 +5,7 @@
 
 **Date:** 2026-06-24T00:46:20Z
 **Phase:** 5-Candidate, Dictionary, Settings, and About UI Parity
-**Areas discussed:** Semantic theme tokens, Qt versus native rendering, bundled appearance theme file ownership, theme JSON shape, settings/dictionary gray areas
+**Areas discussed:** Semantic theme tokens, Qt versus native rendering, bundled appearance theme file ownership, theme JSON shape, source-code-backed layout, settings dialog, About dialog, icon usage, settings/dictionary gray areas
 
 ---
 
@@ -56,6 +56,60 @@
 
 **User's choice:** Include not only the two light/dark color palettes but also font data, and keep fonts outside the `themes` key.
 **Notes:** Suggested shape: top-level `version`, top-level `fonts`, and `themes` with exactly `light` and `dark` palette entries for Phase 5.
+
+---
+
+## Source-Code-Backed Layout
+
+| Option | Description | Selected |
+|--------|-------------|----------|
+| Screenshot-feel approximation | Use screenshots as the main source and approximate spacing/behavior by eye. | |
+| TypeDuck Web source authority | Use screenshots as visual evidence, but follow layout behavior from TypeDuck Web source and `.planning/product` fixtures. | ✓ |
+
+**User's choice:** Integrate Phase 1 verification decisions, especially that exact layout behavior should be source-code-backed by TypeDuck Web.
+**Notes:** Phase 1 verification says screenshots are sufficient references because exact layout is followable from source code, not because screenshots alone are the implementation authority.
+
+---
+
+## Settings Dialog
+
+| Option | Description | Selected |
+|--------|-------------|----------|
+| Native approximation | Keep settings order but use any native layout that fits. | |
+| Exact Web two-column layout | Follow the same two-column layout as TypeDuck Web. | ✓ |
+| Save behavior discretion | Immediate save or Confirm button is left to implementation judgment. | ✓ |
+
+**User's choice:** Follow exactly the same two-column layout as TypeDuck Web. Confirm button versus immediate save is up to the implementer.
+**Notes:** This strengthens settings layout from "order mirrored" to "two-column layout mirrored."
+
+---
+
+## About Dialog
+
+| Requirement | Selected |
+|-------------|----------|
+| Use `D:\VSProjects\moqi-ime\icons\About_Banner.bmp` first | ✓ |
+| Include the exact provided bilingual welcome/contact/credit text | ✓ |
+| Then show `D:\VSProjects\moqi-ime\icons\Credit_Logos.bmp` | ✓ |
+| Include four specified links and labels | ✓ |
+| Move resources to a better semantic resource location rather than leaving them as generic icons | ✓ |
+
+**User's choice:** Exact About dialog content and asset/link order are locked.
+**Notes:** `Installer.bmp` is intentionally left to later installer phases.
+
+---
+
+## Icon Usage
+
+| Asset | Required usage | Selected |
+|-------|----------------|----------|
+| `TypeDuck_Transparent.ico` | All executable icons except installer/uninstaller: `TypeDuckLauncher.exe`, `TypeDuckSetupHelper.exe`, and `moqi-ime\server.exe`. | ✓ |
+| `TypeDuck_Small.ico` | System input method picker menu. | ✓ |
+| `TypeDuck.ico` | Installer, uninstaller `unins000.exe`, and other broad product branding surfaces. | ✓ |
+| `moqi.png`, `mo.ico`, `mo.png`, `moqi.ico` | Must not be used anywhere. | ✓ |
+
+**User's choice:** Icon asset mapping is locked.
+**Notes:** These paths are current source locations under `D:\VSProjects\moqi-ime\icons`; implementation should move/copy assets into semantically appropriate TypeDuck resources as needed.
 
 ---
 
