@@ -30,54 +30,187 @@
   },
   "package": {
     "installer": {
-      "status": "missing"
+      "path": "installer/dist/typeduck-windows-ime-setup.exe",
+      "sha256": "65B9CF6E85DCE5DD7F21D4DFBF96A8A24F40023C0A16B56A4D09B41BDFA667CF",
+      "bytes": 22723330,
+      "status": "verified"
     },
     "stagedSettingsExecutable": {
-      "status": "missing"
+      "path": "installer/stage/win32/TypeDuckIME/TypeDuckSettings.exe",
+      "sha256": "9535EB92C6E30A0B8FC390F42DB1DDF29108139DF5487C657D22D5859FD157DB",
+      "bytes": 1139712,
+      "status": "verified"
     },
     "aboutAssets": {
-      "status": "missing"
+      "status": "verified",
+      "files": [
+        {
+          "path": "TypeDuckSettings/assets/About_Banner.bmp",
+          "sha256": "640E7DAEC4858509D52D0799E87253E9FBDED64F93881F261F0F7E55B2F76E92",
+          "bytes": 132534,
+          "status": "verified"
+        },
+        {
+          "path": "TypeDuckSettings/assets/Credit_Logos.bmp",
+          "sha256": "CF6986046C98145489CFBD32C67B32D64AA69C37B7EC8578B01814CDC5175715",
+          "bytes": 410790,
+          "status": "verified"
+        }
+      ]
     },
     "aboutVersionSource": {
-      "status": "missing"
+      "status": "verified",
+      "path": "version.txt",
+      "version": "0.0.1",
+      "notes": "TypeDuckSettingsVersion.h is generated from the same CMake version source."
     },
     "engineSchemaAttribution": {
-      "status": "missing"
+      "status": "verified",
+      "notes": "About text includes TypeDuck-HK librime fork v1.1.3, rime-dictionary-lookup-filter commit 3671814d4e4aeab8d616ceea3c7f6d88e96bba02, and TypeDuck-HK schema aap2-alpha b5ab44e187d010fa13c71bd320c07259b224ae5b."
     },
     "themeFiles": {
-      "status": "missing"
+      "status": "verified",
+      "files": [
+        {
+          "path": "installer/stage/win32/TypeDuckIME/moqi-ime/input_methods/rime/appearance_themes.json",
+          "sha256": "9BF5742799556BF948900DB9A40B6778DA4CB78669E08F4848CC5D8BB0633E18",
+          "bytes": 5549,
+          "status": "verified"
+        },
+        {
+          "path": "installer/stage/win32/TypeDuckIME/moqi-ime/input_methods/rime/data/appearance_themes.json",
+          "sha256": "9BF5742799556BF948900DB9A40B6778DA4CB78669E08F4848CC5D8BB0633E18",
+          "bytes": 5549,
+          "status": "verified"
+        }
+      ]
     },
     "iconAssignments": {
-      "status": "missing"
+      "status": "verified",
+      "files": [
+        {
+          "path": "installer/stage/win32/TypeDuckIME/TypeDuck_Transparent.ico",
+          "sha256": "8439C9E7CE063BB1D019AEBCF9D615D28D97A764B58C89A0AF44C89AF8D75D9D",
+          "bytes": 131157,
+          "status": "verified"
+        },
+        {
+          "path": "installer/stage/win32/TypeDuckIME/TypeDuck_Small.ico",
+          "sha256": "A68AEF1B1527CF5F100DDA9E15751E32ACF3E2DADF1B47DCA8EA9CA184105B97",
+          "bytes": 123155,
+          "status": "verified"
+        },
+        {
+          "path": "installer/stage/win32/TypeDuckIME/TypeDuck.ico",
+          "sha256": "ECA986DB6D23F91FC9507AFE385D13A9BBE68B7BA36F9B5BAFF008502BC0B76A",
+          "bytes": 130138,
+          "status": "verified"
+        }
+      ],
+      "notes": "Strict icon packaging guard verified PE icon payloads and installer icon assignment."
     },
     "legacyMoqiAssetScan": {
       "status": "passed",
-      "notes": "scripts/Test-TypeDuckIconPackaging.ps1 rejects moqi.png, mo.ico, mo.png, and moqi.ico from Phase 5 packaged surfaces."
+      "notes": "Strict icon packaging guard verified moqi.png, mo.ico, mo.png, and moqi.ico are absent from staged Phase 5 package surfaces."
     }
   },
   "automated": {
-    "commands": [],
+    "commands": [
+      {
+        "command": "pwsh -NoProfile -ExecutionPolicy Bypass -File D:\\VSProjects\\moqi-ime\\scripts\\build.ps1 -RepoRoot D:\\VSProjects\\moqi-ime -RimeDataSource I:\\GitHub\\TypeDuck-Web\\schema",
+        "exitCode": 0,
+        "status": "passed",
+        "recordedAt": "2026-06-24T05:45:59Z"
+      },
+      {
+        "command": "pwsh -NoProfile -ExecutionPolicy Bypass -File scripts\\build.ps1 -RepoRoot . -Configuration Release",
+        "exitCode": 0,
+        "status": "passed",
+        "recordedAt": "2026-06-24T05:45:59Z"
+      },
+      {
+        "command": "pwsh -NoProfile -ExecutionPolicy Bypass -File scripts\\Test-TypeDuckAppearanceTheme.ps1 -RepoRoot . -BackendRoot D:\\VSProjects\\moqi-ime -Strict",
+        "exitCode": 0,
+        "status": "passed",
+        "recordedAt": "2026-06-24T05:45:59Z"
+      },
+      {
+        "command": "pwsh -NoProfile -ExecutionPolicy Bypass -File scripts\\Test-TypeDuckCandidateData.ps1 -RepoRoot . -Strict",
+        "exitCode": 0,
+        "status": "passed",
+        "recordedAt": "2026-06-24T05:45:59Z"
+      },
+      {
+        "command": "pwsh -NoProfile -ExecutionPolicy Bypass -File scripts\\Test-TypeDuckCandidateWindow.ps1 -RepoRoot . -Strict",
+        "exitCode": 0,
+        "status": "passed",
+        "recordedAt": "2026-06-24T05:45:59Z"
+      },
+      {
+        "command": "pwsh -NoProfile -ExecutionPolicy Bypass -File scripts\\Test-TypeDuckSettingsPersistence.ps1 -RepoRoot . -BackendRoot D:\\VSProjects\\moqi-ime -Strict",
+        "exitCode": 0,
+        "status": "passed",
+        "recordedAt": "2026-06-24T05:45:59Z"
+      },
+      {
+        "command": "pwsh -NoProfile -ExecutionPolicy Bypass -File scripts\\Test-TypeDuckSettingsAboutUi.ps1 -RepoRoot . -BackendRoot D:\\VSProjects\\moqi-ime -Strict",
+        "exitCode": 0,
+        "status": "passed",
+        "recordedAt": "2026-06-24T05:45:59Z"
+      },
+      {
+        "command": "pwsh -NoProfile -ExecutionPolicy Bypass -File scripts\\Test-TypeDuckIconPackaging.ps1 -RepoRoot . -BackendRoot D:\\VSProjects\\moqi-ime -Strict",
+        "exitCode": 0,
+        "status": "passed",
+        "recordedAt": "2026-06-24T05:45:59Z"
+      },
+      {
+        "command": "pwsh -NoProfile -ExecutionPolicy Bypass -File scripts\\install.ps1 -RepoRoot . -MoqiImeSource D:\\VSProjects\\moqi-ime\\scripts\\build\\moqi-ime",
+        "exitCode": 0,
+        "status": "passed",
+        "recordedAt": "2026-06-24T05:45:59Z"
+      },
+      {
+        "command": "pwsh -NoProfile -ExecutionPolicy Bypass -File scripts\\Test-TypeDuckIconPackaging.ps1 -RepoRoot . -BackendRoot D:\\VSProjects\\moqi-ime -Strict",
+        "exitCode": 0,
+        "status": "passed",
+        "recordedAt": "2026-06-24T05:45:59Z"
+      }
+    ],
     "previewScreenshots": {
       "candidateBaseline": {
-        "status": "missing"
+        "status": "captured",
+        "path": ".planning/product/ui-fixtures/phase-05/screenshots/candidate-baseline-nei.bmp",
+        "notes": "Preview harness sample nei baseline candidate and dictionary layout."
       },
       "candidateMultilingual": {
-        "status": "missing"
+        "status": "captured",
+        "path": ".planning/product/ui-fixtures/phase-05/screenshots/candidate-multilingual-indonesian-main.bmp",
+        "notes": "Preview harness multilingual Indonesian-main candidate rows."
       },
       "dictionaryDetail": {
-        "status": "missing"
+        "status": "captured",
+        "path": ".planning/product/ui-fixtures/phase-05/screenshots/dictionary-detail-multilingual.bmp",
+        "notes": "Preview harness multilingual dictionary side panel evidence."
       },
       "compoundHousam": {
-        "status": "missing"
+        "status": "captured",
+        "path": ".planning/product/ui-fixtures/phase-05/screenshots/dictionary-detail-housam-compound.bmp",
+        "notes": "Preview harness housam compound detail evidence."
       },
       "reverseLookupCangjie": {
-        "status": "missing"
+        "status": "captured",
+        "path": ".planning/product/ui-fixtures/phase-05/screenshots/reverse-lookup-cangjie-onf.bmp",
+        "notes": "Preview harness Cangjie reverse lookup sample."
       },
       "settingsTwoColumn": {
-        "status": "missing"
+        "status": "captured",
+        "path": ".planning/product/ui-fixtures/phase-05/screenshots/settings-two-column-layout.bmp",
+        "notes": "Local staged TypeDuckSettings.exe settings window capture."
       },
       "aboutDialog": {
-        "status": "missing"
+        "status": "recorded",
+        "notes": "Local source/package guards prove About content; visible About dialog capture is deferred to VM evidence because local window automation did not open the modal reliably."
       }
     }
   },
