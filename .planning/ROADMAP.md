@@ -135,7 +135,32 @@ Plans:
 
 **Verification Environment**: Requires Windows VM or equivalent Windows test machine evidence for real TSF candidate placement, focus behavior, settings entry points, installer-first-run settings, high DPI, and representative host apps. Preview harness screenshots are helpful but insufficient alone.
 
-**Plans**: TBD
+**Plans**: 7 plans
+Plans:
+**Wave 1**
+
+- [ ] 05-01-PLAN.md — Refresh Web alpha fixtures and establish the TypeDuck semantic theme/font contract.
+
+**Wave 2** *(blocked on Wave 1 completion)*
+
+- [ ] 05-02-PLAN.md — Create native CandidateInfo/CandidateEntry parser and candidate/dictionary view models.
+
+**Wave 3** *(blocked on Wave 2 completion)*
+
+- [ ] 05-03-PLAN.md — Implement TypeDuck settings persistence and Rime customization side effects.
+
+**Wave 4** *(blocked on Wave 3 completion)*
+
+- [ ] 05-04-PLAN.md — Render source-backed native candidate and dictionary popup.
+- [ ] 05-05-PLAN.md — Build native TypeDuck settings and About executable surfaces.
+
+**Wave 5** *(blocked on Wave 4 settings/About executable completion)*
+
+- [ ] 05-07-PLAN.md — Wire installer/post-install settings launch and package locked TypeDuck icons/resources.
+
+**Wave 6** *(blocked on Wave 4 candidate UI and Wave 5 packaging completion)*
+
+- [ ] 05-06-PLAN.md — Collect automated package checks and Windows VM evidence for Phase 5 UI parity.
 **UI hint**: yes
 
 ### Phase 6: Privacy, Security, and Scaffold Cleanup
