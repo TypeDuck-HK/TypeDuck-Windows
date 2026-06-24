@@ -1,6 +1,5 @@
 #include "TypeDuckSettingsWindow.h"
 
-#include "TypeDuckAboutDialog.h"
 #include "MoqLauncher/TypeDuckPreferences.h"
 #include "resource.h"
 
@@ -21,6 +20,7 @@ constexpr int kLeftColumnX = 28;
 constexpr int kRightColumnX = 486;
 constexpr int kColumnWidth = 412;
 constexpr int kRowHeight = 28;
+constexpr int kPageTickWidth = 32;
 
 enum ControlId : int {
   kDisplayLanguageBase = 1100,
@@ -41,7 +41,6 @@ enum ControlId : int {
   kCangjie5 = 1801,
   kApply = 1900,
   kCancel = 1901,
-  kAbout = 1902,
 };
 
 struct LanguageOption {
@@ -112,7 +111,7 @@ class SettingsWindow {
     wc.lpszClassName = kWindowClassName;
     wc.hIcon = LoadIconW(instance_, MAKEINTRESOURCEW(IDI_TYPEDUCK_SETTINGS));
     wc.hCursor = LoadCursorW(nullptr, IDC_ARROW);
-    wc.hbrBackground = reinterpret_cast<HBRUSH>(COLOR_WINDOW + 1);
+    wc.hbrBackground = reinterpret_cast<HBRUSH>(COLOR_BTNFACE + 1);
     wc.hIconSm = wc.hIcon;
     RegisterClassExW(&wc);
 
@@ -171,6 +170,9 @@ class SettingsWindow {
       case WM_COMMAND:
         handleCommand(LOWORD(wparam), HIWORD(wparam));
         return 0;
+      case WM_CTLCOLORSTATIC:
+        return reinterpret_cast<LRESULT>(
+            GetSysColorBrush(COLOR_BTNFACE));
       case WM_DESTROY:
         PostQuitMessage(0);
         return 0;
@@ -206,42 +208,41 @@ class SettingsWindow {
                               DEFAULT_PITCH | FF_SWISS,
                               L"Microsoft JhengHei UI");
 
-    addStatic(L"輸入法設定 IME Settings", kLeftColumnX, 18, 360, 32);
-    SendMessageW(GetDlgItem(window_, 0), WM_SETFONT,
-                 reinterpret_cast<WPARAM>(headerFont_), TRUE);
+    addSectionHeader(L"輸入法設定 IME Settings", kLeftColumnX, 18, 360, 32);
 
     createDisplayLanguages();
     createCandidateControls();
     createEngineControls();
     createReverseLookupControls();
 
-    addStatic(L"設定套用後會儲存至 TypeDuckPreferences.json / Apply saves to TypeDuckPreferences.json",
-              kLeftColumnX, 514, 540, 24);
+    addStatic(L"套用後即時更新輸入法設定 / Apply updates TypeDuck input settings",
+              kLeftColumnX, 514, 560, 24);
     status_ = addStatic(L"", kLeftColumnX, 540, 540, 24);
-    addButton(L"關於 About", kAbout, 608, 526, 92, 32, BS_PUSHBUTTON);
     addButton(L"套用 Apply", kApply, 710, 526, 92, 32, BS_DEFPUSHBUTTON);
     addButton(L"取消 Cancel", kCancel, 812, 526, 92, 32, BS_PUSHBUTTON);
     applyFontToChildren();
+    applyHeaderFont();
   }
 
   void createDisplayLanguages() {
     addButton(L"顯示語言 Display Languages", 0, kLeftColumnX, 58,
-              kColumnWidth, 178, BS_GROUPBOX);
-    int y = 86;
+              kColumnWidth, 192, BS_GROUPBOX);
+    addStatic(L"顯示 Display", kLeftColumnX + 20, 84, 142, 24);
+    addStatic(L"主要語言 Main Language", kLeftColumnX + 254, 84, 150, 24);
+    int y = 114;
     int index = 0;
     for (const auto& option : languageOptions()) {
-      addButton(L"", kMainLanguageBase + index, kLeftColumnX + 18, y, 22, 22,
+      addButton(option.label, kDisplayLanguageBase + index, kLeftColumnX + 20,
+                y - 1, 208, 24, BS_AUTOCHECKBOX);
+      addButton(L"", kMainLanguageBase + index, kLeftColumnX + 292, y, 22, 22,
                 BS_AUTORADIOBUTTON);
-      addButton(option.label, kDisplayLanguageBase + index, kLeftColumnX + 46,
-                y - 1, 220, 24, BS_AUTOCHECKBOX);
       y += kRowHeight;
       ++index;
     }
-    addStatic(L"⬑ 主要語言 Main Language", kLeftColumnX + 46, y + 2, 240, 24);
   }
 
   void createCandidateControls() {
-    int y = 250;
+    int y = 266;
     addStatic(L"每頁候選詞數量 No. of Candidates Per Page", kLeftColumnX, y,
               kColumnWidth, 24);
     pageSizeTrack_ = CreateWindowExW(
@@ -251,17 +252,16 @@ class SettingsWindow {
         nullptr);
     SendMessageW(pageSizeTrack_, TBM_SETRANGE, TRUE, MAKELPARAM(4, 10));
     SendMessageW(pageSizeTrack_, TBM_SETTICFREQ, 1, 0);
-    pageSizeValue_ = addStatic(L"", kLeftColumnX + 316, y + 31, 56, 24,
-                               SS_CENTER);
+    addPageSizeTickLabels(y + 64);
 
-    y += 82;
+    y += 106;
     addStatic(L"中文字體 Chinese Typeface", kLeftColumnX, y, 190, 24);
     addButton(L"宋體 Sung", kTypefaceSung, kLeftColumnX + 210, y - 4, 88, 28,
               BS_AUTORADIOBUTTON);
     addButton(L"黑體 Hei", kTypefaceHei, kLeftColumnX + 304, y - 4, 88, 28,
               BS_AUTORADIOBUTTON);
 
-    y += 44;
+    y += 42;
     addButton(L"候選詞粵拼 Candidates Jyutping", 0, kLeftColumnX, y,
               kColumnWidth, 116, BS_GROUPBOX);
     addButton(L"顯示 Always Show", kRomanizationAlways, kLeftColumnX + 18, y + 30,
@@ -274,7 +274,7 @@ class SettingsWindow {
 
   void createEngineControls() {
     int y = 58;
-    addStatic(L"引擎設定 Engine Settings", kRightColumnX, y - 38, 280, 30);
+    addSectionHeader(L"引擎設定 Engine Settings", kRightColumnX, y - 38, 280, 30);
     addButton(L"自動完成 Auto-completion", kEnableCompletion, kRightColumnX, y,
               270, 26, BS_AUTOCHECKBOX);
     addButton(L"自動校正 Auto-correction", kEnableCorrection, kRightColumnX,
@@ -283,13 +283,12 @@ class SettingsWindow {
               y + 80, 270, 26, BS_AUTOCHECKBOX);
     addButton(L"輸入記憶 Input Memory", kEnableLearning, kRightColumnX,
               y + 120, 270, 26, BS_AUTOCHECKBOX);
-    addStatic(L"不支援時會停用並顯示原因 / Unsupported controls are disabled with a reason",
-              kRightColumnX, y + 158, kColumnWidth, 42);
   }
 
   void createReverseLookupControls() {
     int y = 288;
-    addStatic(L"反查設定 Reverse Lookup Settings", kRightColumnX, y, 330, 28);
+    addSectionHeader(L"反查設定 Reverse Lookup Settings", kRightColumnX, y, 330,
+                     28);
     addButton(L"顯示完整輸入碼 Show Full Input Code", kShowReverseCode,
               kRightColumnX, y + 40, 330, 26, BS_AUTOCHECKBOX);
     addStatic(L"倉頡版本 Cangjie Version", kRightColumnX, y + 90, 230, 24);
@@ -307,6 +306,32 @@ class SettingsWindow {
           return TRUE;
         },
         reinterpret_cast<LPARAM>(font_));
+  }
+
+  void applyHeaderFont() {
+    for (HWND header : sectionHeaders_) {
+      SendMessageW(header, WM_SETFONT, reinterpret_cast<WPARAM>(headerFont_),
+                   TRUE);
+    }
+  }
+
+  HWND addSectionHeader(const wchar_t* text, int x, int y, int width,
+                        int height) {
+    HWND header = addStatic(text, x, y, width, height);
+    sectionHeaders_.push_back(header);
+    return header;
+  }
+
+  void addPageSizeTickLabels(int y) {
+    constexpr const wchar_t* kPageSizeTickLabels[] = {
+        L"4", L"5", L"6", L"7", L"8", L"9", L"10"};
+    constexpr int kPageSizeTickLabelCount =
+        sizeof(kPageSizeTickLabels) / sizeof(kPageSizeTickLabels[0]);
+    for (int index = 0; index < kPageSizeTickLabelCount; ++index) {
+      const int x = kLeftColumnX + (index * 300 / 6) - (kPageTickWidth / 2);
+      addStatic(kPageSizeTickLabels[index], x, y, kPageTickWidth, 22,
+                SS_CENTER);
+    }
   }
 
   void loadPreferences() {
@@ -330,7 +355,6 @@ class SettingsWindow {
       ++index;
     }
     SendMessageW(pageSizeTrack_, TBM_SETPOS, TRUE, preferences_.pageSize);
-    updatePageSizeLabel();
     CheckDlgButton(window_, preferences_.isHeiTypeface ? kTypefaceHei
                                                        : kTypefaceSung,
                    BST_CHECKED);
@@ -364,9 +388,7 @@ class SettingsWindow {
   }
 
   void updatePageSizeLabel() {
-    const int value = static_cast<int>(SendMessageW(pageSizeTrack_, TBM_GETPOS, 0, 0));
-    std::wstring text = std::to_wstring(value);
-    SetWindowTextW(pageSizeValue_, text.c_str());
+    InvalidateRect(pageSizeTrack_, nullptr, FALSE);
   }
 
   void handleCommand(int id, int notification) {
@@ -385,9 +407,6 @@ class SettingsWindow {
         break;
       case kCancel:
         DestroyWindow(window_);
-        break;
-      case kAbout:
-        ShowTypeDuckAboutDialog(instance_, window_);
         break;
     }
   }
@@ -442,10 +461,10 @@ class SettingsWindow {
   HINSTANCE instance_;
   HWND window_ = nullptr;
   HWND pageSizeTrack_ = nullptr;
-  HWND pageSizeValue_ = nullptr;
   HWND status_ = nullptr;
   HFONT font_ = nullptr;
   HFONT headerFont_ = nullptr;
+  std::vector<HWND> sectionHeaders_;
   Moqi::TypeDuck::Preferences preferences_;
   std::wstring statusText_;
 };
