@@ -53,10 +53,13 @@ Name: "chinesetraditional"; MessagesFile: "compiler:Default.isl"
 Source: "{#StageDir}\win32\TypeDuckIME\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
 
 [Icons]
+Name: "{autoprograms}\{#MyAppName}\TypeDuck About"; Filename: "{app}\TypeDuckAbout.exe"
+Name: "{autoprograms}\{#MyAppName}\TypeDuck 關於"; Filename: "{app}\TypeDuckAbout.exe"
 Name: "{autoprograms}\{#MyAppName}\解除安裝 / Uninstall"; Filename: "{uninstallexe}"
 
 [Run]
 Filename: "{app}\TypeDuckSettings.exe"; Description: "開啟 TypeDuck 設定 / Open TypeDuck Settings"; Flags: postinstall nowait skipifsilent; Check: ShouldLaunchSettings
+Filename: "{app}\TypeDuckAbout.exe"; Description: "開啟 TypeDuck 關於 / Open TypeDuck About"; Flags: postinstall nowait skipifsilent; Check: ShouldLaunchAbout
 Filename: "{app}\TypeDuckLauncher.exe"; Flags: nowait; Check: ShouldLaunchLauncher
 
 [Registry]
@@ -254,6 +257,11 @@ begin
 end;
 
 function ShouldLaunchSettings(): Boolean;
+begin
+  Result := HelperInstallSucceeded and (not HelperInstallNeedsRestart);
+end;
+
+function ShouldLaunchAbout(): Boolean;
 begin
   Result := HelperInstallSucceeded and (not HelperInstallNeedsRestart);
 end;

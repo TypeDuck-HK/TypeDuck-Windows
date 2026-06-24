@@ -382,6 +382,17 @@ $settingsExe = Resolve-ArtifactPath -Label "TypeDuckSettings.exe" -Candidates @(
 Copy-IfExists -Source $settingsExe -Destination (Join-Path $stageWin32Root "TypeDuckSettings.exe")
 Set-WindowsExecutableIcon -ExecutablePath (Join-Path $stageWin32Root "TypeDuckSettings.exe") -IconPath $transparentIcon
 
+$aboutExe = Resolve-ArtifactPath -Label "TypeDuckAbout.exe" -Candidates @(
+    (Join-Path $Win32BuildDir "TypeDuckAbout.exe"),
+    (Join-Path $Win32BuildDir "Debug\TypeDuckAbout.exe"),
+    (Join-Path $Win32BuildDir "Release\TypeDuckAbout.exe"),
+    (Join-Path $Win32BuildDir "TypeDuckSettings\Debug\TypeDuckAbout.exe"),
+    (Join-Path $Win32BuildDir "TypeDuckSettings\Release\TypeDuckAbout.exe"),
+    (Join-Path $RepoRoot "build-vs32-settings-ui\TypeDuckSettings\Debug\TypeDuckAbout.exe"),
+    (Join-Path $RepoRoot "build-vs32-settings-ui\TypeDuckSettings\Release\TypeDuckAbout.exe")
+)
+Copy-IfExists -Source $aboutExe -Destination (Join-Path $stageWin32Root "TypeDuckAbout.exe")
+
 $dll32 = Resolve-ArtifactPath -Label "Win32 TypeDuckTextService.dll" -Candidates @(
     (Join-Path $Win32BuildDir "TypeDuckTextService.dll"),
     (Join-Path $Win32BuildDir "Debug\TypeDuckTextService.dll"),
