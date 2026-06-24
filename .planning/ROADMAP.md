@@ -135,7 +135,7 @@ Plans:
 
 **Verification Environment**: Requires Windows VM or equivalent Windows test machine evidence for real TSF candidate placement, focus behavior, settings entry points, installer-first-run settings, high DPI, and representative host apps. Preview harness screenshots are helpful but insufficient alone.
 
-**Plans**: 7/14 plans executed; 6 gap-closure plans created for rejected UAT retry
+**Plans**: 8/15 plans executed
 Plans:
 **Wave 1**
 
@@ -168,7 +168,7 @@ Plans:
 
 **Gap Closure Wave 8** *(blocked on Wave 6 packaging completion)*
 
-- [ ] 05-09-PLAN.md — Align rejected-UAT guards, remove stale evidence slots, and record runtime/Web provenance.
+- [x] 05-09-PLAN.md — Align rejected-UAT guards, remove stale evidence slots, and record runtime/Web provenance.
 
 **Gap Closure Wave 9** *(blocked on Wave 8 guard/provenance alignment)*
 
@@ -240,6 +240,6 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7
 | 2. Engine Runtime Contract Spike | 3/3 | Complete    | 2026-06-23 |
 | 3. zh-HK TSF Registration and Installer Skeleton | 3/3 | Complete    | 2026-06-24 |
 | 4. TypeDuck Protocol and Typing MVP | 3/4 | In Progress|  |
-| 5. Candidate, Dictionary, Settings, and About UI Parity | 7/8 | In Progress|  |
+| 5. Candidate, Dictionary, Settings, and About UI Parity | 8/15 | In Progress|  |
 | 6. Privacy, Security, and Scaffold Cleanup | 0/TBD | Not started | - |
 | 7. Compatibility and Release Verification | 0/TBD | Not started | - |

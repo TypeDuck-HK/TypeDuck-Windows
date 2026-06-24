@@ -5,16 +5,16 @@ milestone_name: milestone
 current_phase: 5
 current_phase_name: Candidate, Dictionary, Settings, and About UI Parity
 status: executing
-stopped_at: Completed 05-08-PLAN.md
-last_updated: "2026-06-24T05:23:40.366Z"
+stopped_at: Completed 05-09-PLAN.md
+last_updated: "2026-06-24T07:39:21.032Z"
 last_activity: 2026-06-24
 last_activity_desc: Completed Phase 5 Plan 08 icon and About resource packaging
 progress:
   total_phases: 7
   completed_phases: 4
-  total_plans: 20
-  completed_plans: 19
-  percent: 95
+  total_plans: 27
+  completed_plans: 20
+  percent: 57
 ---
 
 # Project State
@@ -76,6 +76,7 @@ Progress: [██████████] 95%
 | Phase 05-candidate-dictionary-settings-and-about-ui-parity P05 | 16min | 2 tasks | 14 files |
 | Phase 05-candidate-dictionary-settings-and-about-ui-parity P07 | 46min | 2 tasks | 6 files |
 | Phase 05-candidate-dictionary-settings-and-about-ui-parity P08 | 13 min | 2 tasks | 13 files |
+| Phase 05-candidate-dictionary-settings-and-about-ui-parity P09 | 8 min | 3 tasks | 6 files |
 
 ## Accumulated Context
 
@@ -135,6 +136,9 @@ Recent decisions affecting current work:
 - [Phase 05-candidate-dictionary-settings-and-about-ui-parity]: 05-08: Use TypeDuck_Small.ico for the first-party TSF profile/input picker. — D-29 requires the small icon for Windows input picker; the implementation uses the installed icon path with DLL resource fallback.
 - [Phase 05-candidate-dictionary-settings-and-about-ui-parity]: 05-08: Use TypeDuck.ico for Inno setup/uninstall branding. — D-30 requires the full TypeDuck icon for installer, uninstaller, and broad product branding.
 - [Phase 05-candidate-dictionary-settings-and-about-ui-parity]: 05-08: Filter legacy moqi.png, mo.ico, mo.png, and moqi.ico from transitional backend staging. — D-31 bans those legacy Moqi images from packaged TypeDuck resource surfaces.
+- [Phase 05]: 05-09: Active Phase 5 evidence slots no longer include cropped settings-two-column or incorrect About-dialog evidence.
+- [Phase 05]: 05-09: Retry evidence must cite runtime-provenance.json for Windows, backend, TypeDuck Web, runtime DLL/schema/theme, and icon hashes.
+- [Phase 05]: 05-09: Rejected UAT behavior is now an explicit RED-mode guard state, not an acceptable green baseline.
 
 ### Pending Todos
 
@@ -157,6 +161,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-06-24T05:23:40.358Z
-Stopped at: Completed 05-08-PLAN.md
+Last session: 2026-06-24T07:39:21.025Z
+Stopped at: Completed 05-09-PLAN.md
 Resume file: None
