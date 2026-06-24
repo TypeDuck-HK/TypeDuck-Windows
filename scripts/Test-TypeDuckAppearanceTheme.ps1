@@ -114,4 +114,48 @@ foreach ($fontKey in @("candidate_chinese_sung", "candidate_chinese_hei", "dicti
     Assert-True ($null -ne $themeFile.fonts.$fontKey) "Top-level fonts missing '$fontKey'."
 }
 
+$loaderPath = Join-Path $backendRootPath "input_methods\rime\appearance_themes.go"
+$buildScriptPath = Join-Path $backendRootPath "scripts\build.ps1"
+Assert-True (Test-Path -LiteralPath $loaderPath) "Missing backend theme loader: $loaderPath"
+Assert-True (Test-Path -LiteralPath $buildScriptPath) "Missing backend build script: $buildScriptPath"
+
+$loaderSource = Get-Content -Raw -Encoding UTF8 -LiteralPath $loaderPath
+Assert-True ($loaderSource.Contains("ThemePalette")) "Backend loader must decode the semantic palette contract."
+Assert-True ($loaderSource -match 'Palette\s+ThemePalette\s+`json:"palette,omitempty"`') "ThemeDefinition must expose semantic palette data."
+Assert-True ($loaderSource -match 'Fonts\s+map\[string\]interface\{\}\s+`json:"fonts,omitempty"`') "appearanceThemesFile must decode top-level fonts."
+Assert-True ($loaderSource.Contains("semanticPaletteAppearanceConfig")) "Backend loader must map semantic palettes to runtime appearance fields."
+
+$canonicalProbe = 'filepath.Join(exeDir, "input_methods", "rime", appearanceThemesFileName)'
+$compatProbe = 'filepath.Join(exeDir, "input_methods", "rime", "data", appearanceThemesFileName)'
+$canonicalProbeIndex = $loaderSource.IndexOf($canonicalProbe)
+$compatProbeIndex = $loaderSource.IndexOf($compatProbe)
+Assert-True ($canonicalProbeIndex -ge 0) "Backend loader must probe canonical input_methods/rime/appearance_themes.json."
+Assert-True ($compatProbeIndex -ge 0) "Backend loader may keep data-path compatibility only after the canonical probe."
+Assert-True ($canonicalProbeIndex -lt $compatProbeIndex) "Backend loader must prefer the canonical root theme file before the data compatibility copy."
+
+$buildScriptSource = Get-Content -Raw -Encoding UTF8 -LiteralPath $buildScriptPath
+Assert-True ($buildScriptSource.Contains('$sourceAppearanceThemes = Join-Path $RimeDir "appearance_themes.json"')) "Build script must source themes from canonical input_methods/rime/appearance_themes.json."
+Assert-True ($buildScriptSource.Contains('$packageAppearanceThemes = Join-Path $PackageRimeDir "appearance_themes.json"')) "Build script must stage the canonical root theme path."
+Assert-True ($buildScriptSource.Contains('$packageAppearanceThemesData = Join-Path $PackageRimeDataDir "appearance_themes.json"')) "Build script must define the temporary data-path compatibility copy."
+Assert-True ($buildScriptSource.Contains("Packaged appearance theme compatibility copy is not byte-identical")) "Build script must fail if the compatibility copy drifts from the canonical file."
+
+$compatThemePath = Join-Path $backendRootPath "input_methods\rime\data\appearance_themes.json"
+if (Test-Path -LiteralPath $compatThemePath) {
+    $canonicalHash = (Get-FileHash -Algorithm SHA256 -LiteralPath $themePath).Hash
+    $compatHash = (Get-FileHash -Algorithm SHA256 -LiteralPath $compatThemePath).Hash
+    Assert-True ($canonicalHash -eq $compatHash) "Existing data-path compatibility theme file is not byte-identical to the canonical root file."
+}
+
+$packageThemePath = Join-Path $backendRootPath "scripts\build\moqi-ime\input_methods\rime\appearance_themes.json"
+$packageCompatThemePath = Join-Path $backendRootPath "scripts\build\moqi-ime\input_methods\rime\data\appearance_themes.json"
+if ((Test-Path -LiteralPath $packageThemePath) -or (Test-Path -LiteralPath $packageCompatThemePath)) {
+    Assert-True (Test-Path -LiteralPath $packageThemePath) "Packaged canonical appearance theme is missing from input_methods/rime."
+    Assert-True (Test-Path -LiteralPath $packageCompatThemePath) "Packaged compatibility appearance theme is missing from input_methods/rime/data."
+    $packageCanonicalHash = (Get-FileHash -Algorithm SHA256 -LiteralPath $packageThemePath).Hash
+    $packageCompatHash = (Get-FileHash -Algorithm SHA256 -LiteralPath $packageCompatThemePath).Hash
+    Assert-True ($packageCanonicalHash -eq $packageCompatHash) "Packaged compatibility theme file is not byte-identical to the packaged canonical root file."
+    Assert-True ($packageCanonicalHash -eq (Get-FileHash -Algorithm SHA256 -LiteralPath $themePath).Hash) "Packaged canonical theme file does not match the backend source theme file."
+}
+
 Write-Host "[PASS] TypeDuck appearance theme schema is semantic, light/dark only, and font data is top-level."
+Write-Host "[PASS] Backend loader and package checks prefer the canonical root theme file."
