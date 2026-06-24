@@ -1,6 +1,6 @@
 # Phase 5 Manual / VM UAT Notes
 
-Status: partial, blocked
+Status: rejected, gaps recorded in `05-UAT.md`
 VM: My Virtual Machine
 Interactive route: active console user `user`
 PowerShell Direct credential used for orchestration: `typeduckverify`
@@ -19,11 +19,13 @@ Installer safety: installer was copied into the VM and run inside the VM only; i
 
 ## Blocking Gaps
 
+- User review rejected the captured evidence and implementation details on 2026-06-24. The structured gap list is now recorded in `.planning/phases/05-candidate-dictionary-settings-and-about-ui-parity/05-UAT.md`.
 - Visible installer-first-run settings dialog was not captured. The VM install used `/VERYSILENT`, and the Inno `[Run]` entry has `skipifsilent`.
 - About dialog visible capture failed. Source/package guards verify its content, but active VM attempts by control message, keyboard Enter, and coordinate click did not show a usable About dialog capture.
 - Dictionary detail reveal failed in live VM screenshots: pointer movement over `nei` and `housam` candidates did not show the side dictionary panel.
 - Browser host-app evidence was not captured.
 - High-DPI, multi-monitor/extended desktop, UI-less TSF host, imperfect composition rectangle fallback, and visible input-picker/icon evidence were not exercised.
+- Candidate panel, settings layout/copy, About entry point, and icon packaging/branding need fixes before VM evidence is retried.
 
 ## Evidence Files
 
@@ -37,4 +39,4 @@ Installer safety: installer was copied into the VM and run inside the VM only; i
 
 ## Current Conclusion
 
-Phase 5 automated/package evidence is strong, and live VM confirms settings launch plus basic Notepad candidate behavior. The phase should remain pending because Task 3 requires dictionary detail reveal, About dialog visibility, browser host-app, high-DPI, multi-monitor, UI-less, imperfect rectangle, and visible icon/input-picker evidence.
+Phase 5 remains rejected. Retry execution should first close the UAT gaps, then rebuild/reinstall in the VM and recapture evidence for dictionary detail reveal, About replacement, browser host-app, high-DPI, multi-monitor, UI-less, imperfect rectangle, and visible icon/input-picker behavior.

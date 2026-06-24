@@ -203,14 +203,9 @@
         "path": ".planning/product/ui-fixtures/phase-05/screenshots/reverse-lookup-cangjie-onf.bmp",
         "notes": "Preview harness Cangjie reverse lookup sample."
       },
-      "settingsTwoColumn": {
-        "status": "captured",
-        "path": ".planning/product/ui-fixtures/phase-05/screenshots/settings-two-column-layout.bmp",
-        "notes": "Local staged TypeDuckSettings.exe settings window capture."
-      },
       "aboutDialog": {
-        "status": "recorded",
-        "notes": "Local source/package guards prove About content; visible About dialog capture is deferred to VM evidence because local window automation did not open the modal reliably."
+        "status": "missing",
+        "notes": "Local source/package guards prove previous About content, but the Settings About button does not open a dialog and the incorrect VM screenshot was removed."
       }
     }
   },
@@ -231,7 +226,7 @@
     },
     "aboutDialog": {
       "status": "missing",
-      "notes": "Source/package guards verify About text/assets/links/version/attribution, but active VM attempts to open the About modal by control message, keyboard, and mouse click did not produce a visible About dialog capture."
+      "notes": "Source/package guards verify previous About text/assets/links/version/attribution, but active VM attempts to open the About modal by control message, keyboard, and mouse click did not produce a visible About dialog capture; the incorrect vm-about-dialog.bmp was removed."
     },
     "notepadCandidateNei": {
       "status": "captured",
