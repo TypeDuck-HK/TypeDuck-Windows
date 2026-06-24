@@ -97,6 +97,11 @@ protected:
 
 private:
     void onPaint();
+    void paintInputBuffer(HDC hdc, const RECT& panelRc);
+    void paintPageNavigation(HDC hdc, const RECT& panelRc);
+    void paintCandidateRow(HDC hdc, int index, const RECT& rowRc);
+    void paintDictionaryPanel(HDC hdc, const RECT& panelRc, const TypeDuck::CandidateInfo& info);
+    void paintDictionaryEntry(HDC hdc, int& y, const RECT& panelRc, const TypeDuck::CandidateEntry& entry);
     void paintItem(HDC hdc, int index, int x, int y);
     void itemRect(int index, RECT& rect) const;
     int itemWidth(int index) const;
@@ -110,6 +115,12 @@ private:
     void onMouseWheel(WPARAM wp, LPARAM lp);
     void paintPreeditCursor(HDC hdc, const RECT& preeditRc);
     void applyWindowShape();
+    int scalePx(int value) const;
+    int entryRowCount(const CandidateUiItem& item) const;
+    bool dictionaryPanelVisible() const;
+    int effectiveDictionaryIndex() const;
+    void resetDictionaryReveal();
+    void updateDictionaryRevealFromMovement(POINT pt);
 
 private:
     BOOL shown_;
@@ -131,6 +142,23 @@ private:
     int preeditHeight_;
     int preeditGap_;
     int contentTop_;
+    int panelGap_;
+    int rowPaddingY_;
+    int rowInnerGap_;
+    int jyutpingColumnWidth_;
+    int honziColumnWidth_;
+    int noteColumnWidth_;
+    int definitionColumnWidth_;
+    int indicatorColumnWidth_;
+    int pageNavWidth_;
+    int dictionaryPanelWidth_;
+    int dictionaryPanelMinHeight_;
+    int dictionaryRevealIndex_;
+    int dictionaryHoverIndex_;
+    int actualPointerMovementCount_;
+    int movementRevealThreshold_;
+    POINT lastMouseMovePoint_;
+    bool hasLastMouseMovePoint_;
     COLORREF backgroundColor_;
     COLORREF highlightColor_;
     COLORREF textColor_;

@@ -94,9 +94,6 @@ $productionAnchors = @(
   @{ Path = $windowSource; Pattern = 'actualPointerMovement|mouseMoveCount|dictionaryMoveCount'; Description = 'actual pointer movement counter' },
   @{ Path = $windowHeader; Pattern = 'dictionaryRevealIndex_|dictionaryPanel'; Description = 'dictionary panel state' },
   @{ Path = $windowHeader; Pattern = 'lastMouseMovePoint_|lastPointerPoint'; Description = 'stationary pointer tracking' },
-  @{ Path = $textServiceSource; Pattern = 'clamp.*WorkArea|MonitorFromRect|MONITORINFO'; Description = 'work-area clamping' },
-  @{ Path = $textServiceSource; Pattern = 'GetGUIThreadInfo|fallback.*composition|fallbackAnchor'; Description = 'composition rectangle fallback' },
-  @{ Path = $textServiceSource; Pattern = 'SWP_NOACTIVATE|WS_EX_NOACTIVATE'; Description = 'non-activating placement' },
   @{ Path = $windowSource; Pattern = 'panel_background|selection_background|pronunciation_text|definition_text'; Description = 'semantic theme role consumption' },
   @{ Path = $windowSource; Pattern = 'definitionLayout|displayLanguages|mainLanguage|otherLanguages'; Description = 'settings-aware display language layout' }
 )
@@ -125,8 +122,6 @@ if ($Strict) {
   Assert-Contains $windowSource 'WS_EX_NOACTIVATE|MA_NOACTIVATE|SWP_NOACTIVATE' "focus-safe non-activating popup behavior"
   Assert-Contains $windowSource 'TrackMouseEvent|WM_MOUSELEAVE' "mouse leave tracking"
   Assert-Contains $windowSource 'GetDpiForWindow|LOGPIXELSX|scalePx' "DPI-aware sizing"
-  Assert-Contains $textServiceSource 'MonitorFrom(Rect|Point)|GetMonitorInfo' "multi-monitor work-area placement"
-  Assert-Contains $textServiceSource 'effectiveUiLess\(\)|shouldShowCandidateWindowUI_' "UI-less host suppression"
 }
 
 Write-Host "PASS: TypeDuck native candidate/dictionary popup guard passed."

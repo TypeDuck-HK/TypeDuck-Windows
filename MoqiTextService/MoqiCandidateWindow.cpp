@@ -19,13 +19,22 @@
 
 namespace {
 
-constexpr COLORREF kWindowBackground = RGB(255, 255, 255);
-constexpr COLORREF kWindowBorder = RGB(150, 150, 150);
-constexpr COLORREF kDividerColor = RGB(220, 220, 220);
-constexpr COLORREF kItemText = RGB(0, 0, 0);
-constexpr COLORREF kSelectedBackground = RGB(198, 221, 249);
-constexpr COLORREF kSelectedText = RGB(0, 0, 0);
+constexpr COLORREF kWindowBackground = RGB(255, 255, 255);       // panel_background
+constexpr COLORREF kDictionaryBackground = RGB(246, 243, 237);   // dictionary_background
+constexpr COLORREF kInputBufferBackground = RGB(254, 220, 156);  // input_buffer_background
+constexpr COLORREF kWindowBorder = RGB(222, 217, 207);           // panel_border
+constexpr COLORREF kDividerColor = RGB(222, 217, 207);
+constexpr COLORREF kItemText = RGB(36, 34, 30);                  // text_primary
+constexpr COLORREF kSecondaryText = RGB(105, 98, 88);            // text_secondary
+constexpr COLORREF kPronunciationText = RGB(102, 93, 82);        // pronunciation_text
+constexpr COLORREF kDefinitionText = RGB(78, 72, 63);            // definition_text
+constexpr COLORREF kDisabledText = RGB(168, 160, 148);           // disabled_text
+constexpr COLORREF kLinkText = RGB(151, 102, 31);                // link_text
+constexpr COLORREF kSelectedBackground = RGB(254, 220, 156);     // selection_background
+constexpr COLORREF kSelectedText = RGB(36, 34, 30);
 constexpr int kDefaultCandidateSpacing = 20;
+constexpr int kTypeDuckCandidatePanelRenderer = 1;
+constexpr int kMovementRevealThreshold = 2;
 
 Moqi::TextService* productTextService(Ime::TextService* service) {
     return static_cast<Moqi::TextService*>(service);
@@ -241,6 +250,23 @@ CandidateWindow::CandidateWindow(Ime::TextService* service, Ime::EditSession* se
       preeditHeight_(0),
       preeditGap_(8),
       contentTop_(0),
+      panelGap_(10),
+      rowPaddingY_(5),
+      rowInnerGap_(6),
+      jyutpingColumnWidth_(84),
+      honziColumnWidth_(86),
+      noteColumnWidth_(78),
+      definitionColumnWidth_(230),
+      indicatorColumnWidth_(22),
+      pageNavWidth_(64),
+      dictionaryPanelWidth_(0),
+      dictionaryPanelMinHeight_(260),
+      dictionaryRevealIndex_(-1),
+      dictionaryHoverIndex_(-1),
+      actualPointerMovementCount_(0),
+      movementRevealThreshold_(kMovementRevealThreshold),
+      lastMouseMovePoint_{0, 0},
+      hasLastMouseMovePoint_(false),
       backgroundColor_(kWindowBackground),
       highlightColor_(kSelectedBackground),
       textColor_(kItemText),
@@ -276,7 +302,7 @@ STDMETHODIMP CandidateWindow::GetDescription(BSTR* pbstrDescription) {
     if (!pbstrDescription) {
         return E_INVALIDARG;
     }
-    *pbstrDescription = SysAllocString(L"Moqi candidate window");
+    *pbstrDescription = SysAllocString(L"TypeDuck 候選詞視窗 Candidate window");
     return S_OK;
 }
 
@@ -450,6 +476,7 @@ void CandidateWindow::clear() {
     itemTextWidths_.clear();
     itemCommentWidths_.clear();
     itemWidths_.clear();
+    resetDictionaryReveal();
     if (::GetCapture() != hwnd_) {
         pressedSel_ = -1;
     }
@@ -484,6 +511,9 @@ void CandidateWindow::setCurrentSel(int sel) {
     }
     if (currentSel_ != sel) {
         currentSel_ = sel;
+        if (dictionaryRevealIndex_ >= static_cast<int>(items_.size())) {
+            resetDictionaryReveal();
+        }
         if (isVisible()) {
             ::InvalidateRect(hwnd_, NULL, TRUE);
         }
@@ -664,6 +694,27 @@ void CandidateWindow::recalculateSize() {
         return;
     }
 
+    const int scaledPadX = scalePx(textService_->isImmersive() ? 12 : 10);
+    const int scaledPadY = scalePx(textService_->isImmersive() ? 8 : 6);
+    padX_ = scaledPadX;
+    padY_ = scaledPadY;
+    labelGap_ = scalePx(6);
+    commentGap_ = scalePx(8);
+    borderWidth_ = (std::max)(1, scalePx(1));
+    borderRadius_ = scalePx(8);
+    preeditGap_ = scalePx(8);
+    panelGap_ = scalePx(10);
+    rowPaddingY_ = scalePx(5);
+    rowInnerGap_ = scalePx(6);
+    pageNavWidth_ = scalePx(64);
+    indicatorColumnWidth_ = scalePx(22);
+    jyutpingColumnWidth_ = scalePx(84);
+    honziColumnWidth_ = scalePx(86);
+    noteColumnWidth_ = scalePx(78);
+    definitionColumnWidth_ = scalePx(230);
+    dictionaryPanelMinHeight_ = scalePx(260);
+    minWidth_ = scalePx(520);
+
     selKeyWidth_ = 0;
     textWidth_ = 0;
     commentWidth_ = 0;
@@ -692,6 +743,7 @@ void CandidateWindow::recalculateSize() {
         itemTextWidths_[i] = static_cast<int>(candidateSize.cx);
         textWidth_ = (std::max)(textWidth_, static_cast<int>(candidateSize.cx));
         int candidateHeight = static_cast<int>(candidateSize.cy);
+        const int candidateEntryRows = entryRowCount(item);
         if (!itemComment.empty() && commentFont_) {
             SIZE commentSize = {};
             ::SelectObject(hdc, commentFont_);
@@ -702,6 +754,7 @@ void CandidateWindow::recalculateSize() {
             candidateHeight = (std::max)(candidateHeight, static_cast<int>(commentSize.cy));
         }
         itemHeight_ = (std::max)(itemHeight_, (std::max)(candidateHeight, static_cast<int>(selKeySize.cy)));
+        itemHeight_ = (std::max)(itemHeight_, rowPaddingY_ * 2 + candidateEntryRows * scalePx(25));
     }
     if (!preedit_.empty()) {
         SIZE preeditSize = {};
@@ -719,7 +772,6 @@ void CandidateWindow::recalculateSize() {
     ::SelectObject(hdc, oldFont);
     ::ReleaseDC(hwnd(), hdc);
 
-    const int itemsPerRow = (std::max)(1, candPerRow_);
     itemHeight_ = (std::max)(itemHeight_, static_cast<int>(metrics.tmHeight + metrics.tmExternalLeading + 2));
     if (commentFont_) {
         itemHeight_ = (std::max)(itemHeight_, static_cast<int>(commentMetrics.tmHeight + commentMetrics.tmExternalLeading + 2));
@@ -729,37 +781,32 @@ void CandidateWindow::recalculateSize() {
                          : (std::max)(preeditHeight_, static_cast<int>(metrics.tmHeight + metrics.tmExternalLeading));
 
     for (int i = 0, n = static_cast<int>(items_.size()); i < n; ++i) {
-        const int commentSectionWidth =
-            itemCommentWidths_[i] > 0 ? commentGap_ + itemCommentWidths_[i] : 0;
-        const int trailingGap = candPerRow_ > 1 ? candSpacing_ : 0;
-        itemWidths_[i] = selKeyWidth_ + labelGap_ + itemTextWidths_[i] +
-                         commentSectionWidth + trailingGap;
+        itemWidths_[i] = selKeyWidth_ + labelGap_ + jyutpingColumnWidth_ +
+                         honziColumnWidth_ + noteColumnWidth_ +
+                         definitionColumnWidth_ + indicatorColumnWidth_;
     }
 
-    const int rows = (static_cast<int>(items_.size()) + itemsPerRow - 1) / itemsPerRow;
-    int candidateContentWidth = 0;
-    for (int row = 0; row < rows; ++row) {
-        const int rowStart = row * itemsPerRow;
-        const int rowEnd = (std::min)(rowStart + itemsPerRow, static_cast<int>(items_.size()));
-        int rowWidth = 0;
-        for (int i = rowStart; i < rowEnd; ++i) {
-            if (i > rowStart) {
-                rowWidth += colSpacing_;
-            }
-            rowWidth += itemWidth(i);
-        }
-        candidateContentWidth = (std::max)(candidateContentWidth, rowWidth);
-    }
-    const int contentWidth = (std::max)(candidateContentWidth, preeditWidth);
-    const int width = (std::max)(minWidth_, padX_ * 2 + contentWidth) + borderWidth_ * 2;
-    int contentHeight = rows * itemHeight_ + (std::max)(0, rows - 1) * rowSpacing_;
+    const int rows = static_cast<int>(items_.size());
+    const int candidateContentWidth = selKeyWidth_ + labelGap_ + jyutpingColumnWidth_ +
+                                      honziColumnWidth_ + noteColumnWidth_ +
+                                      definitionColumnWidth_ + indicatorColumnWidth_;
+    const int contentWidth = (std::max)((std::max)(candidateContentWidth, preeditWidth + pageNavWidth_), minWidth_);
+    const int candidatePanelWidth = padX_ * 2 + contentWidth + borderWidth_ * 2;
+    int candidatePanelHeight = rows * itemHeight_ + (std::max)(0, rows - 1) * rowSpacing_;
     if (!preedit_.empty()) {
         contentTop_ = borderWidth_ + padY_ + preeditHeight_ + preeditGap_;
-        contentHeight += preeditHeight_ + preeditGap_;
+        candidatePanelHeight += preeditHeight_ + preeditGap_;
     } else {
         contentTop_ = borderWidth_ + padY_;
     }
-    const int height = padY_ * 2 + contentHeight + borderWidth_ * 2;
+    candidatePanelHeight += padY_ * 2 + borderWidth_ * 2;
+    dictionaryPanelWidth_ = dictionaryPanelVisible() ? scalePx(420) : 0;
+    const int dictionaryHeight = dictionaryPanelVisible()
+                                     ? (std::max)(dictionaryPanelMinHeight_, candidatePanelHeight)
+                                     : 0;
+    const int width = candidatePanelWidth +
+                      (dictionaryPanelVisible() ? panelGap_ + dictionaryPanelWidth_ : 0);
+    const int height = (std::max)(candidatePanelHeight, dictionaryHeight);
     resize(width, height);
     applyWindowShape();
 
@@ -814,47 +861,46 @@ void CandidateWindow::onPaint() {
 
     HBRUSH backgroundBrush = ::CreateSolidBrush(backgroundColor_);
     HBRUSH borderBrush = ::CreateSolidBrush(kWindowBorder);
+    const int candidatePanelWidth = rc.right - rc.left -
+        (dictionaryPanelVisible() ? panelGap_ + dictionaryPanelWidth_ : 0);
+    RECT candidatePanelRc = {rc.left, rc.top, candidatePanelWidth, rc.bottom};
     HRGN windowRgn = ::CreateRoundRectRgn(
-        rc.left, rc.top, rc.right + 1, rc.bottom + 1,
+        candidatePanelRc.left, candidatePanelRc.top,
+        candidatePanelRc.right + 1, candidatePanelRc.bottom + 1,
         borderRadius_ * 2, borderRadius_ * 2);
     ::FillRect(memdc, &rc, static_cast<HBRUSH>(::GetStockObject(WHITE_BRUSH)));
     ::FillRgn(memdc, windowRgn, backgroundBrush);
     ::FrameRgn(memdc, windowRgn, borderBrush, borderWidth_, borderWidth_);
 
-    int y = borderWidth_ + padY_;
-    if (!preedit_.empty()) {
-        RECT preeditRc = {
-            borderWidth_ + padX_,
-            y,
-            rc.right - borderWidth_ - padX_,
-            y + preeditHeight_};
-        ::SetTextColor(memdc, textColor_);
-        ::DrawTextW(memdc, preedit_.c_str(), static_cast<int>(preedit_.length()), &preeditRc,
-                    DT_LEFT | DT_VCENTER | DT_SINGLELINE | DT_NOPREFIX);
-        paintPreeditCursor(memdc, preeditRc);
+    paintInputBuffer(memdc, candidatePanelRc);
+    paintPageNavigation(memdc, candidatePanelRc);
 
-        const int dividerY = preeditRc.bottom + preeditGap_ / 2;
-        HPEN dividerPen = ::CreatePen(PS_SOLID, 1, kDividerColor);
-        HGDIOBJ oldPen = ::SelectObject(memdc, dividerPen);
-        ::MoveToEx(memdc, borderWidth_ + padX_, dividerY, nullptr);
-        ::LineTo(memdc, rc.right - borderWidth_ - padX_, dividerY);
-        ::SelectObject(memdc, oldPen);
-        ::DeleteObject(dividerPen);
+    int y = contentTop_;
+    for (int i = 0, n = static_cast<int>(items_.size()); i < n; ++i) {
+        RECT rowRc = {
+            borderWidth_ + padX_ / 2,
+            y,
+            candidatePanelRc.right - borderWidth_ - padX_ / 2,
+            y + itemHeight_};
+        paintCandidateRow(memdc, i, rowRc);
+        y += itemHeight_ + rowSpacing_;
     }
 
-    int col = 0;
-    int x = borderWidth_ + padX_;
-    y = contentTop_;
-    for (int i = 0, n = static_cast<int>(items_.size()); i < n; ++i) {
-        paintItem(memdc, i, x, y);
-        ++col;
-        if (col >= candPerRow_) {
-            col = 0;
-            x = borderWidth_ + padX_;
-            y += itemHeight_ + rowSpacing_;
-        } else {
-            x += colSpacing_ + itemWidth(i);
-        }
+    if (dictionaryPanelVisible()) {
+        RECT dictionaryRc = {
+            candidatePanelRc.right + panelGap_,
+            rc.top,
+            rc.right,
+            rc.bottom};
+        HRGN dictionaryRgn = ::CreateRoundRectRgn(
+            dictionaryRc.left, dictionaryRc.top, dictionaryRc.right + 1, dictionaryRc.bottom + 1,
+            borderRadius_ * 2, borderRadius_ * 2);
+        HBRUSH dictionaryBrush = ::CreateSolidBrush(kDictionaryBackground);
+        ::FillRgn(memdc, dictionaryRgn, dictionaryBrush);
+        ::FrameRgn(memdc, dictionaryRgn, borderBrush, borderWidth_, borderWidth_);
+        ::DeleteObject(dictionaryBrush);
+        ::DeleteObject(dictionaryRgn);
+        paintDictionaryPanel(memdc, dictionaryRc, items_[effectiveDictionaryIndex()].candidateInfo);
     }
 
     ::BitBlt(hdc, 0, 0, rc.right - rc.left, rc.bottom - rc.top, memdc, 0, 0, SRCCOPY);
@@ -869,57 +915,300 @@ void CandidateWindow::onPaint() {
     EndPaint(hwnd_, &ps);
 }
 
+void CandidateWindow::paintInputBuffer(HDC hdc, const RECT& panelRc) {
+    if (preedit_.empty()) {
+        return;
+    }
+
+    RECT preeditRc = {
+        panelRc.left + borderWidth_ + padX_,
+        panelRc.top + borderWidth_ + padY_,
+        panelRc.right - borderWidth_ - padX_ - pageNavWidth_,
+        panelRc.top + borderWidth_ + padY_ + preeditHeight_ + scalePx(8)};
+    RECT activeRc = preeditRc;
+    activeRc.right = (std::min)(activeRc.right,
+        activeRc.left + scalePx(18) + static_cast<int>(preedit_.length()) * scalePx(10));
+
+    HBRUSH inputBrush = ::CreateSolidBrush(kInputBufferBackground);
+    HRGN activeRgn = ::CreateRoundRectRgn(activeRc.left, activeRc.top, activeRc.right + 1,
+                                          activeRc.bottom + 1, scalePx(5) * 2, scalePx(5) * 2);
+    ::FillRgn(hdc, activeRgn, inputBrush);
+    ::DeleteObject(activeRgn);
+    ::DeleteObject(inputBrush);
+
+    RECT textRc = activeRc;
+    textRc.left += scalePx(8);
+    ::SelectObject(hdc, font_);
+    ::SetTextColor(hdc, textColor_);
+    ::DrawTextW(hdc, preedit_.c_str(), static_cast<int>(preedit_.length()), &textRc,
+                DT_LEFT | DT_VCENTER | DT_SINGLELINE | DT_NOPREFIX | DT_END_ELLIPSIS);
+    paintPreeditCursor(hdc, textRc);
+
+    const int dividerY = preeditRc.bottom + preeditGap_ / 2;
+    HPEN dividerPen = ::CreatePen(PS_SOLID, 1, kDividerColor);
+    HGDIOBJ oldPen = ::SelectObject(hdc, dividerPen);
+    ::MoveToEx(hdc, panelRc.left + borderWidth_ + padX_, dividerY, nullptr);
+    ::LineTo(hdc, panelRc.right - borderWidth_ - padX_, dividerY);
+    ::SelectObject(hdc, oldPen);
+    ::DeleteObject(dividerPen);
+}
+
+void CandidateWindow::paintPageNavigation(HDC hdc, const RECT& panelRc) {
+    const auto* service = productTextService(textService_);
+    const int pageIndex = service != nullptr ? service->candidatePageIndex() : 0;
+    const int pageSize = service != nullptr ? service->candidatePageSize() : static_cast<int>(items_.size());
+    const int totalCount = service != nullptr ? service->candidateTotalCount() : static_cast<int>(items_.size());
+    const bool hasPrev = pageIndex > 0;
+    const bool hasNext = pageSize > 0 && totalCount > (pageIndex + 1) * pageSize;
+
+    RECT navRc = {
+        panelRc.right - borderWidth_ - padX_ - pageNavWidth_,
+        panelRc.top + borderWidth_ + padY_,
+        panelRc.right - borderWidth_ - padX_,
+        panelRc.top + borderWidth_ + padY_ + (preedit_.empty() ? scalePx(30) : preeditHeight_ + scalePx(8))};
+    RECT prevRc = navRc;
+    prevRc.right = prevRc.left + pageNavWidth_ / 2;
+    RECT nextRc = navRc;
+    nextRc.left = prevRc.right;
+
+    ::SelectObject(hdc, font_);
+    ::SetTextColor(hdc, hasPrev ? kLinkText : kDisabledText);
+    ::DrawTextW(hdc, L"‹", 1, &prevRc, DT_CENTER | DT_VCENTER | DT_SINGLELINE | DT_NOPREFIX);
+    ::SetTextColor(hdc, hasNext ? kLinkText : kDisabledText);
+    ::DrawTextW(hdc, L"›", 1, &nextRc, DT_CENTER | DT_VCENTER | DT_SINGLELINE | DT_NOPREFIX);
+}
+
 void CandidateWindow::paintItem(HDC hdc, int index, int x, int y) {
+    RECT rowRc = {x, y, x + itemWidth(index), y + itemHeight_};
+    paintCandidateRow(hdc, index, rowRc);
+}
+
+void CandidateWindow::paintCandidateRow(HDC hdc, int index, const RECT& rowRc) {
+    // Mirrors TypeDuck Web definitionLayout: enabled displayLanguages decide
+    // which mainLanguage/otherLanguages definitions are visible.
     const bool selected = useCursor_ && index == currentSel_;
 
-    RECT itemRc = {x, y, x + itemWidth(index), y + itemHeight_};
-    RECT highlightRc = itemRc;
-    RECT selRc = itemRc;
-    selRc.right = selRc.left + selKeyWidth_;
-    RECT textRc = itemRc;
-    textRc.left += selKeyWidth_ + labelGap_;
-    textRc.right = textRc.left + itemTextWidth(index);
-    RECT commentRc = textRc;
-    commentRc.left = textRc.right + commentGap_;
-    commentRc.right = commentRc.left + itemCommentWidth(index);
-
     const COLORREF bgColor = selected ? highlightColor_ : backgroundColor_;
-    const COLORREF textColor = selected ? highlightTextColor_ : textColor_;
     const COLORREF selColor = selected ? highlightTextColor_ : textColor_;
-    const COLORREF commentColor = selected ? commentHighlightColor_ : commentColor_;
 
     if (selected) {
-        if (candPerRow_ == 1) {
-            RECT clientRc = {};
-            ::GetClientRect(hwnd_, &clientRc);
-            highlightRc.left = borderWidth_ + padX_;
-            highlightRc.right = clientRc.right - borderWidth_ - padX_;
-        }
         HBRUSH highlightBrush = ::CreateSolidBrush(bgColor);
-        ::FillRect(hdc, &highlightRc, highlightBrush);
+        HRGN rowRgn = ::CreateRoundRectRgn(rowRc.left, rowRc.top, rowRc.right + 1, rowRc.bottom + 1,
+                                           scalePx(5) * 2, scalePx(5) * 2);
+        ::FillRgn(hdc, rowRgn, highlightBrush);
+        ::DeleteObject(rowRgn);
         ::DeleteObject(highlightBrush);
     }
 
+    RECT selRc = rowRc;
+    selRc.left += scalePx(8);
+    selRc.right = selRc.left + selKeyWidth_;
     wchar_t selKey[] = L"?.";
     selKey[0] = selKeys_[index];
     const COLORREF oldColor = ::SetTextColor(hdc, selColor);
     ::DrawTextW(hdc, selKey, 2, &selRc, DT_LEFT | DT_VCENTER | DT_SINGLELINE | DT_NOPREFIX);
 
-    ::SetTextColor(hdc, textColor);
     const CandidateUiItem& item = items_[index];
-    const std::wstring itemText = item.displayText();
-    const std::wstring itemComment = item.displayComment();
+    const auto matchedEntries = item.candidateInfo.matchedEntries();
+    const std::vector<TypeDuck::CandidateEntry>& allEntries = item.candidateInfo.entries;
+    const bool useMatched = !matchedEntries.empty();
+    const int rowCount = entryRowCount(item);
+    const int lineHeight = (std::max)(scalePx(20), (itemHeight_ - rowPaddingY_ * 2) / rowCount);
+    int y = rowRc.top + rowPaddingY_;
+
     HGDIOBJ oldFont = ::SelectObject(hdc, font_);
-    ::DrawTextW(hdc, itemText.c_str(), static_cast<int>(itemText.length()), &textRc,
-                DT_LEFT | DT_VCENTER | DT_SINGLELINE | DT_NOPREFIX);
-    if (!itemComment.empty() && commentFont_) {
-        ::SelectObject(hdc, commentFont_);
-        ::SetTextColor(hdc, commentColor);
-        ::DrawTextW(hdc, itemComment.c_str(), static_cast<int>(itemComment.length()), &commentRc,
-                    DT_LEFT | DT_VCENTER | DT_SINGLELINE | DT_NOPREFIX);
+    for (int entryIndex = 0; entryIndex < rowCount; ++entryIndex) {
+        TypeDuck::CandidateEntry fallbackEntry;
+        const TypeDuck::CandidateEntry* entry = nullptr;
+        if (useMatched && entryIndex < static_cast<int>(matchedEntries.size())) {
+            entry = &matchedEntries[entryIndex];
+        } else if (!useMatched && entryIndex < static_cast<int>(allEntries.size())) {
+            entry = &allEntries[entryIndex];
+        }
+        if (!entry) {
+            fallbackEntry.honzi = item.displayText();
+            fallbackEntry.jyutping = L"";
+            fallbackEntry.definitions[displayPreferences_.mainLanguage] = item.displayComment();
+            entry = &fallbackEntry;
+        }
+
+        RECT jyutpingRc = {selRc.right + labelGap_, y,
+                           selRc.right + labelGap_ + jyutpingColumnWidth_, y + lineHeight};
+        RECT honziRc = {jyutpingRc.right + rowInnerGap_, y,
+                        jyutpingRc.right + rowInnerGap_ + honziColumnWidth_, y + lineHeight};
+        RECT noteRc = {honziRc.right + rowInnerGap_, y,
+                       honziRc.right + rowInnerGap_ + noteColumnWidth_, y + lineHeight};
+        RECT definitionRc = {noteRc.right + rowInnerGap_, y,
+                             noteRc.right + rowInnerGap_ + definitionColumnWidth_, y + lineHeight};
+        RECT indicatorRc = {definitionRc.right + rowInnerGap_, y, rowRc.right - scalePx(8), y + lineHeight};
+
+        ::SelectObject(hdc, commentFont_ ? commentFont_ : font_);
+        ::SetTextColor(hdc, selected ? commentHighlightColor_ : kPronunciationText);
+        const bool showJyutping = displayPreferences_.shouldShowJyutping(item.candidateInfo.isReverseLookup);
+        if (showJyutping) {
+            ::DrawTextW(hdc, entry->jyutping.c_str(), static_cast<int>(entry->jyutping.length()), &jyutpingRc,
+                        DT_LEFT | DT_VCENTER | DT_SINGLELINE | DT_NOPREFIX | DT_END_ELLIPSIS);
+        }
+
+        ::SelectObject(hdc, font_);
+        ::SetTextColor(hdc, selected ? highlightTextColor_ : textColor_);
+        const std::wstring honzi = entry->honzi.empty() ? item.displayText() : entry->honzi;
+        ::DrawTextW(hdc, honzi.c_str(), static_cast<int>(honzi.length()), &honziRc,
+                    DT_LEFT | DT_VCENTER | DT_SINGLELINE | DT_NOPREFIX | DT_END_ELLIPSIS);
+
+        ::SelectObject(hdc, commentFont_ ? commentFont_ : font_);
+        ::SetTextColor(hdc, selected ? commentHighlightColor_ : kSecondaryText);
+        const std::wstring note = (!item.candidateInfo.isReverseLookup || displayPreferences_.showReverseCode)
+                                      ? item.candidateInfo.note
+                                      : L"";
+        if (entryIndex == 0 && !note.empty()) {
+            ::DrawTextW(hdc, note.c_str(), static_cast<int>(note.length()), &noteRc,
+                        DT_LEFT | DT_VCENTER | DT_SINGLELINE | DT_NOPREFIX | DT_END_ELLIPSIS);
+        }
+
+        std::wstring definition = entry->definition(displayPreferences_.mainLanguage);
+        if (definition.empty()) {
+            const std::wstring reference = entry->canonicalReference();
+            definition = reference.empty() ? item.candidateInfo.displayComment(displayPreferences_) : L"→" + reference;
+        }
+        ::SetTextColor(hdc, selected ? commentHighlightColor_ : kDefinitionText);
+        ::DrawTextW(hdc, definition.c_str(), static_cast<int>(definition.length()), &definitionRc,
+                    DT_LEFT | DT_VCENTER | DT_SINGLELINE | DT_NOPREFIX | DT_END_ELLIPSIS);
+
+        if (entryIndex == 0 && item.candidateInfo.hasDictionaryEntry(displayPreferences_)) {
+            ::SetTextColor(hdc, selected ? highlightTextColor_ : kSecondaryText);
+            ::DrawTextW(hdc, L"ⓘ", 1, &indicatorRc,
+                        DT_RIGHT | DT_VCENTER | DT_SINGLELINE | DT_NOPREFIX);
+        }
+        y += lineHeight;
     }
     ::SelectObject(hdc, oldFont);
     ::SetTextColor(hdc, oldColor);
+}
+
+void CandidateWindow::paintDictionaryPanel(
+    HDC hdc,
+    const RECT& panelRc,
+    const TypeDuck::CandidateInfo& info) {
+    int y = panelRc.top + scalePx(12);
+    RECT titleRc = {panelRc.left + scalePx(18), y, panelRc.right - scalePx(18), y + scalePx(28)};
+    ::SelectObject(hdc, commentFont_ ? commentFont_ : font_);
+    ::SetTextColor(hdc, kSecondaryText);
+    const std::wstring title = L"字典 Dictionary";
+    ::DrawTextW(hdc, title.c_str(), static_cast<int>(title.length()), &titleRc,
+                DT_LEFT | DT_VCENTER | DT_SINGLELINE | DT_NOPREFIX);
+    y = titleRc.bottom + scalePx(4);
+
+    for (const auto& entry : info.entries) {
+        if (!entry.isDictionaryEntry(displayPreferences_)) {
+            continue;
+        }
+        paintDictionaryEntry(hdc, y, panelRc, entry);
+        if (y > panelRc.bottom - scalePx(24)) {
+            break;
+        }
+    }
+}
+
+void CandidateWindow::paintDictionaryEntry(
+    HDC hdc,
+    int& y,
+    const RECT& panelRc,
+    const TypeDuck::CandidateEntry& entry) {
+    const int padX = scalePx(18);
+    const int right = panelRc.right - padX;
+    RECT headRc = {panelRc.left + padX, y, right, y + scalePx(48)};
+    ::SelectObject(hdc, font_);
+    ::SetTextColor(hdc, textColor_);
+    ::DrawTextW(hdc, entry.honzi.c_str(), static_cast<int>(entry.honzi.length()), &headRc,
+                DT_LEFT | DT_VCENTER | DT_SINGLELINE | DT_NOPREFIX | DT_END_ELLIPSIS);
+
+    RECT pronunciationRc = {headRc.left + scalePx(104), y + scalePx(8), right, headRc.bottom};
+    std::wstring pronunciation = entry.jyutping;
+    const std::wstring pronType = entry.pronunciationType();
+    if (!pronType.empty()) {
+        pronunciation += L" " + pronType;
+    }
+    ::SelectObject(hdc, commentFont_ ? commentFont_ : font_);
+    ::SetTextColor(hdc, kPronunciationText);
+    ::DrawTextW(hdc, pronunciation.c_str(), static_cast<int>(pronunciation.length()), &pronunciationRc,
+                DT_LEFT | DT_VCENTER | DT_SINGLELINE | DT_NOPREFIX | DT_END_ELLIPSIS);
+    y = headRc.bottom + scalePx(4);
+
+    std::wstring body;
+    for (const auto& part : entry.formattedPartsOfSpeech()) {
+        if (!body.empty()) {
+            body += L"  ";
+        }
+        body += L"[" + part + L"]";
+    }
+    for (const auto& reg : entry.formattedRegister()) {
+        if (!body.empty()) {
+            body += L"  ";
+        }
+        body += reg;
+    }
+    for (const auto& label : entry.formattedLabels()) {
+        if (!body.empty()) {
+            body += L"  ";
+        }
+        body += label;
+    }
+    const std::wstring canonical = entry.canonicalReference();
+    if (!canonical.empty()) {
+        if (!body.empty()) {
+            body += L"  ";
+        }
+        body += L"→" + canonical;
+    } else {
+        const std::wstring mainDefinition = entry.definition(displayPreferences_.mainLanguage);
+        if (!mainDefinition.empty()) {
+            if (!body.empty()) {
+                body += L"  ";
+            }
+            body += mainDefinition;
+        }
+    }
+    RECT bodyRc = {panelRc.left + padX, y, right, y + scalePx(34)};
+    ::SetTextColor(hdc, kDefinitionText);
+    ::DrawTextW(hdc, body.c_str(), static_cast<int>(body.length()), &bodyRc,
+                DT_LEFT | DT_WORDBREAK | DT_NOPREFIX | DT_END_ELLIPSIS);
+    y = bodyRc.bottom + scalePx(4);
+
+    for (const auto& other : entry.otherData()) {
+        RECT labelRc = {panelRc.left + padX, y, panelRc.left + padX + scalePx(128), y + scalePx(24)};
+        RECT valueRc = {labelRc.right + scalePx(10), y, right, labelRc.bottom};
+        ::SetTextColor(hdc, kSecondaryText);
+        ::DrawTextW(hdc, other.name.c_str(), static_cast<int>(other.name.length()), &labelRc,
+                    DT_RIGHT | DT_VCENTER | DT_SINGLELINE | DT_NOPREFIX | DT_END_ELLIPSIS);
+        ::SetTextColor(hdc, textColor_);
+        ::DrawTextW(hdc, other.value.c_str(), static_cast<int>(other.value.length()), &valueRc,
+                    DT_LEFT | DT_VCENTER | DT_SINGLELINE | DT_NOPREFIX | DT_END_ELLIPSIS);
+        y += scalePx(24);
+    }
+
+    const auto moreLanguages = entry.otherLanguages(displayPreferences_);
+    if (!moreLanguages.empty()) {
+        RECT captionRc = {panelRc.left + padX, y, right, y + scalePx(26)};
+        const std::wstring caption = L"More Languages";
+        ::SetTextColor(hdc, textColor_);
+        ::DrawTextW(hdc, caption.c_str(), static_cast<int>(caption.length()), &captionRc,
+                    DT_LEFT | DT_VCENTER | DT_SINGLELINE | DT_NOPREFIX);
+        y = captionRc.bottom;
+        for (const auto& language : moreLanguages) {
+            RECT labelRc = {panelRc.left + padX, y, panelRc.left + padX + scalePx(128), y + scalePx(24)};
+            RECT valueRc = {labelRc.right + scalePx(10), y, right, labelRc.bottom};
+            ::SetTextColor(hdc, kSecondaryText);
+            ::DrawTextW(hdc, language.name.c_str(), static_cast<int>(language.name.length()), &labelRc,
+                        DT_RIGHT | DT_VCENTER | DT_SINGLELINE | DT_NOPREFIX | DT_END_ELLIPSIS);
+            ::SetTextColor(hdc, kDefinitionText);
+            ::DrawTextW(hdc, language.value.c_str(), static_cast<int>(language.value.length()), &valueRc,
+                        DT_LEFT | DT_VCENTER | DT_SINGLELINE | DT_NOPREFIX | DT_END_ELLIPSIS);
+            y += scalePx(24);
+        }
+    }
+
+    y += scalePx(14);
 }
 
 void CandidateWindow::paintPreeditCursor(HDC hdc, const RECT& preeditRc) {
@@ -1018,10 +1307,18 @@ void CandidateWindow::onMouseMove(WPARAM wp, LPARAM lp) {
         Ime::ImeWindow::onMouseMove(wp, lp);
         return;
     }
+
+    POINT pt = {GET_X_LPARAM(lp), GET_Y_LPARAM(lp)};
+    updateDictionaryRevealFromMovement(pt);
 }
 
 void CandidateWindow::onMouseLeave() {
     trackingMouse_ = false;
+    resetDictionaryReveal();
+    recalculateSize();
+    if (isVisible()) {
+        ::InvalidateRect(hwnd_, NULL, TRUE);
+    }
 }
 
 void CandidateWindow::onMouseWheel(WPARAM wp, LPARAM) {
@@ -1029,20 +1326,102 @@ void CandidateWindow::onMouseWheel(WPARAM wp, LPARAM) {
     if (delta == 0) {
         return;
     }
+    resetDictionaryReveal();
     if (auto* textService = static_cast<Moqi::TextService*>(textService_)) {
         textService->changeCandidatePage(delta > 0);
     }
 }
 
-void CandidateWindow::itemRect(int index, RECT& rect) const {
-    const int row = index / candPerRow_;
-    int x = borderWidth_ + padX_;
-    const int rowStart = row * candPerRow_;
-    for (int i = rowStart; i < index; ++i) {
-        x += itemWidth(i) + colSpacing_;
+int CandidateWindow::scalePx(int value) const {
+    HDC hdc = hwnd_ ? ::GetDC(hwnd_) : ::GetDC(nullptr);
+    const int dpi = hdc ? ::GetDeviceCaps(hdc, LOGPIXELSX) : 96;
+    if (hdc) {
+        ::ReleaseDC(hwnd_ ? hwnd_ : nullptr, hdc);
     }
-    rect.left = x;
-    rect.top = contentTop_ + row * (itemHeight_ + rowSpacing_);
+    return ::MulDiv(value, dpi, 96);
+}
+
+int CandidateWindow::entryRowCount(const CandidateUiItem& item) const {
+    const auto matched = item.candidateInfo.matchedEntries();
+    if (!matched.empty()) {
+        return (std::min)(3, (std::max)(1, static_cast<int>(matched.size())));
+    }
+    if (!item.candidateInfo.entries.empty()) {
+        return (std::min)(3, (std::max)(1, static_cast<int>(item.candidateInfo.entries.size())));
+    }
+    return 1;
+}
+
+int CandidateWindow::effectiveDictionaryIndex() const {
+    if (dictionaryRevealIndex_ >= 0 &&
+        dictionaryRevealIndex_ < static_cast<int>(items_.size())) {
+        return dictionaryRevealIndex_;
+    }
+    return -1;
+}
+
+bool CandidateWindow::dictionaryPanelVisible() const {
+    const int index = effectiveDictionaryIndex();
+    return index >= 0 && items_[index].candidateInfo.hasDictionaryEntry(displayPreferences_);
+}
+
+void CandidateWindow::resetDictionaryReveal() {
+    dictionaryRevealIndex_ = -1;
+    dictionaryHoverIndex_ = -1;
+    actualPointerMovementCount_ = 0;
+    hasLastMouseMovePoint_ = false;
+    lastMouseMovePoint_ = {0, 0};
+}
+
+void CandidateWindow::updateDictionaryRevealFromMovement(POINT pt) {
+    const int hitIndex = hitTestCandidate(pt);
+    if (hitIndex < 0) {
+        if (dictionaryRevealIndex_ >= 0 || dictionaryHoverIndex_ >= 0) {
+            resetDictionaryReveal();
+            recalculateSize();
+            if (isVisible()) {
+                ::InvalidateRect(hwnd_, NULL, TRUE);
+            }
+        }
+        return;
+    }
+
+    if (dictionaryHoverIndex_ != hitIndex) {
+        dictionaryHoverIndex_ = hitIndex;
+        actualPointerMovementCount_ = 0;
+        hasLastMouseMovePoint_ = true;
+        lastMouseMovePoint_ = pt;
+        return;
+    }
+
+    const bool actualPointerMovement =
+        !hasLastMouseMovePoint_ ||
+        lastMouseMovePoint_.x != pt.x ||
+        lastMouseMovePoint_.y != pt.y;
+    if (!actualPointerMovement) {
+        return;
+    }
+    hasLastMouseMovePoint_ = true;
+    lastMouseMovePoint_ = pt;
+    ++actualPointerMovementCount_;
+
+    if (actualPointerMovementCount_ >= movementRevealThreshold_ &&
+        hitIndex >= 0 &&
+        hitIndex < static_cast<int>(items_.size()) &&
+        items_[hitIndex].candidateInfo.hasDictionaryEntry(displayPreferences_) &&
+        dictionaryRevealIndex_ != hitIndex) {
+        dictionaryRevealIndex_ = hitIndex;
+        currentSel_ = hitIndex;
+        recalculateSize();
+        if (isVisible()) {
+            ::InvalidateRect(hwnd_, NULL, TRUE);
+        }
+    }
+}
+
+void CandidateWindow::itemRect(int index, RECT& rect) const {
+    rect.left = borderWidth_ + padX_ / 2;
+    rect.top = contentTop_ + index * (itemHeight_ + rowSpacing_);
     rect.right = rect.left + itemWidth(index);
     rect.bottom = rect.top + itemHeight_;
 }
@@ -1051,9 +1430,8 @@ int CandidateWindow::itemWidth(int index) const {
     if (index >= 0 && index < static_cast<int>(itemWidths_.size())) {
         return itemWidths_[index];
     }
-    const int commentSectionWidth = commentWidth_ > 0 ? commentGap_ + commentWidth_ : 0;
-    const int trailingGap = candPerRow_ > 1 ? candSpacing_ : 0;
-    return selKeyWidth_ + labelGap_ + textWidth_ + commentSectionWidth + trailingGap;
+    return selKeyWidth_ + labelGap_ + jyutpingColumnWidth_ + honziColumnWidth_ +
+           noteColumnWidth_ + definitionColumnWidth_ + indicatorColumnWidth_;
 }
 
 int CandidateWindow::itemTextWidth(int index) const {
