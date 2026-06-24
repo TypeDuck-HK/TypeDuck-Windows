@@ -68,7 +68,7 @@
 - [x] **SET-07**: User can configure Auto-completion, Auto-correction, Auto-composition, and Input Memory where engine support is available.
 - [x] **SET-08**: User can configure Reverse Lookup Settings and Show Full Input Code where engine support is available.
 - [x] **SET-09**: Settings persist locally under TypeDuck-owned storage and apply to subsequent TypeDuck IME sessions.
-- [ ] **SET-10**: User can open an About dialog showing TypeDuck Windows IME identity, version, and relevant engine/schema attribution in bilingual text.
+- [x] **SET-10**: User can open an About dialog showing TypeDuck Windows IME identity, version, and relevant engine/schema attribution in bilingual text.
 
 ### Language and Copy
 
@@ -181,7 +181,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | SET-07 | Phase 5 | Complete |
 | SET-08 | Phase 5 | Complete |
 | SET-09 | Phase 5 | Complete |
-| SET-10 | Phase 5 | Pending |
+| SET-10 | Phase 5 | Complete |
 | LANG-01 | Phase 6 | Pending |
 | LANG-02 | Phase 6 | Pending |
 | LANG-03 | Phase 5 | Complete |

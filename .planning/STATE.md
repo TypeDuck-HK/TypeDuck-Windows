@@ -4,17 +4,17 @@ milestone: v1.0
 milestone_name: milestone
 current_phase: 5
 current_phase_name: Candidate, Dictionary, Settings, and About UI Parity
-status: in_progress
-stopped_at: Completed 05-04-PLAN.md
-last_updated: "2026-06-24T04:32:51.781Z"
+status: executing
+stopped_at: Completed 05-05-PLAN.md
+last_updated: "2026-06-24T04:52:10.100Z"
 last_activity: 2026-06-24
-last_activity_desc: Completed Phase 5 Plan 04 native candidate and dictionary popup
+last_activity_desc: Completed Phase 5 Plan 05 native settings and About UI
 progress:
   total_phases: 7
   completed_phases: 4
   total_plans: 20
-  completed_plans: 16
-  percent: 80
+  completed_plans: 17
+  percent: 57
 ---
 
 # Project State
@@ -29,11 +29,11 @@ See: .planning/PROJECT.md (updated 2026-06-24)
 ## Current Position
 
 Phase: 5 of 7 (Candidate, Dictionary, Settings, and About UI Parity)
-Plan: 5 of 8 (05-05 next)
-Status: Phase 5 in progress; Plan 05-04 complete
-Last activity: 2026-06-24 — Completed Phase 5 Plan 04 native candidate and dictionary popup
+Plan: 6 of 8 (05-06 next)
+Status: Phase 5 in progress; Plan 05-05 complete
+Last activity: 2026-06-24 — Completed Phase 5 Plan 05 native settings and About UI
 
-Progress: [████████░░] 80%
+Progress: [█████████░] 85%
 
 ## Performance Metrics
 
@@ -73,6 +73,7 @@ Progress: [████████░░] 80%
 | Phase 05-candidate-dictionary-settings-and-about-ui-parity P02 | 12 min | 3 tasks | 10 files |
 | Phase 05-candidate-dictionary-settings-and-about-ui-parity P03 | 27min | 3 tasks | 17 files |
 | Phase 05-candidate-dictionary-settings-and-about-ui-parity P04 | 17 min | 3 tasks | 7 files |
+| Phase 05-candidate-dictionary-settings-and-about-ui-parity P05 | 16min | 2 tasks | 14 files |
 
 ## Accumulated Context
 
@@ -122,6 +123,9 @@ Recent decisions affecting current work:
 - [Phase 05]: 05-04: The TypeDuck candidate/dictionary popup remains native Win32/GDI and explicitly rejects Qt in the TSF popup path. — Implemented measured Win32/GDI drawing and a strict guard rejects Qt includes/libs in MoqiTextService.
 - [Phase 05]: 05-04: Dictionary detail reveal follows the Web alpha movement threshold instead of passive pointer-rest hover. — Uses actual pointer movement counts before showing dictionary detail, avoiding flicker while typing when the pointer is stationary.
 - [Phase 05]: 05-04: Preview screenshots remain iteration evidence only; Plan 05-06 owns exact VM host-app proof. — Added CandidateInfo-backed preview capture commands, but D-36 requires installed Windows host-app evidence later.
+- [Phase ?]: [Phase 05]: 05-05: TypeDuckSettings is native Win32 and does not use Qt; standard controls and explicit layout anchors are sufficient for the settings/About executable.
+- [Phase ?]: [Phase 05]: 05-05: Native settings UI applies through MoqLauncher/TypeDuckPreferences.* and saves TypeDuckPreferences.json rather than creating a parallel settings store.
+- [Phase ?]: [Phase 05]: 05-05: About dialog attribution is source-backed by Phase 2 runtime metadata for TypeDuck-HK librime v1.1.3, rime-dictionary-lookup-filter commit 3671814d4e4aeab8d616ceea3c7f6d88e96bba02, and TypeDuck-HK schema aap2-alpha.
 
 ### Pending Todos
 
@@ -144,6 +148,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-06-24T04:32:51.772Z
-Stopped at: Completed 05-04-PLAN.md
+Last session: 2026-06-24T04:51:55.592Z
+Stopped at: Completed 05-05-PLAN.md
 Resume file: None
