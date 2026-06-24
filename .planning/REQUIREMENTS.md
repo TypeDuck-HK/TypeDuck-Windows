@@ -54,8 +54,8 @@
 - [x] **CAND-03**: User can inspect a selected or highlighted candidate's dictionary-like detail panel with headword, Jyutping, part-of-speech labels, English meaning, reading notes, and More Languages rows when available.
 - [x] **CAND-04**: User can configure Jyutping visibility with the Web alpha modes: Always Show, Only in Reverse Lookup, and Hide.
 - [x] **CAND-05**: User can configure Chinese typeface between Sung and Hei for candidate/dictionary presentation.
-- [ ] **CAND-06**: Candidate and dictionary panels position reliably near the composition/caret area without stealing focus in representative Windows host applications.
-- [ ] **CAND-07**: Candidate UI remains coherent under high DPI, multi-monitor placement, UI-less TSF hosts, and host applications with imperfect composition rectangles.
+- [x] **CAND-06**: Candidate and dictionary panels position reliably near the composition/caret area without stealing focus in representative Windows host applications.
+- [x] **CAND-07**: Candidate UI remains coherent under high DPI, multi-monitor placement, UI-less TSF hosts, and host applications with imperfect composition rectangles.
 
 ### Settings and About
 
@@ -170,8 +170,8 @@ Which phases cover which requirements. Updated during roadmap creation.
 | CAND-03 | Phase 5 | Complete |
 | CAND-04 | Phase 5 | Complete |
 | CAND-05 | Phase 5 | Complete |
-| CAND-06 | Phase 5 | Pending |
-| CAND-07 | Phase 5 | Pending |
+| CAND-06 | Phase 5 | Complete |
+| CAND-07 | Phase 5 | Complete |
 | SET-01 | Phase 5 | Pending |
 | SET-02 | Phase 5 | Pending |
 | SET-03 | Phase 5 | Complete |

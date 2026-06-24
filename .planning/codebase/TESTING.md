@@ -27,6 +27,7 @@ ctest --test-dir build-vs32/libIME2/test -C Debug --output-on-failure  # Run reg
 - TypeDuck product tests may live under `Tests/<area>` when they exercise product code outside `libIME2`, for example `Tests/TypeDuckCandidateData`.
 - Test-only CMake wiring lives in `libIME2/test/CMakeLists.txt`.
 - Product test CMake wiring lives beside the tests and is registered from the root `CMakeLists.txt`, for example `Tests/TypeDuckCandidateData/CMakeLists.txt`.
+- Focused TypeDuck guard scripts live under `scripts/`, for example `scripts/Test-TypeDuckCandidateWindow.ps1` for native candidate/dictionary popup rendering, toolkit bans, movement reveal, DPI, fallback, and no-activate placement.
 - Vendored tests exist under `jsoncpp/test`, `libuv/test`, and `libIME2/lib/googletest-release-1.10.0`, but these are third-party code and not the first-party project testing pattern.
 
 **Naming:**
@@ -166,6 +167,7 @@ EXPECT_EQ(ptr2, nullptr);
 - CI release/nightly workflows use Windows runners and package installers in `.github/workflows/release.yml` and `.github/workflows/nightly.yml`.
 - CI does not invoke `ctest`, `ComPtr_test`, or `ComObject_test`.
 - Add or update test targets in `libIME2/test/CMakeLists.txt` for reusable TSF primitives. Add a new product-level test CMake subtree when TypeDuck-owned backend/protocol/candidate behavior appears outside `libIME2/src`.
+- For native candidate-window UI parity, run `scripts/Test-TypeDuckCandidateWindow.ps1 -Strict` plus `MoqiCandidatePreview` and `MoqiTextService` builds; VM host-app evidence remains a separate acceptance layer.
 
 ## TypeDuck-Specific Testing Guidance
 

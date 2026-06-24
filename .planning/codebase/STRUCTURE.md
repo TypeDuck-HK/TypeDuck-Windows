@@ -66,8 +66,8 @@ moqi-im-windows/
 - Key files: `scripts/build.ps1`, `scripts/install.ps1`, `scripts/_all_in_package.ps1`, `scripts/generate-glyph-icon.ps1`.
 
 **`Preview`:**
-- Purpose: Standalone Win32 candidate UI preview.
-- Contains: `MoqiCandidatePreview` executable source and CMake target.
+- Purpose: Standalone Win32 TypeDuck candidate/dictionary UI preview.
+- Contains: `MoqiCandidatePreview` executable source, CMake target, and CandidateInfo-backed preview/capture scenarios.
 - Key files: `Preview/main.cpp`, `Preview/CMakeLists.txt`.
 
 **`jsoncpp`:**
@@ -99,7 +99,7 @@ moqi-im-windows/
 - `MoqLauncher/MoqiLauncher.cpp`: Launcher executable entry point.
 - `MoqLauncher/PipeServer.cpp`: Launcher single-instance setup, named pipe listening, backend initialization, tray GUI thread.
 - `SetupHelper/SetupHelper.cpp`: Installer helper action dispatch.
-- `Preview/main.cpp`: Candidate preview app entry point.
+- `Preview/main.cpp`: CandidateInfo-backed TypeDuck candidate/dictionary preview app entry point and BMP capture helper.
 
 **Configuration:**
 - `CMakeLists.txt`: Top-level project, dependency fetch, protobuf generation, target inclusion rules.
@@ -151,7 +151,7 @@ moqi-im-windows/
 **New TypeDuck TSF Behavior:**
 - Primary code: `MoqiTextService/MoqiTextService.cpp`, `MoqiTextService/MoqiTextService.h`.
 - Backend request/response behavior: `MoqiTextService/MoqiClient.cpp`, `MoqiTextService/MoqiClient.h`.
-- Candidate visual feel matching TypeDuck Web alpha: `MoqiTextService/MoqiCandidateWindow.cpp`, `MoqiTextService/MoqiCandidateWindow.h`.
+- Candidate visual feel, dictionary detail, movement reveal, and focus-safe placement matching TypeDuck Web alpha: `MoqiTextService/MoqiCandidateWindow.cpp`, `MoqiTextService/MoqiCandidateWindow.h`, `MoqiTextService/MoqiTextService.cpp`.
 - Lang-bar and preserved-key controls: `MoqiTextService/MoqiLangBarButton.cpp`, `MoqiTextService/MoqiLangBarButton.h`, `MoqiTextService/MoqiClient.cpp`.
 
 **New Backend Protocol Capability:**
