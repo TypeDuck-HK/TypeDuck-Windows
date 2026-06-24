@@ -5,16 +5,16 @@ milestone_name: milestone
 current_phase: 5
 current_phase_name: Candidate, Dictionary, Settings, and About UI Parity
 status: executing
-stopped_at: Completed 05-07-PLAN.md
-last_updated: "2026-06-24T05:04:24.191Z"
+stopped_at: Completed 05-08-PLAN.md
+last_updated: "2026-06-24T05:23:40.366Z"
 last_activity: 2026-06-24
-last_activity_desc: Completed Phase 5 Plan 07 settings launch wiring
+last_activity_desc: Completed Phase 5 Plan 08 icon and About resource packaging
 progress:
   total_phases: 7
   completed_phases: 4
   total_plans: 20
-  completed_plans: 18
-  percent: 57
+  completed_plans: 19
+  percent: 95
 ---
 
 # Project State
@@ -29,11 +29,11 @@ See: .planning/PROJECT.md (updated 2026-06-24)
 ## Current Position
 
 Phase: 5 of 7 (Candidate, Dictionary, Settings, and About UI Parity)
-Plan: 7 of 8 (05-06 next)
-Status: Phase 5 in progress; Plan 05-07 complete
-Last activity: 2026-06-24 — Completed Phase 5 Plan 07 settings launch wiring
+Plan: 8 of 8 (05-06 next)
+Status: Phase 5 in progress; Plan 05-08 complete
+Last activity: 2026-06-24 — Completed Phase 5 Plan 08 icon and About resource packaging
 
-Progress: [█████████░] 85%
+Progress: [██████████] 95%
 
 ## Performance Metrics
 
@@ -75,6 +75,7 @@ Progress: [█████████░] 85%
 | Phase 05-candidate-dictionary-settings-and-about-ui-parity P04 | 17 min | 3 tasks | 7 files |
 | Phase 05-candidate-dictionary-settings-and-about-ui-parity P05 | 16min | 2 tasks | 14 files |
 | Phase 05-candidate-dictionary-settings-and-about-ui-parity P07 | 46min | 2 tasks | 6 files |
+| Phase 05-candidate-dictionary-settings-and-about-ui-parity P08 | 13 min | 2 tasks | 13 files |
 
 ## Accumulated Context
 
@@ -130,6 +131,10 @@ Recent decisions affecting current work:
 - [Phase ?]: [Phase 05]: 05-07: Install-time and post-install settings entry points launch the fixed first-party TypeDuckSettings.exe.
 - [Phase ?]: [Phase 05]: 05-07: Installer staging treats TypeDuckSettings.exe as required payload and packages the newest launcher artifact for verification.
 - [Phase ?]: [Phase 05]: 05-07: Backend-declared configTool metadata is no longer used for the Phase 5 settings surface.
+- [Phase 05-candidate-dictionary-settings-and-about-ui-parity]: 05-08: Use TypeDuck_Transparent.ico for staged executable surfaces. — D-28 requires transparent TypeDuck icons for executable surfaces; staging-time PE stamping makes the packaged output verifiable even with prebuilt artifacts.
+- [Phase 05-candidate-dictionary-settings-and-about-ui-parity]: 05-08: Use TypeDuck_Small.ico for the first-party TSF profile/input picker. — D-29 requires the small icon for Windows input picker; the implementation uses the installed icon path with DLL resource fallback.
+- [Phase 05-candidate-dictionary-settings-and-about-ui-parity]: 05-08: Use TypeDuck.ico for Inno setup/uninstall branding. — D-30 requires the full TypeDuck icon for installer, uninstaller, and broad product branding.
+- [Phase 05-candidate-dictionary-settings-and-about-ui-parity]: 05-08: Filter legacy moqi.png, mo.ico, mo.png, and moqi.ico from transitional backend staging. — D-31 bans those legacy Moqi images from packaged TypeDuck resource surfaces.
 
 ### Pending Todos
 
@@ -152,6 +157,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-06-24T05:03:34.335Z
-Stopped at: Completed 05-07-PLAN.md
+Last session: 2026-06-24T05:23:40.358Z
+Stopped at: Completed 05-08-PLAN.md
 Resume file: None
