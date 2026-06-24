@@ -1,7 +1,9 @@
 param(
   [string] $RepoRoot = ".",
   [string] $BackendRoot = "D:\VSProjects\moqi-ime",
-  [switch] $Strict
+  [switch] $Strict,
+  [ValidateSet("", "RejectedUatBehavior")]
+  [string] $ExpectRed = ""
 )
 
 $ErrorActionPreference = "Stop"
@@ -124,6 +126,10 @@ function Assert-ExecutableContainsIcon([string] $ExecutablePath, [string] $IconP
   throw $Message
 }
 
+function Add-Violation([System.Collections.Generic.List[string]] $Violations, [string] $Message) {
+  $Violations.Add($Message)
+}
+
 $repo = Resolve-FullPath $RepoRoot
 $backend = Resolve-FullPath $BackendRoot
 
@@ -169,7 +175,6 @@ Assert-Text $typeDuckProfile "programDirEnvVar\(\)" "Profile icon lookup must us
 
 Assert-Text $installer "SetupIconFile=\.\.\\TypeDuckSettings\\assets\\TypeDuck\.ico" "Installer setup icon must use TypeDuck.ico."
 Assert-Text $installer "UninstallDisplayIcon=\{app\}\\TypeDuck\.ico" "Uninstaller/broad product icon must use TypeDuck.ico."
-Assert-Text $installScript 'TypeDuck\.ico' "Staging must copy TypeDuck.ico into the app payload."
 Assert-Text $packageScript "scripts\\install\.ps1" "All-in package must continue routing final packaging through scripts/install.ps1."
 
 Assert-Ordered $about @(
@@ -209,11 +214,28 @@ $stageHasPlanIcons =
   (Test-Path -LiteralPath (Join-Path $stageRoot "TypeDuck_Transparent.ico")) -and
   (Test-Path -LiteralPath (Join-Path $stageRoot "TypeDuck_Small.ico")) -and
   (Test-Path -LiteralPath (Join-Path $stageRoot "TypeDuck.ico"))
-if ($stageHasPlanIcons) {
-  Assert-SameFileHash (Join-Path $stageRoot "TypeDuck_Transparent.ico") $transparent "Staged transparent icon must match source."
-  Assert-SameFileHash (Join-Path $stageRoot "TypeDuck_Small.ico") $small "Staged small icon must match source."
-  Assert-SameFileHash (Join-Path $stageRoot "TypeDuck.ico") $product "Staged product icon must match source."
+$rejectedBehavior = [System.Collections.Generic.List[string]]::new()
+if (Test-Path -LiteralPath $stageRoot -PathType Container) {
+  $rawStageIcons = @(Get-ChildItem -LiteralPath $stageRoot -File -Filter "*.ico" -ErrorAction SilentlyContinue)
+  foreach ($icon in $rawStageIcons) {
+    Add-Violation $rejectedBehavior "Raw standalone icon is staged under installed product root: $($icon.FullName)"
+  }
 
+  $legacyRimeIcon = Join-Path $stageRoot "moqi-ime/input_methods/rime/icon.ico"
+  if (Test-Path -LiteralPath $legacyRimeIcon -PathType Leaf) {
+    Add-Violation $rejectedBehavior "Legacy runtime icon is packaged: $legacyRimeIcon"
+  }
+}
+
+if ($ExpectRed -eq "RejectedUatBehavior") {
+  Assert-True ($rejectedBehavior.Count -gt 0) "Expected RED RejectedUatBehavior, but rejected icon packaging behavior was not present."
+  Write-Host "PASS RED: RejectedUatBehavior caught icon packaging gaps: $($rejectedBehavior -join '; ')"
+  exit 0
+}
+
+Assert-True ($rejectedBehavior.Count -eq 0) "Rejected UAT icon packaging behavior found: $($rejectedBehavior -join '; ')"
+
+if (Test-Path -LiteralPath $stageRoot -PathType Container) {
   Assert-ExecutableContainsIcon (Join-Path $stageRoot "TypeDuckLauncher.exe") $transparent "Staged TypeDuckLauncher.exe does not contain TypeDuck_Transparent.ico image data."
   Assert-ExecutableContainsIcon (Join-Path $stageRoot "TypeDuckSetupHelper.exe") $transparent "Staged TypeDuckSetupHelper.exe does not contain TypeDuck_Transparent.ico image data."
   Assert-ExecutableContainsIcon (Join-Path $stageRoot "TypeDuckSettings.exe") $transparent "Staged TypeDuckSettings.exe does not contain TypeDuck_Transparent.ico image data."

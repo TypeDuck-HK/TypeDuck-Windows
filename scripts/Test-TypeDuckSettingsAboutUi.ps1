@@ -1,7 +1,9 @@
 param(
   [string] $RepoRoot = ".",
   [string] $BackendRoot = "D:\VSProjects\moqi-ime",
-  [switch] $Strict
+  [switch] $Strict,
+  [ValidateSet("", "RejectedUatBehavior")]
+  [string] $ExpectRed = ""
 )
 
 $ErrorActionPreference = "Stop"
@@ -34,6 +36,10 @@ function Assert-Ordered([string] $Text, [string[]] $Patterns, [string] $Label) {
     }
     $position = $position + 1 + $match.Index + $match.Length
   }
+}
+
+function Add-Violation([System.Collections.Generic.List[string]] $Violations, [string] $Message) {
+  $Violations.Add($Message)
 }
 
 $repo = Resolve-FullPath $RepoRoot
@@ -73,6 +79,31 @@ $installScript = Get-Content -Raw -Encoding UTF8 -LiteralPath $installScriptPath
 $packageScript = Get-Content -Raw -Encoding UTF8 -LiteralPath $packageScriptPath
 $installer = Get-Content -Raw -Encoding UTF8 -LiteralPath $installerPath
 $fixture = Get-Content -Raw -Encoding UTF8 -LiteralPath $settingsOrderPath | ConvertFrom-Json
+
+$rejectedBehavior = [System.Collections.Generic.List[string]]::new()
+if ($window -match "TypeDuckPreferences\.json") {
+  Add-Violation $rejectedBehavior "Settings window exposes implementation file name TypeDuckPreferences.json in user-facing copy."
+}
+if ($window -match "Unsupported controls are disabled with a reason|不支援時會停用") {
+  Add-Violation $rejectedBehavior "Settings window exposes unsupported-state wording without a real user-facing disabled state."
+}
+foreach ($tick in 4..10) {
+  if ($window -notmatch "L`"$tick`"") {
+    Add-Violation $rejectedBehavior "Page-size slider is missing visible tick label $tick."
+  }
+}
+if ((Test-Path -LiteralPath (Join-Path $repo "TypeDuckSettings/TypeDuckAboutDialog.cpp")) -and
+    ($window -match "關於 About|ShowTypeDuckAboutDialog|kAbout")) {
+  Add-Violation $rejectedBehavior "Settings panel still exposes an About button/modal instead of leaving About to a separate executable."
+}
+
+if ($ExpectRed -eq "RejectedUatBehavior") {
+  Assert-True ($rejectedBehavior.Count -gt 0) "Expected RED RejectedUatBehavior, but the rejected settings/About behavior was not present."
+  Write-Host "PASS RED: RejectedUatBehavior caught settings/About gaps: $($rejectedBehavior -join '; ')"
+  exit 0
+}
+
+Assert-True ($rejectedBehavior.Count -eq 0) "Rejected UAT settings/About behavior found: $($rejectedBehavior -join '; ')"
 
 Assert-Text $topCmake "add_subdirectory\(.+TypeDuckSettings" "Top-level CMake must include TypeDuckSettings."
 Assert-Text $settingsCmake "add_executable\(TypeDuckSettings\s+WIN32" "TypeDuckSettings must be a native Win32 executable."
@@ -132,7 +163,6 @@ Assert-Text $window "TBM_SETRANGE.+MAKELPARAM\(4,\s*10\)" "Candidate count contr
 Assert-Text $window "TypeDuck::applyPreferences" "Apply must use the shared TypeDuckPreferences apply path."
 Assert-Text $window "套用 Apply" "Apply button must be bilingual."
 Assert-Text $window "取消 Cancel" "Cancel button must be bilingual."
-Assert-Text $window "Unsupported controls are disabled with a reason" "Capability-gated explanatory text is missing."
 Assert-Text $preferences "TypeDuckPreferences\.json" "Settings source of truth must remain TypeDuckPreferences.json."
 
 $aboutPath = Join-Path $repo "TypeDuckSettings/TypeDuckAboutDialog.cpp"

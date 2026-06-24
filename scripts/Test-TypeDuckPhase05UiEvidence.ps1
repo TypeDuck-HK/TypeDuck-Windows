@@ -2,7 +2,7 @@ param(
   [string] $RepoRoot = ".",
   [string] $BackendRoot = "D:\VSProjects\moqi-ime",
   [switch] $Strict,
-  [ValidateSet("", "VmEvidenceMissing")]
+  [ValidateSet("", "RejectedUatBehavior", "VmEvidenceMissing")]
   [string] $ExpectRed = ""
 )
 
@@ -41,6 +41,10 @@ function Invoke-Guard([string] $ScriptName, [string[]] $Arguments) {
   if ($LASTEXITCODE -ne 0) {
     throw "$ScriptName failed with exit code $LASTEXITCODE"
   }
+}
+
+function Add-Violation([System.Collections.Generic.List[string]] $Violations, [string] $Message) {
+  $Violations.Add($Message)
 }
 
 function Test-EvidenceSlotPresent([object] $Slot) {
@@ -99,6 +103,7 @@ $manifestPath = Join-Path $repo ".planning/product/ui-fixtures/phase-05/phase05-
 $screenshotsDir = Join-Path $repo ".planning/product/ui-fixtures/phase-05/screenshots"
 $manualNotesPath = Join-Path $repo ".planning/product/ui-fixtures/phase-05/manual-uat-notes.md"
 $sourceMetadataPath = Join-Path $repo ".planning/product/web-alpha-fixtures/2026-06-23/source-metadata.json"
+$runtimeProvenancePath = Join-Path $repo ".planning/product/ui-fixtures/phase-05/runtime-provenance.json"
 
 Assert-Directory $repo "Repo root is missing: $repo"
 Assert-Directory $backend "Backend root is missing: $backend"
@@ -110,8 +115,13 @@ if ($Strict) {
   Invoke-Guard -ScriptName "Test-TypeDuckCandidateData.ps1" -Arguments @("-RepoRoot", $repo, "-Strict")
   Invoke-Guard -ScriptName "Test-TypeDuckCandidateWindow.ps1" -Arguments @("-RepoRoot", $repo, "-Strict")
   Invoke-Guard -ScriptName "Test-TypeDuckSettingsPersistence.ps1" -Arguments @("-RepoRoot", $repo, "-BackendRoot", $backend, "-Strict")
-  Invoke-Guard -ScriptName "Test-TypeDuckSettingsAboutUi.ps1" -Arguments @("-RepoRoot", $repo, "-BackendRoot", $backend, "-Strict")
-  Invoke-Guard -ScriptName "Test-TypeDuckIconPackaging.ps1" -Arguments @("-RepoRoot", $repo, "-BackendRoot", $backend, "-Strict")
+  if ($ExpectRed -in @("RejectedUatBehavior", "VmEvidenceMissing")) {
+    Invoke-Guard -ScriptName "Test-TypeDuckSettingsAboutUi.ps1" -Arguments @("-RepoRoot", $repo, "-BackendRoot", $backend, "-Strict", "-ExpectRed", "RejectedUatBehavior")
+    Invoke-Guard -ScriptName "Test-TypeDuckIconPackaging.ps1" -Arguments @("-RepoRoot", $repo, "-BackendRoot", $backend, "-Strict", "-ExpectRed", "RejectedUatBehavior")
+  } else {
+    Invoke-Guard -ScriptName "Test-TypeDuckSettingsAboutUi.ps1" -Arguments @("-RepoRoot", $repo, "-BackendRoot", $backend, "-Strict")
+    Invoke-Guard -ScriptName "Test-TypeDuckIconPackaging.ps1" -Arguments @("-RepoRoot", $repo, "-BackendRoot", $backend, "-Strict")
+  }
 }
 
 $sourceMetadata = Get-JsonFile $sourceMetadataPath
@@ -126,6 +136,51 @@ if (Test-Path -LiteralPath $sourceMetadata.localSource.path -PathType Container)
 }
 
 $manifest = Get-JsonFile $manifestPath
+$staleEvidence = [System.Collections.Generic.List[string]]::new()
+foreach ($staleName in @("settings-two-column-layout.bmp", "vm-about-dialog.bmp")) {
+  $stalePath = Join-Path $screenshotsDir $staleName
+  if (Test-Path -LiteralPath $stalePath -PathType Leaf) {
+    Add-Violation $staleEvidence "Stale screenshot remains active: $staleName"
+  }
+  if ((Get-Content -Raw -Encoding UTF8 -LiteralPath $manifestPath) -match [regex]::Escape($staleName)) {
+    Add-Violation $staleEvidence "Evidence manifest still references stale screenshot: $staleName"
+  }
+}
+if ($ExpectRed -eq "RejectedUatBehavior") {
+  Write-Host "PASS RED: RejectedUatBehavior aggregate guard proved rejected child guards are active."
+  exit 0
+}
+
+Assert-True ($staleEvidence.Count -eq 0) "Stale Phase 5 evidence is still accepted: $($staleEvidence -join '; ')"
+Assert-File $runtimeProvenancePath "Missing runtime/Web provenance record: $runtimeProvenancePath"
+$runtimeProvenance = Get-JsonFile $runtimeProvenancePath
+Assert-True ($runtimeProvenance.schemaVersion -ge 1) "Runtime provenance must declare schemaVersion >= 1."
+Assert-True ($runtimeProvenance.repositories.windows.path -eq $repo) "Runtime provenance must record this Windows repo path."
+Assert-True ($runtimeProvenance.repositories.backend.path -eq $backend) "Runtime provenance must record the sibling backend path."
+Assert-True ($runtimeProvenance.repositories.typeDuckWeb.path -eq "I:\GitHub\TypeDuck-Web") "Runtime provenance must record the TypeDuck-Web path."
+Assert-True ($runtimeProvenance.webAlphaFixture.sourceMetadata -eq ".planning/product/web-alpha-fixtures/2026-06-23/source-metadata.json") "Runtime provenance must link the Web alpha fixture metadata."
+Assert-True ($runtimeProvenance.lookupFilter.commit -eq "3671814d4e4aeab8d616ceea3c7f6d88e96bba02") "Runtime provenance must include the Phase 2 lookup-filter commit."
+if (Test-Path -LiteralPath $runtimeProvenance.repositories.backend.path -PathType Container) {
+  $currentBackendHead = (& git -C $runtimeProvenance.repositories.backend.path rev-parse HEAD).Trim()
+  Assert-True ($currentBackendHead -eq $runtimeProvenance.repositories.backend.head) "Runtime provenance backend HEAD is stale: $($runtimeProvenance.repositories.backend.head) vs $currentBackendHead."
+}
+if (Test-Path -LiteralPath $runtimeProvenance.repositories.typeDuckWeb.path -PathType Container) {
+  $currentWebHead = (& git -C $runtimeProvenance.repositories.typeDuckWeb.path rev-parse HEAD).Trim()
+  Assert-True ($currentWebHead -eq $runtimeProvenance.repositories.typeDuckWeb.head) "Runtime provenance TypeDuck-Web HEAD is stale: $($runtimeProvenance.repositories.typeDuckWeb.head) vs $currentWebHead."
+}
+if ($runtimeProvenance.PSObject.Properties.Name -contains "artifacts") {
+  foreach ($artifact in $runtimeProvenance.artifacts) {
+    if ($artifact.PSObject.Properties.Name -contains "path" -and $artifact.PSObject.Properties.Name -contains "sha256") {
+      $artifactPath = [string] $artifact.path
+      if (-not [System.IO.Path]::IsPathRooted($artifactPath)) {
+        $artifactPath = Join-Path $repo $artifactPath
+      }
+      Assert-File $artifactPath "Runtime provenance artifact is missing: $($artifact.path)"
+      $actualHash = (Get-FileHash -Algorithm SHA256 -LiteralPath $artifactPath).Hash
+      Assert-True ($actualHash -eq $artifact.sha256) "Runtime provenance artifact hash is stale for $($artifact.path): expected $($artifact.sha256), got $actualHash."
+    }
+  }
+}
 Assert-True ($manifest.schemaVersion -ge 1) "Evidence manifest must declare schemaVersion >= 1."
 Assert-True ($manifest.fixture.sourceMetadata -eq ".planning/product/web-alpha-fixtures/2026-06-23/source-metadata.json") "Evidence manifest must link the Web alpha source metadata."
 Assert-True ($manifest.fixture.localTypeDuckWebSource -eq "I:\GitHub\TypeDuck-Web") "Evidence manifest must link local TypeDuck-Web source authority."
@@ -164,8 +219,7 @@ $requiredPreviewScreenshots = @(
   "dictionaryDetail",
   "compoundHousam",
   "reverseLookupCangjie",
-  "settingsTwoColumn",
-  "aboutDialog"
+  "settingsApplyPersistence"
 )
 $requiredPackageSlots = @(
   "installer",
