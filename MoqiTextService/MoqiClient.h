@@ -72,6 +72,9 @@ public:
 
 	bool onCommand(UINT id, Ime::TextService::CommandType type);
 
+	bool requestTypeDuckSettingsSnapshot(Json::Value& result);
+	bool applyTypeDuckSettingsUpdate(const Json::Value& update, Json::Value& result);
+
 	// called when a language bar button needs a menu
 	bool onMenu(LangBarButton* btn, ITfMenu* pMenu);
 

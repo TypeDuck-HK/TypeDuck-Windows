@@ -111,6 +111,19 @@ message TypeDuckSettingsSnapshot {
   bool ascii_mode = 4;
   bool traditional_hong_kong = 5;
   uint32 candidate_page_size = 6;
+  repeated string display_languages = 20;
+  string main_language = 21;
+  uint32 page_size = 22;
+  bool is_hei_typeface = 23;
+  string show_romanization = 24;
+  bool enable_completion = 25;
+  bool enable_correction = 26;
+  bool enable_sentence = 27;
+  bool enable_learning = 28;
+  bool show_reverse_code = 29;
+  bool is_cangjie5 = 30;
+  string source = 31;
+  string status_message = 32;
 }
 
 message TypeDuckSettingsUpdate {
@@ -120,6 +133,17 @@ message TypeDuckSettingsUpdate {
   optional bool ascii_mode = 4;
   optional bool traditional_hong_kong = 5;
   optional uint32 candidate_page_size = 6;
+  repeated string display_languages = 20;
+  optional string main_language = 21;
+  optional uint32 page_size = 22;
+  optional bool is_hei_typeface = 23;
+  optional string show_romanization = 24;
+  optional bool enable_completion = 25;
+  optional bool enable_correction = 26;
+  optional bool enable_sentence = 27;
+  optional bool enable_learning = 28;
+  optional bool show_reverse_code = 29;
+  optional bool is_cangjie5 = 30;
 }
 
 message TypeDuckEngineCapability {
@@ -165,6 +189,7 @@ enum TypeDuckErrorCode {
   TYPEDUCK_ERROR_BACKEND_TIMEOUT = 4;
   TYPEDUCK_ERROR_BACKEND_RESTART = 5;
   TYPEDUCK_ERROR_ENGINE_INIT_FAILED = 6;
+  TYPEDUCK_ERROR_SETTINGS_APPLY_FAILED = 7;
 }
 
 message TypeDuckError {

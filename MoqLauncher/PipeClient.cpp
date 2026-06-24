@@ -21,6 +21,7 @@
 #include "PipeServer.h"
 #include "Utils.h"
 #include "BackendServer.h"
+#include "TypeDuckPreferences.h"
 #include "proto/moqi.pb.h"
 #include "../proto/ProtoFraming.h"
 
@@ -32,6 +33,89 @@ static wstring_convert<codecvt_utf8<wchar_t>> utf8Codec;
 
 // default to 30 seconds
 static constexpr std::uint64_t BACKEND_REQUEST_TIMEOUT_MS = 30 * 1000;
+
+namespace {
+
+void fillTypeDuckSettingsSnapshot(
+    moqi::protocol::TypeDuckSettingsSnapshot* snapshot,
+    const TypeDuck::Preferences& preferences,
+    const std::string& message) {
+    snapshot->set_language("zh-HK");
+    snapshot->set_display_language(preferences.mainLanguage);
+    snapshot->set_traditional_hong_kong(true);
+    snapshot->set_candidate_page_size(static_cast<uint32_t>(preferences.pageSize));
+    snapshot->set_main_language(preferences.mainLanguage);
+    snapshot->set_page_size(static_cast<uint32_t>(preferences.pageSize));
+    snapshot->set_is_hei_typeface(preferences.isHeiTypeface);
+    snapshot->set_show_romanization(preferences.showRomanization);
+    snapshot->set_enable_completion(preferences.enableCompletion);
+    snapshot->set_enable_correction(preferences.enableCorrection);
+    snapshot->set_enable_sentence(preferences.enableSentence);
+    snapshot->set_enable_learning(preferences.enableLearning);
+    snapshot->set_show_reverse_code(preferences.showReverseCode);
+    snapshot->set_is_cangjie5(preferences.isCangjie5);
+    snapshot->set_source("TypeDuckPreferences.json");
+    snapshot->set_status_message(message);
+    for (const auto& language : preferences.displayLanguages) {
+        snapshot->add_display_languages(language);
+    }
+}
+
+void addCapability(
+    moqi::protocol::ServerResponse& response,
+    const TypeDuck::CapabilityMetadata& capability) {
+    auto* item = response.add_typeduck_capabilities();
+    item->set_name(capability.id);
+    item->set_supported(capability.supported);
+    item->set_detail(capability.message);
+}
+
+TypeDuck::Preferences applyUpdateToPreferences(
+    const TypeDuck::Preferences& current,
+    const moqi::protocol::TypeDuckSettingsUpdate& update) {
+    auto next = current;
+    if (update.display_languages_size() > 0) {
+        next.displayLanguages.clear();
+        for (const auto& language : update.display_languages()) {
+            next.displayLanguages.push_back(language);
+        }
+    }
+    if (update.has_main_language()) {
+        next.mainLanguage = update.main_language();
+    }
+    if (update.has_page_size()) {
+        next.pageSize = static_cast<int>(update.page_size());
+    } else if (update.has_candidate_page_size()) {
+        next.pageSize = static_cast<int>(update.candidate_page_size());
+    }
+    if (update.has_is_hei_typeface()) {
+        next.isHeiTypeface = update.is_hei_typeface();
+    }
+    if (update.has_show_romanization()) {
+        next.showRomanization = update.show_romanization();
+    }
+    if (update.has_enable_completion()) {
+        next.enableCompletion = update.enable_completion();
+    }
+    if (update.has_enable_correction()) {
+        next.enableCorrection = update.enable_correction();
+    }
+    if (update.has_enable_sentence()) {
+        next.enableSentence = update.enable_sentence();
+    }
+    if (update.has_enable_learning()) {
+        next.enableLearning = update.enable_learning();
+    }
+    if (update.has_show_reverse_code()) {
+        next.showReverseCode = update.show_reverse_code();
+    }
+    if (update.has_is_cangjie5()) {
+        next.isCangjie5 = update.is_cangjie5();
+    }
+    return next;
+}
+
+} // namespace
 
 
 PipeClient::PipeClient(PipeServer* server, DWORD pipeMode, SECURITY_ATTRIBUTES* securityAttributes) :
@@ -115,6 +199,10 @@ void PipeClient::handleClientMessage(const char* readBuf, size_t len) {
         }
 
         if (!backend_ && !initBackend(request)) {
+            continue;
+        }
+
+        if (handleTypeDuckSettingsRequest(request)) {
             continue;
         }
 
@@ -232,6 +320,88 @@ void PipeClient::handleClientFrameViolation() {
         moqi::protocol::TYPEDUCK_HEALTH_DEGRADED,
         true,
         detail);
+}
+
+bool PipeClient::handleTypeDuckSettingsRequest(
+    const moqi::protocol::ClientRequest& request) {
+    if (request.method() != moqi::protocol::METHOD_TYPEDUCK_SETTINGS_SNAPSHOT &&
+        request.method() != moqi::protocol::METHOD_TYPEDUCK_SETTINGS_UPDATE) {
+        return false;
+    }
+
+    const auto path = TypeDuck::defaultPreferencesPath();
+    auto loaded = TypeDuck::loadPreferences(path);
+    auto preferences = loaded.preferences;
+
+    if (request.method() == moqi::protocol::METHOD_TYPEDUCK_SETTINGS_UPDATE) {
+        if (!request.has_typeduck_settings_update()) {
+            writeTypeDuckSettingsResponse(
+                request,
+                false,
+                "設定更新內容無效 / Settings update payload is invalid");
+            return true;
+        }
+        preferences = applyUpdateToPreferences(
+            preferences, request.typeduck_settings_update());
+        auto applied = TypeDuck::applyPreferences(
+            path,
+            preferences,
+            [](const TypeDuck::RimeSideEffects&) {
+                return TypeDuck::ApplyResult{true, "設定已套用 / Settings applied"};
+            });
+        if (!applied.ok) {
+            writeTypeDuckSettingsResponse(request, false, applied.message);
+            return true;
+        }
+        loaded = TypeDuck::loadPreferences(path);
+        preferences = loaded.preferences;
+        writeTypeDuckSettingsResponse(request, true, applied.message);
+        return true;
+    }
+
+    writeTypeDuckSettingsResponse(request, loaded.ok, loaded.message);
+    return true;
+}
+
+void PipeClient::writeTypeDuckSettingsResponse(
+    const moqi::protocol::ClientRequest& request,
+    bool success,
+    const std::string& message) {
+    moqi::protocol::ServerResponse response;
+    response.set_client_id(clientId_);
+    response.set_seq_num(request.seq_num());
+    response.set_success(success);
+    response.set_return_value(success ? 1 : 0);
+    if (!success) {
+        response.set_error(message);
+        auto* health = response.mutable_typeduck_engine_health();
+        health->set_status(moqi::protocol::TYPEDUCK_HEALTH_DEGRADED);
+        health->set_backend_name(backend_ != nullptr ? backend_->name() : "");
+        health->set_message(message);
+        health->set_recoverable(true);
+        auto* error = response.mutable_typeduck_error();
+        error->set_code(moqi::protocol::TYPEDUCK_ERROR_SETTINGS_APPLY_FAILED);
+        error->set_message(message);
+        error->set_recoverable(true);
+        error->set_detail("TypeDuckPreferences.json");
+    }
+
+    const auto loaded = TypeDuck::loadPreferences(TypeDuck::defaultPreferencesPath());
+    fillTypeDuckSettingsSnapshot(
+        response.mutable_typeduck_settings_snapshot(),
+        loaded.preferences,
+        message);
+    for (const auto& capability : TypeDuck::defaultCapabilities()) {
+        addCapability(response, capability);
+    }
+
+    std::string framedMessage;
+    if (!Proto::serializeMessageBounded(
+            response, framedMessage, Proto::kMaxClientFramePayloadBytes)) {
+        logger()->error("Failed to serialize TypeDuck settings response for client {}", clientId_);
+        return;
+    }
+    pipe_.write(std::move(framedMessage));
 }
 
 void PipeClient::disconnectFromBackend() {

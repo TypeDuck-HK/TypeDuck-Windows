@@ -88,6 +88,13 @@ private:
 
     void handleClientFrameViolation();
 
+    bool handleTypeDuckSettingsRequest(const moqi::protocol::ClientRequest& request);
+
+    void writeTypeDuckSettingsResponse(
+        const moqi::protocol::ClientRequest& request,
+        bool success,
+        const std::string& message = {});
+
     void startRequestTimeoutTimer(std::uint64_t timeoutMs);
 
     void stopRequestTimeoutTimer();

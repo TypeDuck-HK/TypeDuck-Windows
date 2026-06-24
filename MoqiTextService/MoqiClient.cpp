@@ -304,6 +304,10 @@ static moqi::protocol::Method methodNameToProto(const char *methodName) {
     return moqi::protocol::METHOD_SELECT_CANDIDATE;
   if (strcmp(methodName, "changePage") == 0)
     return moqi::protocol::METHOD_CHANGE_PAGE;
+  if (strcmp(methodName, "typeduckSettingsSnapshot") == 0)
+    return moqi::protocol::METHOD_TYPEDUCK_SETTINGS_SNAPSHOT;
+  if (strcmp(methodName, "typeduckSettingsUpdate") == 0)
+    return moqi::protocol::METHOD_TYPEDUCK_SETTINGS_UPDATE;
   return moqi::protocol::METHOD_UNSPECIFIED;
 }
 
@@ -431,6 +435,46 @@ static Json::Value buttonInfoToJson(const moqi::protocol::ButtonInfo &button) {
   return result;
 }
 
+static Json::Value typeDuckSettingsSnapshotToJson(
+    const moqi::protocol::TypeDuckSettingsSnapshot &snapshot) {
+  Json::Value result;
+  Json::Value displayLanguages(Json::arrayValue);
+  for (const auto &language : snapshot.display_languages()) {
+    displayLanguages.append(language);
+  }
+  result["displayLanguages"] = displayLanguages;
+  result["mainLanguage"] = snapshot.main_language();
+  result["pageSize"] = snapshot.page_size() != 0
+                           ? snapshot.page_size()
+                           : snapshot.candidate_page_size();
+  result["isHeiTypeface"] = snapshot.is_hei_typeface();
+  result["showRomanization"] = snapshot.show_romanization();
+  result["enableCompletion"] = snapshot.enable_completion();
+  result["enableCorrection"] = snapshot.enable_correction();
+  result["enableSentence"] = snapshot.enable_sentence();
+  result["enableLearning"] = snapshot.enable_learning();
+  result["showReverseCode"] = snapshot.show_reverse_code();
+  result["isCangjie5"] = snapshot.is_cangjie5();
+  result["source"] = snapshot.source();
+  result["statusMessage"] = snapshot.status_message();
+  return result;
+}
+
+static Json::Value typeDuckCapabilitiesToJson(
+    const google::protobuf::RepeatedPtrField<
+        moqi::protocol::TypeDuckEngineCapability> &capabilities) {
+  Json::Value result(Json::arrayValue);
+  for (const auto &capability : capabilities) {
+    Json::Value item;
+    item["id"] = capability.name();
+    item["supported"] = capability.supported();
+    item["version"] = capability.version();
+    item["message"] = capability.detail();
+    result.append(item);
+  }
+  return result;
+}
+
 static Json::Value responseToJson(const moqi::protocol::ServerResponse &response) {
   Json::Value result;
   result["success"] = response.success();
@@ -505,6 +549,15 @@ static Json::Value responseToJson(const moqi::protocol::ServerResponse &response
     typeduckError["detail"] = error.detail();
     result["typeduckError"] = typeduckError;
     result["typeduckDegraded"] = true;
+  }
+
+  if (response.has_typeduck_settings_snapshot()) {
+    result["typeduckSettingsSnapshot"] =
+        typeDuckSettingsSnapshotToJson(response.typeduck_settings_snapshot());
+  }
+  if (!response.typeduck_capabilities().empty()) {
+    result["typeduckCapabilities"] =
+        typeDuckCapabilitiesToJson(response.typeduck_capabilities());
   }
 
   if (!response.menu_items().empty()) {
@@ -1313,6 +1366,62 @@ bool Client::onCommand(UINT id, Ime::TextService::CommandType type) {
     return ret["return"].asBool();
   }
   return false;
+}
+
+bool Client::requestTypeDuckSettingsSnapshot(Json::Value &result) {
+  auto req = createRpcRequest("typeduckSettingsSnapshot");
+  req.set_method(moqi::protocol::METHOD_TYPEDUCK_SETTINGS_SNAPSHOT);
+
+  callRpcMethod(req, result);
+  return handleRpcResponse(result);
+}
+
+bool Client::applyTypeDuckSettingsUpdate(const Json::Value &update,
+                                         Json::Value &result) {
+  auto req = createRpcRequest("typeduckSettingsUpdate");
+  req.set_method(moqi::protocol::METHOD_TYPEDUCK_SETTINGS_UPDATE);
+  auto *typeduckUpdate = req.mutable_typeduck_settings_update();
+  const Json::Value &displayLanguages = update["displayLanguages"];
+  if (displayLanguages.isArray()) {
+    for (const auto &language : displayLanguages) {
+      if (language.isString()) {
+        typeduckUpdate->add_display_languages(language.asString());
+      }
+    }
+  }
+  if (update["mainLanguage"].isString()) {
+    typeduckUpdate->set_main_language(update["mainLanguage"].asString());
+  }
+  if (update["pageSize"].isUInt() || update["pageSize"].isInt()) {
+    typeduckUpdate->set_page_size(update["pageSize"].asUInt());
+  }
+  if (update["isHeiTypeface"].isBool()) {
+    typeduckUpdate->set_is_hei_typeface(update["isHeiTypeface"].asBool());
+  }
+  if (update["showRomanization"].isString()) {
+    typeduckUpdate->set_show_romanization(update["showRomanization"].asString());
+  }
+  if (update["enableCompletion"].isBool()) {
+    typeduckUpdate->set_enable_completion(update["enableCompletion"].asBool());
+  }
+  if (update["enableCorrection"].isBool()) {
+    typeduckUpdate->set_enable_correction(update["enableCorrection"].asBool());
+  }
+  if (update["enableSentence"].isBool()) {
+    typeduckUpdate->set_enable_sentence(update["enableSentence"].asBool());
+  }
+  if (update["enableLearning"].isBool()) {
+    typeduckUpdate->set_enable_learning(update["enableLearning"].asBool());
+  }
+  if (update["showReverseCode"].isBool()) {
+    typeduckUpdate->set_show_reverse_code(update["showReverseCode"].asBool());
+  }
+  if (update["isCangjie5"].isBool()) {
+    typeduckUpdate->set_is_cangjie5(update["isCangjie5"].asBool());
+  }
+
+  callRpcMethod(req, result);
+  return handleRpcResponse(result);
 }
 
 bool Client::sendOnMenu(std::string button_id, Json::Value &result) {

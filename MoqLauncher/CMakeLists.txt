@@ -49,6 +49,8 @@ add_executable(MoqiLauncher WIN32
     PipeSecurity.h
     BackendServer.cpp
     BackendServer.h
+    TypeDuckPreferences.cpp
+    TypeDuckPreferences.h
     Utils.cpp
     Utils.h
     # resources
