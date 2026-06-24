@@ -1,0 +1,129 @@
+{
+  "schemaVersion": 1,
+  "plan": "05-06",
+  "phase": "05-candidate-dictionary-settings-and-about-ui-parity",
+  "fixture": {
+    "sourceMetadata": ".planning/product/web-alpha-fixtures/2026-06-23/source-metadata.json",
+    "localTypeDuckWebSource": "I:\\GitHub\\TypeDuck-Web",
+    "captureDate": "2026-06-23",
+    "fixtureCommit": "db21054",
+    "notes": "TypeDuck Web alpha fixture and local source are the Phase 5 UI authority."
+  },
+  "interaction": {
+    "dictionaryReveal": {
+      "trigger": "pointer-movement",
+      "stationaryPointerNoFlicker": true,
+      "source": ".planning/product/TYPEDUCK-WEB-ALPHA-FIXTURES-2026-06-23.md"
+    }
+  },
+  "settings": {
+    "deployFailureEvidence": {
+      "status": "recorded",
+      "notes": "Plan 05-03 guard covers save-before-side-effect failure semantics; VM evidence must confirm user-facing Apply behavior."
+    }
+  },
+  "about": {
+    "identity": {
+      "status": "recorded",
+      "notes": "Plan 05-05 and 05-08 guards cover TypeDuck Windows IME identity, version, TypeDuck-HK librime, lookup-filter, and schema attribution; VM evidence must capture the visible dialog."
+    }
+  },
+  "package": {
+    "installer": {
+      "status": "missing"
+    },
+    "stagedSettingsExecutable": {
+      "status": "missing"
+    },
+    "aboutAssets": {
+      "status": "missing"
+    },
+    "aboutVersionSource": {
+      "status": "missing"
+    },
+    "engineSchemaAttribution": {
+      "status": "missing"
+    },
+    "themeFiles": {
+      "status": "missing"
+    },
+    "iconAssignments": {
+      "status": "missing"
+    },
+    "legacyMoqiAssetScan": {
+      "status": "passed",
+      "notes": "scripts/Test-TypeDuckIconPackaging.ps1 rejects moqi.png, mo.ico, mo.png, and moqi.ico from Phase 5 packaged surfaces."
+    }
+  },
+  "automated": {
+    "commands": [],
+    "previewScreenshots": {
+      "candidateBaseline": {
+        "status": "missing"
+      },
+      "candidateMultilingual": {
+        "status": "missing"
+      },
+      "dictionaryDetail": {
+        "status": "missing"
+      },
+      "compoundHousam": {
+        "status": "missing"
+      },
+      "reverseLookupCangjie": {
+        "status": "missing"
+      },
+      "settingsTwoColumn": {
+        "status": "missing"
+      },
+      "aboutDialog": {
+        "status": "missing"
+      }
+    }
+  },
+  "vmEvidence": {
+    "installerFirstRunSettings": {
+      "status": "missing"
+    },
+    "postInstallSettingsEntryPoint": {
+      "status": "missing"
+    },
+    "settingsPersistenceAfterRestart": {
+      "status": "missing"
+    },
+    "aboutDialog": {
+      "status": "missing"
+    },
+    "notepadCandidateNei": {
+      "status": "missing"
+    },
+    "browserCandidateHousam": {
+      "status": "missing"
+    },
+    "movementReveal": {
+      "status": "missing"
+    },
+    "stationaryPointerNoFlicker": {
+      "status": "missing"
+    },
+    "highDpiPlacement": {
+      "status": "missing"
+    },
+    "multiMonitorPlacement": {
+      "status": "missing"
+    },
+    "uiLessHost": {
+      "status": "missing"
+    },
+    "imperfectCompositionRectangle": {
+      "status": "missing"
+    },
+    "inputPickerAndExecutableIcons": {
+      "status": "missing"
+    }
+  },
+  "privacy": {
+    "controlledInputsOnly": true,
+    "notes": "Evidence must avoid personal typed content; use controlled samples nei and housam only."
+  }
+}
