@@ -25,6 +25,8 @@ add_library(MoqiTextService SHARED
     MoqiImeModule.h
     TypeDuckProfile.cpp
     TypeDuckProfile.h
+    TypeDuckCandidateInfo.cpp
+    TypeDuckCandidateInfo.h
     MoqiTextService.cpp
     MoqiTextService.def
     MoqiTextService.h

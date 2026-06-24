@@ -74,15 +74,17 @@ TEST(TypeDuckCandidateInfoTest, MapsNeiToCandidateDictionaryAndMoreLanguages) {
   const CandidateInfo info(L"1.", L"你", L"note\f\r" + NeiRow());
   const DisplayPreferences prefs = MultilingualIndonesianPreferences();
 
-  ASSERT_EQ(info.matchedEntries().size(), 1u);
-  const CandidateEntry& entry = info.matchedEntries()[0];
+  const auto matchedEntries = info.matchedEntries();
+  ASSERT_EQ(matchedEntries.size(), 1u);
+  const CandidateEntry& entry = matchedEntries[0];
   EXPECT_EQ(info.displayCandidateText(prefs), L"你");
   EXPECT_EQ(entry.jyutping, L"nei5");
   EXPECT_EQ(entry.definition(DisplayLanguage::English), L"you (singular)");
   EXPECT_TRUE(info.hasDictionaryEntry(prefs));
-  ASSERT_EQ(entry.otherLanguages(prefs).size(), 4u);
-  EXPECT_EQ(entry.otherLanguages(prefs)[0].name, L"English");
-  EXPECT_EQ(entry.otherLanguages(prefs)[0].value, L"you (singular)");
+  const auto otherLanguages = entry.otherLanguages(prefs);
+  ASSERT_EQ(otherLanguages.size(), 4u);
+  EXPECT_EQ(otherLanguages[0].name, L"English");
+  EXPECT_EQ(otherLanguages[0].value, L"you (singular)");
 }
 
 TEST(TypeDuckCandidateInfoTest, MapsCompoundHousamToMultipleDictionaryEntries) {
