@@ -1,0 +1,10 @@
+#pragma code_page(65001)
+
+#include "resource.h"
+#include <winresrc.h>
+
+LANGUAGE LANG_CHINESE, SUBLANG_CHINESE_HONGKONG
+
+IDI_TYPEDUCK_SETTINGS ICON "../MoqLauncher/TypeDuckLauncher.ico"
+
+#include "TypeDuckSettingsVersion.rc"

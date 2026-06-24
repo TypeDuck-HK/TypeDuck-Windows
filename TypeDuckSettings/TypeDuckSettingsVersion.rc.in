@@ -1,0 +1,33 @@
+#include <winver.h>
+
+VS_VERSION_INFO VERSIONINFO
+ FILEVERSION @MOQI_VERSION_MAJOR@,@MOQI_VERSION_MINOR@,@MOQI_VERSION_PATCH@,0
+ PRODUCTVERSION @MOQI_VERSION_MAJOR@,@MOQI_VERSION_MINOR@,@MOQI_VERSION_PATCH@,0
+ FILEFLAGSMASK 0x3fL
+#ifdef _DEBUG
+ FILEFLAGS 0x1L
+#else
+ FILEFLAGS 0x0L
+#endif
+ FILEOS 0x40004L
+ FILETYPE 0x1L
+ FILESUBTYPE 0x0L
+BEGIN
+  BLOCK "StringFileInfo"
+  BEGIN
+    BLOCK "0c0404b0"
+    BEGIN
+      VALUE "CompanyName", "TypeDuck\0"
+      VALUE "FileDescription", "TypeDuck 設定 / TypeDuck Settings\0"
+      VALUE "FileVersion", "@MOQI_VERSION@\0"
+      VALUE "InternalName", "TypeDuckSettings.exe\0"
+      VALUE "OriginalFilename", "TypeDuckSettings.exe\0"
+      VALUE "ProductName", "TypeDuck 粵語輸入法 / TypeDuck Cantonese IME\0"
+      VALUE "ProductVersion", "@MOQI_VERSION@\0"
+    END
+  END
+  BLOCK "VarFileInfo"
+  BEGIN
+    VALUE "Translation", 0x0c04, 1200
+  END
+END

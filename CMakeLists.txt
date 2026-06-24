@@ -221,6 +221,7 @@ add_subdirectory("${PROJECT_SOURCE_DIR}/Tests/TypeDuckSettings")
 add_subdirectory("${PROJECT_SOURCE_DIR}/Tests/TypeDuckProtocol")
 add_subdirectory("${PROJECT_SOURCE_DIR}/MoqiTextService")
 add_subdirectory("${PROJECT_SOURCE_DIR}/Preview")
+add_subdirectory("${PROJECT_SOURCE_DIR}/TypeDuckSettings")
 
 if(CMAKE_SIZEOF_VOID_P EQUAL 4)
     add_subdirectory("${PROJECT_SOURCE_DIR}/Tools/TypeduckBackendProbe")
