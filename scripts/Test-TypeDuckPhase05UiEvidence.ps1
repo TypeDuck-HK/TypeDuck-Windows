@@ -115,7 +115,7 @@ if ($Strict) {
   Invoke-Guard -ScriptName "Test-TypeDuckCandidateData.ps1" -Arguments @("-RepoRoot", $repo, "-Strict")
   Invoke-Guard -ScriptName "Test-TypeDuckCandidateWindow.ps1" -Arguments @("-RepoRoot", $repo, "-Strict")
   Invoke-Guard -ScriptName "Test-TypeDuckSettingsPersistence.ps1" -Arguments @("-RepoRoot", $repo, "-BackendRoot", $backend, "-Strict")
-  if ($ExpectRed -in @("RejectedUatBehavior", "VmEvidenceMissing")) {
+  if ($ExpectRed -eq "RejectedUatBehavior") {
     Invoke-Guard -ScriptName "Test-TypeDuckSettingsAboutUi.ps1" -Arguments @("-RepoRoot", $repo, "-BackendRoot", $backend, "-Strict", "-ExpectRed", "RejectedUatBehavior")
     Invoke-Guard -ScriptName "Test-TypeDuckIconPackaging.ps1" -Arguments @("-RepoRoot", $repo, "-BackendRoot", $backend, "-Strict", "-ExpectRed", "RejectedUatBehavior")
   } else {
