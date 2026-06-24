@@ -5,16 +5,16 @@ milestone_name: milestone
 current_phase: 5
 current_phase_name: Candidate, Dictionary, Settings, and About UI Parity
 status: executing
-stopped_at: Completed 05-12-PLAN.md
-last_updated: "2026-06-24T08:27:40.693Z"
+stopped_at: Completed 05-13-PLAN.md
+last_updated: "2026-06-24T08:43:23.913Z"
 last_activity: 2026-06-24
-last_activity_desc: Completed Phase 5 Plan 12 icon packaging gap closure
+last_activity_desc: Completed Phase 5 Plan 13 automated evidence and package rebuild
 progress:
   total_phases: 7
   completed_phases: 4
   total_plans: 27
-  completed_plans: 23
-  percent: 85
+  completed_plans: 24
+  percent: 89
 ---
 
 # Project State
@@ -29,11 +29,11 @@ See: .planning/PROJECT.md (updated 2026-06-24)
 ## Current Position
 
 Phase: 5 of 7 (Candidate, Dictionary, Settings, and About UI Parity)
-Plan: 12 of 15 (05-13 next)
-Status: Phase 5 in progress; Plan 05-12 complete
-Last activity: 2026-06-24 — Completed Phase 5 Plan 12 icon packaging gap closure
+Plan: 13 of 15 (05-14 next)
+Status: Phase 5 in progress; Plan 05-13 complete
+Last activity: 2026-06-24 — Completed Phase 5 Plan 13 automated evidence and package rebuild
 
-Progress: [█████████░] 85%
+Progress: [█████████░] 89%
 
 ## Performance Metrics
 
@@ -80,6 +80,7 @@ Progress: [█████████░] 85%
 | Phase 05-candidate-dictionary-settings-and-about-ui-parity P10 | 15 min | 3 tasks | 17 files |
 | Phase 05-candidate-dictionary-settings-and-about-ui-parity P11 | 45min | 2 tasks | 8 files |
 | Phase 05-candidate-dictionary-settings-and-about-ui-parity P12 | 15min | 2 tasks | 6 files |
+| Phase 05-candidate-dictionary-settings-and-about-ui-parity P13 | 10min | 2 tasks | 12 files |
 
 ## Accumulated Context
 
@@ -151,6 +152,9 @@ Recent decisions affecting current work:
 - [Phase 05-candidate-dictionary-settings-and-about-ui-parity]: 05-12: TypeDuck input picker registration uses the compiled TypeDuckTextService.dll icon resource instead of an installed raw TypeDuck_Small.ico file.
 - [Phase 05-candidate-dictionary-settings-and-about-ui-parity]: 05-12: Uninstall display icon resolves from the compiled uninstaller executable instead of an app-root TypeDuck.ico file.
 - [Phase 05-candidate-dictionary-settings-and-about-ui-parity]: 05-12: Backend package build stamps server.exe from TypeDuck_Transparent.ico and removes legacy input_methods/rime/icon.ico.
+- [Phase 05-candidate-dictionary-settings-and-about-ui-parity]: 05-13: Keep installer/dist and installer/stage as ignored generated outputs; commit package SHA-256 and staged artifact hashes in provenance instead.
+- [Phase 05-candidate-dictionary-settings-and-about-ui-parity]: 05-13: VmEvidenceMissing expected-red mode keeps fixed settings/About and icon child guards green; only VM/manual slots remain unresolved.
+- [Phase 05-candidate-dictionary-settings-and-about-ui-parity]: 05-13: All required VM/manual evidence slots remain status=missing for Plan 05-14, even where older VM BMP files still exist on disk.
 
 ### Pending Todos
 
@@ -173,6 +177,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-06-24T08:27:00.350Z
-Stopped at: Completed 05-12-PLAN.md
+Last session: 2026-06-24T08:43:23.904Z
+Stopped at: Completed 05-13-PLAN.md
 Resume file: None
