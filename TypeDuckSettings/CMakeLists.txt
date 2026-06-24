@@ -5,6 +5,8 @@ configure_file("TypeDuckSettingsVersion.h.in" "TypeDuckSettingsVersion.h" @ONLY)
 
 add_executable(TypeDuckSettings WIN32
   main.cpp
+  TypeDuckAboutDialog.cpp
+  TypeDuckAboutDialog.h
   TypeDuckSettingsWindow.cpp
   TypeDuckSettingsWindow.h
   "${CMAKE_SOURCE_DIR}/MoqLauncher/TypeDuckPreferences.cpp"

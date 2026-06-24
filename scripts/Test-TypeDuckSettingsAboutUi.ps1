@@ -111,19 +111,30 @@ if (Test-Path -LiteralPath $aboutPath) {
   Assert-Text $rc "About_Banner\.bmp" "About banner bitmap must be compiled as a resource."
   Assert-Text $rc "Credit_Logos\.bmp" "Credit logos bitmap must be compiled as a resource."
   Assert-True ($about -notmatch "Installer\.bmp" -and $rc -notmatch "Installer\.bmp") "Installer.bmp must not be referenced in Phase 5 settings/About."
-  Assert-Ordered $about @(
+  Assert-Text $about "歡迎使用 TypeDuck 打得" "About dialog must include the exact D-27 bilingual text block."
+  $createControlsStart = $about.IndexOf("void createControls()")
+  Assert-True ($createControlsStart -ge 0) "About dialog must create controls in a dedicated createControls method."
+  $aboutCreateControls = $about.Substring($createControlsStart)
+  Assert-Ordered $aboutCreateControls @(
     "IDB_TYPEDUCK_ABOUT_BANNER",
-    "歡迎使用 TypeDuck 打得",
+    "kAboutBodyText",
     "IDB_TYPEDUCK_CREDIT_LOGOS",
+    "attributionText",
+    "aboutLinks",
+    "關閉 Close"
+  ) "About dialog resource/text/attribution/control order"
+  Assert-Ordered $about @(
     "TypeDuck Windows IME version",
     "TypeDuck-HK librime fork",
     "rime-dictionary-lookup-filter",
-    "TypeDuck-HK schema",
+    "TypeDuck-HK schema"
+  ) "About attribution order"
+  Assert-Ordered $about @(
     "TypeDuck 網站 Website",
     "LearnDuck 粵拼打字入門 Introduction to Cantonese Jyutping Typing",
     "粵拼方案 Jyutping Scheme",
     "TypeDuck 原始碼 Source Code"
-  ) "About dialog resource/text/attribution/link order"
+  ) "About link order"
   Assert-Text $about "TYPEDUCK_VERSION_TEXT" "About version must use the version.txt-derived build definition."
   Assert-Text $about "3671814d4e4aeab8d616ceea3c7f6d88e96bba02" "Lookup-filter attribution must include recorded commit evidence."
   Assert-Text $about "https://typeduck\.hk" "Missing TypeDuck Website URL."

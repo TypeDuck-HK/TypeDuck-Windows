@@ -1,5 +1,6 @@
 #include "TypeDuckSettingsWindow.h"
 
+#include "TypeDuckAboutDialog.h"
 #include "MoqLauncher/TypeDuckPreferences.h"
 #include "resource.h"
 
@@ -40,6 +41,7 @@ enum ControlId : int {
   kCangjie5 = 1801,
   kApply = 1900,
   kCancel = 1901,
+  kAbout = 1902,
 };
 
 struct LanguageOption {
@@ -216,6 +218,7 @@ class SettingsWindow {
     addStatic(L"設定套用後會儲存至 TypeDuckPreferences.json / Apply saves to TypeDuckPreferences.json",
               kLeftColumnX, 514, 540, 24);
     status_ = addStatic(L"", kLeftColumnX, 540, 540, 24);
+    addButton(L"關於 About", kAbout, 608, 526, 92, 32, BS_PUSHBUTTON);
     addButton(L"套用 Apply", kApply, 710, 526, 92, 32, BS_DEFPUSHBUTTON);
     addButton(L"取消 Cancel", kCancel, 812, 526, 92, 32, BS_PUSHBUTTON);
     applyFontToChildren();
@@ -382,6 +385,9 @@ class SettingsWindow {
         break;
       case kCancel:
         DestroyWindow(window_);
+        break;
+      case kAbout:
+        ShowTypeDuckAboutDialog(instance_, window_);
         break;
     }
   }
