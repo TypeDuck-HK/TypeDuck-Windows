@@ -216,43 +216,60 @@
   },
   "vmEvidence": {
     "installerFirstRunSettings": {
-      "status": "missing"
+      "status": "missing",
+      "notes": "Installer was run inside the VM active user session via /VERYSILENT for safety; source/package guards verify the postinstall run entry, but visible installer-first-run settings UI was not captured because skipifsilent suppresses the run entry."
     },
     "postInstallSettingsEntryPoint": {
-      "status": "missing"
+      "status": "captured",
+      "path": ".planning/product/ui-fixtures/phase-05/screenshots/vm-postinstall-settings-entrypoint.bmp",
+      "notes": "Active VM user route launched installed TypeDuckSettings.exe from C:\\Program Files (x86)\\TypeDuckIME; screenshot shows Display Languages first and two-column settings layout."
     },
     "settingsPersistenceAfterRestart": {
-      "status": "missing"
+      "status": "recorded",
+      "path": ".planning/product/ui-fixtures/phase-05/screenshots/vm-settings-apply-persistence.bmp",
+      "notes": "Apply in active VM session showed bilingual Settings saved status and created C:\\Users\\User\\AppData\\Local\\TypeDuckIME\\TypeDuckPreferences.json. Restart persistence was not exercised."
     },
     "aboutDialog": {
-      "status": "missing"
+      "status": "missing",
+      "notes": "Source/package guards verify About text/assets/links/version/attribution, but active VM attempts to open the About modal by control message, keyboard, and mouse click did not produce a visible About dialog capture."
     },
     "notepadCandidateNei": {
-      "status": "missing"
+      "status": "captured",
+      "path": ".planning/product/ui-fixtures/phase-05/screenshots/vm-notepad-candidate-nei.bmp",
+      "notes": "Active VM user default input method override was set to the TypeDuck zh-HK TIP; Notepad typing nei showed the TypeDuck candidate popup with Cantonese candidates."
     },
     "browserCandidateHousam": {
-      "status": "missing"
+      "status": "missing",
+      "notes": "A controlled housam candidate capture was taken in Notepad, but browser host-app evidence was not captured."
     },
     "movementReveal": {
-      "status": "missing"
+      "status": "missing",
+      "notes": "Pointer movement over live Notepad candidates for nei and housam did not reveal a side dictionary detail panel in captured VM screenshots."
     },
     "stationaryPointerNoFlicker": {
-      "status": "missing"
+      "status": "recorded",
+      "path": ".planning/product/ui-fixtures/phase-05/screenshots/vm-stationary-pointer-no-flicker.bmp",
+      "notes": "Stationary pointer capture remained stable with the candidate list visible; this is partial no-flicker evidence but does not prove dictionary detail reveal."
     },
     "highDpiPlacement": {
-      "status": "missing"
+      "status": "missing",
+      "notes": "High-DPI live VM placement was not exercised; preview-only high-DPI screenshot exists but is not final VM evidence."
     },
     "multiMonitorPlacement": {
-      "status": "missing"
+      "status": "missing",
+      "notes": "Multi-monitor or equivalent extended-desktop live VM placement was not exercised."
     },
     "uiLessHost": {
-      "status": "missing"
+      "status": "missing",
+      "notes": "UI-less TSF host path was not exercised in the active VM session."
     },
     "imperfectCompositionRectangle": {
-      "status": "missing"
+      "status": "missing",
+      "notes": "Imperfect composition-rectangle fallback was not exercised in the active VM session."
     },
     "inputPickerAndExecutableIcons": {
-      "status": "missing"
+      "status": "missing",
+      "notes": "Icon package guard passed, but visible VM input picker/executable icon evidence was not captured."
     }
   },
   "privacy": {
