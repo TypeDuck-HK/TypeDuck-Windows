@@ -135,7 +135,7 @@ Plans:
 
 **Verification Environment**: Requires Windows VM or equivalent Windows test machine evidence for real TSF candidate placement, focus behavior, settings entry points, installer-first-run settings, high DPI, and representative host apps. Preview harness screenshots are helpful but insufficient alone.
 
-**Plans**: 5/8 plans executed
+**Plans**: 6/8 plans executed
 Plans:
 **Wave 1**
 
@@ -156,7 +156,7 @@ Plans:
 
 **Wave 5** *(blocked on Wave 4 settings/About executable completion)*
 
-- [ ] 05-07-PLAN.md — Wire installer-first-run and post-install settings launch.
+- [x] 05-07-PLAN.md — Wire installer-first-run and post-install settings launch.
 
 **Wave 6** *(blocked on Wave 5 launch wiring completion)*
 
@@ -212,6 +212,6 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7
 | 2. Engine Runtime Contract Spike | 3/3 | Complete    | 2026-06-23 |
 | 3. zh-HK TSF Registration and Installer Skeleton | 3/3 | Complete    | 2026-06-24 |
 | 4. TypeDuck Protocol and Typing MVP | 3/4 | In Progress|  |
-| 5. Candidate, Dictionary, Settings, and About UI Parity | 5/8 | In Progress|  |
+| 5. Candidate, Dictionary, Settings, and About UI Parity | 6/8 | In Progress|  |
 | 6. Privacy, Security, and Scaffold Cleanup | 0/TBD | Not started | - |
 | 7. Compatibility and Release Verification | 0/TBD | Not started | - |

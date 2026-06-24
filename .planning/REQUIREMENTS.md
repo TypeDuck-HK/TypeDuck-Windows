@@ -19,7 +19,7 @@
 - [x] **INST-03**: The installed TSF profile uses deterministic TypeDuck-owned CLSID/profile GUID, `zh-HK` locale metadata, TypeDuck icon, and bilingual display text.
 - [x] **INST-04**: Installer registers both 32-bit and 64-bit TSF DLLs so TypeDuck works in 32-bit and 64-bit host applications.
 - [x] **INST-05**: User can uninstall TypeDuck and remove TypeDuck-owned TSF registration, startup entries, install files, and runtime registry/profile residue without leaving broken profile entries.
-- [ ] **INST-06**: Installer launches the TypeDuck settings dialog or install-time settings flow during installation with Display Languages shown first.
+- [x] **INST-06**: Installer launches the TypeDuck settings dialog or install-time settings flow during installation with Display Languages shown first.
 
 ### Engine and Runtime Assets
 
@@ -59,8 +59,8 @@
 
 ### Settings and About
 
-- [ ] **SET-01**: User can open a TypeDuck settings dialog from the installer flow.
-- [ ] **SET-02**: User can open the same TypeDuck settings dialog after installation from a TypeDuck configuration entry point.
+- [x] **SET-01**: User can open a TypeDuck settings dialog from the installer flow.
+- [x] **SET-02**: User can open the same TypeDuck settings dialog after installation from a TypeDuck configuration entry point.
 - [x] **SET-03**: Settings dialog mirrors TypeDuck Web alpha settings and order, with Display Languages first.
 - [x] **SET-04**: User can enable display languages from the Web alpha language set: English, Hindi, Indonesian, Nepali, and Urdu.
 - [x] **SET-05**: User can choose one main display language from the enabled display languages.
@@ -147,7 +147,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | INST-03 | Phase 3 | Complete |
 | INST-04 | Phase 3 | Complete |
 | INST-05 | Phase 3 | Complete |
-| INST-06 | Phase 5 | Pending |
+| INST-06 | Phase 5 | Complete |
 | ENG-01 | Phase 2 | Complete |
 | ENG-02 | Phase 2 | Complete |
 | ENG-03 | Phase 2 | Complete |
@@ -172,8 +172,8 @@ Which phases cover which requirements. Updated during roadmap creation.
 | CAND-05 | Phase 5 | Complete |
 | CAND-06 | Phase 5 | Complete |
 | CAND-07 | Phase 5 | Complete |
-| SET-01 | Phase 5 | Pending |
-| SET-02 | Phase 5 | Pending |
+| SET-01 | Phase 5 | Complete |
+| SET-02 | Phase 5 | Complete |
 | SET-03 | Phase 5 | Complete |
 | SET-04 | Phase 5 | Complete |
 | SET-05 | Phase 5 | Complete |
