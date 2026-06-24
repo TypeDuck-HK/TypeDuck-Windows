@@ -24,7 +24,9 @@ ctest --test-dir build-vs32/libIME2/test -C Debug --output-on-failure  # Run reg
 
 **Location:**
 - First-party tests are separate under `libIME2/test`.
+- TypeDuck product tests may live under `Tests/<area>` when they exercise product code outside `libIME2`, for example `Tests/TypeDuckCandidateData`.
 - Test-only CMake wiring lives in `libIME2/test/CMakeLists.txt`.
+- Product test CMake wiring lives beside the tests and is registered from the root `CMakeLists.txt`, for example `Tests/TypeDuckCandidateData/CMakeLists.txt`.
 - Vendored tests exist under `jsoncpp/test`, `libuv/test`, and `libIME2/lib/googletest-release-1.10.0`, but these are third-party code and not the first-party project testing pattern.
 
 **Naming:**
@@ -39,6 +41,11 @@ libIME2/
     ├── CMakeLists.txt   # add_executable, target_link_libraries, add_test
     ├── ComPtr_test.cpp
     └── ComObject_test.cpp
+
+Tests/
+└── TypeDuckCandidateData/
+    ├── CMakeLists.txt
+    └── TypeDuckCandidateInfo_test.cpp
 ```
 
 ## Test Structure

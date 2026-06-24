@@ -50,10 +50,10 @@
 ### Candidate and Dictionary UI
 
 - [x] **CAND-01**: User sees a native candidate panel styled to match TypeDuck Web alpha visual tone: light neutral surface, warm amber highlight/accent, compact rows, readable HK Chinese/English font stack, and restrained rounded controls.
-- [ ] **CAND-02**: User sees each candidate's Chinese text and relevant input code/Jyutping/comment/translation fields according to settings and available engine data.
-- [ ] **CAND-03**: User can inspect a selected or highlighted candidate's dictionary-like detail panel with headword, Jyutping, part-of-speech labels, English meaning, reading notes, and More Languages rows when available.
-- [ ] **CAND-04**: User can configure Jyutping visibility with the Web alpha modes: Always Show, Only in Reverse Lookup, and Hide.
-- [ ] **CAND-05**: User can configure Chinese typeface between Sung and Hei for candidate/dictionary presentation.
+- [x] **CAND-02**: User sees each candidate's Chinese text and relevant input code/Jyutping/comment/translation fields according to settings and available engine data.
+- [x] **CAND-03**: User can inspect a selected or highlighted candidate's dictionary-like detail panel with headword, Jyutping, part-of-speech labels, English meaning, reading notes, and More Languages rows when available.
+- [x] **CAND-04**: User can configure Jyutping visibility with the Web alpha modes: Always Show, Only in Reverse Lookup, and Hide.
+- [x] **CAND-05**: User can configure Chinese typeface between Sung and Hei for candidate/dictionary presentation.
 - [ ] **CAND-06**: Candidate and dictionary panels position reliably near the composition/caret area without stealing focus in representative Windows host applications.
 - [ ] **CAND-07**: Candidate UI remains coherent under high DPI, multi-monitor placement, UI-less TSF hosts, and host applications with imperfect composition rectangles.
 
@@ -166,10 +166,10 @@ Which phases cover which requirements. Updated during roadmap creation.
 | TYPE-04 | Phase 4 | Complete |
 | TYPE-05 | Phase 4 | Complete |
 | CAND-01 | Phase 5 | Complete |
-| CAND-02 | Phase 5 | Pending |
-| CAND-03 | Phase 5 | Pending |
-| CAND-04 | Phase 5 | Pending |
-| CAND-05 | Phase 5 | Pending |
+| CAND-02 | Phase 5 | Complete |
+| CAND-03 | Phase 5 | Complete |
+| CAND-04 | Phase 5 | Complete |
+| CAND-05 | Phase 5 | Complete |
 | CAND-06 | Phase 5 | Pending |
 | CAND-07 | Phase 5 | Pending |
 | SET-01 | Phase 5 | Pending |
