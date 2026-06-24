@@ -319,6 +319,66 @@ bool shouldDisableTsfCandidateUiForProcess(const std::wstring& imagePath) {
 	return lowerBaseName == L"cs2.exe" || lowerBaseName == L"csgo.exe";
 }
 
+bool fallbackAnchorRect(RECT* rect) {
+	if (!rect) {
+		return false;
+	}
+
+	GUITHREADINFO guiThreadInfo{};
+	guiThreadInfo.cbSize = sizeof(guiThreadInfo);
+	if (::GetGUIThreadInfo(0, &guiThreadInfo) && guiThreadInfo.hwndCaret != nullptr) {
+		*rect = guiThreadInfo.rcCaret;
+		::MapWindowPoints(guiThreadInfo.hwndCaret, nullptr, reinterpret_cast<POINT*>(rect), 2);
+		if (rect->right > rect->left || rect->bottom > rect->top) {
+			return true;
+		}
+	}
+
+	const HWND foreground = ::GetForegroundWindow();
+	RECT foregroundRect{};
+	if (foreground != nullptr && ::GetWindowRect(foreground, &foregroundRect)) {
+		rect->left = foregroundRect.left + 24;
+		rect->top = foregroundRect.top + 48;
+		rect->right = rect->left + 1;
+		rect->bottom = rect->top + 20;
+		return true;
+	}
+
+	rect->left = 0;
+	rect->top = 0;
+	rect->right = 1;
+	rect->bottom = 20;
+	return true;
+}
+
+POINT clampCandidateWindowToWorkArea(const RECT& anchorRect, const SIZE& popupSize) {
+	MONITORINFO monitorInfo{};
+	monitorInfo.cbSize = sizeof(monitorInfo);
+	const HMONITOR monitor = ::MonitorFromRect(&anchorRect, MONITOR_DEFAULTTONEAREST);
+	RECT workArea{};
+	if (monitor != nullptr && ::GetMonitorInfoW(monitor, &monitorInfo)) {
+		workArea = monitorInfo.rcWork;
+	}
+	else {
+		::SystemParametersInfoW(SPI_GETWORKAREA, 0, &workArea, 0);
+	}
+
+	POINT pos{anchorRect.left, anchorRect.bottom};
+	if (pos.x + popupSize.cx > workArea.right) {
+		pos.x = workArea.right - popupSize.cx;
+	}
+	if (pos.x < workArea.left) {
+		pos.x = workArea.left;
+	}
+	if (pos.y + popupSize.cy > workArea.bottom) {
+		pos.y = anchorRect.top - popupSize.cy;
+	}
+	if (pos.y < workArea.top) {
+		pos.y = workArea.top;
+	}
+	return pos;
+}
+
 }
 
 TextService::TextService(ImeModule* module):
@@ -998,17 +1058,25 @@ bool TextService::moveCandidateWindowToInputRect(Ime::EditSession* session, cons
 		return false;
 	}
 
-	RECT textRect;
-	// get the position of composition area from TSF
+	RECT textRect{};
+	bool usedFallbackAnchor = false;
 	if (!inputRect(session, &textRect)) {
-		std::wstring tag = L"[TextService::";
-		tag += reason;
-		tag += L"] inputRect unavailable";
-		appendCandidateWindowLog(tag);
-		return false;
+		usedFallbackAnchor = fallbackAnchorRect(&textRect);
+		if (!usedFallbackAnchor) {
+			std::wstring tag = L"[TextService::";
+			tag += reason;
+			tag += L"] inputRect unavailable and fallbackAnchor unavailable";
+			appendCandidateWindowLog(tag);
+			return false;
+		}
 	}
 
-	const POINT nextPos{textRect.left, textRect.bottom};
+	RECT windowRect{};
+	::GetWindowRect(candidateWindow_->hwnd(), &windowRect);
+	const SIZE popupSize{
+		(std::max)(1L, windowRect.right - windowRect.left),
+		(std::max)(1L, windowRect.bottom - windowRect.top)};
+	const POINT nextPos = clampCandidateWindowToWorkArea(textRect, popupSize);
 	const ULONGLONG now = ::GetTickCount64();
 	if (throttleSamePosition && hasLastCandidateWindowPos_ &&
 		lastCandidateWindowPos_.x == nextPos.x &&
@@ -1017,15 +1085,17 @@ bool TextService::moveCandidateWindowToInputRect(Ime::EditSession* session, cons
 		return false;
 	}
 
-	// FIXME: where should we put the candidate window?
-	candidateWindow_->move(nextPos.x, nextPos.y);
+	::SetWindowPos(candidateWindow_->hwnd(), HWND_TOPMOST, nextPos.x, nextPos.y, 0, 0,
+		SWP_NOSIZE | SWP_NOACTIVATE | SWP_NOOWNERZORDER);
 	hasLastCandidateWindowPos_ = true;
 	lastCandidateWindowPos_ = nextPos;
 	lastCandidateWindowMoveTick_ = now;
 
 	std::wostringstream log;
 	log << L"[TextService::" << reason << L"] moved left=" << nextPos.x
-		<< L" bottom=" << nextPos.y;
+		<< L" top=" << nextPos.y
+		<< L" fallback_anchor=" << boolText(usedFallbackAnchor)
+		<< L" popup_size=(" << popupSize.cx << L"," << popupSize.cy << L")";
 	appendCandidateWindowLog(log.str());
 	return true;
 }

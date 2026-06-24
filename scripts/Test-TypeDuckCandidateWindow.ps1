@@ -122,6 +122,10 @@ if ($Strict) {
   Assert-Contains $windowSource 'WS_EX_NOACTIVATE|MA_NOACTIVATE|SWP_NOACTIVATE' "focus-safe non-activating popup behavior"
   Assert-Contains $windowSource 'TrackMouseEvent|WM_MOUSELEAVE' "mouse leave tracking"
   Assert-Contains $windowSource 'GetDpiForWindow|LOGPIXELSX|scalePx' "DPI-aware sizing"
+  Assert-Contains $textServiceSource 'clampCandidateWindowToWorkArea|MonitorFromRect|GetMonitorInfo' "multi-monitor work-area placement"
+  Assert-Contains $textServiceSource 'fallbackAnchorRect|GetGUIThreadInfo' "composition rectangle fallback"
+  Assert-Contains $textServiceSource 'SWP_NOACTIVATE' "non-activating SetWindowPos placement"
+  Assert-Contains $textServiceSource 'effectiveUiLess\(\)|shouldShowCandidateWindowUI_' "UI-less host suppression"
 }
 
 Write-Host "PASS: TypeDuck native candidate/dictionary popup guard passed."
