@@ -35,6 +35,8 @@ const GUID g_textServiceClsid = TypeDuck::kTextServiceClsid;
 
 namespace {
 
+constexpr const wchar_t* kTypeDuckSettingsExecutable = L"TypeDuckSettings.exe";
+
 std::wstring getConfiguredProgramDir() {
   wchar_t path[MAX_PATH] = {};
   DWORD len = ::GetEnvironmentVariableW(TypeDuck::programDirEnvVar(), path, _countof(path));
@@ -56,6 +58,24 @@ std::wstring getConfiguredProgramDir() {
     return TypeDuck::defaultProgramDir(path);
   }
   return std::wstring();
+}
+
+std::wstring buildTypeDuckSettingsPath(const std::wstring& programDir) {
+  if (programDir.empty()) {
+    return kTypeDuckSettingsExecutable;
+  }
+  std::wstring settingsPath = programDir;
+  settingsPath += L"\\";
+  settingsPath += kTypeDuckSettingsExecutable;
+  return settingsPath;
+}
+
+bool launchTypeDuckSettings(HWND hwndParent, const std::wstring& programDir) {
+  const std::wstring settingsPath = buildTypeDuckSettingsPath(programDir);
+  const HINSTANCE result = ::ShellExecuteW(
+      hwndParent, L"open", settingsPath.c_str(), nullptr,
+      programDir.empty() ? nullptr : programDir.c_str(), SW_SHOWNORMAL);
+  return reinterpret_cast<INT_PTR>(result) > 32;
 }
 
 void loadBackendDirs(const std::wstring& programDir,
@@ -142,53 +162,16 @@ bool ImeModule::loadImeInfo(const std::string &guid, std::wstring &filePath,
 // virtual
 bool ImeModule::onConfigure(HWND hwndParent, LANGID langid,
                             REFGUID rguidProfile) {
-  // FIXME: this is inefficient. Should we cache known modules?
-  LPOLESTR pGuidStr = NULL;
-  if (FAILED(::StringFromCLSID(rguidProfile, &pGuidStr)))
+  (void)langid;
+  (void)rguidProfile;
+
+  if (!launchTypeDuckSettings(hwndParent, programDir_)) {
+    ::MessageBoxW(
+        hwndParent,
+        L"未能開啟 TypeDuck 設定。請確認 TypeDuckSettings.exe 已安裝。\n"
+        L"Unable to open TypeDuck Settings. Please confirm TypeDuckSettings.exe is installed.",
+        L"TypeDuck 設定 / TypeDuck Settings", MB_OK | MB_ICONWARNING);
     return false;
-  std::string guidStr = utf16ToUtf8(pGuidStr);
-  CoTaskMemFree(pGuidStr);
-
-  std::wstring configCommand;
-  std::wstring configParams;
-  std::wstring configDir;
-
-  // find the input method module
-  std::wstring infoFilePath;
-  Json::Value info;
-  if (loadImeInfo(guidStr, infoFilePath, info)) {
-    std::wstring currentDir = infoFilePath.substr(
-        0, infoFilePath.length() - 8); // remove "ime.json" from file path
-    configCommand = utf8ToUtf16(info.get("configTool", "").asCString());
-    configParams = utf8ToUtf16(info.get("configToolParams", "").asCString());
-    configDir = utf8ToUtf16(info.get("configToolDir", "").asCString());
-    // for some mysterious reasons, relative paths do not work here (according
-    // to Win32 API doc it should work).
-    if (PathIsRelative(
-            configCommand.c_str())) { // convert it to an absolute path
-      wchar_t absPath[MAX_PATH];
-      PathCanonicalize(absPath, (currentDir + configCommand).c_str());
-      configCommand = absPath;
-    }
-    if (!configDir.empty()) {
-      if (PathIsRelative(configDir.c_str())) { // convert it to an absolute path
-        wchar_t absPath[MAX_PATH];
-        PathCanonicalize(absPath, (currentDir + configDir).c_str());
-        configDir = absPath;
-      }
-    }
-  }
-
-  if (!configCommand.empty()) { // command line is found
-    // execute the config tool
-    ::ShellExecuteW(hwndParent, L"open", configCommand.c_str(),
-                    configParams.empty() ? NULL : configParams.c_str(),
-                    configDir.empty() ? NULL : configDir.c_str(),
-                    SW_SHOWNORMAL);
-  } else {
-    // FIXME: this message should be localized.
-    ::MessageBoxW(hwndParent, L"The input module does not have a config tool.",
-                  NULL, MB_OK);
   }
   return true;
 }

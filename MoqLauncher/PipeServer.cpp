@@ -76,12 +76,14 @@ static constexpr UINT ID_ENABLE_DEBUG_LOG = 1000;
 static constexpr UINT ID_SHOW_DEBUG_LOGS = 1001;
 static constexpr UINT ID_RESTART_Moqi_BACKENDS = 1002;
 static constexpr UINT ID_EXIT_Moqi = 1003;
+static constexpr UINT ID_OPEN_TYPEDUCK_SETTINGS = 1004;
 
 static constexpr size_t MAX_LOG_FILE_SIZE =
     5 * 1024 * 1024;                    // log file size: 5 MB
 static constexpr int NUM_LOG_FILES = 5; // backup 3 copies of the log file
 
 static constexpr wchar_t CONFIG_FILE_REL_PATH[] = L"\\MoqiLauncher.json";
+static constexpr wchar_t TYPEDUCK_SETTINGS_EXE[] = L"\\TypeDuckSettings.exe";
 
 static void copyNotifyText(wchar_t *dest, size_t destCount, const std::wstring &text) {
   if (destCount == 0) {
@@ -355,6 +357,20 @@ void PipeServer::onBackendClosed(BackendServer *backend) {
   }
 }
 
+void PipeServer::openTypeDuckSettings() const {
+  std::wstring settingsPath = topDirPath_ + TYPEDUCK_SETTINGS_EXE;
+  HINSTANCE result = ::ShellExecuteW(hwnd_, L"open", settingsPath.c_str(),
+                                     nullptr, topDirPath_.c_str(),
+                                     SW_SHOWNORMAL);
+  if (reinterpret_cast<INT_PTR>(result) <= 32) {
+    ::MessageBoxW(
+        hwnd_,
+        L"未能開啟 TypeDuck 設定。請確認 TypeDuckSettings.exe 已安裝。\n"
+        L"Unable to open TypeDuck Settings. Please confirm TypeDuckSettings.exe is installed.",
+        L"TypeDuck 設定 / TypeDuck Settings", MB_OK | MB_ICONWARNING);
+  }
+}
+
 void PipeServer::notifyClientsOfBackendError(
     BackendServer *backend,
     moqi::protocol::TypeDuckErrorCode errorCode,
@@ -594,6 +610,9 @@ LRESULT PipeServer::wndProc(UINT msg, WPARAM wp, LPARAM lp) {
       ::ShellExecuteW(hwnd_, L"open", (dataDirPath_ + L"\\Log").c_str(),
                       nullptr, nullptr, SW_SHOWNORMAL);
       break;
+    case ID_OPEN_TYPEDUCK_SETTINGS:
+      openTypeDuckSettings();
+      break;
     }
     break;
   case WM_CLOSE:
@@ -705,6 +724,8 @@ void PipeServer::showPopupMenu() const {
   HMENU hmenu = ::CreatePopupMenu();
   // FIXME: make this translatable later
   bool debugEnabled = logLevel_ <= spdlog::level::debug;
+  ::AppendMenu(hmenu, MF_STRING | MF_ENABLED, ID_OPEN_TYPEDUCK_SETTINGS,
+               L"設定 / Settings");
   ::AppendMenu(hmenu, MF_STRING | MF_ENABLED | (debugEnabled ? MF_CHECKED : 0),
                ID_ENABLE_DEBUG_LOG, L"開啟除錯 / Enable Debug");
   ::AppendMenu(hmenu, MF_STRING | MF_ENABLED, ID_SHOW_DEBUG_LOGS,

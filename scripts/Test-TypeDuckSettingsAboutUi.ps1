@@ -46,6 +46,8 @@ $mainPath = Join-Path $repo "TypeDuckSettings/main.cpp"
 $rcPath = Join-Path $repo "TypeDuckSettings/TypeDuckSettings.rc"
 $resourcePath = Join-Path $repo "TypeDuckSettings/resource.h"
 $preferencesPath = Join-Path $repo "MoqLauncher/TypeDuckPreferences.cpp"
+$imeModulePath = Join-Path $repo "MoqiTextService/MoqiImeModule.cpp"
+$pipeServerPath = Join-Path $repo "MoqLauncher/PipeServer.cpp"
 $installScriptPath = Join-Path $repo "scripts/install.ps1"
 $packageScriptPath = Join-Path $repo "scripts/_all_in_package.ps1"
 $installerPath = Join-Path $repo "installer/MoqiTsf.iss"
@@ -56,6 +58,8 @@ Assert-True (Test-Path -LiteralPath $windowPath) "TypeDuckSettingsWindow.cpp is 
 Assert-True (Test-Path -LiteralPath $mainPath) "TypeDuckSettings main.cpp is missing."
 Assert-True (Test-Path -LiteralPath $rcPath) "TypeDuckSettings.rc is missing."
 Assert-True (Test-Path -LiteralPath $resourcePath) "TypeDuckSettings resource.h is missing."
+Assert-True (Test-Path -LiteralPath $imeModulePath) "MoqiImeModule.cpp is missing."
+Assert-True (Test-Path -LiteralPath $pipeServerPath) "PipeServer.cpp is missing."
 Assert-True (Test-Path -LiteralPath $installScriptPath) "scripts/install.ps1 is missing."
 Assert-True (Test-Path -LiteralPath $packageScriptPath) "scripts/_all_in_package.ps1 is missing."
 Assert-True (Test-Path -LiteralPath $installerPath) "installer/MoqiTsf.iss is missing."
@@ -63,6 +67,8 @@ Assert-True (Test-Path -LiteralPath $installerPath) "installer/MoqiTsf.iss is mi
 $settingsCmake = Get-Content -Raw -Encoding UTF8 -LiteralPath $settingsCmakePath
 $window = Get-Content -Raw -Encoding UTF8 -LiteralPath $windowPath
 $preferences = Get-Content -Raw -Encoding UTF8 -LiteralPath $preferencesPath
+$imeModule = Get-Content -Raw -Encoding UTF8 -LiteralPath $imeModulePath
+$pipeServer = Get-Content -Raw -Encoding UTF8 -LiteralPath $pipeServerPath
 $installScript = Get-Content -Raw -Encoding UTF8 -LiteralPath $installScriptPath
 $packageScript = Get-Content -Raw -Encoding UTF8 -LiteralPath $packageScriptPath
 $installer = Get-Content -Raw -Encoding UTF8 -LiteralPath $installerPath
@@ -84,8 +90,16 @@ Assert-Ordered $installer @(
   "Filename:\s+`"\{app\}\\TypeDuckLauncher\.exe`""
 ) "Installer run order"
 Assert-Text $packageScript "scripts\\install\.ps1" "All-in package script must continue to route packaging through scripts/install.ps1."
+Assert-Text $imeModule "TypeDuckSettings\.exe" "TSF Configure entry point must launch TypeDuckSettings.exe."
+Assert-Text $imeModule "launchTypeDuckSettings" "TSF Configure entry point must route through a fixed TypeDuck settings launch helper."
+Assert-Text $imeModule "ShellExecuteW" "TSF Configure entry point must use a native launch call for the fixed settings executable."
+Assert-True ($imeModule -notmatch "configTool|configToolParams|configToolDir") "TSF Configure entry point must not use backend-declared config tool metadata."
+Assert-Text $pipeServer "TypeDuckSettings\.exe" "Launcher post-install entry point must launch TypeDuckSettings.exe."
+Assert-Text $pipeServer "openTypeDuckSettings" "Launcher must expose a fixed TypeDuck settings launch helper."
+Assert-Text $pipeServer "設定 / Settings" "Launcher settings menu label must be bilingual."
+Assert-True ($pipeServer -notmatch "configTool|configToolParams|configToolDir") "Launcher settings entry point must not use backend-declared config tool metadata."
 
-$combined = "$topCmake`n$settingsCmake`n$window"
+$combined = "$topCmake`n$settingsCmake`n$window`n$imeModule`n$pipeServer"
 Assert-True ($combined -notmatch "find_package\s*\(\s*Qt|Qt[0-9]::|QApplication|#include\s*<Q") "TypeDuckSettings must not use Qt."
 Assert-True ($combined -notmatch "configTool|configToolParams|configToolDir") "Settings UI must not use backend-declared config tools."
 
