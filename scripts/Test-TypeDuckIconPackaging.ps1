@@ -147,6 +147,7 @@ Assert-SameFileHash $small $backendSmall "TypeDuck_Small.ico must be staged from
 Assert-SameFileHash $product $backendProduct "TypeDuck.ico must be staged from the locked backend source."
 
 $settingsRc = Get-FileText (Join-Path $repo "TypeDuckSettings/TypeDuckSettings.rc")
+$aboutRc = Get-FileText (Join-Path $repo "TypeDuckSettings/TypeDuckAbout.rc")
 $settingsResource = Get-FileText (Join-Path $repo "TypeDuckSettings/resource.h")
 $textServiceRc = Get-FileText (Join-Path $repo "MoqiTextService/MoqiTextService.rc.in")
 $typeDuckProfile = Get-FileText (Join-Path $repo "MoqiTextService/TypeDuckProfile.cpp")
@@ -161,6 +162,7 @@ $about = Get-FileText (Join-Path $repo "TypeDuckSettings/TypeDuckAboutDialog.cpp
 
 Assert-Text $settingsResource "IDI_TYPEDUCK_SETTINGS" "Settings icon resource id must remain addressable."
 Assert-Text $settingsRc "IDI_TYPEDUCK_SETTINGS\s+ICON\s+`"assets/TypeDuck_Transparent\.ico`"" "TypeDuckSettings executable must use TypeDuck_Transparent.ico."
+Assert-Text $aboutRc "IDI_TYPEDUCK_SETTINGS\s+ICON\s+`"assets/TypeDuck_Transparent\.ico`"" "TypeDuckAbout executable must use TypeDuck_Transparent.ico."
 Assert-Text $launcherRc "IDI_MOQI_LAUNCHER\s+ICON\s+`"\.\./TypeDuckSettings/assets/TypeDuck_Transparent\.ico`"" "TypeDuckLauncher executable must use TypeDuck_Transparent.ico."
 Assert-Text $setupHelperCmake "SetupHelper\.rc" "TypeDuckSetupHelper must compile a resource script."
 Assert-Text $setupHelperRc "TypeDuck_Transparent\.ico" "TypeDuckSetupHelper executable must use TypeDuck_Transparent.ico."
@@ -169,6 +171,7 @@ Assert-NotText $installScript 'Copy-IfExists\s+-Source\s+\$(transparentIcon|smal
 Assert-Text $installScript 'Set-WindowsExecutableIcon\s+-ExecutablePath\s+\(Join-Path\s+\$stageWin32Root\s+"TypeDuckLauncher\.exe"\)\s+-IconPath\s+\$transparentIcon' "Staging must stamp TypeDuckLauncher.exe with TypeDuck_Transparent.ico."
 Assert-Text $installScript 'Set-WindowsExecutableIcon\s+-ExecutablePath\s+\(Join-Path\s+\$stageWin32Root\s+"TypeDuckSetupHelper\.exe"\)\s+-IconPath\s+\$transparentIcon' "Staging must stamp TypeDuckSetupHelper.exe with TypeDuck_Transparent.ico."
 Assert-Text $installScript 'Set-WindowsExecutableIcon\s+-ExecutablePath\s+\(Join-Path\s+\$stageWin32Root\s+"TypeDuckSettings\.exe"\)\s+-IconPath\s+\$transparentIcon' "Staging must stamp TypeDuckSettings.exe with TypeDuck_Transparent.ico."
+Assert-Text $installScript 'Set-WindowsExecutableIcon\s+-ExecutablePath\s+\(Join-Path\s+\$stageWin32Root\s+"TypeDuckAbout\.exe"\)\s+-IconPath\s+\$transparentIcon' "Staging must stamp TypeDuckAbout.exe with TypeDuck_Transparent.ico."
 Assert-Text $installScript 'Set-WindowsExecutableIcon\s+-ExecutablePath\s+\$backendServer\s+-IconPath\s+\$transparentIcon' "Staging must stamp packaged moqi-ime/server.exe with TypeDuck_Transparent.ico."
 
 Assert-Text $textServiceRc "IDI_TYPEDUCK_PROFILE\s+ICON\s+`"\.\./TypeDuckSettings/assets/TypeDuck_Small\.ico`"" "TSF DLL profile resource must use TypeDuck_Small.ico."
@@ -240,6 +243,8 @@ if (Test-Path -LiteralPath $stageRoot -PathType Container) {
   Assert-ExecutableContainsIcon (Join-Path $stageRoot "TypeDuckLauncher.exe") $transparent "Staged TypeDuckLauncher.exe does not contain TypeDuck_Transparent.ico image data."
   Assert-ExecutableContainsIcon (Join-Path $stageRoot "TypeDuckSetupHelper.exe") $transparent "Staged TypeDuckSetupHelper.exe does not contain TypeDuck_Transparent.ico image data."
   Assert-ExecutableContainsIcon (Join-Path $stageRoot "TypeDuckSettings.exe") $transparent "Staged TypeDuckSettings.exe does not contain TypeDuck_Transparent.ico image data."
+  Assert-ExecutableContainsIcon (Join-Path $stageRoot "TypeDuckAbout.exe") $transparent "Staged TypeDuckAbout.exe does not contain TypeDuck_Transparent.ico image data."
+  Assert-ExecutableContainsIcon (Join-Path $stageRoot "TypeDuckTextService.dll") $small "Staged TypeDuckTextService.dll does not contain TypeDuck_Small.ico image data for the input picker."
   Assert-ExecutableContainsIcon (Join-Path $stageRoot "moqi-ime/server.exe") $transparent "Staged moqi-ime/server.exe does not contain TypeDuck_Transparent.ico image data."
   foreach ($bannedName in @("moqi.png", "mo.ico", "mo.png", "moqi.ico")) {
     $bannedStageFile = Get-ChildItem -LiteralPath $stageRoot -Recurse -Force -File -ErrorAction SilentlyContinue |
