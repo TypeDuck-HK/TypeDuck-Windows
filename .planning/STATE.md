@@ -5,15 +5,15 @@ milestone_name: milestone
 current_phase: 5
 current_phase_name: Candidate, Dictionary, Settings, and About UI Parity
 status: executing
-stopped_at: Completed 05-09-PLAN.md
-last_updated: "2026-06-24T07:39:21.032Z"
+stopped_at: Completed 05-10-PLAN.md
+last_updated: "2026-06-24T07:56:57.537Z"
 last_activity: 2026-06-24
 last_activity_desc: Completed Phase 5 Plan 08 icon and About resource packaging
 progress:
   total_phases: 7
   completed_phases: 4
   total_plans: 27
-  completed_plans: 20
+  completed_plans: 21
   percent: 57
 ---
 
@@ -77,6 +77,7 @@ Progress: [██████████] 95%
 | Phase 05-candidate-dictionary-settings-and-about-ui-parity P07 | 46min | 2 tasks | 6 files |
 | Phase 05-candidate-dictionary-settings-and-about-ui-parity P08 | 13 min | 2 tasks | 13 files |
 | Phase 05-candidate-dictionary-settings-and-about-ui-parity P09 | 8 min | 3 tasks | 6 files |
+| Phase 05-candidate-dictionary-settings-and-about-ui-parity P10 | 15 min | 3 tasks | 17 files |
 
 ## Accumulated Context
 
@@ -139,6 +140,9 @@ Recent decisions affecting current work:
 - [Phase 05]: 05-09: Active Phase 5 evidence slots no longer include cropped settings-two-column or incorrect About-dialog evidence.
 - [Phase 05]: 05-09: Retry evidence must cite runtime-provenance.json for Windows, backend, TypeDuck Web, runtime DLL/schema/theme, and icon hashes.
 - [Phase 05]: 05-09: Rejected UAT behavior is now an explicit RED-mode guard state, not an acceptable green baseline.
+- [Phase 05-candidate-dictionary-settings-and-about-ui-parity]: 05-10: VM candidate screenshots from stale external TypeDuck 1.1.2 runtime are not accepted as current package evidence.
+- [Phase 05-candidate-dictionary-settings-and-about-ui-parity]: 05-10: Candidate transport remains pass-through; raw_lookup_comment is parsed only at the CandidateInfo renderer boundary.
+- [Phase 05-candidate-dictionary-settings-and-about-ui-parity]: 05-10: Candidate preview BMPs are guarded source-backed iteration evidence and must cite runtime-provenance before use.
 
 ### Pending Todos
 
@@ -161,6 +165,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-06-24T07:39:21.025Z
-Stopped at: Completed 05-09-PLAN.md
+Last session: 2026-06-24T07:56:57.320Z
+Stopped at: Completed 05-10-PLAN.md
 Resume file: None
