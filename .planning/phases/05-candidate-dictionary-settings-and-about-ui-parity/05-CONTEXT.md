@@ -25,7 +25,7 @@ This phase makes the visible TypeDuck Windows experience native and Web-alpha-al
 - **D-07:** Name colors semantically for the Windows/native theme contract. Do not preserve Tailwind/DaisyUI names such as `primary`, `base-100`, `base-300`, or `base-content-400` as product-facing token names merely because they appear in `tailwind.config.ts`.
 - **D-08:** The TypeDuck theme contract should expose semantic roles such as `panel_background`, `dictionary_background`, `input_buffer_background`, `panel_border`, `selection_background`, `accent`, `text_primary`, `text_secondary`, `pronunciation_text`, `definition_text`, `disabled_text`, and `link_text`.
 - **D-09:** Keep the Phase 5 bundled palette set small: Web-alpha-derived `light` and `dark` palettes only. Additional named novelty themes from the Moqi scaffold are not TypeDuck v1 product scope.
-- **D-10:** The Windows palette values should be source-backed by the refreshed TypeDuck Web alpha, but token names may intentionally differ from the Web/Tailwind names when semantic Windows names are clearer.
+- **D-10:** The Windows palette values should be source-backed by the existing TypeDuck Web alpha fixture and local source, but token names may intentionally differ from the Web/Tailwind names when semantic Windows names are clearer.
 - **D-11:** The settings UI should not expose arbitrary color editing in Phase 5. Theme data is a product contract for rendering parity, not a broad customization surface.
 
 ### `appearance_themes.json` Ownership and Shape
@@ -73,7 +73,6 @@ L"This input method is developed by the Department of Linguistics and Modern Lan
 - **D-34:** Candidate-row definitions should obey the enabled display languages and main display language from settings, matching the Web alpha behavior rather than hardcoding English-only display.
 
 ### Verification and Evidence
-- **D-35:** Refresh or re-check the TypeDuck Web alpha fixtures before implementation planning because Phase 5 is directly visual and Web alpha can drift.
 - **D-36:** Preview harness screenshots are useful for layout iteration, but acceptance requires VM or equivalent Windows evidence for candidate placement, focus behavior, settings entry points, installer-first-run settings, high DPI, multi-monitor, UI-less/imperfect composition rectangles, and representative host apps.
 - **D-37:** Add focused automated tests where possible: theme JSON schema/loader, duplicate theme-file package behavior, settings persistence, lookup payload parser, candidate/dictionary view-model mapping, About resource/text/link presence, icon assignment, and banned Moqi theme/string leakage in Phase 5 surfaces.
 
