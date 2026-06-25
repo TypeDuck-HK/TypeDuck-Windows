@@ -88,7 +88,7 @@
     "purpose": "Plan 05-10 candidate parity guard and VM-versus-preview divergence diagnosis.",
     "expectedRuntime": {
       "serverPath": "D:\\VSProjects\\moqi-ime\\scripts\\build\\moqi-ime\\server.exe",
-      "serverSha256": "058CDC6C2D1E9DA30C002C13F50842CECE22955BBD302FBC5FE9FC53180A9511",
+      "serverSha256": "F209AC06894E7E17A243B3EAB8FB71E21D1E7135B4797A6DEEBF77E7DFE40BAF",
       "rimeDllPath": "D:\\VSProjects\\moqi-ime\\scripts\\build\\moqi-ime\\input_methods\\rime\\rime.dll",
       "rimeDllSha256": "5783B84916FEFC0DD5DDA28F1D7292A9CA86C75F05132947FE816178B916C04B",
       "lookupFilterCommit": "3671814d4e4aeab8d616ceea3c7f6d88e96bba02",
@@ -97,11 +97,11 @@
     "bitnessAndInstallPaths": {
       "win32BuildTextService": {
         "path": "D:\\VSProjects\\moqi-im-windows\\build-vs32\\MoqiTextService\\Release\\TypeDuckTextService.dll",
-        "sha256": "76B9DF959B3BE16D73D90DB4D45CADA11041270E194D09A072029ED6FB19A888"
+        "sha256": "0429B2A8F74C20A0E6912748CB732FDD7C00B9C31EE450C46CCFF02362EF0B1E"
       },
       "x64BuildTextService": {
         "path": "D:\\VSProjects\\moqi-im-windows\\build-vs64\\MoqiTextService\\Release\\TypeDuckTextService.dll",
-        "sha256": "3B66940D17DC20E9F51CF9126734D625F7580DF2D393B626D7D587F6BABFBDAE"
+        "sha256": "F2C47F451795DF37C6D565BB02F995C694B746C1DF6184E09E3CC43BD76F0C75"
       },
       "hostInstalledTypeDuckImePackage": {
         "path": "C:\\Program Files (x86)\\TypeDuckIME\\moqi-ime",
@@ -151,8 +151,8 @@
     {
       "kind": "backend-server",
       "path": "D:\\VSProjects\\moqi-ime\\scripts\\build\\moqi-ime\\server.exe",
-      "bytes": 9729024,
-      "sha256": "058CDC6C2D1E9DA30C002C13F50842CECE22955BBD302FBC5FE9FC53180A9511"
+      "bytes": 9730048,
+      "sha256": "F209AC06894E7E17A243B3EAB8FB71E21D1E7135B4797A6DEEBF77E7DFE40BAF"
     },
     {
       "kind": "typeduck-librime",
@@ -175,8 +175,8 @@
     {
       "kind": "installer",
       "path": "installer/dist/typeduck-windows-ime-setup.exe",
-      "bytes": 22692039,
-      "sha256": "59757083C0B11A7D9676C1AE86B9176A4FF8382AB12283DFE5690DCB64F55CE5"
+      "bytes": 22689347,
+      "sha256": "9FB28F3CC1A7A674681FD6222C7C7AA0E2B0541D3CBBFEEB86B1B05D8928F563"
     },
     {
       "kind": "staged-launcher-exe",
@@ -205,20 +205,20 @@
     {
       "kind": "staged-win32-textservice-dll",
       "path": "installer/stage/win32/TypeDuckIME/TypeDuckTextService.dll",
-      "bytes": 1993728,
-      "sha256": "76B9DF959B3BE16D73D90DB4D45CADA11041270E194D09A072029ED6FB19A888"
+      "bytes": 1990656,
+      "sha256": "0429B2A8F74C20A0E6912748CB732FDD7C00B9C31EE450C46CCFF02362EF0B1E"
     },
     {
       "kind": "staged-x64-textservice-dll",
       "path": "installer/stage/win32/TypeDuckIME/x64/TypeDuckTextService.dll",
-      "bytes": 2301440,
-      "sha256": "3B66940D17DC20E9F51CF9126734D625F7580DF2D393B626D7D587F6BABFBDAE"
+      "bytes": 2297856,
+      "sha256": "F2C47F451795DF37C6D565BB02F995C694B746C1DF6184E09E3CC43BD76F0C75"
     },
     {
       "kind": "staged-backend-server-stamped",
       "path": "installer/stage/win32/TypeDuckIME/moqi-ime/server.exe",
-      "bytes": 9860608,
-      "sha256": "CDC22CA095593FE26E81B85B5171D9B1F965B793BFCA7F9BC99EA7BD0B78ABFD"
+      "bytes": 9861632,
+      "sha256": "B3DE8AAAB536FE9F9CAE5728B1E35765FF6DAC05EDA9C1939590F3AF7EF1F22F"
     },
     {
       "kind": "staged-typeduck-librime",
