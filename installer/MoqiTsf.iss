@@ -58,9 +58,10 @@ Name: "{autoprograms}\{#MyAppName}\TypeDuck 關於"; Filename: "{app}\TypeDuckAb
 Name: "{autoprograms}\{#MyAppName}\解除安裝 / Uninstall"; Filename: "{uninstallexe}"
 
 [Run]
+Filename: "{app}\TypeDuckLauncher.exe"; Flags: nowait; Check: ShouldLaunchLauncher
+Filename: "{app}\TypeDuckSettings.exe"; Parameters: "/apply-defaults"; Flags: runhidden waituntilterminated; Check: ShouldSeedDefaultSettings
 Filename: "{app}\TypeDuckSettings.exe"; Description: "開啟 TypeDuck 設定 / Open TypeDuck Settings"; Flags: postinstall nowait skipifsilent; Check: ShouldLaunchSettings
 Filename: "{app}\TypeDuckAbout.exe"; Description: "開啟 TypeDuck 關於 / Open TypeDuck About"; Flags: postinstall nowait skipifsilent; Check: ShouldLaunchAbout
-Filename: "{app}\TypeDuckLauncher.exe"; Flags: nowait; Check: ShouldLaunchLauncher
 
 [Registry]
 Root: HKCU; Subkey: "Software\Microsoft\Windows\CurrentVersion\Run"; \
@@ -257,6 +258,11 @@ begin
 end;
 
 function ShouldLaunchSettings(): Boolean;
+begin
+  Result := HelperInstallSucceeded and (not HelperInstallNeedsRestart);
+end;
+
+function ShouldSeedDefaultSettings(): Boolean;
 begin
   Result := HelperInstallSucceeded and (not HelperInstallNeedsRestart);
 end;

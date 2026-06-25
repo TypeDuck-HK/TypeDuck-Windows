@@ -36,6 +36,7 @@ add_library(MoqiTextService SHARED
     MoqiClient.h
     MoqiLangBarButton.cpp
     MoqiLangBarButton.h
+    "${CMAKE_SOURCE_DIR}/MoqLauncher/TypeDuckPreferences.cpp"
     DllEntry.cpp
     # resources
     ${CMAKE_CURRENT_BINARY_DIR}/MoqiTextService.rc

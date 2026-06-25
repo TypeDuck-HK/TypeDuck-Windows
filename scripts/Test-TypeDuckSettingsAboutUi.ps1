@@ -55,6 +55,8 @@ $aboutRcPath = Join-Path $repo "TypeDuckSettings/TypeDuckAbout.rc"
 $resourcePath = Join-Path $repo "TypeDuckSettings/resource.h"
 $preferencesPath = Join-Path $repo "MoqLauncher/TypeDuckPreferences.cpp"
 $imeModulePath = Join-Path $repo "MoqiTextService/MoqiImeModule.cpp"
+$textServicePath = Join-Path $repo "MoqiTextService/MoqiTextService.cpp"
+$textServiceCmakePath = Join-Path $repo "MoqiTextService/CMakeLists.txt"
 $pipeServerPath = Join-Path $repo "MoqLauncher/PipeServer.cpp"
 $installScriptPath = Join-Path $repo "scripts/install.ps1"
 $packageScriptPath = Join-Path $repo "scripts/_all_in_package.ps1"
@@ -79,6 +81,8 @@ $window = Get-Content -Raw -Encoding UTF8 -LiteralPath $windowPath
 $aboutMain = Get-Content -Raw -Encoding UTF8 -LiteralPath $aboutMainPath
 $preferences = Get-Content -Raw -Encoding UTF8 -LiteralPath $preferencesPath
 $imeModule = Get-Content -Raw -Encoding UTF8 -LiteralPath $imeModulePath
+$textService = Get-Content -Raw -Encoding UTF8 -LiteralPath $textServicePath
+$textServiceCmake = Get-Content -Raw -Encoding UTF8 -LiteralPath $textServiceCmakePath
 $pipeServer = Get-Content -Raw -Encoding UTF8 -LiteralPath $pipeServerPath
 $installScript = Get-Content -Raw -Encoding UTF8 -LiteralPath $installScriptPath
 $packageScript = Get-Content -Raw -Encoding UTF8 -LiteralPath $packageScriptPath
@@ -134,13 +138,15 @@ Assert-Text $installer "Filename:\s+`"\{app\}\\TypeDuckAbout\.exe`"" "Installer 
 Assert-Text $installer "Description:\s+`"開啟 TypeDuck 設定 / Open TypeDuck Settings`"" "Installer settings launch description must be bilingual."
 Assert-Text $installer "Description:\s+`"開啟 TypeDuck 關於 / Open TypeDuck About`"" "Installer About launch description must be bilingual."
 Assert-Text $installer "function\s+ShouldLaunchSettings\(\):\s+Boolean" "Installer settings launch must be gated by a dedicated function."
+Assert-Text $installer "function\s+ShouldSeedDefaultSettings\(\):\s+Boolean" "Installer must gate default settings seeding."
 Assert-Text $installer "function\s+ShouldLaunchAbout\(\):\s+Boolean" "Installer About launch must be gated by a dedicated function."
 Assert-Text $installer 'TypeDuck About";\s+Filename:\s+"\{app\}\\TypeDuckAbout\.exe"' "Installer must create a TypeDuck About Start Menu shortcut."
 Assert-Text $installer 'TypeDuck 關於";\s+Filename:\s+"\{app\}\\TypeDuckAbout\.exe"' "Installer must create a TypeDuck 關於 Start Menu shortcut."
 Assert-Ordered $installer @(
+  "Filename:\s+`"\{app\}\\TypeDuckLauncher\.exe`"",
+  "Parameters:\s+`"/apply-defaults`"",
   "Filename:\s+`"\{app\}\\TypeDuckSettings\.exe`"",
-  "Filename:\s+`"\{app\}\\TypeDuckAbout\.exe`"",
-  "Filename:\s+`"\{app\}\\TypeDuckLauncher\.exe`""
+  "Filename:\s+`"\{app\}\\TypeDuckAbout\.exe`""
 ) "Installer run order"
 Assert-Text $packageScript "scripts\\install\.ps1" "All-in package script must continue to route packaging through scripts/install.ps1."
 Assert-Text $imeModule "TypeDuckSettings\.exe" "TSF Configure entry point must launch TypeDuckSettings.exe."
@@ -188,6 +194,11 @@ Assert-Text $window "applyHeaderFont" "Settings section headings must keep the h
 Assert-Text $window "kRadioGroupStartStyle\s*=\s*BS_AUTORADIOBUTTON\s*\|\s*WS_GROUP" "Settings radio clusters must start separate Win32 radio groups."
 Assert-Text $window "index == 0 \? kRadioGroupStartStyle : kRadioStyle" "Main-language radios must form their own group without sharing later settings radios."
 Assert-True ($window -notmatch "addButton\([^;]+BS_AUTORADIOBUTTON") "Settings radio controls must use grouped radio style constants, not raw shared radio styles."
+Assert-Text $window "kPageSizeTrackInset" "Page-size tick labels must leave side padding instead of spanning the full fieldset width."
+Assert-Text $window "kSettingsButtonWidth" "Confirm and Cancel buttons must use an explicit widened button width."
+Assert-Text $window "kApplyDefaultsSwitch" "Settings executable must expose a quiet default-preference seed mode for installation."
+Assert-Text $window "applyViaLauncher" "Settings confirmation must apply through the launcher so Rime redeploy runs."
+Assert-Text $window "METHOD_TYPEDUCK_SETTINGS_UPDATE" "Settings confirmation must send the TypeDuck settings update IPC request."
 Assert-Ordered $window @(
   "主要語言 Main Language",
   "顯示 Display",
@@ -199,10 +210,14 @@ foreach ($tick in 4..10) {
   Assert-Text $window "L`"$tick`"" "Candidate page-size control must show tick label $tick."
 }
 Assert-Text $window "TBM_SETRANGE.+MAKELPARAM\(4,\s*10\)" "Candidate count control must be bounded 4-10."
-Assert-Text $window "TypeDuck::applyPreferences" "Apply must use the shared TypeDuckPreferences apply path."
-Assert-Text $window "applyRimeSettings" "Confirm must apply Rime custom YAML side effects."
-Assert-Text $window "default\.custom\.yaml|effects\.defaultCustomFile" "Settings must write default.custom.yaml side effects."
-Assert-Text $window "common\.custom\.yaml|effects\.commonCustomFile" "Settings must write common.custom.yaml side effects."
+Assert-Text $window "applyViaLauncher" "Apply must use the launcher-mediated TypeDuckPreferences path."
+Assert-Text $window "fillSettingsUpdate" "Settings must serialize the shared TypeDuckPreferences state into IPC updates."
+Assert-Text $window "METHOD_TYPEDUCK_SETTINGS_UPDATE" "Settings confirmation must send the TypeDuck settings update IPC request."
+Assert-Text $window "kApplyDefaultsSwitch" "Settings executable must expose a quiet default-preference seed mode for installation."
+Assert-Text $window "applyDefaultPreferencesIfMissing" "Installation seed mode must apply defaults when preferences are missing."
+Assert-Text $textServiceCmake "MoqLauncher/TypeDuckPreferences\.cpp" "Text service must link the shared preferences loader for UI-only settings."
+Assert-Text $textService "reloadTypeDuckDisplayPreferences" "Text service must reload saved UI preferences during candidate refresh."
+Assert-Text $textService "displayPreferencesFromSavedPreferences" "Text service must map saved preferences to candidate display preferences."
 Assert-Text $window "確定 Confirm" "Confirm button must be bilingual."
 Assert-Text $window "取消 Cancel" "Cancel button must be bilingual."
 Assert-True ($window -notmatch "套用後即時更新輸入法設定|Apply updates TypeDuck input settings|設定已儲存") "Settings window must not expose removed apply/status helper labels."

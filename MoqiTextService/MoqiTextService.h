@@ -292,6 +292,8 @@ public:
 		autoPairQuotes_ = autoPairQuotes;
 	}
 
+	void setTypeDuckDisplayPreferences(TypeDuck::DisplayPreferences preferences);
+
 	void suppressNextCompositionTerminatedNotification() {
 		suppressNextCompositionTerminatedNotification_ = true;
 	}
@@ -393,6 +395,7 @@ private:
 	int candCommentFontHeight();
 	void applyCandidateAppearanceNow();
 	void refreshCandidateAppearance();
+	void reloadTypeDuckDisplayPreferences();
 	void applyUiLessOverrideState();
 	void invalidateCandidateUiCache();
 	bool isCandidateContentApplied(const std::wstring& renderedPreedit) const;
@@ -448,6 +451,7 @@ private:
 	COLORREF candHighlightTextColor_;
 	COLORREF candCommentColor_;
 	COLORREF candCommentHighlightColor_;
+	TypeDuck::DisplayPreferences typeDuckDisplayPreferences_;
 	bool inlinePreedit_;
 	bool autoPairQuotes_;
 	bool suppressNextCompositionTerminatedNotification_;

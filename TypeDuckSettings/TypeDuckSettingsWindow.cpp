@@ -2,13 +2,13 @@
 
 #include "MoqLauncher/TypeDuckPreferences.h"
 #include "resource.h"
+#include "proto/ProtoFraming.h"
+#include "proto/moqi.pb.h"
 
 #include <algorithm>
 #include <commctrl.h>
-#include <cstdlib>
 #include <filesystem>
-#include <fstream>
-#include <sstream>
+#include <shellapi.h>
 #include <string>
 #include <vector>
 
@@ -17,22 +17,32 @@ namespace Moqi::TypeDuckSettings {
 namespace {
 
 constexpr const wchar_t* kWindowClassName = L"TypeDuckSettingsWindow";
+constexpr const wchar_t* kApplyDefaultsSwitch = L"/apply-defaults";
+constexpr const wchar_t* kLauncherExecutableName = L"TypeDuckLauncher.exe";
+constexpr const wchar_t* kLauncherPipeBaseName = L"Launcher";
+constexpr const char* kTypeDuckProfileGuid =
+    "{c6e8f5df-6504-44f9-b7cf-17a195373a83}";
 constexpr int kWindowWidth = 940;
 constexpr int kWindowHeight = 620;
 constexpr int kMargin = 22;
 constexpr int kLeftColumnX = 28;
 constexpr int kRightColumnX = 486;
 constexpr int kColumnWidth = 412;
-constexpr int kDisplayLanguageGroupHeight = 192;
+constexpr int kDisplayLanguageGroupHeight = 193;
 constexpr int kDisplayLanguageMainX = kLeftColumnX + 20;
 constexpr int kDisplayLanguageDisplayX = kLeftColumnX + 248;
 constexpr int kDisplayLanguageMainWidth = 190;
 constexpr int kDisplayLanguageDisplayWidth = 160;
-constexpr int kPageSizeTrackWidth = kColumnWidth;
+constexpr int kPageSizeTrackInset = 18;
+constexpr int kPageSizeTrackWidth = kColumnWidth - (kPageSizeTrackInset * 2);
 constexpr int kRowHeight = 28;
 constexpr int kPageTickWidth = 32;
+constexpr int kSettingsButtonWidth = 148;
+constexpr int kSettingsButtonGap = 16;
+constexpr int kSettingsButtonBottomY = 526;
 constexpr DWORD kRadioStyle = BS_AUTORADIOBUTTON;
 constexpr DWORD kRadioGroupStartStyle = BS_AUTORADIOBUTTON | WS_GROUP;
+constexpr DWORD kPipeConnectTimeoutMs = 5000;
 
 enum ControlId : int {
   kDisplayLanguageBase = 1100,
@@ -84,21 +94,6 @@ std::wstring utf8ToWide(const std::string& value) {
   return result;
 }
 
-std::string wideToUtf8(const std::wstring& value) {
-  if (value.empty()) {
-    return "";
-  }
-  const int size = WideCharToMultiByte(CP_UTF8, 0, value.c_str(), -1, nullptr, 0,
-                                      nullptr, nullptr);
-  if (size <= 0) {
-    return "";
-  }
-  std::string result(size - 1, '\0');
-  WideCharToMultiByte(CP_UTF8, 0, value.c_str(), -1, result.data(), size,
-                      nullptr, nullptr);
-  return result;
-}
-
 bool containsLanguage(const Moqi::TypeDuck::Preferences& preferences,
                       const char* language) {
   return std::find(preferences.displayLanguages.begin(),
@@ -106,57 +101,193 @@ bool containsLanguage(const Moqi::TypeDuck::Preferences& preferences,
                    language) != preferences.displayLanguages.end();
 }
 
-std::filesystem::path rimeUserDir() {
-  const wchar_t* appData = _wgetenv(L"APPDATA");
-  if (appData == nullptr || appData[0] == L'\0') {
-    return {};
+std::wstring executableDir() {
+  std::wstring path(MAX_PATH, L'\0');
+  DWORD length = GetModuleFileNameW(nullptr, path.data(),
+                                    static_cast<DWORD>(path.size()));
+  while (length == path.size()) {
+    path.resize(path.size() * 2);
+    length = GetModuleFileNameW(nullptr, path.data(),
+                                static_cast<DWORD>(path.size()));
   }
-  return std::filesystem::path(appData) / L"Moqi" / L"Rime";
+  if (length == 0) {
+    return L"";
+  }
+  path.resize(length);
+  const auto slash = path.find_last_of(L"\\/");
+  return slash == std::wstring::npos ? L"" : path.substr(0, slash);
 }
 
-bool writeUtf8File(const std::filesystem::path& path, const std::string& content) {
-  std::error_code ec;
-  std::filesystem::create_directories(path.parent_path(), ec);
-  if (ec) {
+std::wstring launcherPath() {
+  std::wstring dir = executableDir();
+  if (dir.empty()) {
+    return kLauncherExecutableName;
+  }
+  if (dir.back() != L'\\') {
+    dir += L"\\";
+  }
+  dir += kLauncherExecutableName;
+  return dir;
+}
+
+std::wstring launcherPipeName() {
+  DWORD len = 0;
+  GetUserNameW(nullptr, &len);
+  if (len == 0) {
+    return L"";
+  }
+  std::wstring username(len, L'\0');
+  if (!GetUserNameW(username.data(), &len)) {
+    return L"";
+  }
+  if (!username.empty() && username.back() == L'\0') {
+    username.pop_back();
+  }
+  return L"\\\\.\\pipe\\" + username + L"\\MoqiIM\\" + kLauncherPipeBaseName;
+}
+
+bool ensureLauncherRunning() {
+  const std::wstring path = launcherPath();
+  const DWORD attrs = GetFileAttributesW(path.c_str());
+  if (attrs == INVALID_FILE_ATTRIBUTES || (attrs & FILE_ATTRIBUTE_DIRECTORY)) {
     return false;
   }
-  std::ofstream stream(path, std::ios::binary | std::ios::trunc);
-  if (!stream.is_open()) {
+  const HINSTANCE result = ShellExecuteW(
+      nullptr, L"open", path.c_str(), nullptr, executableDir().c_str(),
+      SW_SHOWNORMAL);
+  return reinterpret_cast<INT_PTR>(result) > 32;
+}
+
+HANDLE connectLauncherPipe(DWORD timeoutMs) {
+  const std::wstring pipeName = launcherPipeName();
+  if (pipeName.empty()) {
+    return INVALID_HANDLE_VALUE;
+  }
+  if (!WaitNamedPipeW(pipeName.c_str(), timeoutMs)) {
+    return INVALID_HANDLE_VALUE;
+  }
+  HANDLE pipe = CreateFileW(pipeName.c_str(), GENERIC_READ | GENERIC_WRITE, 0,
+                            nullptr, OPEN_EXISTING, 0, nullptr);
+  if (pipe == INVALID_HANDLE_VALUE) {
+    return INVALID_HANDLE_VALUE;
+  }
+  DWORD mode = PIPE_READMODE_MESSAGE;
+  if (!SetNamedPipeHandleState(pipe, &mode, nullptr, nullptr)) {
+    CloseHandle(pipe);
+    return INVALID_HANDLE_VALUE;
+  }
+  return pipe;
+}
+
+bool transactLauncher(HANDLE pipe, const moqi::protocol::ClientRequest& request,
+                      moqi::protocol::ServerResponse& response) {
+  std::string framedRequest;
+  if (!Moqi::Proto::serializeMessageBounded(
+          request, framedRequest, Moqi::Proto::kMaxClientFramePayloadBytes)) {
     return false;
   }
-  stream << content;
-  return stream.good();
+
+  std::string framedResponse;
+  char buffer[4096];
+  DWORD bytesRead = 0;
+  bool hasMoreData = false;
+  if (!TransactNamedPipe(pipe, framedRequest.data(),
+                         static_cast<DWORD>(framedRequest.size()), buffer,
+                         sizeof(buffer), &bytesRead, nullptr)) {
+    if (GetLastError() != ERROR_MORE_DATA) {
+      return false;
+    }
+    hasMoreData = true;
+  }
+  framedResponse.append(buffer, bytesRead);
+  while (hasMoreData) {
+    if (ReadFile(pipe, buffer, sizeof(buffer), &bytesRead, nullptr)) {
+      hasMoreData = false;
+    } else if (GetLastError() != ERROR_MORE_DATA) {
+      return false;
+    }
+    framedResponse.append(buffer, bytesRead);
+  }
+
+  Moqi::Proto::FrameBuffer responseBuffer{
+      Moqi::Proto::kMaxClientFramePayloadBytes};
+  responseBuffer.append(framedResponse.data(), framedResponse.size());
+  std::string payload;
+  return responseBuffer.nextFrame(payload) &&
+         Moqi::Proto::parsePayload(payload, response);
 }
 
-std::string defaultCustomYaml(const Moqi::TypeDuck::RimeSideEffects& effects) {
-  std::ostringstream content;
-  content << "config_version: '" << effects.pageSize << "'\n"
-          << "patch:\n"
-          << "  " << effects.defaultCustomPath << ": " << effects.pageSize << "\n";
-  return content.str();
+void fillSettingsUpdate(const Moqi::TypeDuck::Preferences& preferences,
+                        moqi::protocol::TypeDuckSettingsUpdate* update) {
+  for (const auto& language : preferences.displayLanguages) {
+    update->add_display_languages(language);
+  }
+  update->set_main_language(preferences.mainLanguage);
+  update->set_page_size(static_cast<uint32_t>(preferences.pageSize));
+  update->set_is_hei_typeface(preferences.isHeiTypeface);
+  update->set_show_romanization(preferences.showRomanization);
+  update->set_enable_completion(preferences.enableCompletion);
+  update->set_enable_correction(preferences.enableCorrection);
+  update->set_enable_sentence(preferences.enableSentence);
+  update->set_enable_learning(preferences.enableLearning);
+  update->set_show_reverse_code(preferences.showReverseCode);
+  update->set_is_cangjie5(preferences.isCangjie5);
 }
 
-std::string commonCustomYaml(const Moqi::TypeDuck::RimeSideEffects& effects) {
-  std::ostringstream content;
-  content << "patch:\n"
-          << "  " << effects.commonPatchKey << ":\n";
-  for (const auto& patch : effects.commonPatches) {
-    content << "    - " << patch << "\n";
+Moqi::TypeDuck::ApplyResult applyViaLauncher(
+    const Moqi::TypeDuck::Preferences& preferences) {
+  HANDLE pipe = connectLauncherPipe(0);
+  if (pipe == INVALID_HANDLE_VALUE) {
+    ensureLauncherRunning();
+    pipe = connectLauncherPipe(kPipeConnectTimeoutMs);
   }
-  return content.str();
+  if (pipe == INVALID_HANDLE_VALUE) {
+    return {false, "設定未能套用：TypeDuck Launcher 未能連線 / Settings could not be applied: TypeDuck Launcher was unavailable"};
+  }
+
+  moqi::protocol::ClientRequest initRequest;
+  initRequest.set_seq_num(1);
+  initRequest.set_method(moqi::protocol::METHOD_INIT);
+  initRequest.set_guid(kTypeDuckProfileGuid);
+  moqi::protocol::ServerResponse initResponse;
+  if (!transactLauncher(pipe, initRequest, initResponse) ||
+      !initResponse.success()) {
+    CloseHandle(pipe);
+    const std::string message =
+        !initResponse.error().empty()
+            ? initResponse.error()
+            : "設定未能套用：TypeDuck 後端未能初始化 / Settings could not be applied: TypeDuck backend could not initialize";
+    return {false, message};
+  }
+
+  moqi::protocol::ClientRequest updateRequest;
+  updateRequest.set_seq_num(2);
+  updateRequest.set_method(moqi::protocol::METHOD_TYPEDUCK_SETTINGS_UPDATE);
+  fillSettingsUpdate(preferences, updateRequest.mutable_typeduck_settings_update());
+  moqi::protocol::ServerResponse updateResponse;
+  if (!transactLauncher(pipe, updateRequest, updateResponse)) {
+    CloseHandle(pipe);
+    return {false, "設定未能套用：TypeDuck Launcher 沒有回應 / Settings could not be applied: TypeDuck Launcher did not respond"};
+  }
+  CloseHandle(pipe);
+  if (!updateResponse.success()) {
+    return {false, !updateResponse.error().empty()
+                       ? updateResponse.error()
+                       : "設定未能套用 / Settings could not be applied"};
+  }
+  const auto& snapshot = updateResponse.typeduck_settings_snapshot();
+  return {true, snapshot.status_message().empty()
+                    ? "設定已套用 / Settings applied"
+                    : snapshot.status_message()};
 }
 
-Moqi::TypeDuck::ApplyResult applyRimeSettings(
-    const Moqi::TypeDuck::RimeSideEffects& effects) {
-  const auto userDir = rimeUserDir();
-  if (userDir.empty()) {
-    return {false, "設定未能套用：找不到 Rime 使用者目錄 / Settings could not be applied: the Rime user directory was unavailable"};
+int applyDefaultPreferencesIfMissing() {
+  const auto path = Moqi::TypeDuck::defaultPreferencesPath();
+  if (std::filesystem::exists(path)) {
+    return 0;
   }
-  if (!writeUtf8File(userDir / effects.defaultCustomFile, defaultCustomYaml(effects)) ||
-      !writeUtf8File(userDir / effects.commonCustomFile, commonCustomYaml(effects))) {
-    return {false, "設定未能套用：Rime 自訂設定未能寫入 / Settings could not be applied: Rime custom settings could not be written"};
-  }
-  return {true, "設定已套用 / Settings applied"};
+  const auto result = applyViaLauncher(Moqi::TypeDuck::defaultPreferences());
+  return result.ok ? 0 : 1;
 }
 
 class SettingsWindow {
@@ -291,8 +422,12 @@ class SettingsWindow {
     createEngineControls();
     createReverseLookupControls();
 
-    addButton(L"確定 Confirm", kConfirm, 676, 526, 112, 32, BS_DEFPUSHBUTTON);
-    addButton(L"取消 Cancel", kCancel, 804, 526, 112, 32, BS_PUSHBUTTON);
+    const int cancelX = kWindowWidth - kMargin - kSettingsButtonWidth - 24;
+    const int confirmX = cancelX - kSettingsButtonGap - kSettingsButtonWidth;
+    addButton(L"確定 Confirm", kConfirm, confirmX, kSettingsButtonBottomY,
+              kSettingsButtonWidth, 32, BS_DEFPUSHBUTTON);
+    addButton(L"取消 Cancel", kCancel, cancelX, kSettingsButtonBottomY,
+              kSettingsButtonWidth, 32, BS_PUSHBUTTON);
     applyFontToChildren();
     applyHeaderFont();
   }
@@ -323,7 +458,7 @@ class SettingsWindow {
               kColumnWidth, 24);
     pageSizeTrack_ = CreateWindowExW(
         0, TRACKBAR_CLASSW, L"", WS_CHILD | WS_VISIBLE | WS_TABSTOP | TBS_AUTOTICKS,
-        kLeftColumnX, y + 28, kPageSizeTrackWidth, 34, window_,
+        kLeftColumnX + kPageSizeTrackInset, y + 28, kPageSizeTrackWidth, 34, window_,
         reinterpret_cast<HMENU>(static_cast<INT_PTR>(kPageSizeTrack)), instance_,
         nullptr);
     SendMessageW(pageSizeTrack_, TBM_SETRANGE, TRUE, MAKELPARAM(4, 10));
@@ -350,7 +485,7 @@ class SettingsWindow {
 
   void createEngineControls() {
     int y = 58;
-    addSectionHeader(L"引擎設定 Engine Settings", kRightColumnX, y - 38, 280, 30);
+    addSectionHeader(L"引擎設定 Engine Settings", kRightColumnX, y - 40, 330, 34);
     addButton(L"自動完成 Auto-completion", kEnableCompletion, kRightColumnX, y,
               270, 26, BS_AUTOCHECKBOX);
     addButton(L"自動校正 Auto-correction", kEnableCorrection, kRightColumnX,
@@ -405,7 +540,7 @@ class SettingsWindow {
         sizeof(kPageSizeTickLabels) / sizeof(kPageSizeTickLabels[0]);
     for (int index = 0; index < kPageSizeTickLabelCount; ++index) {
       const int x = kLeftColumnX + (index * kPageSizeTrackWidth / 6) -
-                    (kPageTickWidth / 2);
+                    (kPageTickWidth / 2) + kPageSizeTrackInset;
       addStatic(kPageSizeTickLabels[index], x, y, kPageTickWidth, 22,
                 SS_CENTER);
     }
@@ -524,8 +659,7 @@ class SettingsWindow {
 
   bool apply() {
     collectState();
-    const auto result = Moqi::TypeDuck::applyPreferences(
-        Moqi::TypeDuck::defaultPreferencesPath(), preferences_, applyRimeSettings);
+    const auto result = applyViaLauncher(preferences_);
     if (!result.ok) {
       MessageBoxW(window_, utf8ToWide(result.message).c_str(),
                   L"TypeDuck 設定 / TypeDuck Settings", MB_ICONWARNING);
@@ -552,6 +686,17 @@ class SettingsWindow {
 } // namespace
 
 int RunSettingsWindow(HINSTANCE instance, int showCommand) {
+  int argc = 0;
+  wchar_t** argv = CommandLineToArgvW(GetCommandLineW(), &argc);
+  for (int index = 1; index < argc; ++index) {
+    if (_wcsicmp(argv[index], kApplyDefaultsSwitch) == 0) {
+      LocalFree(argv);
+      return applyDefaultPreferencesIfMissing();
+    }
+  }
+  if (argv != nullptr) {
+    LocalFree(argv);
+  }
   SettingsWindow window(instance);
   return window.run(showCommand);
 }

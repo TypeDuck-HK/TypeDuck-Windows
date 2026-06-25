@@ -459,6 +459,78 @@ static Json::Value typeDuckSettingsSnapshotToJson(
   return result;
 }
 
+static bool displayLanguageFromId(const std::string& id,
+                                  TypeDuck::DisplayLanguage& language) {
+  if (id == "eng") {
+    language = TypeDuck::DisplayLanguage::English;
+  } else if (id == "hin") {
+    language = TypeDuck::DisplayLanguage::Hindi;
+  } else if (id == "ind") {
+    language = TypeDuck::DisplayLanguage::Indonesian;
+  } else if (id == "nep") {
+    language = TypeDuck::DisplayLanguage::Nepali;
+  } else if (id == "urd") {
+    language = TypeDuck::DisplayLanguage::Urdu;
+  } else {
+    return false;
+  }
+  return true;
+}
+
+static TypeDuck::DisplayPreferences displayPreferencesFromJson(
+    const Json::Value& snapshot) {
+  TypeDuck::DisplayPreferences preferences;
+  const Json::Value& displayLanguages = snapshot["displayLanguages"];
+  if (displayLanguages.isArray()) {
+    std::vector<TypeDuck::DisplayLanguage> languages;
+    for (const auto& item : displayLanguages) {
+      if (!item.isString()) {
+        continue;
+      }
+      TypeDuck::DisplayLanguage language{};
+      if (displayLanguageFromId(item.asString(), language) &&
+          std::find(languages.begin(), languages.end(), language) ==
+              languages.end()) {
+        languages.push_back(language);
+      }
+    }
+    if (!languages.empty()) {
+      preferences.displayLanguages = std::move(languages);
+    }
+  }
+
+  TypeDuck::DisplayLanguage mainLanguage{};
+  if (snapshot["mainLanguage"].isString() &&
+      displayLanguageFromId(snapshot["mainLanguage"].asString(), mainLanguage)) {
+    preferences.mainLanguage = mainLanguage;
+    if (std::find(preferences.displayLanguages.begin(),
+                  preferences.displayLanguages.end(),
+                  mainLanguage) == preferences.displayLanguages.end()) {
+      preferences.displayLanguages.push_back(mainLanguage);
+    }
+  }
+
+  const std::string romanization =
+      snapshot["showRomanization"].isString()
+          ? snapshot["showRomanization"].asString()
+          : "";
+  if (romanization == "reverse_only") {
+    preferences.jyutpingVisibility = TypeDuck::JyutpingVisibility::ReverseLookupOnly;
+  } else if (romanization == "never") {
+    preferences.jyutpingVisibility = TypeDuck::JyutpingVisibility::Hidden;
+  } else {
+    preferences.jyutpingVisibility = TypeDuck::JyutpingVisibility::Always;
+  }
+  preferences.chineseTypeface =
+      snapshot["isHeiTypeface"].asBool()
+          ? TypeDuck::ChineseTypeface::Hei
+          : TypeDuck::ChineseTypeface::Sung;
+  if (snapshot["showReverseCode"].isBool()) {
+    preferences.showReverseCode = snapshot["showReverseCode"].asBool();
+  }
+  return preferences;
+}
+
 static Json::Value typeDuckCapabilitiesToJson(
     const google::protobuf::RepeatedPtrField<
         moqi::protocol::TypeDuckEngineCapability> &capabilities) {
@@ -1032,6 +1104,11 @@ void Client::updateStatus(Json::Value &msg, Ime::EditSession *session) {
   // We need to handle ordering of some types of the requests.
   // For example, setCompositionCursor() should happen after
   // setCompositionCursor().
+  const auto& settingsSnapshotVal = msg["typeduckSettingsSnapshot"];
+  if (settingsSnapshotVal.isObject()) {
+    textService_->setTypeDuckDisplayPreferences(
+        displayPreferencesFromJson(settingsSnapshotVal));
+  }
   updateSelectionKeys(msg);
   const auto &candidatePageIndexVal = msg["candidatePageIndex"];
   if (candidatePageIndexVal.isUInt()) {

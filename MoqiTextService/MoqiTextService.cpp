@@ -27,6 +27,7 @@
 #include <libIME2/src/Utils.h>
 #include <libIME2/src/LangBarButton.h>
 #include "MoqiImeModule.h"
+#include "MoqLauncher/TypeDuckPreferences.h"
 #include "resource.h"
 #include <Shellapi.h>
 #include <sys/stat.h>
@@ -403,6 +404,77 @@ bool fallbackAnchorRect(RECT* rect) {
 	rect->right = 1;
 	rect->bottom = 20;
 	return true;
+}
+
+bool displayLanguageFromPreferenceId(const std::string& id, TypeDuck::DisplayLanguage& language) {
+	if (id == "eng") {
+		language = TypeDuck::DisplayLanguage::English;
+	}
+	else if (id == "hin") {
+		language = TypeDuck::DisplayLanguage::Hindi;
+	}
+	else if (id == "ind") {
+		language = TypeDuck::DisplayLanguage::Indonesian;
+	}
+	else if (id == "nep") {
+		language = TypeDuck::DisplayLanguage::Nepali;
+	}
+	else if (id == "urd") {
+		language = TypeDuck::DisplayLanguage::Urdu;
+	}
+	else {
+		return false;
+	}
+	return true;
+}
+
+TypeDuck::DisplayPreferences displayPreferencesFromSavedPreferences(
+	const TypeDuck::Preferences& savedPreferences) {
+	TypeDuck::DisplayPreferences preferences;
+	std::vector<TypeDuck::DisplayLanguage> displayLanguages;
+	for (const auto& id : savedPreferences.displayLanguages) {
+		TypeDuck::DisplayLanguage language{};
+		if (displayLanguageFromPreferenceId(id, language) &&
+			std::find(displayLanguages.begin(), displayLanguages.end(), language) == displayLanguages.end()) {
+			displayLanguages.push_back(language);
+		}
+	}
+	if (!displayLanguages.empty()) {
+		preferences.displayLanguages = std::move(displayLanguages);
+	}
+
+	TypeDuck::DisplayLanguage mainLanguage{};
+	if (displayLanguageFromPreferenceId(savedPreferences.mainLanguage, mainLanguage)) {
+		preferences.mainLanguage = mainLanguage;
+		if (std::find(preferences.displayLanguages.begin(), preferences.displayLanguages.end(), mainLanguage) ==
+			preferences.displayLanguages.end()) {
+			preferences.displayLanguages.push_back(mainLanguage);
+		}
+	}
+
+	if (savedPreferences.showRomanization == "reverse_only") {
+		preferences.jyutpingVisibility = TypeDuck::JyutpingVisibility::ReverseLookupOnly;
+	}
+	else if (savedPreferences.showRomanization == "never") {
+		preferences.jyutpingVisibility = TypeDuck::JyutpingVisibility::Hidden;
+	}
+	else {
+		preferences.jyutpingVisibility = TypeDuck::JyutpingVisibility::Always;
+	}
+	preferences.chineseTypeface = savedPreferences.isHeiTypeface
+		? TypeDuck::ChineseTypeface::Hei
+		: TypeDuck::ChineseTypeface::Sung;
+	preferences.showReverseCode = savedPreferences.showReverseCode;
+	return preferences;
+}
+
+bool displayPreferencesEqual(const TypeDuck::DisplayPreferences& left,
+	const TypeDuck::DisplayPreferences& right) {
+	return left.displayLanguages == right.displayLanguages &&
+		left.mainLanguage == right.mainLanguage &&
+		left.jyutpingVisibility == right.jyutpingVisibility &&
+		left.chineseTypeface == right.chineseTypeface &&
+		left.showReverseCode == right.showReverseCode;
 }
 
 POINT clampCandidateWindowToWorkArea(const RECT& anchorRect, const SIZE& popupSize) {
@@ -939,6 +1011,7 @@ void TextService::createCandidateWindow(Ime::EditSession* session) {
 		candidateWindow_->setHighlightColor(candHighlightColor_);
 		candidateWindow_->setTextColor(candTextColor_);
 		candidateWindow_->setHighlightTextColor(candHighlightTextColor_);
+		candidateWindow_->setDisplayPreferences(typeDuckDisplayPreferences_);
 		candidateWindow_->setPreeditText(candidatePreedit_);
 		candidateWindow_->setPreeditCursor(candidatePreeditCursor_);
 		candidateWindow_->setPreeditSelection(candidatePreeditSelectionStart_, candidatePreeditSelectionEnd_);
@@ -996,6 +1069,7 @@ void TextService::updateCandidates(Ime::EditSession* session) {
 		appendCandidateWindowLog(L"[TextService::updateCandidates] skipped by process policy");
 		return;
 	}
+	reloadTypeDuckDisplayPreferences();
 	createCandidateWindow(session);
 	if (!candidateWindow_) {
 		return;
@@ -1017,6 +1091,7 @@ void TextService::updateCandidates(Ime::EditSession* session) {
 		candidateWindow_->setHighlightTextColor(candHighlightTextColor_);
 		candidateWindow_->setCommentColor(candCommentColor_);
 		candidateWindow_->setCommentHighlightColor(candCommentHighlightColor_);
+		candidateWindow_->setDisplayPreferences(typeDuckDisplayPreferences_);
 		candidateWindow_->setPreeditText(renderedPreedit);
 		candidateWindow_->setPreeditCursor(candidatePreeditCursor_);
 		candidateWindow_->setPreeditSelection(candidatePreeditSelectionStart_, candidatePreeditSelectionEnd_);
@@ -1171,6 +1246,7 @@ void TextService::showCandidates(Ime::EditSession* session) {
 		appendCandidateWindowLog(L"[TextService::showCandidates] skipped by process policy");
 		return;
 	}
+	reloadTypeDuckDisplayPreferences();
 	// NOTE: in Windows 8 store apps, candidate window should be owned by
 	// composition window, which can be returned by TextService::compositionWindow().
 	// Otherwise, the candidate window cannot be shown.
@@ -1377,12 +1453,39 @@ void TextService::refreshCandidateAppearance() {
 	candidateWindow_->setHighlightColor(candHighlightColor_);
 	candidateWindow_->setTextColor(candTextColor_);
 	candidateWindow_->setHighlightTextColor(candHighlightTextColor_);
+	candidateWindow_->setDisplayPreferences(typeDuckDisplayPreferences_);
 	candidateWindow_->setPreeditText(candidatePreedit_);
 	candidateWindow_->setPreeditCursor(candidatePreeditCursor_);
 	candidateWindow_->setPreeditSelection(candidatePreeditSelectionStart_, candidatePreeditSelectionEnd_);
 	candidateWindow_->recalculateSize();
 	candidateWindow_->refresh();
 	refreshCandidates();
+}
+
+void TextService::setTypeDuckDisplayPreferences(TypeDuck::DisplayPreferences preferences) {
+	if (!candFontName_.empty() && displayPreferencesEqual(typeDuckDisplayPreferences_, preferences)) {
+		return;
+	}
+	typeDuckDisplayPreferences_ = std::move(preferences);
+	if (typeDuckDisplayPreferences_.chineseTypeface == TypeDuck::ChineseTypeface::Hei) {
+		setCandFontName(L"Microsoft JhengHei UI, Microsoft JhengHei");
+		setCandCommentFontName(L"Microsoft JhengHei UI, Microsoft JhengHei");
+	}
+	else {
+		setCandFontName(L"PMingLiU, MingLiU, Microsoft JhengHei UI");
+		setCandCommentFontName(L"Microsoft JhengHei UI, Microsoft JhengHei");
+	}
+	if (candidateWindow_) {
+		candidateWindow_->setDisplayPreferences(typeDuckDisplayPreferences_);
+		candidateWindow_->recalculateSize();
+		candidateWindow_->refresh();
+		invalidateCandidateUiCache();
+	}
+}
+
+void TextService::reloadTypeDuckDisplayPreferences() {
+	const auto loaded = TypeDuck::loadPreferences(TypeDuck::defaultPreferencesPath());
+	setTypeDuckDisplayPreferences(displayPreferencesFromSavedPreferences(loaded.preferences));
 }
 
 void TextService::applyUiLessOverrideState() {
