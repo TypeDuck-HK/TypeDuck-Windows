@@ -39,6 +39,9 @@ constexpr COLORREF kPosPillText = RGB(86, 79, 69);
 constexpr int kDefaultCandidateSpacing = 20;
 constexpr int kTypeDuckCandidatePanelRenderer = 1;
 constexpr int kMovementRevealThreshold = 2;
+constexpr int kPageNavNone = -1;
+constexpr int kPageNavPrevious = 0;
+constexpr int kPageNavNext = 1;
 constexpr int kWindowDpiBaseline = 96;
 constexpr int kBorderWidth = 1;
 constexpr int kInitialCompactPanelPaddingX = 7;
@@ -418,6 +421,7 @@ CandidateWindow::CandidateWindow(Ime::TextService* service, Ime::EditSession* se
       preeditSelectionEnd_(0),
       currentSel_(0),
       pressedSel_(-1),
+      pressedPageNavDirection_(kPageNavNone),
       draggingWindow_(false),
       trackingMouse_(false),
       useCursor_(false),
@@ -1475,23 +1479,14 @@ void CandidateWindow::paintInputBuffer(HDC hdc, const RECT& panelRc) {
 }
 
 void CandidateWindow::paintPageNavigation(HDC hdc, const RECT& panelRc) {
-    const auto* service = productTextService(textService_);
-    const int pageIndex = service != nullptr ? service->candidatePageIndex() : 0;
-    const int pageSize = service != nullptr ? service->candidatePageSize() : static_cast<int>(items_.size());
-    const int totalCount = service != nullptr ? service->candidateTotalCount() : static_cast<int>(items_.size());
-    const bool hasPrev = pageIndex > 0;
-    const bool hasNext = pageSize > 0 && totalCount > (pageIndex + 1) * pageSize;
-
-    RECT navRc = {
-        panelRc.right - borderWidth_ - padX_ - pageNavWidth_,
-        panelRc.top + borderWidth_ + padY_,
-        panelRc.right - borderWidth_ - padX_,
-        panelRc.top + borderWidth_ + padY_ +
-            (preedit_.empty() ? scalePx(kPageNavPreeditlessHeight) : preeditHeight_ + scalePx(kPreeditExtraHeight))};
-    RECT prevRc = navRc;
-    prevRc.right = prevRc.left + pageNavWidth_ / 2;
-    RECT nextRc = navRc;
-    nextRc.left = prevRc.right;
+    const bool hasPrev = isPageNavigationEnabled(false);
+    const bool hasNext = isPageNavigationEnabled(true);
+    RECT prevRc = {};
+    RECT nextRc = {};
+    pageNavigationButtonRect(false, prevRc);
+    pageNavigationButtonRect(true, nextRc);
+    ::OffsetRect(&prevRc, panelRc.left, panelRc.top);
+    ::OffsetRect(&nextRc, panelRc.left, panelRc.top);
 
     HFONT navFont = createPanelFont(hdc, L"Segoe UI Symbol", kPageNavGlyphPointSize);
     HGDIOBJ oldFont = ::SelectObject(hdc, navFont ? navFont : font_);
@@ -1978,17 +1973,79 @@ int CandidateWindow::hitTestCandidate(POINT pt) const {
     return -1;
 }
 
+void CandidateWindow::pageNavigationButtonRect(bool next, RECT& rect) const {
+    const int candidatePanelRight = candidatePanelWidth_ > 0
+                                        ? candidatePanelWidth_
+                                        : padX_ * 2 + minWidth_ + borderWidth_ * 2;
+    rect = {
+        candidatePanelRight - borderWidth_ - padX_ - pageNavWidth_,
+        borderWidth_ + padY_,
+        candidatePanelRight - borderWidth_ - padX_,
+        borderWidth_ + padY_ +
+            (preedit_.empty() ? scalePx(kPageNavPreeditlessHeight)
+                              : preeditHeight_ + scalePx(kPreeditExtraHeight))};
+    if (next) {
+        rect.left += pageNavWidth_ / 2;
+    } else {
+        rect.right = rect.left + pageNavWidth_ / 2;
+    }
+}
+
+bool CandidateWindow::isPageNavigationEnabled(bool next) const {
+    const auto* service = productTextService(textService_);
+    if (!service) {
+        return false;
+    }
+    if (next) {
+        if (service->candidateHasNext()) {
+            return true;
+        }
+        const int pageSize = service->candidatePageSize();
+        const int totalCount = service->candidateTotalCount();
+        return pageSize > 0 && totalCount > (service->candidatePageIndex() + 1) * pageSize;
+    }
+    return service->candidateHasPrevious() || service->candidatePageIndex() > 0;
+}
+
+int CandidateWindow::hitTestPageNavigation(POINT pt) const {
+    if (pageNavWidth_ <= 0 || candidatePanelWidth_ <= 0) {
+        return kPageNavNone;
+    }
+    RECT prevRc = {};
+    RECT nextRc = {};
+    pageNavigationButtonRect(false, prevRc);
+    pageNavigationButtonRect(true, nextRc);
+    if (isPageNavigationEnabled(false) && ::PtInRect(&prevRc, pt)) {
+        return kPageNavPrevious;
+    }
+    if (isPageNavigationEnabled(true) && ::PtInRect(&nextRc, pt)) {
+        return kPageNavNext;
+    }
+    return kPageNavNone;
+}
+
 void CandidateWindow::onLButtonDown(WPARAM wp, LPARAM lp) {
     POINT pt = {GET_X_LPARAM(lp), GET_Y_LPARAM(lp)};
+    const int navDirection = hitTestPageNavigation(pt);
+    if (navDirection != kPageNavNone) {
+        pressedPageNavDirection_ = navDirection;
+        pressedSel_ = -1;
+        draggingWindow_ = false;
+        ::SetCapture(hwnd_);
+        return;
+    }
+
     const int hitIndex = hitTestCandidate(pt);
     if (hitIndex >= 0) {
         pressedSel_ = hitIndex;
+        pressedPageNavDirection_ = kPageNavNone;
         draggingWindow_ = false;
         ::SetCapture(hwnd_);
         return;
     }
 
     pressedSel_ = -1;
+    pressedPageNavDirection_ = kPageNavNone;
     draggingWindow_ = true;
     Ime::ImeWindow::onLButtonDown(wp, lp);
 }
@@ -2006,6 +2063,18 @@ void CandidateWindow::onLButtonUp(WPARAM wp, LPARAM lp) {
     }
 
     POINT pt = {GET_X_LPARAM(lp), GET_Y_LPARAM(lp)};
+    const int navDirection = hitTestPageNavigation(pt);
+    if (pressedPageNavDirection_ != kPageNavNone &&
+        navDirection == pressedPageNavDirection_) {
+        if (auto* textService = static_cast<Moqi::TextService*>(textService_)) {
+            textService->changeCandidatePage(pressedPageNavDirection_ == kPageNavPrevious);
+        }
+        pressedPageNavDirection_ = kPageNavNone;
+        pressedSel_ = -1;
+        return;
+    }
+    pressedPageNavDirection_ = kPageNavNone;
+
     const int hitIndex = hitTestCandidate(pt);
     if (pressedSel_ >= 0 && hitIndex >= 0 &&
         (hitIndex == currentSel_ || hitIndex == pressedSel_)) {

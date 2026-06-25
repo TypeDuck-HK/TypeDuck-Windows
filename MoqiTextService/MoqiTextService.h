@@ -116,6 +116,22 @@ public:
 		candidateTotalCount_ = (std::max)(0, candidateTotalCount);
 	}
 
+	bool candidateHasPrevious() const {
+		return candidateHasPrevious_;
+	}
+
+	void setCandidateHasPrevious(bool candidateHasPrevious) {
+		candidateHasPrevious_ = candidateHasPrevious;
+	}
+
+	bool candidateHasNext() const {
+		return candidateHasNext_;
+	}
+
+	void setCandidateHasNext(bool candidateHasNext) {
+		candidateHasNext_ = candidateHasNext;
+	}
+
 	int candSpacing() const {
 		return candSpacing_;
 	}
@@ -417,6 +433,8 @@ private:
 	int candidatePageIndex_;
 	int candidatePageSize_;
 	int candidateTotalCount_;
+	bool candidateHasPrevious_;
+	bool candidateHasNext_;
 	int candSpacing_;
 	std::wstring selKeys_;
 	bool candUseCursor_;

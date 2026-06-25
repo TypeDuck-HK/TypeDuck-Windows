@@ -181,15 +181,15 @@ foreach ($language in $fixture.displayLanguageBehavior.languages) {
 Assert-Text $window "主要語言 Main Language" "Missing corrected in-group main-language label."
 Assert-Text $window "kLeftColumnX" "Settings UI must expose a left column anchor."
 Assert-Text $window "kRightColumnX" "Settings UI must expose a right column anchor."
-Assert-Text $window "COLOR_BTNFACE" "Settings controls must share the dialog control background."
+Assert-Text $window "COLOR_WINDOW" "Settings controls must share the white dialog background."
 Assert-Text $window "addSectionHeader" "Settings section headings must use a dedicated section header path."
 Assert-Text $window "FW_BOLD" "Settings section headings must be bold."
 Assert-Text $window "applyHeaderFont" "Settings section headings must keep the header font after child font application."
 Assert-Ordered $window @(
-  "顯示 Display",
   "主要語言 Main Language",
-  "kDisplayLanguageBase",
-  "kMainLanguageBase"
+  "顯示 Display",
+  "kMainLanguageBase",
+  "kDisplayLanguageBase"
 ) "Display/main-language label alignment"
 Assert-Text $window "addPageSizeTickLabels" "Candidate page-size control must render fixed tick labels."
 foreach ($tick in 4..10) {
@@ -197,8 +197,12 @@ foreach ($tick in 4..10) {
 }
 Assert-Text $window "TBM_SETRANGE.+MAKELPARAM\(4,\s*10\)" "Candidate count control must be bounded 4-10."
 Assert-Text $window "TypeDuck::applyPreferences" "Apply must use the shared TypeDuckPreferences apply path."
-Assert-Text $window "套用 Apply" "Apply button must be bilingual."
+Assert-Text $window "applyRimeSettings" "Confirm must apply Rime custom YAML side effects."
+Assert-Text $window "default\.custom\.yaml|effects\.defaultCustomFile" "Settings must write default.custom.yaml side effects."
+Assert-Text $window "common\.custom\.yaml|effects\.commonCustomFile" "Settings must write common.custom.yaml side effects."
+Assert-Text $window "確定 Confirm" "Confirm button must be bilingual."
 Assert-Text $window "取消 Cancel" "Cancel button must be bilingual."
+Assert-True ($window -notmatch "套用後即時更新輸入法設定|Apply updates TypeDuck input settings|設定已儲存") "Settings window must not expose removed apply/status helper labels."
 Assert-True ($window -notmatch "TypeDuckPreferences\.json|Unsupported controls are disabled|不支援時會停用") "Settings copy must not expose internal persistence files or unsupported-state placeholders."
 Assert-Text $preferences "TypeDuckPreferences\.json" "Settings source of truth must remain TypeDuckPreferences.json."
 

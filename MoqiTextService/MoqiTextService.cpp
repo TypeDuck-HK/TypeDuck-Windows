@@ -462,6 +462,8 @@ TextService::TextService(ImeModule* module):
 	candidatePageIndex_(0),
 	candidatePageSize_(0),
 	candidateTotalCount_(0),
+	candidateHasPrevious_(false),
+	candidateHasNext_(false),
 	candSpacing_(20),
 	selKeys_(L"1234567890"),
 	candUseCursor_(true),
@@ -1214,6 +1216,8 @@ void TextService::resetTypeDuckDegradedState(Ime::EditSession* session) {
 	candidatePageIndex_ = 0;
 	candidatePageSize_ = 0;
 	candidateTotalCount_ = 0;
+	candidateHasPrevious_ = false;
+	candidateHasNext_ = false;
 	candidatePreedit_.clear();
 	candidatePreeditCursor_ = 0;
 	candidatePreeditSelectionStart_ = 0;

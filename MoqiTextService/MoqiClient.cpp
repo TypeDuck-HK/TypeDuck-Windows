@@ -1045,6 +1045,14 @@ void Client::updateStatus(Json::Value &msg, Ime::EditSession *session) {
   if (candidateTotalCountVal.isUInt()) {
     textService_->setCandidateTotalCount(candidateTotalCountVal.asInt());
   }
+  const auto &candidateHasPreviousVal = msg["candidateHasPrevious"];
+  if (candidateHasPreviousVal.isBool()) {
+    textService_->setCandidateHasPrevious(candidateHasPreviousVal.asBool());
+  }
+  const auto &candidateHasNextVal = msg["candidateHasNext"];
+  if (candidateHasNextVal.isBool()) {
+    textService_->setCandidateHasNext(candidateHasNextVal.asBool());
+  }
 
   // show message
   bool endComposition = false;

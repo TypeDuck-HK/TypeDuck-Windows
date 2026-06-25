@@ -5,6 +5,10 @@
 
 #include <algorithm>
 #include <commctrl.h>
+#include <cstdlib>
+#include <filesystem>
+#include <fstream>
+#include <sstream>
 #include <string>
 #include <vector>
 
@@ -19,6 +23,12 @@ constexpr int kMargin = 22;
 constexpr int kLeftColumnX = 28;
 constexpr int kRightColumnX = 486;
 constexpr int kColumnWidth = 412;
+constexpr int kDisplayLanguageGroupHeight = 192;
+constexpr int kDisplayLanguageMainX = kLeftColumnX + 20;
+constexpr int kDisplayLanguageDisplayX = kLeftColumnX + 248;
+constexpr int kDisplayLanguageMainWidth = 190;
+constexpr int kDisplayLanguageDisplayWidth = 160;
+constexpr int kPageSizeTrackWidth = kColumnWidth;
 constexpr int kRowHeight = 28;
 constexpr int kPageTickWidth = 32;
 
@@ -39,7 +49,7 @@ enum ControlId : int {
   kShowReverseCode = 1700,
   kCangjie3 = 1800,
   kCangjie5 = 1801,
-  kApply = 1900,
+  kConfirm = 1900,
   kCancel = 1901,
 };
 
@@ -94,6 +104,59 @@ bool containsLanguage(const Moqi::TypeDuck::Preferences& preferences,
                    language) != preferences.displayLanguages.end();
 }
 
+std::filesystem::path rimeUserDir() {
+  const wchar_t* appData = _wgetenv(L"APPDATA");
+  if (appData == nullptr || appData[0] == L'\0') {
+    return {};
+  }
+  return std::filesystem::path(appData) / L"Moqi" / L"Rime";
+}
+
+bool writeUtf8File(const std::filesystem::path& path, const std::string& content) {
+  std::error_code ec;
+  std::filesystem::create_directories(path.parent_path(), ec);
+  if (ec) {
+    return false;
+  }
+  std::ofstream stream(path, std::ios::binary | std::ios::trunc);
+  if (!stream.is_open()) {
+    return false;
+  }
+  stream << content;
+  return stream.good();
+}
+
+std::string defaultCustomYaml(const Moqi::TypeDuck::RimeSideEffects& effects) {
+  std::ostringstream content;
+  content << "config_version: '" << effects.pageSize << "'\n"
+          << "patch:\n"
+          << "  " << effects.defaultCustomPath << ": " << effects.pageSize << "\n";
+  return content.str();
+}
+
+std::string commonCustomYaml(const Moqi::TypeDuck::RimeSideEffects& effects) {
+  std::ostringstream content;
+  content << "patch:\n"
+          << "  " << effects.commonPatchKey << ":\n";
+  for (const auto& patch : effects.commonPatches) {
+    content << "    - " << patch << "\n";
+  }
+  return content.str();
+}
+
+Moqi::TypeDuck::ApplyResult applyRimeSettings(
+    const Moqi::TypeDuck::RimeSideEffects& effects) {
+  const auto userDir = rimeUserDir();
+  if (userDir.empty()) {
+    return {false, "設定未能套用：找不到 Rime 使用者目錄 / Settings could not be applied: the Rime user directory was unavailable"};
+  }
+  if (!writeUtf8File(userDir / effects.defaultCustomFile, defaultCustomYaml(effects)) ||
+      !writeUtf8File(userDir / effects.commonCustomFile, commonCustomYaml(effects))) {
+    return {false, "設定未能套用：Rime 自訂設定未能寫入 / Settings could not be applied: Rime custom settings could not be written"};
+  }
+  return {true, "設定已套用 / Settings applied"};
+}
+
 class SettingsWindow {
  public:
   SettingsWindow(HINSTANCE instance) : instance_(instance) {}
@@ -111,7 +174,7 @@ class SettingsWindow {
     wc.lpszClassName = kWindowClassName;
     wc.hIcon = LoadIconW(instance_, MAKEINTRESOURCEW(IDI_TYPEDUCK_SETTINGS));
     wc.hCursor = LoadCursorW(nullptr, IDC_ARROW);
-    wc.hbrBackground = reinterpret_cast<HBRUSH>(COLOR_BTNFACE + 1);
+    wc.hbrBackground = reinterpret_cast<HBRUSH>(COLOR_WINDOW + 1);
     wc.hIconSm = wc.hIcon;
     RegisterClassExW(&wc);
 
@@ -170,9 +233,16 @@ class SettingsWindow {
       case WM_COMMAND:
         handleCommand(LOWORD(wparam), HIWORD(wparam));
         return 0;
+      case WM_CLOSE:
+        confirmAndClose();
+        return 0;
+      case WM_CTLCOLORDLG:
       case WM_CTLCOLORSTATIC:
+      case WM_CTLCOLORBTN:
+        SetBkColor(reinterpret_cast<HDC>(wparam), GetSysColor(COLOR_WINDOW));
+        SetTextColor(reinterpret_cast<HDC>(wparam), GetSysColor(COLOR_WINDOWTEXT));
         return reinterpret_cast<LRESULT>(
-            GetSysColorBrush(COLOR_BTNFACE));
+            GetSysColorBrush(COLOR_WINDOW));
       case WM_DESTROY:
         PostQuitMessage(0);
         return 0;
@@ -215,27 +285,26 @@ class SettingsWindow {
     createEngineControls();
     createReverseLookupControls();
 
-    addStatic(L"套用後即時更新輸入法設定 / Apply updates TypeDuck input settings",
-              kLeftColumnX, 514, 560, 24);
-    status_ = addStatic(L"", kLeftColumnX, 540, 540, 24);
-    addButton(L"套用 Apply", kApply, 710, 526, 92, 32, BS_DEFPUSHBUTTON);
-    addButton(L"取消 Cancel", kCancel, 812, 526, 92, 32, BS_PUSHBUTTON);
+    addButton(L"確定 Confirm", kConfirm, 676, 526, 112, 32, BS_DEFPUSHBUTTON);
+    addButton(L"取消 Cancel", kCancel, 804, 526, 112, 32, BS_PUSHBUTTON);
     applyFontToChildren();
     applyHeaderFont();
   }
 
   void createDisplayLanguages() {
     addButton(L"顯示語言 Display Languages", 0, kLeftColumnX, 58,
-              kColumnWidth, 192, BS_GROUPBOX);
-    addStatic(L"顯示 Display", kLeftColumnX + 20, 84, 142, 24);
-    addStatic(L"主要語言 Main Language", kLeftColumnX + 254, 84, 150, 24);
+              kColumnWidth, kDisplayLanguageGroupHeight, BS_GROUPBOX);
+    addStatic(L"主要語言 Main Language", kDisplayLanguageMainX, 84,
+              kDisplayLanguageMainWidth, 24);
+    addStatic(L"顯示 Display", kDisplayLanguageDisplayX, 84,
+              kDisplayLanguageDisplayWidth, 24);
     int y = 114;
     int index = 0;
     for (const auto& option : languageOptions()) {
-      addButton(option.label, kDisplayLanguageBase + index, kLeftColumnX + 20,
-                y - 1, 208, 24, BS_AUTOCHECKBOX);
-      addButton(L"", kMainLanguageBase + index, kLeftColumnX + 292, y, 22, 22,
-                BS_AUTORADIOBUTTON);
+      addButton(option.label, kMainLanguageBase + index, kDisplayLanguageMainX,
+                y, kDisplayLanguageMainWidth, 24, BS_AUTORADIOBUTTON);
+      addButton(L"", kDisplayLanguageBase + index, kDisplayLanguageDisplayX,
+                y, 22, 22, BS_AUTOCHECKBOX);
       y += kRowHeight;
       ++index;
     }
@@ -247,7 +316,7 @@ class SettingsWindow {
               kColumnWidth, 24);
     pageSizeTrack_ = CreateWindowExW(
         0, TRACKBAR_CLASSW, L"", WS_CHILD | WS_VISIBLE | WS_TABSTOP | TBS_AUTOTICKS,
-        kLeftColumnX, y + 28, 300, 34, window_,
+        kLeftColumnX, y + 28, kPageSizeTrackWidth, 34, window_,
         reinterpret_cast<HMENU>(static_cast<INT_PTR>(kPageSizeTrack)), instance_,
         nullptr);
     SendMessageW(pageSizeTrack_, TBM_SETRANGE, TRUE, MAKELPARAM(4, 10));
@@ -256,9 +325,9 @@ class SettingsWindow {
 
     y += 106;
     addStatic(L"中文字體 Chinese Typeface", kLeftColumnX, y, 190, 24);
-    addButton(L"宋體 Sung", kTypefaceSung, kLeftColumnX + 210, y - 4, 88, 28,
+    addButton(L"宋體 Sung", kTypefaceSung, kLeftColumnX + 198, y - 4, 104, 28,
               BS_AUTORADIOBUTTON);
-    addButton(L"黑體 Hei", kTypefaceHei, kLeftColumnX + 304, y - 4, 88, 28,
+    addButton(L"黑體 Hei", kTypefaceHei, kLeftColumnX + 314, y - 4, 98, 28,
               BS_AUTORADIOBUTTON);
 
     y += 42;
@@ -328,7 +397,8 @@ class SettingsWindow {
     constexpr int kPageSizeTickLabelCount =
         sizeof(kPageSizeTickLabels) / sizeof(kPageSizeTickLabels[0]);
     for (int index = 0; index < kPageSizeTickLabelCount; ++index) {
-      const int x = kLeftColumnX + (index * 300 / 6) - (kPageTickWidth / 2);
+      const int x = kLeftColumnX + (index * kPageSizeTrackWidth / 6) -
+                    (kPageTickWidth / 2);
       addStatic(kPageSizeTickLabels[index], x, y, kPageTickWidth, 22,
                 SS_CENTER);
     }
@@ -339,7 +409,8 @@ class SettingsWindow {
         Moqi::TypeDuck::defaultPreferencesPath());
     preferences_ = loaded.preferences;
     if (!loaded.message.empty()) {
-      statusText_ = utf8ToWide(loaded.message);
+      MessageBoxW(window_, utf8ToWide(loaded.message).c_str(),
+                  L"TypeDuck 設定 / TypeDuck Settings", MB_ICONWARNING);
     }
   }
 
@@ -372,9 +443,6 @@ class SettingsWindow {
                    preferences_.showReverseCode ? BST_CHECKED : BST_UNCHECKED);
     CheckDlgButton(window_, preferences_.isCangjie5 ? kCangjie5 : kCangjie3,
                    BST_CHECKED);
-    if (!statusText_.empty()) {
-      SetWindowTextW(status_, statusText_.c_str());
-    }
   }
 
   int romanizationControl(const std::string& value) const {
@@ -402,8 +470,8 @@ class SettingsWindow {
       return;
     }
     switch (id) {
-      case kApply:
-        apply();
+      case kConfirm:
+        confirmAndClose();
         break;
       case kCancel:
         DestroyWindow(window_);
@@ -447,26 +515,31 @@ class SettingsWindow {
     preferences_.isCangjie5 = IsDlgButtonChecked(window_, kCangjie5) == BST_CHECKED;
   }
 
-  void apply() {
+  bool apply() {
     collectState();
     const auto result = Moqi::TypeDuck::applyPreferences(
-        Moqi::TypeDuck::defaultPreferencesPath(), preferences_, nullptr);
-    SetWindowTextW(status_, utf8ToWide(result.message).c_str());
+        Moqi::TypeDuck::defaultPreferencesPath(), preferences_, applyRimeSettings);
     if (!result.ok) {
       MessageBoxW(window_, utf8ToWide(result.message).c_str(),
                   L"TypeDuck 設定 / TypeDuck Settings", MB_ICONWARNING);
+      return false;
+    }
+    return true;
+  }
+
+  void confirmAndClose() {
+    if (apply()) {
+      DestroyWindow(window_);
     }
   }
 
   HINSTANCE instance_;
   HWND window_ = nullptr;
   HWND pageSizeTrack_ = nullptr;
-  HWND status_ = nullptr;
   HFONT font_ = nullptr;
   HFONT headerFont_ = nullptr;
   std::vector<HWND> sectionHeaders_;
   Moqi::TypeDuck::Preferences preferences_;
-  std::wstring statusText_;
 };
 
 } // namespace

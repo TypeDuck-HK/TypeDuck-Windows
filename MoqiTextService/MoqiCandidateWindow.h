@@ -109,11 +109,14 @@ private:
     void paintPartOfSpeechPills(HDC hdc, int& x, int y, int maxRight, const std::vector<std::wstring>& values, HFONT pillFont);
     void paintItem(HDC hdc, int index, int x, int y);
     void itemRect(int index, RECT& rect) const;
+    void pageNavigationButtonRect(bool next, RECT& rect) const;
     int itemWidth(int index) const;
     int itemHeight(int index) const;
     int itemTextWidth(int index) const;
     int itemCommentWidth(int index) const;
     int hitTestCandidate(POINT pt) const;
+    int hitTestPageNavigation(POINT pt) const;
+    bool isPageNavigationEnabled(bool next) const;
     void onLButtonDown(WPARAM wp, LPARAM lp);
     void onLButtonUp(WPARAM wp, LPARAM lp);
     void onMouseMove(WPARAM wp, LPARAM lp);
@@ -194,6 +197,7 @@ private:
     TypeDuck::DisplayPreferences displayPreferences_;
     int currentSel_;
     int pressedSel_;
+    int pressedPageNavDirection_;
     bool draggingWindow_;
     bool trackingMouse_;
     bool useCursor_;
