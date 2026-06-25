@@ -278,6 +278,8 @@ CandidateWindow::CandidateWindow(Ime::TextService* service, Ime::EditSession* se
       commentColor_(kItemText),
       commentHighlightColor_(kSelectedText),
       preeditCursor_(0),
+      preeditSelectionStart_(0),
+      preeditSelectionEnd_(0),
       currentSel_(0),
       pressedSel_(-1),
       draggingWindow_(false),
@@ -537,6 +539,12 @@ void CandidateWindow::setPreeditText(std::wstring text) {
         if (preeditCursor_ > static_cast<int>(preedit_.length())) {
             preeditCursor_ = static_cast<int>(preedit_.length());
         }
+        if (preeditSelectionStart_ > static_cast<int>(preedit_.length())) {
+            preeditSelectionStart_ = static_cast<int>(preedit_.length());
+        }
+        if (preeditSelectionEnd_ > static_cast<int>(preedit_.length())) {
+            preeditSelectionEnd_ = static_cast<int>(preedit_.length());
+        }
         recalculateSize();
         if (isVisible()) {
             ::InvalidateRect(hwnd_, NULL, TRUE);
@@ -551,6 +559,23 @@ void CandidateWindow::setPreeditCursor(int cursor) {
         if (isVisible() && !preedit_.empty()) {
             ::InvalidateRect(hwnd_, NULL, TRUE);
         }
+    }
+}
+
+void CandidateWindow::setPreeditSelection(int start, int end) {
+    const int length = static_cast<int>(preedit_.length());
+    start = (std::max)(0, (std::min)(start, length));
+    end = (std::max)(0, (std::min)(end, length));
+    if (end < start) {
+        std::swap(start, end);
+    }
+    if (preeditSelectionStart_ == start && preeditSelectionEnd_ == end) {
+        return;
+    }
+    preeditSelectionStart_ = start;
+    preeditSelectionEnd_ = end;
+    if (isVisible() && !preedit_.empty()) {
+        ::InvalidateRect(hwnd_, NULL, TRUE);
     }
 }
 
@@ -838,7 +863,7 @@ void CandidateWindow::recalculateSize() {
     if (!preedit_.empty()) {
         SIZE preeditSize = {};
         ::GetTextExtentPoint32W(hdc, preedit_.c_str(), static_cast<int>(preedit_.length()), &preeditSize);
-        preeditWidth = static_cast<int>(preeditSize.cx);
+        preeditWidth = static_cast<int>(preeditSize.cx) + scalePx(28);
         textWidth_ = (std::max)(textWidth_, static_cast<int>(preeditSize.cx));
         preeditHeight_ = static_cast<int>(preeditSize.cy);
     }
@@ -1032,15 +1057,53 @@ void CandidateWindow::paintInputBuffer(HDC hdc, const RECT& panelRc) {
         panelRc.top + borderWidth_ + padY_,
         panelRc.right - borderWidth_ - padX_ - pageNavWidth_,
         panelRc.top + borderWidth_ + padY_ + preeditHeight_ + scalePx(8)};
-    RECT activeRc = preeditRc;
-    activeRc.right = (std::min)(activeRc.right,
-        activeRc.left + scalePx(18) + static_cast<int>(preedit_.length()) * scalePx(10));
-
-    SIZE inputTextSize = {};
     ::SelectObject(hdc, font_);
-    ::GetTextExtentPoint32W(hdc, preedit_.c_str(), static_cast<int>(preedit_.length()), &inputTextSize);
-    activeRc.right = (std::min)(preeditRc.right, activeRc.left + scalePx(18) + static_cast<int>(inputTextSize.cx));
+    ::SetBkMode(hdc, TRANSPARENT);
 
+    const int length = static_cast<int>(preedit_.length());
+    int activeStart = (std::max)(0, (std::min)(preeditSelectionStart_, length));
+    int activeEnd = (std::max)(0, (std::min)(preeditSelectionEnd_, length));
+    if (activeEnd < activeStart) {
+        std::swap(activeStart, activeEnd);
+    }
+    if (activeEnd == activeStart) {
+        if (preeditCursor_ >= 0 && preeditCursor_ < length) {
+            activeStart = preeditCursor_;
+            activeEnd = preeditCursor_ + 1;
+        } else {
+            activeStart = 0;
+            activeEnd = length;
+        }
+    }
+
+    const std::wstring before = preedit_.substr(0, activeStart);
+    const std::wstring active = preedit_.substr(activeStart, activeEnd - activeStart);
+    const std::wstring after = preedit_.substr(activeEnd);
+    auto textWidth = [&](const std::wstring& text) {
+        if (text.empty()) {
+            return 0;
+        }
+        SIZE size = {};
+        ::GetTextExtentPoint32W(hdc, text.c_str(), static_cast<int>(text.length()), &size);
+        return static_cast<int>(size.cx);
+    };
+
+    const int plainMargin = scalePx(4);
+    const int activePadX = scalePx(6);
+    int x = preeditRc.left;
+
+    if (!before.empty()) {
+        RECT beforeRc = {x + plainMargin, preeditRc.top, preeditRc.right, preeditRc.bottom};
+        ::SetTextColor(hdc, kItemText);
+        ::DrawTextW(hdc, before.c_str(), static_cast<int>(before.length()), &beforeRc,
+                    DT_LEFT | DT_VCENTER | DT_SINGLELINE | DT_NOPREFIX | DT_END_ELLIPSIS);
+        x += textWidth(before) + plainMargin * 2;
+    }
+
+    const int activeWidth = textWidth(active);
+    RECT activeRc = {x, preeditRc.top,
+                     (std::min)(static_cast<int>(preeditRc.right), x + activeWidth + activePadX * 2),
+                     preeditRc.bottom};
     HBRUSH inputBrush = ::CreateSolidBrush(kInputBufferBackground);
     HRGN activeRgn = ::CreateRoundRectRgn(activeRc.left, activeRc.top, activeRc.right + 1,
                                           activeRc.bottom + 1, scalePx(5) * 2, scalePx(5) * 2);
@@ -1048,13 +1111,32 @@ void CandidateWindow::paintInputBuffer(HDC hdc, const RECT& panelRc) {
     ::DeleteObject(activeRgn);
     ::DeleteObject(inputBrush);
 
-    RECT textRc = activeRc;
-    textRc.left += scalePx(8);
-    ::SelectObject(hdc, font_);
+    RECT activeTextRc = activeRc;
+    activeTextRc.left += activePadX;
+    activeTextRc.right -= activePadX;
     ::SetTextColor(hdc, kInputBufferText);
-    ::DrawTextW(hdc, preedit_.c_str(), static_cast<int>(preedit_.length()), &textRc,
+    ::DrawTextW(hdc, active.c_str(), static_cast<int>(active.length()), &activeTextRc,
                 DT_LEFT | DT_VCENTER | DT_SINGLELINE | DT_NOPREFIX | DT_END_ELLIPSIS);
-    paintPreeditCursor(hdc, textRc);
+
+    x = activeRc.right;
+    if (!after.empty() && x < preeditRc.right) {
+        RECT afterRc = {x + plainMargin, preeditRc.top, preeditRc.right, preeditRc.bottom};
+        ::SetTextColor(hdc, kItemText);
+        ::DrawTextW(hdc, after.c_str(), static_cast<int>(after.length()), &afterRc,
+                    DT_LEFT | DT_VCENTER | DT_SINGLELINE | DT_NOPREFIX | DT_END_ELLIPSIS);
+    }
+
+    auto cursorXForIndex = [&](int index) {
+        index = (std::max)(0, (std::min)(index, length));
+        if (index <= activeStart) {
+            return preeditRc.left + plainMargin + textWidth(preedit_.substr(0, index));
+        }
+        if (index <= activeEnd) {
+            return activeTextRc.left + textWidth(preedit_.substr(activeStart, index - activeStart));
+        }
+        return activeRc.right + plainMargin + textWidth(preedit_.substr(activeEnd, index - activeEnd));
+    };
+    paintPreeditCursor(hdc, preeditRc, cursorXForIndex(preeditCursor_));
 
     const int dividerY = preeditRc.bottom + preeditGap_ / 2;
     HPEN dividerPen = ::CreatePen(PS_SOLID, 1, kDividerColor);
@@ -1374,17 +1456,13 @@ void CandidateWindow::paintPartOfSpeechPills(
     ::DeleteObject(borderPen);
 }
 
-void CandidateWindow::paintPreeditCursor(HDC hdc, const RECT& preeditRc) {
+void CandidateWindow::paintPreeditCursor(HDC hdc, const RECT& preeditRc, int cursorX) {
     if (preedit_.empty()) {
         return;
     }
 
-    const int cursor = (std::max)(0, (std::min)(preeditCursor_, static_cast<int>(preedit_.length())));
-    SIZE beforeSize = {};
-    if (cursor > 0) {
-        ::GetTextExtentPoint32W(hdc, preedit_.c_str(), cursor, &beforeSize);
-    }
-    const int cursorX = (std::min)(preeditRc.right - 1, preeditRc.left + static_cast<int>(beforeSize.cx));
+    cursorX = (std::max)(static_cast<int>(preeditRc.left),
+                         (std::min)(static_cast<int>(preeditRc.right - 1), cursorX));
     const int cursorWidth = 2;
     RECT cursorRc = {
         cursorX,

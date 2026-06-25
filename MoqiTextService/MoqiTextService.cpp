@@ -424,6 +424,8 @@ TextService::TextService(ImeModule* module):
 	autoPairQuotes_(false),
 	suppressNextCompositionTerminatedNotification_(false),
 	candidatePreeditCursor_(0),
+	candidatePreeditSelectionStart_(0),
+	candidatePreeditSelectionEnd_(0),
 	currentLangProfile_(GUID_NULL) {
 	shouldShowCandidateWindowUI_ = !effectiveUiLess();
 
@@ -882,6 +884,7 @@ void TextService::createCandidateWindow(Ime::EditSession* session) {
 		candidateWindow_->setHighlightTextColor(candHighlightTextColor_);
 		candidateWindow_->setPreeditText(candidatePreedit_);
 		candidateWindow_->setPreeditCursor(candidatePreeditCursor_);
+		candidateWindow_->setPreeditSelection(candidatePreeditSelectionStart_, candidatePreeditSelectionEnd_);
 		auto elementMgr = Ime::ComPtr<ITfUIElementMgr>::queryFrom(threadMgr());
 		if (elementMgr) {
 			BOOL pbShow = shouldShowCandidateWindowUI_ ? TRUE : FALSE;
@@ -926,6 +929,8 @@ void TextService::destroyCandidateWindow() {
 	pendingCandidateRecovery_ = false;
 	candidatePreedit_.clear();
 	candidatePreeditCursor_ = 0;
+	candidatePreeditSelectionStart_ = 0;
+	candidatePreeditSelectionEnd_ = 0;
 	invalidateCandidateUiCache();
 }
 
@@ -957,6 +962,7 @@ void TextService::updateCandidates(Ime::EditSession* session) {
 		candidateWindow_->setCommentHighlightColor(candCommentHighlightColor_);
 		candidateWindow_->setPreeditText(renderedPreedit);
 		candidateWindow_->setPreeditCursor(candidatePreeditCursor_);
+		candidateWindow_->setPreeditSelection(candidatePreeditSelectionStart_, candidatePreeditSelectionEnd_);
 
 		// the items in the candidate list should not exist the
 		// number of available keys used to select them.
@@ -1155,6 +1161,8 @@ void TextService::resetTypeDuckDegradedState(Ime::EditSession* session) {
 	candidateTotalCount_ = 0;
 	candidatePreedit_.clear();
 	candidatePreeditCursor_ = 0;
+	candidatePreeditSelectionStart_ = 0;
+	candidatePreeditSelectionEnd_ = 0;
 	pendingCandidateRecovery_ = false;
 	hideCandidates();
 	hideMessage();
@@ -1314,6 +1322,7 @@ void TextService::refreshCandidateAppearance() {
 	candidateWindow_->setHighlightTextColor(candHighlightTextColor_);
 	candidateWindow_->setPreeditText(candidatePreedit_);
 	candidateWindow_->setPreeditCursor(candidatePreeditCursor_);
+	candidateWindow_->setPreeditSelection(candidatePreeditSelectionStart_, candidatePreeditSelectionEnd_);
 	candidateWindow_->recalculateSize();
 	candidateWindow_->refresh();
 	refreshCandidates();
@@ -1329,6 +1338,7 @@ void TextService::applyUiLessOverrideState() {
 	if (candidateWindow_) {
 		candidateWindow_->setPreeditText(candidatePreedit_);
 		candidateWindow_->setPreeditCursor(candidatePreeditCursor_);
+		candidateWindow_->setPreeditSelection(candidatePreeditSelectionStart_, candidatePreeditSelectionEnd_);
 		candidateWindow_->Show(shouldShowCandidateWindowUI_ ? TRUE : FALSE);
 	}
 	if (effectiveUiLess()) {

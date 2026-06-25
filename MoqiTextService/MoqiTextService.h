@@ -292,9 +292,16 @@ public:
 		if (candidatePreeditCursor_ > static_cast<int>(candidatePreedit_.length())) {
 			candidatePreeditCursor_ = static_cast<int>(candidatePreedit_.length());
 		}
+		if (candidatePreeditSelectionStart_ > static_cast<int>(candidatePreedit_.length())) {
+			candidatePreeditSelectionStart_ = static_cast<int>(candidatePreedit_.length());
+		}
+		if (candidatePreeditSelectionEnd_ > static_cast<int>(candidatePreedit_.length())) {
+			candidatePreeditSelectionEnd_ = static_cast<int>(candidatePreedit_.length());
+		}
 		if (candidateWindow_) {
 			candidateWindow_->setPreeditText(candidatePreedit_);
 			candidateWindow_->setPreeditCursor(candidatePreeditCursor_);
+			candidateWindow_->setPreeditSelection(candidatePreeditSelectionStart_, candidatePreeditSelectionEnd_);
 		}
 	}
 
@@ -306,6 +313,23 @@ public:
 		candidatePreeditCursor_ = cursor;
 		if (candidateWindow_) {
 			candidateWindow_->setPreeditCursor(candidatePreeditCursor_);
+		}
+	}
+
+	void setCandidatePreeditSelection(int start, int end) {
+		const int length = static_cast<int>(candidatePreedit_.length());
+		start = (std::max)(0, (std::min)(start, length));
+		end = (std::max)(0, (std::min)(end, length));
+		if (end < start) {
+			std::swap(start, end);
+		}
+		if (candidatePreeditSelectionStart_ == start && candidatePreeditSelectionEnd_ == end) {
+			return;
+		}
+		candidatePreeditSelectionStart_ = start;
+		candidatePreeditSelectionEnd_ = end;
+		if (candidateWindow_) {
+			candidateWindow_->setPreeditSelection(candidatePreeditSelectionStart_, candidatePreeditSelectionEnd_);
 		}
 	}
 
@@ -411,6 +435,8 @@ private:
 	bool suppressNextCompositionTerminatedNotification_;
 	std::wstring candidatePreedit_;
 	int candidatePreeditCursor_;
+	int candidatePreeditSelectionStart_;
+	int candidatePreeditSelectionEnd_;
 
 	HMENU popupMenu_;
 

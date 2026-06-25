@@ -931,6 +931,20 @@ void Client::updateComposition(Json::Value &msg, Ime::EditSession *session,
       textService_->setCompositionCursor(session, fixedCursorPos);
     }
   }
+  const auto &selStartVal = msg["selStart"];
+  const auto &selEndVal = msg["selEnd"];
+  if (selStartVal.isInt() && selEndVal.isInt()) {
+    if (!hasCompositionString) {
+      compositionString = textService_->effectiveInlinePreedit()
+                              ? textService_->compositionString(session)
+                              : textService_->candidatePreedit();
+    }
+    const int fixedSelStart =
+        utf16CursorFromCodePointCursor(compositionString, selStartVal.asInt());
+    const int fixedSelEnd =
+        utf16CursorFromCodePointCursor(compositionString, selEndVal.asInt());
+    textService_->setCandidatePreeditSelection(fixedSelStart, fixedSelEnd);
+  }
   if (endComposition) {
     textService_->endComposition(session->context());
   }

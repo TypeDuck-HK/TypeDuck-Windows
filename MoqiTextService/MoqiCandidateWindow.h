@@ -81,6 +81,7 @@ public:
     void setUseCursor(bool use);
     void setPreeditText(std::wstring text);
     void setPreeditCursor(int cursor);
+    void setPreeditSelection(int start, int end);
     void setCommentFont(HFONT font);
     void setBackgroundColor(COLORREF color);
     void setHighlightColor(COLORREF color);
@@ -116,7 +117,7 @@ private:
     void onMouseMove(WPARAM wp, LPARAM lp);
     void onMouseLeave();
     void onMouseWheel(WPARAM wp, LPARAM lp);
-    void paintPreeditCursor(HDC hdc, const RECT& preeditRc);
+    void paintPreeditCursor(HDC hdc, const RECT& preeditRc, int cursorX);
     void applyWindowShape();
     int scalePx(int value) const;
     int entryRowCount(const CandidateUiItem& item) const;
@@ -170,6 +171,8 @@ private:
     COLORREF commentHighlightColor_;
     std::wstring preedit_;
     int preeditCursor_;
+    int preeditSelectionStart_;
+    int preeditSelectionEnd_;
     HFONT commentFont_;
     std::vector<wchar_t> selKeys_;
     std::vector<CandidateUiItem> items_;
