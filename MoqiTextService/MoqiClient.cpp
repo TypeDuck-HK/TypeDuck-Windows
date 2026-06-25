@@ -32,7 +32,6 @@
 #include <Winnls.h> // for IS_HIGH_SURROGATE() macro for checking UTF16 surrogate pairs
 #include <algorithm>
 #include <cctype>
-#include <cstdlib>
 #include <ctime>
 #include <filesystem>
 #include <fstream>
@@ -643,23 +642,6 @@ bool uuidFromString(const char *uuidStr, UUID &result) {
   return SUCCEEDED(CLSIDFromString(utf16UuidStr.c_str(), &result));
 }
 
-bool parseHexColor(const std::string &text, COLORREF &result) {
-  std::string value = text;
-  if (!value.empty() && value.front() == '#') {
-    value.erase(value.begin());
-  }
-  if (value.size() != 6) {
-    return false;
-  }
-  char *end = nullptr;
-  const unsigned long rgb = std::strtoul(value.c_str(), &end, 16);
-  if (end == nullptr || *end != '\0') {
-    return false;
-  }
-  result = RGB((rgb >> 16) & 0xff, (rgb >> 8) & 0xff, rgb & 0xff);
-  return true;
-}
-
 Client::Client(TextService *service, REFIID langProfileGuid)
     : textService_(service), guid_{uuidToString(langProfileGuid)},
       pipe_(INVALID_HANDLE_VALUE), rpcInProgress_(0),
@@ -765,36 +747,6 @@ void Client::updateUI(const Json::Value &data) {
         rules.push_back({std::move(openText), std::move(closeText)});
       }
       autoPairRules_ = std::move(rules);
-    } else if (value.isString() && strcmp(name, "candBackgroundColor") == 0) {
-      COLORREF color = textService_->candBackgroundColor();
-      if (parseHexColor(value.asCString(), color)) {
-        textService_->setCandBackgroundColor(color);
-      }
-    } else if (value.isString() && strcmp(name, "candHighlightColor") == 0) {
-      COLORREF color = textService_->candHighlightColor();
-      if (parseHexColor(value.asCString(), color)) {
-        textService_->setCandHighlightColor(color);
-      }
-    } else if (value.isString() && strcmp(name, "candTextColor") == 0) {
-      COLORREF color = textService_->candTextColor();
-      if (parseHexColor(value.asCString(), color)) {
-        textService_->setCandTextColor(color);
-      }
-    } else if (value.isString() && strcmp(name, "candHighlightTextColor") == 0) {
-      COLORREF color = textService_->candHighlightTextColor();
-      if (parseHexColor(value.asCString(), color)) {
-        textService_->setCandHighlightTextColor(color);
-      }
-    } else if (value.isString() && strcmp(name, "candCommentColor") == 0) {
-      COLORREF color = textService_->candCommentColor();
-      if (parseHexColor(value.asCString(), color)) {
-        textService_->setCandCommentColor(color);
-      }
-    } else if (value.isString() && strcmp(name, "candCommentHighlightColor") == 0) {
-      COLORREF color = textService_->candCommentHighlightColor();
-      if (parseHexColor(value.asCString(), color)) {
-        textService_->setCandCommentHighlightColor(color);
-      }
     }
   }
   textService_->applyCandidateAppearanceNow();
@@ -1145,8 +1097,20 @@ void Client::updateCandidateList(Json::Value &msg, Ime::EditSession *session) {
         if (candidate["text"].isString()) {
           item.text = jsonStringToUtf16(candidate["text"]);
         }
+        if (candidate["rawLookupComment"].isString()) {
+          item.comment = jsonStringToUtf16(candidate["rawLookupComment"]);
+        }
         if (candidate["comment"].isString()) {
-          item.comment = jsonStringToUtf16(candidate["comment"]);
+          const std::wstring comment = jsonStringToUtf16(candidate["comment"]);
+          if (item.comment.empty()) {
+            item.comment = comment;
+          }
+        }
+        if (candidate["inputCode"].isString()) {
+          item.inputCode = jsonStringToUtf16(candidate["inputCode"]);
+        }
+        if (item.inputCode.empty() && candidate["jyutping"].isString()) {
+          item.inputCode = jsonStringToUtf16(candidate["jyutping"]);
         }
       }
       candidates.emplace_back(std::move(item));

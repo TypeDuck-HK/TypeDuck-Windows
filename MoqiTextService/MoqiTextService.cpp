@@ -880,8 +880,8 @@ void TextService::createCandidateWindow(Ime::EditSession* session) {
 		candidateWindow_->setHighlightColor(candHighlightColor_);
 		candidateWindow_->setTextColor(candTextColor_);
 		candidateWindow_->setHighlightTextColor(candHighlightTextColor_);
-		candidateWindow_->setPreeditText(effectiveInlinePreedit() ? L"" : candidatePreedit_);
-		candidateWindow_->setPreeditCursor(effectiveInlinePreedit() ? 0 : candidatePreeditCursor_);
+		candidateWindow_->setPreeditText(candidatePreedit_);
+		candidateWindow_->setPreeditCursor(candidatePreeditCursor_);
 		auto elementMgr = Ime::ComPtr<ITfUIElementMgr>::queryFrom(threadMgr());
 		if (elementMgr) {
 			BOOL pbShow = shouldShowCandidateWindowUI_ ? TRUE : FALSE;
@@ -942,7 +942,7 @@ void TextService::updateCandidates(Ime::EditSession* session) {
 
 	applyCandidateAppearanceNow();
 
-	const std::wstring renderedPreedit = effectiveInlinePreedit() ? L"" : candidatePreedit_;
+	const std::wstring renderedPreedit = candidatePreedit_;
 	const bool contentChanged = !isCandidateContentApplied(renderedPreedit);
 	if (contentChanged) {
 		candidateWindow_->clear();
@@ -956,7 +956,7 @@ void TextService::updateCandidates(Ime::EditSession* session) {
 		candidateWindow_->setCommentColor(candCommentColor_);
 		candidateWindow_->setCommentHighlightColor(candCommentHighlightColor_);
 		candidateWindow_->setPreeditText(renderedPreedit);
-		candidateWindow_->setPreeditCursor(effectiveInlinePreedit() ? 0 : candidatePreeditCursor_);
+		candidateWindow_->setPreeditCursor(candidatePreeditCursor_);
 
 		// the items in the candidate list should not exist the
 		// number of available keys used to select them.
@@ -1312,8 +1312,8 @@ void TextService::refreshCandidateAppearance() {
 	candidateWindow_->setHighlightColor(candHighlightColor_);
 	candidateWindow_->setTextColor(candTextColor_);
 	candidateWindow_->setHighlightTextColor(candHighlightTextColor_);
-	candidateWindow_->setPreeditText(effectiveInlinePreedit() ? L"" : candidatePreedit_);
-	candidateWindow_->setPreeditCursor(effectiveInlinePreedit() ? 0 : candidatePreeditCursor_);
+	candidateWindow_->setPreeditText(candidatePreedit_);
+	candidateWindow_->setPreeditCursor(candidatePreeditCursor_);
 	candidateWindow_->recalculateSize();
 	candidateWindow_->refresh();
 	refreshCandidates();
@@ -1327,8 +1327,8 @@ void TextService::applyUiLessOverrideState() {
 		return;
 	}
 	if (candidateWindow_) {
-		candidateWindow_->setPreeditText(effectiveInlinePreedit() ? L"" : candidatePreedit_);
-		candidateWindow_->setPreeditCursor(effectiveInlinePreedit() ? 0 : candidatePreeditCursor_);
+		candidateWindow_->setPreeditText(candidatePreedit_);
+		candidateWindow_->setPreeditCursor(candidatePreeditCursor_);
 		candidateWindow_->Show(shouldShowCandidateWindowUI_ ? TRUE : FALSE);
 	}
 	if (effectiveUiLess()) {

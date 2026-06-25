@@ -21,7 +21,8 @@ namespace {
 
 constexpr COLORREF kWindowBackground = RGB(255, 255, 255);       // panel_background
 constexpr COLORREF kDictionaryBackground = RGB(246, 243, 237);   // dictionary_background
-constexpr COLORREF kInputBufferBackground = RGB(254, 220, 156);  // input_buffer_background
+constexpr COLORREF kInputBufferBackground = RGB(246, 234, 216);  // input_buffer_background
+constexpr COLORREF kInputBufferText = RGB(70, 58, 42);           // input_buffer_text
 constexpr COLORREF kWindowBorder = RGB(222, 217, 207);           // panel_border
 constexpr COLORREF kDividerColor = RGB(222, 217, 207);
 constexpr COLORREF kItemText = RGB(36, 34, 30);                  // text_primary
@@ -468,7 +469,7 @@ void CandidateWindow::add(CandidateUiItem item, wchar_t selKey) {
     item.diagnosticRawComment = rawComment;
     item.displayPreferences = displayPreferences_;
     item.candidateInfo = TypeDuck::CandidateInfo(
-        label, item.text, rawComment);
+        label, item.text, rawComment, item.inputCode);
     items_.push_back(std::move(item));
     selKeys_.push_back(selKey);
 }
@@ -947,7 +948,7 @@ void CandidateWindow::paintInputBuffer(HDC hdc, const RECT& panelRc) {
     RECT textRc = activeRc;
     textRc.left += scalePx(8);
     ::SelectObject(hdc, font_);
-    ::SetTextColor(hdc, textColor_);
+    ::SetTextColor(hdc, kInputBufferText);
     ::DrawTextW(hdc, preedit_.c_str(), static_cast<int>(preedit_.length()), &textRc,
                 DT_LEFT | DT_VCENTER | DT_SINGLELINE | DT_NOPREFIX | DT_END_ELLIPSIS);
     paintPreeditCursor(hdc, textRc);

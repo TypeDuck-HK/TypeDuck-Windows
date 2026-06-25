@@ -262,8 +262,8 @@ public:
 	void setInlinePreedit(bool inlinePreedit) {
 		inlinePreedit_ = inlinePreedit;
 		if (candidateWindow_) {
-			candidateWindow_->setPreeditText(effectiveInlinePreedit() ? L"" : candidatePreedit_);
-			candidateWindow_->setPreeditCursor(effectiveInlinePreedit() ? 0 : candidatePreeditCursor_);
+			candidateWindow_->setPreeditText(candidatePreedit_);
+			candidateWindow_->setPreeditCursor(candidatePreeditCursor_);
 			invalidateCandidateUiCache();
 		}
 	}
@@ -293,8 +293,8 @@ public:
 			candidatePreeditCursor_ = static_cast<int>(candidatePreedit_.length());
 		}
 		if (candidateWindow_) {
-			candidateWindow_->setPreeditText(effectiveInlinePreedit() ? L"" : candidatePreedit_);
-			candidateWindow_->setPreeditCursor(effectiveInlinePreedit() ? 0 : candidatePreeditCursor_);
+			candidateWindow_->setPreeditText(candidatePreedit_);
+			candidateWindow_->setPreeditCursor(candidatePreeditCursor_);
 		}
 	}
 
@@ -305,7 +305,7 @@ public:
 		}
 		candidatePreeditCursor_ = cursor;
 		if (candidateWindow_) {
-			candidateWindow_->setPreeditCursor(effectiveInlinePreedit() ? 0 : candidatePreeditCursor_);
+			candidateWindow_->setPreeditCursor(candidatePreeditCursor_);
 		}
 	}
 

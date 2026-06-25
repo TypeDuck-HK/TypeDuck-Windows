@@ -48,6 +48,7 @@ function Assert-NotContains {
 $Root = Resolve-RepoPath $RepoRoot
 $windowHeader = Join-Path $Root "MoqiTextService/MoqiCandidateWindow.h"
 $windowSource = Join-Path $Root "MoqiTextService/MoqiCandidateWindow.cpp"
+$clientSource = Join-Path $Root "MoqiTextService/MoqiClient.cpp"
 $textServiceHeader = Join-Path $Root "MoqiTextService/MoqiTextService.h"
 $textServiceSource = Join-Path $Root "MoqiTextService/MoqiTextService.cpp"
 $candidateInfoHeader = Join-Path $Root "MoqiTextService/TypeDuckCandidateInfo.h"
@@ -59,6 +60,7 @@ $captureDoc = Join-Path $fixtureDir "capture-commands.md"
 
 Assert-File $windowHeader
 Assert-File $windowSource
+Assert-File $clientSource
 Assert-File $textServiceHeader
 Assert-File $textServiceSource
 Assert-File $candidateInfoHeader
@@ -99,7 +101,7 @@ $productionAnchors = @(
   @{ Path = $windowSource; Pattern = 'actualPointerMovement|mouseMoveCount|dictionaryMoveCount'; Description = 'actual pointer movement counter' },
   @{ Path = $windowHeader; Pattern = 'dictionaryRevealIndex_|dictionaryPanel'; Description = 'dictionary panel state' },
   @{ Path = $windowHeader; Pattern = 'lastMouseMovePoint_|lastPointerPoint'; Description = 'stationary pointer tracking' },
-  @{ Path = $windowSource; Pattern = 'panel_background|selection_background|pronunciation_text|definition_text'; Description = 'semantic theme role consumption' },
+  @{ Path = $windowSource; Pattern = 'panel_background|selection_background|input_buffer_background|input_buffer_text|pronunciation_text|definition_text'; Description = 'semantic theme role consumption' },
   @{ Path = $windowSource; Pattern = 'definitionLayout|displayLanguages|mainLanguage|otherLanguages'; Description = 'settings-aware display language layout' }
 )
 
@@ -146,6 +148,14 @@ if ($Strict) {
   Assert-Contains $windowSource 'DT_VCENTER|candidateBaseline|baselineAligned' "candidate row baseline alignment guard"
   Assert-Contains $windowSource 'DT_CALCRECT|GetTextExtentPoint32W' "input buffer measured text guard"
   Assert-Contains $previewSource 'candidate-data-contract|runtime-provenance|TypeDuck-1\.1\.2' "preview provenance/divergence documentation anchors"
+  Assert-Contains $clientSource 'rawLookupComment' "candidate raw lookup comment preservation"
+  Assert-Contains $clientSource 'inputCode' "candidate input-code preservation"
+  Assert-Contains $clientSource 'jyutping' "candidate Jyutping fallback preservation"
+  Assert-Contains $windowHeader 'std::wstring inputCode' "candidate UI fallback input-code field"
+  Assert-Contains $windowSource 'CandidateInfo\(\s*label,\s*item\.text,\s*rawComment,\s*item\.inputCode\)' "candidate info input-code fallback wiring"
+  Assert-NotContains $clientSource 'setCandBackgroundColor\(color\)|setCandHighlightColor\(color\)|setCandTextColor\(color\)|setCandHighlightTextColor\(color\)|setCandCommentColor\(color\)|setCandCommentHighlightColor\(color\)' "backend-driven native candidate theme color override"
+  Assert-NotContains $textServiceHeader 'setPreeditText\(effectiveInlinePreedit\(\) \? L"" : candidatePreedit_\)|setPreeditCursor\(effectiveInlinePreedit\(\) \? 0 : candidatePreeditCursor_\)' "inline preedit hiding the popup input buffer in header"
+  Assert-NotContains $textServiceSource 'setPreeditText\(effectiveInlinePreedit\(\) \? L"" : candidatePreedit_\)|setPreeditCursor\(effectiveInlinePreedit\(\) \? 0 : candidatePreeditCursor_\)' "inline preedit hiding the popup input buffer in source"
   Assert-Contains $windowSource 'WS_EX_NOACTIVATE|MA_NOACTIVATE|SWP_NOACTIVATE' "focus-safe non-activating popup behavior"
   Assert-Contains $windowSource 'TrackMouseEvent|WM_MOUSELEAVE' "mouse leave tracking"
   Assert-Contains $windowSource 'GetDpiForWindow|LOGPIXELSX|scalePx' "DPI-aware sizing"

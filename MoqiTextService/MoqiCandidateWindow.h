@@ -20,6 +20,7 @@ namespace Moqi {
 struct CandidateUiItem {
     std::wstring text;
     std::wstring comment;
+    std::wstring inputCode;
     std::wstring diagnosticRawComment;
     TypeDuck::CandidateInfo candidateInfo;
     TypeDuck::DisplayPreferences displayPreferences;
@@ -34,6 +35,7 @@ struct CandidateUiItem {
 
     bool operator==(const CandidateUiItem& other) const {
         return text == other.text && comment == other.comment &&
+               inputCode == other.inputCode &&
                diagnosticRawComment == other.diagnosticRawComment;
     }
 
