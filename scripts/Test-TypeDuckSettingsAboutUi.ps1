@@ -185,6 +185,9 @@ Assert-Text $window "COLOR_WINDOW" "Settings controls must share the white dialo
 Assert-Text $window "addSectionHeader" "Settings section headings must use a dedicated section header path."
 Assert-Text $window "FW_BOLD" "Settings section headings must be bold."
 Assert-Text $window "applyHeaderFont" "Settings section headings must keep the header font after child font application."
+Assert-Text $window "kRadioGroupStartStyle\s*=\s*BS_AUTORADIOBUTTON\s*\|\s*WS_GROUP" "Settings radio clusters must start separate Win32 radio groups."
+Assert-Text $window "index == 0 \? kRadioGroupStartStyle : kRadioStyle" "Main-language radios must form their own group without sharing later settings radios."
+Assert-True ($window -notmatch "addButton\([^;]+BS_AUTORADIOBUTTON") "Settings radio controls must use grouped radio style constants, not raw shared radio styles."
 Assert-Ordered $window @(
   "主要語言 Main Language",
   "顯示 Display",

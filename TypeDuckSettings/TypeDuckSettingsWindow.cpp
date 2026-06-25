@@ -31,6 +31,8 @@ constexpr int kDisplayLanguageDisplayWidth = 160;
 constexpr int kPageSizeTrackWidth = kColumnWidth;
 constexpr int kRowHeight = 28;
 constexpr int kPageTickWidth = 32;
+constexpr DWORD kRadioStyle = BS_AUTORADIOBUTTON;
+constexpr DWORD kRadioGroupStartStyle = BS_AUTORADIOBUTTON | WS_GROUP;
 
 enum ControlId : int {
   kDisplayLanguageBase = 1100,
@@ -260,8 +262,12 @@ class SettingsWindow {
 
   HWND addButton(const wchar_t* text, int id, int x, int y, int width,
                  int height, DWORD style) {
+    DWORD windowStyle = WS_CHILD | WS_VISIBLE | style;
+    if (id != 0 && (style & BS_GROUPBOX) == 0) {
+      windowStyle |= WS_TABSTOP;
+    }
     return CreateWindowExW(0, L"BUTTON", text,
-                           WS_CHILD | WS_VISIBLE | WS_TABSTOP | style,
+                           windowStyle,
                            x, y, width, height, window_,
                            reinterpret_cast<HMENU>(static_cast<INT_PTR>(id)),
                            instance_, nullptr);
@@ -302,7 +308,8 @@ class SettingsWindow {
     int index = 0;
     for (const auto& option : languageOptions()) {
       addButton(option.label, kMainLanguageBase + index, kDisplayLanguageMainX,
-                y, kDisplayLanguageMainWidth, 24, BS_AUTORADIOBUTTON);
+                y, kDisplayLanguageMainWidth, 24,
+                index == 0 ? kRadioGroupStartStyle : kRadioStyle);
       addButton(L"", kDisplayLanguageBase + index, kDisplayLanguageDisplayX,
                 y, 22, 22, BS_AUTOCHECKBOX);
       y += kRowHeight;
@@ -326,19 +333,19 @@ class SettingsWindow {
     y += 106;
     addStatic(L"中文字體 Chinese Typeface", kLeftColumnX, y, 190, 24);
     addButton(L"宋體 Sung", kTypefaceSung, kLeftColumnX + 198, y - 4, 104, 28,
-              BS_AUTORADIOBUTTON);
+              kRadioGroupStartStyle);
     addButton(L"黑體 Hei", kTypefaceHei, kLeftColumnX + 314, y - 4, 98, 28,
-              BS_AUTORADIOBUTTON);
+              kRadioStyle);
 
     y += 42;
     addButton(L"候選詞粵拼 Candidates Jyutping", 0, kLeftColumnX, y,
               kColumnWidth, 116, BS_GROUPBOX);
     addButton(L"顯示 Always Show", kRomanizationAlways, kLeftColumnX + 18, y + 30,
-              190, 24, BS_AUTORADIOBUTTON);
+              190, 24, kRadioGroupStartStyle);
     addButton(L"僅反查 Only in Reverse Lookup", kRomanizationReverseOnly,
-              kLeftColumnX + 18, y + 58, 260, 24, BS_AUTORADIOBUTTON);
+              kLeftColumnX + 18, y + 58, 260, 24, kRadioStyle);
     addButton(L"隱藏 Hide", kRomanizationNever, kLeftColumnX + 18, y + 86, 160,
-              24, BS_AUTORADIOBUTTON);
+              24, kRadioStyle);
   }
 
   void createEngineControls() {
@@ -362,9 +369,9 @@ class SettingsWindow {
               kRightColumnX, y + 40, 330, 26, BS_AUTOCHECKBOX);
     addStatic(L"倉頡版本 Cangjie Version", kRightColumnX, y + 90, 230, 24);
     addButton(L"三代 Version 3", kCangjie3, kRightColumnX, y + 120, 160, 26,
-              BS_AUTORADIOBUTTON);
+              kRadioGroupStartStyle);
     addButton(L"五代 Version 5", kCangjie5, kRightColumnX + 180, y + 120, 160,
-              26, BS_AUTORADIOBUTTON);
+              26, kRadioStyle);
   }
 
   void applyFontToChildren() {
