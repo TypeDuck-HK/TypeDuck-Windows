@@ -154,7 +154,7 @@ if ($Strict) {
   Assert-Contains $windowHeader 'std::wstring inputCode' "candidate UI fallback input-code field"
   Assert-Contains $windowSource 'CandidateInfo\(\s*label,\s*item\.text,\s*rawComment,\s*item\.inputCode\)' "candidate info input-code fallback wiring"
   Assert-Contains $windowSource 'jyutpingContentWidth|definitionContentWidth|honziContentWidth' "candidate window must measure visible content columns"
-  Assert-Contains $windowSource 'minWidth_\s*=\s*scalePx\(230\)' "candidate window must not keep the old fixed wide minimum"
+  Assert-Contains $windowSource 'minWidth_\s*=\s*scalePx\(kCandidateMinWidth\)' "candidate window must keep compact content-sized minimum width"
   Assert-Contains $windowSource '!allEntries\.empty\(\)\s*&&\s*noteColumnWidth_' "reverse/fallback comments must not render the same raw code in both note and definition columns"
   Assert-Contains $windowSource 'nextColumn\(jyutpingColumnWidth_\)' "candidate row painter must use measured dynamic columns"
   Assert-Contains $clientSource 'selStart|selEnd|setCandidatePreeditSelection' "candidate input buffer must consume backend active selection range"

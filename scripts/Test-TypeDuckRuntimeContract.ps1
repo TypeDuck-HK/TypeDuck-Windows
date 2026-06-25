@@ -22,7 +22,7 @@ $ErrorActionPreference = "Stop"
 
 $ExpectedSchemaUrl = "https://github.com/TypeDuck-HK/schema"
 $ExpectedSchemaBranch = "aap2-alpha"
-$ExpectedReleaseUrl = "https://github.com/TypeDuck-HK/librime/releases/download/v1.1.3/rime-TypeDuck-v1.1.3-Windows-msvc-x86.7z"
+$ExpectedReleaseUrl = "https://github.com/TypeDuck-HK/librime/releases/download/v1.1.4/rime-TypeDuck-v1.1.4-Windows-msvc-x64.7z"
 $ExpectedLookupFilterSource = "https://github.com/TypeDuck-HK/rime-dictionary-lookup-filter"
 
 $failures = New-Object System.Collections.Generic.List[string]

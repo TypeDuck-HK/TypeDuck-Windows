@@ -238,11 +238,8 @@ function Apply-AdapterPatches {
       return $false
     }
     $librimeText = Get-Content -Raw -LiteralPath $librimePath
-    if ($PatchName -eq "0001-typeduck-librime-1.1.3-candidate-abi.patch") {
+    if ($PatchName -eq "0001-typeduck-librime-1.1.4-candidate-abi.patch") {
       return $librimeText -match "Quality\s+float64"
-    }
-    if ($PatchName -eq "0002-typeduck-librime-1.1.3-candidate-abi-x86-padding.patch") {
-      return $librimeText -match "Padding\s+uint32"
     }
     return $false
   }
@@ -370,7 +367,7 @@ function Build-AdapterServer {
   $oldCgo = $env:CGO_ENABLED
   try {
     $env:GOOS = "windows"
-    $env:GOARCH = "386"
+    $env:GOARCH = "amd64"
     $env:CGO_ENABLED = "0"
     Invoke-External -FilePath "go" -ArgumentList @("build", "-o", $ServerExe, ".") -WorkingDirectory $AdapterRoot
   }

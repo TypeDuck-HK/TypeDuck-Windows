@@ -19,7 +19,7 @@ The verified adapter source was:
 
 - repository: `https://github.com/gaboolic/moqi-ime`
 - commit: `88f532714e91390994d021deb3db8c11a566d0fb`
-- build mode: Windows x86 backend server, because the staged TypeDuck runtime for this phase provides an x86 `rime.dll`
+- build mode: Windows x64 backend server, because the staged TypeDuck runtime for this phase provides an x64 `rime.dll`
 
 Run the proof with:
 
@@ -31,14 +31,13 @@ The runner applies patch files in lexical order and treats known post-patch mark
 
 ## Patch Files
 
-- `0001-typeduck-librime-1.1.3-candidate-abi.patch` adds `Quality float64` to the adapter's Go mirror of `RimeCandidate`.
-- `0002-typeduck-librime-1.1.3-candidate-abi-x86-padding.patch` adds the x86 padding needed for the Windows x86 proof build.
+- `0001-typeduck-librime-1.1.4-candidate-abi.patch` adds `Quality float64` to the adapter's Go mirror of `RimeCandidate`.
 
 These patches are intentionally adapter-local. They do not modify TypeDuck-HK librime, do not change the committed staged runtime manifest, and do not define a final Windows IME backend protocol.
 
 ## Rime API Compatibility Findings
 
-TypeDuck librime uses its own version numbering, so the investigation compared API shape and commit history rather than assuming the TypeDuck `v1.1.3` label matches an official librime release.
+TypeDuck librime uses its own version numbering, so the investigation compared API shape and commit history rather than assuming the TypeDuck `v1.1.4` label matches an official librime release.
 
 Primary sources checked:
 
@@ -47,7 +46,7 @@ Primary sources checked:
 
 Findings:
 
-- The TypeDuck-HK fork's `src/rime_api.h` at its `v1.1.3` tag / release commit includes `RimeContext::select_labels`, matching the official upstream API family after upstream commit `b992f35`.
+- The TypeDuck-HK fork's `src/rime_api.h` at its `v1.1.4` tag / release commit includes `RimeContext::select_labels`, matching the official upstream API family after upstream commit `b992f35`.
 - The TypeDuck-HK fork also adds `double quality` to `RimeCandidate`. That field is not present in official upstream `src/rime_api.h` at current upstream HEAD.
 - The relevant TypeDuck-HK fork commit for candidate weights is `9315986` (`Print Candidate Weights in API Console for Easy Debugging`).
 - The current `moqi-ime` Go adapter mirror lacked the TypeDuck-HK `RimeCandidate::quality` field, so candidate materialization could stall or misread memory once real TypeDuck candidates were available.

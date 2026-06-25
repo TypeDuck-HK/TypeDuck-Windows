@@ -104,11 +104,13 @@ private:
     void paintPageNavigation(HDC hdc, const RECT& panelRc);
     void paintCandidateRow(HDC hdc, int index, const RECT& rowRc);
     void paintDictionaryPanel(HDC hdc, const RECT& panelRc, const TypeDuck::CandidateInfo& info);
-    void paintDictionaryEntry(HDC hdc, int& y, const RECT& panelRc, const TypeDuck::CandidateEntry& entry);
-    void paintPartOfSpeechPills(HDC hdc, int& x, int y, int maxRight, const std::vector<std::wstring>& values);
+    void paintDictionaryEntry(HDC hdc, int& y, const RECT& panelRc, const TypeDuck::CandidateEntry& entry, bool paint);
+    void paintDictionaryScrollBar(HDC hdc, const RECT& panelRc);
+    void paintPartOfSpeechPills(HDC hdc, int& x, int y, int maxRight, const std::vector<std::wstring>& values, HFONT pillFont);
     void paintItem(HDC hdc, int index, int x, int y);
     void itemRect(int index, RECT& rect) const;
     int itemWidth(int index) const;
+    int itemHeight(int index) const;
     int itemTextWidth(int index) const;
     int itemCommentWidth(int index) const;
     int hitTestCandidate(POINT pt) const;
@@ -123,7 +125,10 @@ private:
     int entryRowCount(const CandidateUiItem& item) const;
     bool dictionaryPanelVisible() const;
     int effectiveDictionaryIndex() const;
-    void resetDictionaryReveal();
+    int dictionaryMaxScrollOffset() const;
+    bool pointInDictionaryPanel(POINT pt) const;
+    void clampDictionaryScrollOffset();
+    void resetDictionaryReveal(bool resetMouseTracking = true);
     void updateDictionaryRevealFromMovement(POINT pt);
 
 private:
@@ -155,8 +160,14 @@ private:
     int definitionColumnWidth_;
     int indicatorColumnWidth_;
     int pageNavWidth_;
+    int candidatePanelWidth_;
+    int candidatePanelHeight_;
     int dictionaryPanelWidth_;
+    int dictionaryPanelTop_;
+    int dictionaryPanelHeight_;
     int dictionaryPanelMinHeight_;
+    int dictionaryContentHeight_;
+    int dictionaryScrollOffset_;
     int dictionaryRevealIndex_;
     int dictionaryHoverIndex_;
     int actualPointerMovementCount_;
@@ -179,6 +190,7 @@ private:
     std::vector<int> itemTextWidths_;
     std::vector<int> itemCommentWidths_;
     std::vector<int> itemWidths_;
+    std::vector<int> itemHeights_;
     TypeDuck::DisplayPreferences displayPreferences_;
     int currentSel_;
     int pressedSel_;

@@ -44,8 +44,62 @@ std::wstring currentProcessPath();
 std::wstring processBaseName(const std::wstring& imagePath);
 std::wstring timestampNow();
 std::wstring formatDebugLogLine(const std::wstring& message);
-constexpr wchar_t kDefaultCommentFontFace[] = L"Consolas";
+constexpr wchar_t kDefaultCandidateFontFace[] = L"Microsoft JhengHei";
+constexpr wchar_t kDefaultCommentFontFace[] = L"Segoe UI";
 constexpr ULONGLONG kCandidateWindowMoveThrottleMs = 50;
+
+std::wstring trimFontToken(std::wstring value) {
+	const size_t stylePos = value.find(L':');
+	if (stylePos != std::wstring::npos) {
+		value = value.substr(0, stylePos);
+	}
+	const auto isSpace = [](wchar_t ch) { return std::iswspace(ch) != 0; };
+	const auto first = std::find_if_not(value.begin(), value.end(), isSpace);
+	const auto last = std::find_if_not(value.rbegin(), value.rend(), isSpace).base();
+	if (first >= last) {
+		return L"";
+	}
+	return std::wstring(first, last);
+}
+
+BOOL CALLBACK markFontFamilyFound(const LOGFONTW*, const TEXTMETRICW*, DWORD, LPARAM lParam) {
+	*reinterpret_cast<bool*>(lParam) = true;
+	return FALSE;
+}
+
+bool isFontFamilyInstalled(const std::wstring& faceName) {
+	if (faceName.empty()) {
+		return false;
+	}
+	HDC hdc = ::GetDC(nullptr);
+	if (!hdc) {
+		return false;
+	}
+	LOGFONTW lf{};
+	lf.lfCharSet = DEFAULT_CHARSET;
+	wcsncpy_s(lf.lfFaceName, _countof(lf.lfFaceName), faceName.c_str(), _TRUNCATE);
+	bool found = false;
+	::EnumFontFamiliesExW(hdc, &lf, markFontFamilyFound, reinterpret_cast<LPARAM>(&found), 0);
+	::ReleaseDC(nullptr, hdc);
+	return found;
+}
+
+std::wstring resolveFontFace(const std::wstring& requested, const wchar_t* fallback) {
+	size_t start = 0;
+	while (start <= requested.size()) {
+		const size_t comma = requested.find(L',', start);
+		const std::wstring candidate = trimFontToken(
+			requested.substr(start, comma == std::wstring::npos ? std::wstring::npos : comma - start));
+		if (isFontFamilyInstalled(candidate)) {
+			return candidate;
+		}
+		if (comma == std::wstring::npos) {
+			break;
+		}
+		start = comma + 1;
+	}
+	return fallback;
+}
 
 bool callClientFilterKeyDown(Client* client, Ime::KeyEvent& keyEvent, bool& sehCaught) {
 	sehCaught = false;
@@ -435,10 +489,11 @@ TextService::TextService(ImeModule* module):
 	GetObject(font_, sizeof(lf), &lf);
 	lf.lfHeight = candFontHeight(); // FIXME: make this configurable
 	lf.lfWeight = FW_NORMAL;
+	wcsncpy_s(lf.lfFaceName, _countof(lf.lfFaceName),
+	          resolveFontFace(candFontName_, kDefaultCandidateFontFace).c_str(), _TRUNCATE);
 	font_ = CreateFontIndirect(&lf);
 	lf.lfHeight = candCommentFontHeight();
-	const std::wstring& commentFontName =
-		candCommentFontName_.empty() ? std::wstring(kDefaultCommentFontFace) : candCommentFontName_;
+	const std::wstring commentFontName = resolveFontFace(candCommentFontName_, kDefaultCommentFontFace);
 	wcsncpy_s(lf.lfFaceName, _countof(lf.lfFaceName), commentFontName.c_str(), _TRUNCATE);
 	commentFont_ = CreateFontIndirect(&lf);
 }
@@ -1287,14 +1342,12 @@ void TextService::applyCandidateAppearanceNow() {
 
 	lf.lfHeight = candFontHeight();
 	lf.lfWeight = FW_NORMAL;
-	if (!candFontName_.empty()) {
-		wcsncpy_s(lf.lfFaceName, _countof(lf.lfFaceName), candFontName_.c_str(), _TRUNCATE);
-	}
+	wcsncpy_s(lf.lfFaceName, _countof(lf.lfFaceName),
+	          resolveFontFace(candFontName_, kDefaultCandidateFontFace).c_str(), _TRUNCATE);
 	font_ = CreateFontIndirect(&lf);
 
 	lf.lfHeight = candCommentFontHeight();
-	const std::wstring& commentFontName =
-		candCommentFontName_.empty() ? std::wstring(kDefaultCommentFontFace) : candCommentFontName_;
+	const std::wstring commentFontName = resolveFontFace(candCommentFontName_, kDefaultCommentFontFace);
 	wcsncpy_s(lf.lfFaceName, _countof(lf.lfFaceName), commentFontName.c_str(), _TRUNCATE);
 	commentFont_ = CreateFontIndirect(&lf);
 	updateFont_ = false;

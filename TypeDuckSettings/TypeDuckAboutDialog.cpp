@@ -40,7 +40,7 @@ std::wstring attributionText() {
   text += L"TypeDuck Windows IME version / 版本 ";
   text += TYPEDUCK_VERSION_TEXT;
   text += L"\r\n";
-  text += L"引擎 Engine: TypeDuck-HK librime fork v1.1.3 pinned Windows runtime\r\n";
+  text += L"引擎 Engine: TypeDuck-HK librime fork v1.1.4 pinned Windows x64 runtime\r\n";
   text += L"字典查詢 Dictionary lookup: rime-dictionary-lookup-filter 3671814d4e4aeab8d616ceea3c7f6d88e96bba02\r\n";
   text += L"方案 Schema: TypeDuck-HK schema aap2-alpha b5ab44e187d010fa13c71bd320c07259b224ae5b with built schema artifacts";
   return text;

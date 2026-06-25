@@ -32,8 +32,8 @@ param(
 
 $ErrorActionPreference = "Stop"
 
-$ReleaseUrl = "https://github.com/TypeDuck-HK/librime/releases/download/v1.1.3/rime-TypeDuck-v1.1.3-Windows-msvc-x86.7z"
-$ReleaseArchiveName = "rime-TypeDuck-v1.1.3-Windows-msvc-x86.7z"
+$ReleaseUrl = "https://github.com/TypeDuck-HK/librime/releases/download/v1.1.4/rime-TypeDuck-v1.1.4-Windows-msvc-x64.7z"
+$ReleaseArchiveName = "rime-TypeDuck-v1.1.4-Windows-msvc-x64.7z"
 $SchemaUrl = "https://github.com/TypeDuck-HK/schema"
 $SchemaBranch = "aap2-alpha"
 $LookupFilterSource = "https://github.com/TypeDuck-HK/rime-dictionary-lookup-filter"

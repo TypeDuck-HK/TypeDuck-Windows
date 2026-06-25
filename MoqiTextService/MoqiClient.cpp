@@ -711,11 +711,9 @@ void Client::updateUI(const Json::Value &data) {
     const char *name = it.memberName();
     const Json::Value &value = *it;
     if (value.isString() && strcmp(name, "candFontName") == 0) {
-      wstring fontName = utf8ToUtf16(value.asCString());
-      textService_->setCandFontName(fontName);
+      continue;
     } else if (value.isString() && strcmp(name, "candCommentFontName") == 0) {
-      wstring fontName = utf8ToUtf16(value.asCString());
-      textService_->setCandCommentFontName(fontName);
+      continue;
     } else if (value.isInt() && strcmp(name, "candFontSize") == 0) {
       textService_->setCandFontSize(value.asInt());
     } else if (value.isInt() && strcmp(name, "candCommentFontSize") == 0) {

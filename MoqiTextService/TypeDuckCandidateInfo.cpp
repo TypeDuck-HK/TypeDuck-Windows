@@ -327,6 +327,10 @@ std::wstring chineseTypefaceLabel(ChineseTypeface typeface) {
   return typeface == ChineseTypeface::Hei ? L"黑體 Hei" : L"宋體 Sung";
 }
 
+std::vector<std::wstring> OtherDataRow::values() const {
+  return split(value, L'|');
+}
+
 CandidateEntry CandidateEntry::fromCsvRow(const std::wstring& csv) {
   CandidateEntry entry;
   const std::vector<std::wstring> fields = parseCsv(csv);

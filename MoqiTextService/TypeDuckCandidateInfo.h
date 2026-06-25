@@ -39,6 +39,8 @@ struct OtherDataRow {
   std::wstring key;
   std::wstring name;
   std::wstring value;
+
+  std::vector<std::wstring> values() const;
 };
 
 struct DisplayPreferences {
