@@ -91,11 +91,11 @@ foreach ($theme in $themeFile.themes) {
     $themeProperties = @($theme.PSObject.Properties.Name)
     Assert-True (-not ($themeProperties -contains "fonts")) "Theme '$($theme.id)' must not contain font data; fonts belong at the top level."
     Assert-True (-not ($themeProperties -contains "appearance")) "Theme '$($theme.id)' must not use the legacy appearance object."
-    Assert-True ($null -ne $theme.palette) "Theme '$($theme.id)' must define a semantic palette."
+    Assert-True ($null -ne $theme.palette) "Theme '$($theme.id)' must define a role-based palette."
 
     $paletteKeys = @($theme.palette.PSObject.Properties.Name)
     foreach ($role in $requiredPaletteRoles) {
-        Assert-True ($paletteKeys -contains $role) "Theme '$($theme.id)' is missing semantic palette role '$role'."
+        Assert-True ($paletteKeys -contains $role) "Theme '$($theme.id)' is missing palette role '$role'."
     }
     foreach ($key in $paletteKeys) {
         Assert-True (-not ($bannedPaletteKeys -contains $key)) "Theme '$($theme.id)' uses banned Tailwind/DaisyUI token key '$key'."
@@ -120,10 +120,10 @@ Assert-True (Test-Path -LiteralPath $loaderPath) "Missing backend theme loader: 
 Assert-True (Test-Path -LiteralPath $buildScriptPath) "Missing backend build script: $buildScriptPath"
 
 $loaderSource = Get-Content -Raw -Encoding UTF8 -LiteralPath $loaderPath
-Assert-True ($loaderSource.Contains("ThemePalette")) "Backend loader must decode the semantic palette contract."
-Assert-True ($loaderSource -match 'Palette\s+ThemePalette\s+`json:"palette,omitempty"`') "ThemeDefinition must expose semantic palette data."
+Assert-True ($loaderSource.Contains("ThemePalette")) "Backend loader must decode the TypeDuck palette contract."
+Assert-True ($loaderSource -match 'Palette\s+ThemePalette\s+`json:"palette,omitempty"`') "ThemeDefinition must expose TypeDuck palette data."
 Assert-True ($loaderSource -match 'Fonts\s+map\[string\]interface\{\}\s+`json:"fonts,omitempty"`') "appearanceThemesFile must decode top-level fonts."
-Assert-True ($loaderSource.Contains("semanticPaletteAppearanceConfig")) "Backend loader must map semantic palettes to runtime appearance fields."
+Assert-True ($loaderSource.Contains("paletteAppearanceConfig")) "Backend loader must map TypeDuck palettes to runtime appearance fields."
 
 $canonicalProbe = 'filepath.Join(exeDir, "input_methods", "rime", appearanceThemesFileName)'
 $compatProbe = 'filepath.Join(exeDir, "input_methods", "rime", "data", appearanceThemesFileName)'
@@ -157,5 +157,5 @@ if ((Test-Path -LiteralPath $packageThemePath) -or (Test-Path -LiteralPath $pack
     Assert-True ($packageCanonicalHash -eq (Get-FileHash -Algorithm SHA256 -LiteralPath $themePath).Hash) "Packaged canonical theme file does not match the backend source theme file."
 }
 
-Write-Host "[PASS] TypeDuck appearance theme schema is semantic, light/dark only, and font data is top-level."
+Write-Host "[PASS] TypeDuck appearance theme schema is role-based, light/dark only, and font data is top-level."
 Write-Host "[PASS] Backend loader and package checks prefer the canonical root theme file."

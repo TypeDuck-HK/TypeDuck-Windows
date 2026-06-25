@@ -101,7 +101,7 @@ $productionAnchors = @(
   @{ Path = $windowSource; Pattern = 'actualPointerMovement|mouseMoveCount|dictionaryMoveCount'; Description = 'actual pointer movement counter' },
   @{ Path = $windowHeader; Pattern = 'dictionaryRevealIndex_|dictionaryPanel'; Description = 'dictionary panel state' },
   @{ Path = $windowHeader; Pattern = 'lastMouseMovePoint_|lastPointerPoint'; Description = 'stationary pointer tracking' },
-  @{ Path = $windowSource; Pattern = 'panel_background|selection_background|input_buffer_background|input_buffer_text|pronunciation_text|definition_text'; Description = 'semantic theme role consumption' },
+  @{ Path = $windowSource; Pattern = 'panel_background|selection_background|input_buffer_background|input_buffer_text|pronunciation_text|definition_text'; Description = 'theme palette role consumption' },
   @{ Path = $windowSource; Pattern = 'definitionLayout|displayLanguages|mainLanguage|otherLanguages'; Description = 'settings-aware display language layout' }
 )
 
@@ -153,6 +153,10 @@ if ($Strict) {
   Assert-Contains $clientSource 'jyutping' "candidate Jyutping fallback preservation"
   Assert-Contains $windowHeader 'std::wstring inputCode' "candidate UI fallback input-code field"
   Assert-Contains $windowSource 'CandidateInfo\(\s*label,\s*item\.text,\s*rawComment,\s*item\.inputCode\)' "candidate info input-code fallback wiring"
+  Assert-Contains $windowSource 'jyutpingContentWidth|definitionContentWidth|honziContentWidth' "candidate window must measure visible content columns"
+  Assert-Contains $windowSource 'minWidth_\s*=\s*scalePx\(230\)' "candidate window must not keep the old fixed wide minimum"
+  Assert-Contains $windowSource '!allEntries\.empty\(\)\s*&&\s*noteColumnWidth_' "reverse/fallback comments must not render the same raw code in both note and definition columns"
+  Assert-Contains $windowSource 'nextColumn\(jyutpingColumnWidth_\)' "candidate row painter must use measured dynamic columns"
   Assert-NotContains $clientSource 'setCandBackgroundColor\(color\)|setCandHighlightColor\(color\)|setCandTextColor\(color\)|setCandHighlightTextColor\(color\)|setCandCommentColor\(color\)|setCandCommentHighlightColor\(color\)' "backend-driven native candidate theme color override"
   Assert-NotContains $textServiceHeader 'setPreeditText\(effectiveInlinePreedit\(\) \? L"" : candidatePreedit_\)|setPreeditCursor\(effectiveInlinePreedit\(\) \? 0 : candidatePreeditCursor_\)' "inline preedit hiding the popup input buffer in header"
   Assert-NotContains $textServiceSource 'setPreeditText\(effectiveInlinePreedit\(\) \? L"" : candidatePreedit_\)|setPreeditCursor\(effectiveInlinePreedit\(\) \? 0 : candidatePreeditCursor_\)' "inline preedit hiding the popup input buffer in source"

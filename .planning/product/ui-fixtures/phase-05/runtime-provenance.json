@@ -22,7 +22,7 @@
     "backend": {
       "path": "D:\\VSProjects\\moqi-ime",
       "branch": "main",
-      "head": "2a54521ad32d8de322a6dad6de7821274b51512d",
+      "head": "13370ba05ecffff0700a67eed4e16d141a207e36",
       "statusShort": [
         " M go.mod",
         " M input_methods/rime/icons/chi.ico",
@@ -88,7 +88,7 @@
     "purpose": "Plan 05-10 candidate parity guard and VM-versus-preview divergence diagnosis.",
     "expectedRuntime": {
       "serverPath": "D:\\VSProjects\\moqi-ime\\scripts\\build\\moqi-ime\\server.exe",
-      "serverSha256": "F209AC06894E7E17A243B3EAB8FB71E21D1E7135B4797A6DEEBF77E7DFE40BAF",
+      "serverSha256": "F9C1DA51F3DC8999D300D6DF39E32BF69D1FD3311BF308863FEB4D230D503FAF",
       "rimeDllPath": "D:\\VSProjects\\moqi-ime\\scripts\\build\\moqi-ime\\input_methods\\rime\\rime.dll",
       "rimeDllSha256": "5783B84916FEFC0DD5DDA28F1D7292A9CA86C75F05132947FE816178B916C04B",
       "lookupFilterCommit": "3671814d4e4aeab8d616ceea3c7f6d88e96bba02",
@@ -97,11 +97,11 @@
     "bitnessAndInstallPaths": {
       "win32BuildTextService": {
         "path": "D:\\VSProjects\\moqi-im-windows\\build-vs32\\MoqiTextService\\Release\\TypeDuckTextService.dll",
-        "sha256": "0429B2A8F74C20A0E6912748CB732FDD7C00B9C31EE450C46CCFF02362EF0B1E"
+        "sha256": "5B7E64B7587E308F5D77AF24BFFBCA5310FAB5D78294744B072247400F25CBDC"
       },
       "x64BuildTextService": {
         "path": "D:\\VSProjects\\moqi-im-windows\\build-vs64\\MoqiTextService\\Release\\TypeDuckTextService.dll",
-        "sha256": "F2C47F451795DF37C6D565BB02F995C694B746C1DF6184E09E3CC43BD76F0C75"
+        "sha256": "2B41050CA1E9959AB3B9277C7F1E36418807C80A0F3BC101A471DE483BE47543"
       },
       "hostInstalledTypeDuckImePackage": {
         "path": "C:\\Program Files (x86)\\TypeDuckIME\\moqi-ime",
@@ -151,8 +151,8 @@
     {
       "kind": "backend-server",
       "path": "D:\\VSProjects\\moqi-ime\\scripts\\build\\moqi-ime\\server.exe",
-      "bytes": 9730048,
-      "sha256": "F209AC06894E7E17A243B3EAB8FB71E21D1E7135B4797A6DEEBF77E7DFE40BAF"
+      "bytes": 9736704,
+      "sha256": "F9C1DA51F3DC8999D300D6DF39E32BF69D1FD3311BF308863FEB4D230D503FAF"
     },
     {
       "kind": "typeduck-librime",
@@ -164,7 +164,7 @@
       "kind": "typeduck-theme",
       "path": "D:\\VSProjects\\moqi-ime\\scripts\\build\\moqi-ime\\input_methods\\rime\\appearance_themes.json",
       "bytes": 5549,
-      "sha256": "9BF5742799556BF948900DB9A40B6778DA4CB78669E08F4848CC5D8BB0633E18"
+      "sha256": "BF7030D6FB227F9B0975934DA1FC2A4F02DD89405D238B2E1ED919A656D8F085"
     },
     {
       "kind": "typeduck-built-schema",
@@ -175,8 +175,8 @@
     {
       "kind": "installer",
       "path": "installer/dist/typeduck-windows-ime-setup.exe",
-      "bytes": 22689347,
-      "sha256": "9FB28F3CC1A7A674681FD6222C7C7AA0E2B0541D3CBBFEEB86B1B05D8928F563"
+      "bytes": 22691316,
+      "sha256": "41C8F840CFB2B6E2DF3CB5B49D67655544E37648268912EBC1A34E5F05A15F0B"
     },
     {
       "kind": "staged-launcher-exe",
@@ -205,20 +205,20 @@
     {
       "kind": "staged-win32-textservice-dll",
       "path": "installer/stage/win32/TypeDuckIME/TypeDuckTextService.dll",
-      "bytes": 1990656,
-      "sha256": "0429B2A8F74C20A0E6912748CB732FDD7C00B9C31EE450C46CCFF02362EF0B1E"
+      "bytes": 1996288,
+      "sha256": "5B7E64B7587E308F5D77AF24BFFBCA5310FAB5D78294744B072247400F25CBDC"
     },
     {
       "kind": "staged-x64-textservice-dll",
       "path": "installer/stage/win32/TypeDuckIME/x64/TypeDuckTextService.dll",
-      "bytes": 2297856,
-      "sha256": "F2C47F451795DF37C6D565BB02F995C694B746C1DF6184E09E3CC43BD76F0C75"
+      "bytes": 2302464,
+      "sha256": "2B41050CA1E9959AB3B9277C7F1E36418807C80A0F3BC101A471DE483BE47543"
     },
     {
       "kind": "staged-backend-server-stamped",
       "path": "installer/stage/win32/TypeDuckIME/moqi-ime/server.exe",
-      "bytes": 9861632,
-      "sha256": "B3DE8AAAB536FE9F9CAE5728B1E35765FF6DAC05EDA9C1939590F3AF7EF1F22F"
+      "bytes": 9868288,
+      "sha256": "25E0FB39E6AF11BF6A192B2DB4B33BF514A2F985B10B1988C423FC3A4E764F67"
     },
     {
       "kind": "staged-typeduck-librime",

@@ -712,12 +712,12 @@ void CandidateWindow::recalculateSize() {
     rowInnerGap_ = scalePx(6);
     pageNavWidth_ = scalePx(64);
     indicatorColumnWidth_ = scalePx(22);
-    jyutpingColumnWidth_ = scalePx(84);
-    honziColumnWidth_ = scalePx(86);
-    noteColumnWidth_ = scalePx(78);
-    definitionColumnWidth_ = scalePx(230);
+    jyutpingColumnWidth_ = 0;
+    honziColumnWidth_ = 0;
+    noteColumnWidth_ = 0;
+    definitionColumnWidth_ = 0;
     dictionaryPanelMinHeight_ = scalePx(260);
-    minWidth_ = scalePx(520);
+    minWidth_ = scalePx(230);
 
     selKeyWidth_ = 0;
     textWidth_ = 0;
@@ -728,10 +728,37 @@ void CandidateWindow::recalculateSize() {
     itemCommentWidths_.assign(items_.size(), 0);
     itemWidths_.assign(items_.size(), 0);
     int preeditWidth = 0;
+    int jyutpingContentWidth = 0;
+    int honziContentWidth = 0;
+    int noteContentWidth = 0;
+    int definitionContentWidth = 0;
+    bool hasJyutpingColumn = false;
+    bool hasNoteColumn = false;
+    bool hasDefinitionColumn = false;
+    bool hasIndicatorColumn = false;
 
     HGDIOBJ oldFont = ::SelectObject(hdc, font_);
     TEXTMETRICW metrics = {};
     TEXTMETRICW commentMetrics = {};
+    auto measureWithFont = [&](HFONT font, const std::wstring& value) -> int {
+        if (value.empty()) {
+            return 0;
+        }
+        HGDIOBJ previous = ::SelectObject(hdc, font ? font : font_);
+        SIZE size = {};
+        ::GetTextExtentPoint32W(hdc, value.c_str(), static_cast<int>(value.length()), &size);
+        ::SelectObject(hdc, previous);
+        return static_cast<int>(size.cx);
+    };
+    auto layoutDefinition = [&](const TypeDuck::CandidateEntry& entry,
+                                const CandidateUiItem& item) -> std::wstring {
+        std::wstring definition = entry.definition(displayPreferences_.mainLanguage);
+        if (definition.empty()) {
+            const std::wstring reference = entry.canonicalReference();
+            definition = reference.empty() ? item.candidateInfo.displayComment(displayPreferences_) : L"→" + reference;
+        }
+        return definition;
+    };
     for (int i = 0, n = static_cast<int>(items_.size()); i < n; ++i) {
         SIZE selKeySize = {};
         wchar_t selKey[] = L"?.";
@@ -759,6 +786,54 @@ void CandidateWindow::recalculateSize() {
         }
         itemHeight_ = (std::max)(itemHeight_, (std::max)(candidateHeight, static_cast<int>(selKeySize.cy)));
         itemHeight_ = (std::max)(itemHeight_, rowPaddingY_ * 2 + candidateEntryRows * scalePx(25));
+
+        std::vector<TypeDuck::CandidateEntry> layoutEntries = item.candidateInfo.matchedEntries();
+        if (layoutEntries.empty()) {
+            layoutEntries = item.candidateInfo.entries;
+        }
+        if (layoutEntries.empty()) {
+            TypeDuck::CandidateEntry fallbackEntry;
+            fallbackEntry.honzi = item.displayText();
+            fallbackEntry.definitions[displayPreferences_.mainLanguage] = item.displayComment();
+            layoutEntries.push_back(std::move(fallbackEntry));
+        }
+
+        const bool showJyutping = displayPreferences_.shouldShowJyutping(item.candidateInfo.isReverseLookup);
+        for (int entryIndex = 0; entryIndex < static_cast<int>(layoutEntries.size()); ++entryIndex) {
+            const TypeDuck::CandidateEntry& entry = layoutEntries[entryIndex];
+            if (showJyutping && !entry.jyutping.empty()) {
+                hasJyutpingColumn = true;
+                jyutpingContentWidth = (std::max)(
+                    jyutpingContentWidth,
+                    measureWithFont(commentFont_ ? commentFont_ : font_, entry.jyutping));
+            }
+
+            const std::wstring honzi = entry.honzi.empty() ? item.displayText() : entry.honzi;
+            if (!honzi.empty()) {
+                honziContentWidth = (std::max)(honziContentWidth, measureWithFont(font_, honzi));
+            }
+
+            const std::wstring note = (!item.candidateInfo.isReverseLookup || displayPreferences_.showReverseCode)
+                                          ? item.candidateInfo.note
+                                          : L"";
+            if (entryIndex == 0 && !note.empty() && !item.candidateInfo.entries.empty()) {
+                hasNoteColumn = true;
+                noteContentWidth = (std::max)(
+                    noteContentWidth,
+                    measureWithFont(commentFont_ ? commentFont_ : font_, note));
+            }
+
+            const std::wstring definition = layoutDefinition(entry, item);
+            if (!definition.empty()) {
+                hasDefinitionColumn = true;
+                definitionContentWidth = (std::max)(
+                    definitionContentWidth,
+                    measureWithFont(commentFont_ ? commentFont_ : font_, definition));
+            }
+        }
+        if (item.candidateInfo.hasDictionaryEntry(displayPreferences_)) {
+            hasIndicatorColumn = true;
+        }
     }
     if (!preedit_.empty()) {
         SIZE preeditSize = {};
@@ -784,16 +859,44 @@ void CandidateWindow::recalculateSize() {
                          ? 0
                          : (std::max)(preeditHeight_, static_cast<int>(metrics.tmHeight + metrics.tmExternalLeading));
 
+    const int columnPad = scalePx(8);
+    jyutpingColumnWidth_ = hasJyutpingColumn
+                               ? (std::min)((std::max)(jyutpingContentWidth + columnPad, scalePx(42)), scalePx(150))
+                               : 0;
+    honziColumnWidth_ = (std::min)((std::max)(honziContentWidth + columnPad, scalePx(34)), scalePx(520));
+    noteColumnWidth_ = hasNoteColumn
+                           ? (std::min)((std::max)(noteContentWidth + columnPad, scalePx(42)), scalePx(170))
+                           : 0;
+    definitionColumnWidth_ = hasDefinitionColumn
+                                 ? (std::min)((std::max)(definitionContentWidth + columnPad, scalePx(78)), scalePx(360))
+                                 : 0;
+    indicatorColumnWidth_ = hasIndicatorColumn ? scalePx(22) : 0;
+
+    auto rowBodyWidth = [&]() {
+        int width = 0;
+        auto addColumn = [&](int columnWidth) {
+            if (columnWidth <= 0) {
+                return;
+            }
+            if (width > 0) {
+                width += rowInnerGap_;
+            }
+            width += columnWidth;
+        };
+        addColumn(jyutpingColumnWidth_);
+        addColumn(honziColumnWidth_);
+        addColumn(noteColumnWidth_);
+        addColumn(definitionColumnWidth_);
+        addColumn(indicatorColumnWidth_);
+        return width;
+    };
+    const int rowContentWidth = selKeyWidth_ + labelGap_ + rowBodyWidth();
     for (int i = 0, n = static_cast<int>(items_.size()); i < n; ++i) {
-        itemWidths_[i] = selKeyWidth_ + labelGap_ + jyutpingColumnWidth_ +
-                         honziColumnWidth_ + noteColumnWidth_ +
-                         definitionColumnWidth_ + indicatorColumnWidth_;
+        itemWidths_[i] = rowContentWidth;
     }
 
     const int rows = static_cast<int>(items_.size());
-    const int candidateContentWidth = selKeyWidth_ + labelGap_ + jyutpingColumnWidth_ +
-                                      honziColumnWidth_ + noteColumnWidth_ +
-                                      definitionColumnWidth_ + indicatorColumnWidth_;
+    const int candidateContentWidth = rowContentWidth;
     const int contentWidth = (std::max)((std::max)(candidateContentWidth, preeditWidth + pageNavWidth_), minWidth_);
     const int candidatePanelWidth = padX_ * 2 + contentWidth + borderWidth_ * 2;
     int candidatePanelHeight = rows * itemHeight_ + (std::max)(0, rows - 1) * rowSpacing_;
@@ -1042,20 +1145,25 @@ void CandidateWindow::paintCandidateRow(HDC hdc, int index, const RECT& rowRc) {
             entry = &fallbackEntry;
         }
 
-        RECT jyutpingRc = {selRc.right + labelGap_, y,
-                           selRc.right + labelGap_ + jyutpingColumnWidth_, y + lineHeight};
-        RECT honziRc = {jyutpingRc.right + rowInnerGap_, y,
-                        jyutpingRc.right + rowInnerGap_ + honziColumnWidth_, y + lineHeight};
-        RECT noteRc = {honziRc.right + rowInnerGap_, y,
-                       honziRc.right + rowInnerGap_ + noteColumnWidth_, y + lineHeight};
-        RECT definitionRc = {noteRc.right + rowInnerGap_, y,
-                             noteRc.right + rowInnerGap_ + definitionColumnWidth_, y + lineHeight};
-        RECT indicatorRc = {definitionRc.right + rowInnerGap_, y, rowRc.right - scalePx(8), y + lineHeight};
+        int columnX = selRc.right + labelGap_;
+        auto nextColumn = [&](int width) {
+            RECT rc = {columnX, y, columnX + width, y + lineHeight};
+            if (width > 0) {
+                columnX = rc.right + rowInnerGap_;
+            }
+            return rc;
+        };
+        RECT jyutpingRc = nextColumn(jyutpingColumnWidth_);
+        RECT honziRc = nextColumn(honziColumnWidth_);
+        RECT noteRc = nextColumn(noteColumnWidth_);
+        RECT definitionRc = nextColumn(definitionColumnWidth_);
+        RECT indicatorRc = nextColumn(indicatorColumnWidth_);
+        indicatorRc.right = rowRc.right - scalePx(8);
 
         ::SelectObject(hdc, commentFont_ ? commentFont_ : font_);
         ::SetTextColor(hdc, selected ? commentHighlightColor_ : kPronunciationText);
         const bool showJyutping = displayPreferences_.shouldShowJyutping(item.candidateInfo.isReverseLookup);
-        if (showJyutping) {
+        if (showJyutping && jyutpingColumnWidth_ > 0) {
             ::DrawTextW(hdc, entry->jyutping.c_str(), static_cast<int>(entry->jyutping.length()), &jyutpingRc,
                         DT_LEFT | DT_VCENTER | DT_SINGLELINE | DT_NOPREFIX | DT_END_ELLIPSIS);
         }
@@ -1071,7 +1179,7 @@ void CandidateWindow::paintCandidateRow(HDC hdc, int index, const RECT& rowRc) {
         const std::wstring note = (!item.candidateInfo.isReverseLookup || displayPreferences_.showReverseCode)
                                       ? item.candidateInfo.note
                                       : L"";
-        if (entryIndex == 0 && !note.empty()) {
+        if (entryIndex == 0 && !note.empty() && !allEntries.empty() && noteColumnWidth_ > 0) {
             ::DrawTextW(hdc, note.c_str(), static_cast<int>(note.length()), &noteRc,
                         DT_LEFT | DT_VCENTER | DT_SINGLELINE | DT_NOPREFIX | DT_END_ELLIPSIS);
         }
@@ -1081,11 +1189,14 @@ void CandidateWindow::paintCandidateRow(HDC hdc, int index, const RECT& rowRc) {
             const std::wstring reference = entry->canonicalReference();
             definition = reference.empty() ? item.candidateInfo.displayComment(displayPreferences_) : L"→" + reference;
         }
-        ::SetTextColor(hdc, selected ? commentHighlightColor_ : kDefinitionText);
-        ::DrawTextW(hdc, definition.c_str(), static_cast<int>(definition.length()), &definitionRc,
-                    DT_LEFT | DT_VCENTER | DT_SINGLELINE | DT_NOPREFIX | DT_END_ELLIPSIS);
+        if (definitionColumnWidth_ > 0) {
+            ::SetTextColor(hdc, selected ? commentHighlightColor_ : kDefinitionText);
+            ::DrawTextW(hdc, definition.c_str(), static_cast<int>(definition.length()), &definitionRc,
+                        DT_LEFT | DT_VCENTER | DT_SINGLELINE | DT_NOPREFIX | DT_END_ELLIPSIS);
+        }
 
-        if (entryIndex == 0 && item.candidateInfo.hasDictionaryEntry(displayPreferences_)) {
+        if (entryIndex == 0 && indicatorColumnWidth_ > 0 &&
+            item.candidateInfo.hasDictionaryEntry(displayPreferences_)) {
             ::SetTextColor(hdc, selected ? highlightTextColor_ : kSecondaryText);
             ::DrawTextW(hdc, L"ⓘ", 1, &indicatorRc,
                         DT_RIGHT | DT_VCENTER | DT_SINGLELINE | DT_NOPREFIX);
