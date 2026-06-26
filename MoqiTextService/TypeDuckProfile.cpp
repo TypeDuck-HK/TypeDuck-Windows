@@ -2,6 +2,29 @@
 
 namespace Moqi {
 namespace TypeDuck {
+namespace {
+
+std::wstring preferredSmallIconPath(const std::wstring& fallbackIconFile) {
+  wchar_t programDir[MAX_PATH] = {};
+  const DWORD length = ::GetEnvironmentVariableW(
+      programDirEnvVar(), programDir, static_cast<DWORD>(_countof(programDir)));
+  if (length == 0 || length >= _countof(programDir)) {
+    return fallbackIconFile;
+  }
+
+  std::wstring iconPath = programDir;
+  if (!iconPath.empty() && iconPath.back() != L'\\' && iconPath.back() != L'/') {
+    iconPath += L'\\';
+  }
+  iconPath += L"moqi-ime\\icons\\TypeDuck_Small.ico";
+  if (::GetFileAttributesW(iconPath.c_str()) == INVALID_FILE_ATTRIBUTES) {
+    return fallbackIconFile;
+  }
+  return iconPath;
+}
+
+}  // namespace
+
 // TypeDuck text service CLSID {7D92985A-BC53-47B5-A5CC-6E47F86B9D18}
 const GUID kTextServiceClsid = {
     0x7d92985a,
@@ -59,13 +82,15 @@ std::wstring defaultProgramDir(const wchar_t* programFilesDir) {
 }
 
 Ime::LangProfileInfo makeLangProfile(const std::wstring& iconFile, int iconIndex) {
+  const std::wstring profileIconFile = preferredSmallIconPath(iconFile);
+  const int profileIconIndex = profileIconFile == iconFile ? iconIndex : 0;
   return Ime::LangProfileInfo{
       profileDisplayName(),
       kProfileGuid,
       localeName(),
       fallbackLocaleName(),
-      iconFile,
-      iconIndex};
+      profileIconFile,
+      profileIconIndex};
 }
 
 }  // namespace TypeDuck

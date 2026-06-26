@@ -175,8 +175,9 @@ Assert-Text $installScript 'Set-WindowsExecutableIcon\s+-ExecutablePath\s+\(Join
 Assert-Text $installScript 'Set-WindowsExecutableIcon\s+-ExecutablePath\s+\$backendServer\s+-IconPath\s+\$transparentIcon' "Staging must stamp packaged moqi-ime/server.exe with TypeDuck_Transparent.ico."
 
 Assert-Text $textServiceRc "IDI_TYPEDUCK_PROFILE\s+ICON\s+`"\.\./TypeDuckSettings/assets/TypeDuck_Small\.ico`"" "TSF DLL profile resource must use TypeDuck_Small.ico."
-Assert-NotText $typeDuckProfile "TypeDuck_Small\.ico" "First-party TypeDuck profile must use the DLL resource icon, not a raw installed TypeDuck_Small.ico file."
-Assert-NotText $typeDuckProfile "lockedSmallIconPath" "Profile icon lookup must not depend on raw icon files in the installed TypeDuck program directory."
+Assert-Text $typeDuckProfile 'moqi-ime\\\\icons\\\\TypeDuck_Small\.ico' "First-party TypeDuck profile must prefer the packaged TypeDuck_Small.ico used by the system IME menu."
+Assert-Text $typeDuckProfile "preferredSmallIconPath" "Profile icon lookup must prefer the packaged small icon with a DLL resource fallback."
+Assert-NotText $typeDuckProfile "lockedSmallIconPath" "Profile icon lookup must not depend on the old raw app-root icon helper."
 
 Assert-Text $installer "SetupIconFile=\.\.\\TypeDuckSettings\\assets\\TypeDuck\.ico" "Installer setup icon must use TypeDuck.ico."
 Assert-Text $installer "UninstallDisplayIcon=\{uninstallexe\}" "Uninstaller display icon must come from the compiled uninstaller icon, not a raw app-root TypeDuck.ico file."
