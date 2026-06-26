@@ -98,6 +98,7 @@ private:
 	void destroyShellNotifyIcon();
 	void showPopupMenu() const;
 	void openTypeDuckSettings() const;
+	void openTypeDuckAbout() const;
 	void showTrayNotification(const std::wstring& title, const std::wstring& message,
 	                         DWORD infoFlags);
 	void flushTrayNotifications();

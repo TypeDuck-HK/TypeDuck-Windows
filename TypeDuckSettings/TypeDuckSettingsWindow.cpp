@@ -17,6 +17,8 @@ namespace Moqi::TypeDuckSettings {
 namespace {
 
 constexpr const wchar_t* kWindowClassName = L"TypeDuckSettingsWindow";
+constexpr const wchar_t* kSettingsInstanceMutexName =
+    L"Local\\TypeDuckSettingsWindowInstance";
 constexpr const wchar_t* kApplyDefaultsSwitch = L"/apply-defaults";
 constexpr const wchar_t* kLauncherExecutableName = L"TypeDuckLauncher.exe";
 constexpr const wchar_t* kLauncherPipeBaseName = L"Launcher";
@@ -79,6 +81,20 @@ const std::vector<LanguageOption>& languageOptions() {
       {"urd", L"烏爾都語 Urdu"},
   };
   return options;
+}
+
+bool bringExistingWindowToForeground(const wchar_t* className) {
+  HWND existing = FindWindowW(className, nullptr);
+  if (existing == nullptr) {
+    return false;
+  }
+  if (IsIconic(existing)) {
+    ShowWindow(existing, SW_RESTORE);
+  } else {
+    ShowWindow(existing, SW_SHOW);
+  }
+  SetForegroundWindow(existing);
+  return true;
 }
 
 std::wstring utf8ToWide(const std::string& value) {
@@ -697,8 +713,19 @@ int RunSettingsWindow(HINSTANCE instance, int showCommand) {
   if (argv != nullptr) {
     LocalFree(argv);
   }
+  HANDLE singleInstance = CreateMutexW(nullptr, TRUE, kSettingsInstanceMutexName);
+  if (singleInstance != nullptr && GetLastError() == ERROR_ALREADY_EXISTS) {
+    bringExistingWindowToForeground(kWindowClassName);
+    CloseHandle(singleInstance);
+    return 0;
+  }
   SettingsWindow window(instance);
-  return window.run(showCommand);
+  const int result = window.run(showCommand);
+  if (singleInstance != nullptr) {
+    ReleaseMutex(singleInstance);
+    CloseHandle(singleInstance);
+  }
+  return result;
 }
 
 } // namespace Moqi::TypeDuckSettings

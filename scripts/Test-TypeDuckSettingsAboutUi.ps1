@@ -123,6 +123,8 @@ Assert-Text $settingsCmake "TypeDuckAboutVersion\.rc\.in" "TypeDuckAbout must ge
 $settingsTargetBlock = [regex]::Match($settingsCmake, "add_executable\(TypeDuckSettings[\s\S]*?\n\)").Value
 Assert-True ($settingsTargetBlock -notmatch "TypeDuckAboutDialog\.cpp") "TypeDuckSettings target must not link the About dialog implementation."
 Assert-Text $aboutMain "ShowTypeDuckAboutDialog\(instance,\s*nullptr\)" "TypeDuckAbout must launch the About dialog directly."
+Assert-Text $window "Local\\\\TypeDuckSettingsWindowInstance" "Settings executable must prevent duplicate interactive windows."
+Assert-Text $window "bringExistingWindowToForeground" "Settings duplicate launch must foreground the existing window."
 Assert-Text $settingsCmake "MoqLauncher/TypeDuckPreferences\.cpp" "Settings executable must reuse TypeDuckPreferences."
 Assert-Text $settingsCmake "TypeDuckSettingsVersion\.h\.in" "TypeDuckSettings must generate a version header from version.txt-derived CMake values."
 Assert-Text $installScript "Resolve-ArtifactPath\s+-Label\s+`"TypeDuckSettings\.exe`"" "Installer staging must resolve TypeDuckSettings.exe."
@@ -155,7 +157,18 @@ Assert-Text $imeModule "ShellExecuteW" "TSF Configure entry point must use a nat
 Assert-True ($imeModule -notmatch "configTool|configToolParams|configToolDir") "TSF Configure entry point must not use backend-declared config tool metadata."
 Assert-Text $pipeServer "TypeDuckSettings\.exe" "Launcher post-install entry point must launch TypeDuckSettings.exe."
 Assert-Text $pipeServer "openTypeDuckSettings" "Launcher must expose a fixed TypeDuck settings launch helper."
-Assert-Text $pipeServer "設定 / Settings" "Launcher settings menu label must be bilingual."
+Assert-Text $pipeServer "TypeDuckAbout\.exe" "Launcher tray entry must launch TypeDuckAbout.exe."
+Assert-Text $pipeServer "openTypeDuckAbout" "Launcher must expose a fixed TypeDuck About launch helper."
+Assert-Text $pipeServer "輸入法設定 IME Settings" "Launcher settings menu label must be bilingual."
+Assert-Text $pipeServer "關於 / About TypeDuck" "Launcher About menu label must be bilingual."
+Assert-Ordered $pipeServer @(
+  "ID_OPEN_TYPEDUCK_SETTINGS",
+  "ID_OPEN_TYPEDUCK_ABOUT"
+) "Launcher tray settings/About command ordering"
+Assert-Ordered $pipeServer @(
+  "輸入法設定 IME Settings",
+  "關於 / About TypeDuck"
+) "Launcher tray settings/About menu ordering"
 Assert-True ($pipeServer -notmatch "configTool|configToolParams|configToolDir") "Launcher settings entry point must not use backend-declared config tool metadata."
 
 $combined = "$topCmake`n$settingsCmake`n$window`n$imeModule`n$pipeServer"
@@ -238,6 +251,8 @@ if (Test-Path -LiteralPath $aboutPath) {
   Assert-Text $aboutRc "About_Banner\.bmp" "Separate About executable must compile the About banner bitmap."
   Assert-Text $aboutRc "Credit_Logos\.bmp" "Separate About executable must compile the credit logos bitmap."
   Assert-True ($about -notmatch "Installer\.bmp" -and $rc -notmatch "Installer\.bmp" -and $aboutRc -notmatch "Installer\.bmp") "Installer.bmp must not be referenced in Phase 5 settings/About."
+  Assert-Text $about "Local\\\\TypeDuckAboutWindowInstance" "About executable must prevent duplicate interactive windows."
+  Assert-Text $about "bringExistingAboutToForeground" "About duplicate launch must foreground the existing window."
   Assert-Text $about "歡迎使用 TypeDuck 打得" "About dialog must include the exact D-27 bilingual text block."
   $createControlsStart = $about.IndexOf("void createControls()")
   Assert-True ($createControlsStart -ge 0) "About dialog must create controls in a dedicated createControls method."

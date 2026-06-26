@@ -78,6 +78,7 @@ static constexpr UINT ID_RESTART_Moqi_BACKENDS = 1002;
 static constexpr UINT ID_EXIT_Moqi = 1003;
 static constexpr UINT ID_OPEN_TYPEDUCK_SETTINGS = 1004;
 static constexpr UINT ID_REDEPLOY_TYPEDUCK_BACKEND = 1005;
+static constexpr UINT ID_OPEN_TYPEDUCK_ABOUT = 1006;
 
 static constexpr size_t MAX_LOG_FILE_SIZE =
     5 * 1024 * 1024;                    // log file size: 5 MB
@@ -85,6 +86,7 @@ static constexpr int NUM_LOG_FILES = 5; // backup 3 copies of the log file
 
 static constexpr wchar_t CONFIG_FILE_REL_PATH[] = L"\\MoqiLauncher.json";
 static constexpr wchar_t TYPEDUCK_SETTINGS_EXE[] = L"\\TypeDuckSettings.exe";
+static constexpr wchar_t TYPEDUCK_ABOUT_EXE[] = L"\\TypeDuckAbout.exe";
 
 static void copyNotifyText(wchar_t *dest, size_t destCount, const std::wstring &text) {
   if (destCount == 0) {
@@ -408,6 +410,20 @@ void PipeServer::openTypeDuckSettings() const {
   }
 }
 
+void PipeServer::openTypeDuckAbout() const {
+  std::wstring aboutPath = topDirPath_ + TYPEDUCK_ABOUT_EXE;
+  HINSTANCE result = ::ShellExecuteW(hwnd_, L"open", aboutPath.c_str(),
+                                     nullptr, topDirPath_.c_str(),
+                                     SW_SHOWNORMAL);
+  if (reinterpret_cast<INT_PTR>(result) <= 32) {
+    ::MessageBoxW(
+        hwnd_,
+        L"未能開啟 TypeDuck 關於。請確認 TypeDuckAbout.exe 已安裝。\n"
+        L"Unable to open TypeDuck About. Please confirm TypeDuckAbout.exe is installed.",
+        L"關於 TypeDuck / About TypeDuck", MB_OK | MB_ICONWARNING);
+  }
+}
+
 void PipeServer::notifyClientsOfBackendError(
     BackendServer *backend,
     moqi::protocol::TypeDuckErrorCode errorCode,
@@ -657,6 +673,9 @@ LRESULT PipeServer::wndProc(UINT msg, WPARAM wp, LPARAM lp) {
     case ID_OPEN_TYPEDUCK_SETTINGS:
       openTypeDuckSettings();
       break;
+    case ID_OPEN_TYPEDUCK_ABOUT:
+      openTypeDuckAbout();
+      break;
     }
     break;
   case WM_CLOSE:
@@ -769,18 +788,20 @@ void PipeServer::showPopupMenu() const {
   // FIXME: make this translatable later
   bool debugEnabled = logLevel_ <= spdlog::level::debug;
   ::AppendMenu(hmenu, MF_STRING | MF_ENABLED, ID_OPEN_TYPEDUCK_SETTINGS,
-               L"設定 / Settings");
+               L"輸入法設定 IME Settings");
+  ::AppendMenu(hmenu, MF_STRING | MF_ENABLED, ID_OPEN_TYPEDUCK_ABOUT,
+               L"關於 / About TypeDuck…");
   ::AppendMenu(hmenu, MF_STRING | MF_ENABLED | (debugEnabled ? MF_CHECKED : 0),
                ID_ENABLE_DEBUG_LOG, L"開啟除錯 / Enable Debug");
   ::AppendMenu(hmenu, MF_STRING | MF_ENABLED, ID_SHOW_DEBUG_LOGS,
-               L"開啟記錄 / Open Logs");
+               L"開啟除錯記錄資料夾 / Open Debug Logs Folder");
   ::AppendMenu(hmenu, MF_SEPARATOR, 0, 0);
   ::AppendMenu(hmenu, MF_STRING | MF_ENABLED, ID_REDEPLOY_TYPEDUCK_BACKEND,
-               L"重新部署 TypeDuck / Redeploy TypeDuck");
+               L"重新整理 / Refresh");
   ::AppendMenu(hmenu, MF_STRING | MF_ENABLED, ID_RESTART_Moqi_BACKENDS,
                L"重新啟動 TypeDuck 引擎 / Restart TypeDuck Engine");
   ::AppendMenu(hmenu, MF_STRING | MF_ENABLED, ID_EXIT_Moqi,
-               L"結束 TypeDuck / Exit TypeDuck");
+               L"終止輸入法 / Terminate IME");
 
   ::SetForegroundWindow(hwnd_);
   ::TrackPopupMenu(hmenu, TPM_LEFTALIGN | TPM_BOTTOMALIGN, pos.x, pos.y, 0,

@@ -12,6 +12,8 @@ namespace Moqi::TypeDuckSettings {
 namespace {
 
 constexpr const wchar_t* kAboutClassName = L"TypeDuckAboutDialogWindow";
+constexpr const wchar_t* kAboutInstanceMutexName =
+    L"Local\\TypeDuckAboutWindowInstance";
 constexpr int kAboutWidth = 1000;
 constexpr int kAboutHeight = 858;
 constexpr int kMargin = 28;
@@ -91,6 +93,20 @@ const std::vector<AboutLink>& aboutLinks() {
        L"https://github.com/TypeDuck-HK/TypeDuck-Windows"},
   };
   return links;
+}
+
+bool bringExistingAboutToForeground() {
+  HWND existing = FindWindowW(kAboutClassName, nullptr);
+  if (existing == nullptr) {
+    return false;
+  }
+  if (IsIconic(existing)) {
+    ShowWindow(existing, SW_RESTORE);
+  } else {
+    ShowWindow(existing, SW_SHOW);
+  }
+  SetForegroundWindow(existing);
+  return true;
 }
 
 void drawTextBlock(HDC dc, HFONT font, COLORREF color, const std::wstring& text,
@@ -340,8 +356,18 @@ class AboutDialog {
 } // namespace
 
 void ShowTypeDuckAboutDialog(HINSTANCE instance, HWND owner) {
+  HANDLE singleInstance = CreateMutexW(nullptr, TRUE, kAboutInstanceMutexName);
+  if (singleInstance != nullptr && GetLastError() == ERROR_ALREADY_EXISTS) {
+    bringExistingAboutToForeground();
+    CloseHandle(singleInstance);
+    return;
+  }
   AboutDialog dialog(instance, owner);
   dialog.show();
+  if (singleInstance != nullptr) {
+    ReleaseMutex(singleInstance);
+    CloseHandle(singleInstance);
+  }
 }
 
 } // namespace Moqi::TypeDuckSettings
