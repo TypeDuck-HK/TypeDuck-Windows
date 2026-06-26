@@ -44,7 +44,7 @@ key-files:
 key-decisions:
   - "TypeDuckSettings is native Win32 and does not use Qt; the UI is sufficient with standard controls and custom layout anchors."
   - "The settings executable applies through MoqLauncher/TypeDuckPreferences.* and saves TypeDuckPreferences.json, preserving the Plan 05-03 source-of-truth contract."
-  - "About dialog attribution is source-backed by the Phase 2 runtime manifest and version-info evidence: TypeDuck-HK librime v1.1.3, rime-dictionary-lookup-filter commit 3671814d4e4aeab8d616ceea3c7f6d88e96bba02, and TypeDuck-HK schema aap2-alpha commit b5ab44e187d010fa13c71bd320c07259b224ae5b."
+  - "About dialog attribution uses concise product copy: TypeDuck Windows IME 版本 Version, TypeDuck-HK librime fork v1.1.4, and TypeDuck-HK schema v2.0.0."
 
 patterns-established:
   - "Use scripts/Test-TypeDuckSettingsAboutUi.ps1 as the focused guard for settings order, bilingual labels, About assets/text/link order, and banned Installer.bmp usage."

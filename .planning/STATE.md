@@ -132,7 +132,7 @@ Recent decisions affecting current work:
 - [Phase 05]: 05-04: Preview screenshots remain iteration evidence only; Plan 05-06 owns exact VM host-app proof. — Added CandidateInfo-backed preview capture commands, but D-36 requires installed Windows host-app evidence later.
 - [Phase ?]: [Phase 05]: 05-05: TypeDuckSettings is native Win32 and does not use Qt; standard controls and explicit layout anchors are sufficient for the settings/About executable.
 - [Phase ?]: [Phase 05]: 05-05: Native settings UI applies through MoqLauncher/TypeDuckPreferences.* and saves TypeDuckPreferences.json rather than creating a parallel settings store.
-- [Phase ?]: [Phase 05]: 05-05: About dialog attribution is source-backed by Phase 2 runtime metadata for TypeDuck-HK librime v1.1.3, rime-dictionary-lookup-filter commit 3671814d4e4aeab8d616ceea3c7f6d88e96bba02, and TypeDuck-HK schema aap2-alpha.
+- [Phase ?]: [Phase 05]: 05-05: About dialog attribution is the concise product copy: TypeDuck Windows IME 版本 Version, TypeDuck-HK librime fork v1.1.4, and TypeDuck-HK schema v2.0.0.
 - [Phase ?]: [Phase 05]: 05-07: Install-time and post-install settings entry points launch the fixed first-party TypeDuckSettings.exe.
 - [Phase ?]: [Phase 05]: 05-07: Installer staging treats TypeDuckSettings.exe as required payload and packages the newest launcher artifact for verification.
 - [Phase ?]: [Phase 05]: 05-07: Backend-declared configTool metadata is no longer used for the Phase 5 settings surface.

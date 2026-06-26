@@ -45,7 +45,7 @@ This phase makes the visible TypeDuck Windows experience native and Web-alpha-al
 
 ### About Dialog and Branding Assets
 - **D-23:** The About dialog must include `D:\VSProjects\moqi-ime\icons\About_Banner.bmp` at the top, the exact bilingual text block below, then `D:\VSProjects\moqi-ime\icons\Credit_Logos.bmp`.
-- **D-24:** The About dialog must include these links with these exact labels and URLs: `TypeDuck 網站 Website` -> `https://typeduck.hk`; `LearnDuck 粵拼打字入門 Introduction to Cantonese Jyutping Typing` -> `https://learn.typeduck.hk`; `粵拼方案 Jyutping Scheme` -> `https://lshk.org/jyutping-scheme/`; `TypeDuck 原始碼 Source Code` -> `https://github.com/TypeDuck-HK/TypeDuck-Windows`.
+- **D-24:** The About dialog must include these links with these exact labels and URLs: `TypeDuck 網站 Website` -> `https://typeduck.hk`; `LearnDuck 粵拼打字入門 Introduction to Jyutping Typing` -> `https://learn.typeduck.hk`; `粵拼方案 Jyutping Scheme` -> `https://lshk.org/jyutping-scheme/`; `TypeDuck 原始碼 Source Code` -> `https://github.com/TypeDuck-HK/TypeDuck-Windows`.
 - **D-25:** About and branding bitmap resources should be moved into a proper TypeDuck product resource/assets location during implementation, not left semantically buried under a generic `icons` directory. Keep `D:\VSProjects\moqi-ime\icons` as the current source location for planning.
 - **D-26:** `D:\VSProjects\moqi-ime\icons\Installer.bmp` is installer-specific and should be left for later installer-focused phases unless Phase 5 needs to reference installer-first-run settings only.
 - **D-27:** The About dialog exact text is:
