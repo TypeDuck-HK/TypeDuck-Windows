@@ -1134,7 +1134,52 @@ void TextService::updateCandidatesWindow(Ime::EditSession* session) {
     if (candidateWindow_) {
         candidateWindow_->syncOwner(session);
 		moveCandidateWindowToInputRect(session, L"updateCandidatesWindow", true);
-    }
+	}
+}
+
+void TextService::updateCandidatesWithoutSession() {
+	if (!tsfCandidateUiEnabled()) {
+		appendCandidateWindowLog(L"[TextService::updateCandidatesWithoutSession] skipped by process policy");
+		return;
+	}
+	if (!candidateWindow_) {
+		return;
+	}
+	reloadTypeDuckDisplayPreferences();
+	applyCandidateAppearanceNow();
+	invalidateCandidateUiCache();
+
+	candidateWindow_->clear();
+	candidateWindow_->setUseCursor(candUseCursor_);
+	candidateWindow_->setCandPerRow(candPerRow_);
+	candidateWindow_->setCandSpacing(candSpacing_);
+	candidateWindow_->setBackgroundColor(candBackgroundColor_);
+	candidateWindow_->setHighlightColor(candHighlightColor_);
+	candidateWindow_->setTextColor(candTextColor_);
+	candidateWindow_->setHighlightTextColor(candHighlightTextColor_);
+	candidateWindow_->setCommentColor(candCommentColor_);
+	candidateWindow_->setCommentHighlightColor(candCommentHighlightColor_);
+	candidateWindow_->setDisplayPreferences(typeDuckDisplayPreferences_);
+	candidateWindow_->setPreeditText(candidatePreedit_);
+	candidateWindow_->setPreeditCursor(candidatePreeditCursor_);
+	candidateWindow_->setPreeditSelection(candidatePreeditSelectionStart_, candidatePreeditSelectionEnd_);
+	assert(candidates_.size() <= selKeys_.size());
+	for (int i = 0; i < candidates_.size(); ++i) {
+		candidateWindow_->add(candidates_[i], selKeys_[i]);
+	}
+	candidateWindow_->recalculateSize();
+	candidateWindow_->refresh();
+	markCandidateContentApplied(candidatePreedit_);
+	hasAppliedCandidateCursor_ = false;
+	if (showingCandidates_) {
+		candidateWindow_->Show(shouldShowCandidateWindowUI_ ? TRUE : FALSE);
+	}
+	if (validCandidateListElementId_) {
+		auto elementMgr = Ime::ComPtr<ITfUIElementMgr>::queryFrom(threadMgr());
+		if (elementMgr) {
+			elementMgr->UpdateUIElement(candidateListElementId_);
+		}
+	}
 }
 
 void TextService::refreshCandidates() {

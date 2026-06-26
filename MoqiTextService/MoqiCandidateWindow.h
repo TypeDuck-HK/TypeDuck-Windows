@@ -198,6 +198,7 @@ private:
     int currentSel_;
     int pressedSel_;
     int pressedPageNavDirection_;
+    int hoveredPageNavDirection_;
     bool draggingWindow_;
     bool trackingMouse_;
     bool useCursor_;

@@ -80,6 +80,7 @@ constexpr int kPageNavWidth = 64;
 constexpr int kPageNavPreeditlessHeight = 30;
 constexpr int kPageNavGlyphPointSize = 28;
 constexpr int kPageNavGlyphYOffset = 7;
+constexpr int kPageNavHoverRadius = 6;
 constexpr int kPreeditExtraHeight = 8;
 constexpr int kPreeditTextWidthPadding = 28;
 constexpr int kPreeditPlainMargin = 4;
@@ -120,6 +121,7 @@ constexpr int kInlineBodySpacingUnit = 4;
 constexpr int kUnboundedMeasureHeight = 32000;
 constexpr COLORREF kDictionaryScrollTrack = RGB(224, 218, 208);
 constexpr COLORREF kDictionaryScrollThumb = RGB(166, 153, 132);
+constexpr const wchar_t* kInputBufferFontName = L"Microsoft JhengHei UI";
 
 Moqi::TextService* productTextService(Ime::TextService* service) {
     return static_cast<Moqi::TextService*>(service);
@@ -194,6 +196,18 @@ HFONT createPanelFont(HDC hdc,
         CLEARTYPE_QUALITY,
         DEFAULT_PITCH | FF_DONTCARE,
         faceName);
+}
+
+HFONT createDerivedFont(HFONT baseFont, const wchar_t* faceName) {
+    LOGFONTW lf = {};
+    if (!baseFont || ::GetObjectW(baseFont, sizeof(lf), &lf) == 0) {
+        HFONT defaultFont = reinterpret_cast<HFONT>(::GetStockObject(DEFAULT_GUI_FONT));
+        if (!defaultFont || ::GetObjectW(defaultFont, sizeof(lf), &lf) == 0) {
+            return nullptr;
+        }
+    }
+    wcscpy_s(lf.lfFaceName, faceName);
+    return ::CreateFontIndirectW(&lf);
 }
 
 SIZE textExtent(HDC hdc, HFONT font, const std::wstring& text) {
@@ -422,6 +436,7 @@ CandidateWindow::CandidateWindow(Ime::TextService* service, Ime::EditSession* se
       currentSel_(0),
       pressedSel_(-1),
       pressedPageNavDirection_(kPageNavNone),
+      hoveredPageNavDirection_(kPageNavNone),
       draggingWindow_(false),
       trackingMouse_(false),
       useCursor_(false),
@@ -512,7 +527,7 @@ STDMETHODIMP CandidateWindow::GetCount(UINT* puCount) {
     const int totalCount = service != nullptr ? service->candidateTotalCount() : 0;
     *puCount = totalCount > 0
         ? static_cast<UINT>(totalCount)
-        : (std::min<UINT>)(10, static_cast<UINT>(items_.size()));
+        : static_cast<UINT>(items_.size());
     return S_OK;
 }
 
@@ -1014,7 +1029,7 @@ void CandidateWindow::recalculateSize() {
             const std::wstring note = (!item.candidateInfo.isReverseLookup || displayPreferences_.showReverseCode)
                                           ? item.candidateInfo.note
                                           : L"";
-            if (entryIndex == 0 && !note.empty() && !item.candidateInfo.entries.empty()) {
+            if (entryIndex == 0 && !note.empty()) {
                 hasNoteColumn = true;
                 noteContentWidth = (std::max)(
                     noteContentWidth,
@@ -1034,8 +1049,14 @@ void CandidateWindow::recalculateSize() {
         }
     }
     if (!preedit_.empty()) {
+        HFONT inputFont = createDerivedFont(font_, kInputBufferFontName);
+        HGDIOBJ previousFont = ::SelectObject(hdc, inputFont ? inputFont : font_);
         SIZE preeditSize = {};
         ::GetTextExtentPoint32W(hdc, preedit_.c_str(), static_cast<int>(preedit_.length()), &preeditSize);
+        ::SelectObject(hdc, previousFont);
+        if (inputFont) {
+            ::DeleteObject(inputFont);
+        }
         preeditWidth = static_cast<int>(preeditSize.cx) + scalePx(kPreeditTextWidthPadding);
         textWidth_ = (std::max)(textWidth_, static_cast<int>(preeditSize.cx));
         preeditHeight_ = static_cast<int>(preeditSize.cy);
@@ -1395,7 +1416,8 @@ void CandidateWindow::paintInputBuffer(HDC hdc, const RECT& panelRc) {
         panelRc.top + borderWidth_ + padY_,
         panelRc.right - borderWidth_ - padX_ - pageNavWidth_,
         panelRc.top + borderWidth_ + padY_ + preeditHeight_ + scalePx(kPreeditExtraHeight)};
-    ::SelectObject(hdc, font_);
+    HFONT inputFont = createDerivedFont(font_, kInputBufferFontName);
+    HGDIOBJ oldFont = ::SelectObject(hdc, inputFont ? inputFont : font_);
     ::SetBkMode(hdc, TRANSPARENT);
 
     const int length = static_cast<int>(preedit_.length());
@@ -1476,6 +1498,10 @@ void CandidateWindow::paintInputBuffer(HDC hdc, const RECT& panelRc) {
     ::LineTo(hdc, panelRc.right - borderWidth_ - padX_, dividerY);
     ::SelectObject(hdc, oldPen);
     ::DeleteObject(dividerPen);
+    ::SelectObject(hdc, oldFont);
+    if (inputFont) {
+        ::DeleteObject(inputFont);
+    }
 }
 
 void CandidateWindow::paintPageNavigation(HDC hdc, const RECT& panelRc) {
@@ -1487,6 +1513,27 @@ void CandidateWindow::paintPageNavigation(HDC hdc, const RECT& panelRc) {
     pageNavigationButtonRect(true, nextRc);
     ::OffsetRect(&prevRc, panelRc.left, panelRc.top);
     ::OffsetRect(&nextRc, panelRc.left, panelRc.top);
+
+    auto paintNavBackground = [&](int direction, const RECT& buttonRc, bool enabled) {
+        if (!enabled) {
+            return;
+        }
+        if (pressedPageNavDirection_ != direction && hoveredPageNavDirection_ != direction) {
+            return;
+        }
+        HBRUSH brush = ::CreateSolidBrush(kWindowBorder);
+        HBRUSH oldBrush = static_cast<HBRUSH>(::SelectObject(hdc, brush));
+        HPEN pen = ::CreatePen(PS_SOLID, 1, kWindowBorder);
+        HPEN oldPen = static_cast<HPEN>(::SelectObject(hdc, pen));
+        ::RoundRect(hdc, buttonRc.left, buttonRc.top, buttonRc.right, buttonRc.bottom,
+                    scalePx(kPageNavHoverRadius), scalePx(kPageNavHoverRadius));
+        ::SelectObject(hdc, oldPen);
+        ::SelectObject(hdc, oldBrush);
+        ::DeleteObject(pen);
+        ::DeleteObject(brush);
+    };
+    paintNavBackground(kPageNavPrevious, prevRc, hasPrev);
+    paintNavBackground(kPageNavNext, nextRc, hasNext);
 
     HFONT navFont = createPanelFont(hdc, L"Segoe UI Symbol", kPageNavGlyphPointSize);
     HGDIOBJ oldFont = ::SelectObject(hdc, navFont ? navFont : font_);
@@ -1606,7 +1653,7 @@ void CandidateWindow::paintCandidateRow(HDC hdc, int index, const RECT& rowRc) {
         const std::wstring note = (!item.candidateInfo.isReverseLookup || displayPreferences_.showReverseCode)
                                       ? item.candidateInfo.note
                                       : L"";
-        if (entryIndex == 0 && !note.empty() && !allEntries.empty() && noteColumnWidth_ > 0) {
+        if (entryIndex == 0 && !note.empty() && noteColumnWidth_ > 0) {
             ::DrawTextW(hdc, note.c_str(), static_cast<int>(note.length()), &noteRc,
                         DT_LEFT | DT_VCENTER | DT_SINGLELINE | DT_NOPREFIX | DT_END_ELLIPSIS);
         }
@@ -2029,8 +2076,10 @@ void CandidateWindow::onLButtonDown(WPARAM wp, LPARAM lp) {
     const int navDirection = hitTestPageNavigation(pt);
     if (navDirection != kPageNavNone) {
         pressedPageNavDirection_ = navDirection;
+        hoveredPageNavDirection_ = navDirection;
         pressedSel_ = -1;
         draggingWindow_ = false;
+        ::InvalidateRect(hwnd_, NULL, FALSE);
         ::SetCapture(hwnd_);
         return;
     }
@@ -2066,10 +2115,13 @@ void CandidateWindow::onLButtonUp(WPARAM wp, LPARAM lp) {
     const int navDirection = hitTestPageNavigation(pt);
     if (pressedPageNavDirection_ != kPageNavNone &&
         navDirection == pressedPageNavDirection_) {
-        if (auto* textService = static_cast<Moqi::TextService*>(textService_)) {
-            textService->changeCandidatePage(pressedPageNavDirection_ == kPageNavPrevious);
-        }
+        const int direction = pressedPageNavDirection_;
         pressedPageNavDirection_ = kPageNavNone;
+        hoveredPageNavDirection_ = navDirection;
+        ::InvalidateRect(hwnd_, NULL, FALSE);
+        if (auto* textService = static_cast<Moqi::TextService*>(textService_)) {
+            textService->changeCandidatePage(direction == kPageNavPrevious);
+        }
         pressedSel_ = -1;
         return;
     }
@@ -2083,6 +2135,7 @@ void CandidateWindow::onLButtonUp(WPARAM wp, LPARAM lp) {
         }
     }
     pressedSel_ = -1;
+    ::InvalidateRect(hwnd_, NULL, FALSE);
 }
 
 void CandidateWindow::onMouseMove(WPARAM wp, LPARAM lp) {
@@ -2102,11 +2155,18 @@ void CandidateWindow::onMouseMove(WPARAM wp, LPARAM lp) {
     }
 
     POINT pt = {GET_X_LPARAM(lp), GET_Y_LPARAM(lp)};
+    const int navDirection = hitTestPageNavigation(pt);
+    if (hoveredPageNavDirection_ != navDirection) {
+        hoveredPageNavDirection_ = navDirection;
+        ::InvalidateRect(hwnd_, NULL, FALSE);
+    }
     updateDictionaryRevealFromMovement(pt);
 }
 
 void CandidateWindow::onMouseLeave() {
     trackingMouse_ = false;
+    hoveredPageNavDirection_ = kPageNavNone;
+    pressedPageNavDirection_ = kPageNavNone;
     resetDictionaryReveal();
     recalculateSize();
     if (isVisible()) {

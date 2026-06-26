@@ -362,6 +362,7 @@ public:
 	// candidate window
 	void showCandidates(Ime::EditSession* session);
 	void updateCandidates(Ime::EditSession* session);
+	void updateCandidatesWithoutSession();
     void updateCandidatesWindow(Ime::EditSession* session);
 	void hideCandidates(bool preserveRecoveryState = false);
 	void resetTypeDuckDegradedState(Ime::EditSession* session = nullptr);

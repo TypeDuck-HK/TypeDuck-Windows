@@ -130,7 +130,9 @@ private:
 	void updateLanguageButtons(Json::Value& msg);
 	void updatePreservedKeys(Json::Value& msg);
 	void updateKeyboardStatus(Json::Value& msg);
+	bool updateCandidatePayload(Json::Value& msg, bool& hasVisibleCandidates);
     void updateCandidateList(Json::Value& msg, Ime::EditSession* session);
+	void updateCandidateListWithoutSession(Json::Value& msg);
     void updateUI(const Json::Value& data);
     void updateStatus(Json::Value& msg, Ime::EditSession* session = nullptr);
 

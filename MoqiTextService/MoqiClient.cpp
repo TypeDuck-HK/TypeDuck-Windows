@@ -1160,6 +1160,8 @@ void Client::updateStatus(Json::Value &msg, Ime::EditSession *session) {
       updateCommitString(msg, session, false);
       updateComposition(msg, session, endComposition);
     }
+  } else {
+    updateCandidateListWithoutSession(msg);
   }
 
   updateLanguageButtons(msg);
@@ -1172,17 +1174,11 @@ void Client::updateStatus(Json::Value &msg, Ime::EditSession *session) {
 
 }
 
-void Client::updateCandidateList(Json::Value &msg, Ime::EditSession *session) {
-  // handle candidate list
-  const auto &showCandidatesVal = msg["showCandidates"];
-  const bool hasExplicitShowCandidates = showCandidatesVal.isBool();
-  const bool explicitShowCandidates =
-      hasExplicitShowCandidates && showCandidatesVal.asBool();
-
+bool Client::updateCandidatePayload(Json::Value &msg, bool &hasVisibleCandidates) {
   const auto &candidateListVal = msg["candidateList"];
   const auto &candidateEntriesVal = msg["candidateEntries"];
   bool hasCandidatePayload = false;
-  bool hasVisibleCandidates = false;
+  hasVisibleCandidates = false;
 
   if (candidateEntriesVal.isArray()) {
     hasCandidatePayload = true;
@@ -1226,6 +1222,18 @@ void Client::updateCandidateList(Json::Value &msg, Ime::EditSession *session) {
     }
     hasVisibleCandidates = !candidates.empty();
   }
+  return hasCandidatePayload;
+}
+
+void Client::updateCandidateList(Json::Value &msg, Ime::EditSession *session) {
+  // handle candidate list
+  const auto &showCandidatesVal = msg["showCandidates"];
+  const bool hasExplicitShowCandidates = showCandidatesVal.isBool();
+  const bool explicitShowCandidates =
+      hasExplicitShowCandidates && showCandidatesVal.asBool();
+
+  bool hasVisibleCandidates = false;
+  const bool hasCandidatePayload = updateCandidatePayload(msg, hasVisibleCandidates);
 
   const bool hasCandidateRecoveryState =
       textService_->pendingCandidateRecovery() || textService_->showingCandidates() ||
@@ -1260,6 +1268,32 @@ void Client::updateCandidateList(Json::Value &msg, Ime::EditSession *session) {
       if (textService_->setCandidateCursor(candidateCursorVal.asInt())) {
         textService_->refreshCandidates();
       }
+    }
+  }
+}
+
+void Client::updateCandidateListWithoutSession(Json::Value &msg) {
+  const bool hasRenderableCandidatePayload =
+      (msg["candidateEntries"].isArray() && !msg["candidateEntries"].empty()) ||
+      (msg["candidateList"].isArray() && !msg["candidateList"].empty());
+  if (!hasRenderableCandidatePayload) {
+    return;
+  }
+
+  bool hasVisibleCandidates = false;
+  const bool hasCandidatePayload = updateCandidatePayload(msg, hasVisibleCandidates);
+  if (hasCandidatePayload) {
+    if (hasVisibleCandidates) {
+      textService_->updateCandidatesWithoutSession();
+    } else {
+      textService_->hideCandidates();
+    }
+  }
+
+  const auto &candidateCursorVal = msg["candidateCursor"];
+  if (candidateCursorVal.isInt() && textService_->hasCandidateWindow()) {
+    if (textService_->setCandidateCursor(candidateCursorVal.asInt())) {
+      textService_->refreshCandidates();
     }
   }
 }
