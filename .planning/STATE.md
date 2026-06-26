@@ -2,44 +2,44 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-current_phase: 5
-current_phase_name: Candidate, Dictionary, Settings, and About UI Parity
-status: executing
-stopped_at: Completed 05-13-PLAN.md
-last_updated: "2026-06-24T08:43:23.913Z"
-last_activity: 2026-06-24
-last_activity_desc: Completed Phase 5 Plan 13 automated evidence and package rebuild
+current_phase: 6
+current_phase_name: Privacy, Security, and Scaffold Cleanup
+status: ready_for_phase_6_planning
+stopped_at: Completed Phase 5 closeout
+last_updated: "2026-06-26T09:38:50Z"
+last_activity: 2026-06-26
+last_activity_desc: Closed Phase 5 by human verification and explicit screenshot-evidence divergence
 progress:
   total_phases: 7
-  completed_phases: 4
+  completed_phases: 5
   total_plans: 27
-  completed_plans: 24
-  percent: 89
+  completed_plans: 27
+  percent: 100
 ---
 
 # Project State
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-06-24)
+See: .planning/PROJECT.md (updated 2026-06-26)
 
 **Core value:** Hong Kong users can install TypeDuck under Chinese (Traditional, Hong Kong) and type Cantonese with the same trusted behavior, bilingual settings, candidate details, and dictionary-like lookup experience as TypeDuck Web alpha.
-**Current focus:** Phase 5: Candidate, Dictionary, Settings, and About UI Parity
+**Current focus:** Phase 6: Privacy, Security, and Scaffold Cleanup
 
 ## Current Position
 
-Phase: 5 of 7 (Candidate, Dictionary, Settings, and About UI Parity)
-Plan: 13 of 15 (05-14 next)
-Status: Phase 5 in progress; Plan 05-13 complete
-Last activity: 2026-06-24 — Completed Phase 5 Plan 13 automated evidence and package rebuild
+Phase: 6 of 7 (Privacy, Security, and Scaffold Cleanup)
+Plan: not planned yet
+Status: Phase 5 closed; Phase 6 ready for planning
+Last activity: 2026-06-26 — Closed Phase 5 with user human verification, retired screenshot fixtures, and updated UAT/verification records
 
-Progress: [█████████░] 89%
+Progress: [██████████] 100% of planned Phase 1-5 plans
 
 ## Performance Metrics
 
 **Velocity:**
 
-- Total plans completed: 13
+- Total plans completed: 27
 - Average duration: 20 min
 - Total execution time: 1.7 hours
 
@@ -54,7 +54,7 @@ Progress: [█████████░] 89%
 **Recent Trend:**
 
 - Last 5 plans: P01 5 min, P02 17 min, P03 10 min, P04 55 min, P05 13 min
-- Trend: Phase 4 typing MVP is accepted on live VM user evidence; Phase 5 native candidate/settings/About UI parity is next.
+- Trend: Phase 5 native candidate, dictionary, settings, About, tray, icon, and resource parity is accepted by iterative human verification and static/build/package guards; Phase 6 scaffold/privacy cleanup is next.
 
 *Updated after each plan completion*
 | Phase 01 P01 | 5 min | 2 tasks | 2 files |
@@ -81,6 +81,8 @@ Progress: [█████████░] 89%
 | Phase 05-candidate-dictionary-settings-and-about-ui-parity P11 | 45min | 2 tasks | 8 files |
 | Phase 05-candidate-dictionary-settings-and-about-ui-parity P12 | 15min | 2 tasks | 6 files |
 | Phase 05-candidate-dictionary-settings-and-about-ui-parity P13 | 10min | 2 tasks | 12 files |
+| Phase 05-candidate-dictionary-settings-and-about-ui-parity P14 | user-approved skip | 1 retired evidence path | docs |
+| Phase 05-candidate-dictionary-settings-and-about-ui-parity P15 | closeout | UAT/verification/roadmap | docs |
 
 ## Accumulated Context
 
@@ -98,7 +100,7 @@ Recent decisions affecting current work:
 - [Phase 01]: The 2026-06-23 Web alpha fixture is source-backed at TypeDuck-Web commit db21054 with dirty-worktree status recorded.
 - [Phase 01]: Baseline settings/candidate screenshots, multilingual Indonesian-main settings/candidate/dictionary screenshots, supplemental `housam` compound dictionary detail, and Cangjie reverse lookup screenshots were captured at 1280x720.
 - [Phase 01]: Web alpha dictionary detail reveal is movement-triggered: actual mouse movement over a candidate shows the panel, while a stationary pointer should not cause typing flicker.
-- [Phase 01]: Phase 5 and Phase 7 must refresh Web alpha fixtures if the alpha drifts before UI implementation or release verification.
+- [Phase 01]: Phase 5 used the 2026-06-23 Web alpha fixture as source-backed layout authority; Phase 7 may refresh Web alpha fixtures if release verification needs fresh visual evidence.
 - [Phase 02 Plan 01]: Lookup-filter evidence is recorded as static runtime inclusion: the TypeDuck-HK librime release `version-info.txt` names `rime-dictionary-lookup-filter` commit `3671814d4e4aeab8d616ceea3c7f6d88e96bba02`, tied to staged `rime.dll` SHA-256 evidence.
 - [Phase 02 Plan 01]: Generated TypeDuck runtime and cache trees stay ignored; reproducible scripts and manifest evidence are committed instead.
 - [Phase 02 Plan 02]: ENG-04 is proven through the existing moqi-ime framed protobuf process boundary, not direct in-process librime.
@@ -123,13 +125,13 @@ Recent decisions affecting current work:
 - [Phase 05 Plan 01]: `scripts/Test-TypeDuckAppearanceTheme.ps1` is the focused guard for theme schema, loader path order, and package-copy drift.
 - [Phase 05]: TypeDuck lookup-filter parsing lives in MoqiTextService/TypeDuckCandidateInfo.* and is invoked at the candidate-window boundary, not in launcher/protocol/backend transport. — Preserves D-39 and keeps raw backend comments at the renderer trust boundary.
 - [Phase 05]: Native display-language, Jyutping visibility, typeface, dictionary label, register, and part-of-speech maps mirror TypeDuck Web consts.ts. — Maintains LANG-03 and candidate/dictionary parity with the Web alpha source.
-- [Phase 05]: The current candidate window consumes structured fields but exact dictionary panel drawing and placement remain in later Phase 5 rendering plans. — Plan 05-02 owns the parser/view-model foundation; Plan 05-04 owns visual rendering.
+- [Phase 05]: Candidate window rendering now consumes structured TypeDuck fields and draws the native candidate/dictionary panel with accepted human-verified behavior.
 - [Phase 05]: 05-03: TypeDuck settings JSON is saved before generated Rime side effects so deploy failure does not erase the readable source of truth.
 - [Phase 05]: 05-03: Only Rime-affecting TypeDuck settings generate default/common custom YAML; interface-only settings remain JSON/native UI state.
 - [Phase 05]: 05-03: TypeDuck-HK librime uses the reviewed generated-YAML bridge because the Web levers/custom-settings API is not exposed in this fork.
 - [Phase 05]: 05-04: The TypeDuck candidate/dictionary popup remains native Win32/GDI and explicitly rejects Qt in the TSF popup path. — Implemented measured Win32/GDI drawing and a strict guard rejects Qt includes/libs in MoqiTextService.
 - [Phase 05]: 05-04: Dictionary detail reveal follows the Web alpha movement threshold instead of passive pointer-rest hover. — Uses actual pointer movement counts before showing dictionary detail, avoiding flicker while typing when the pointer is stationary.
-- [Phase 05]: 05-04: Preview screenshots remain iteration evidence only; Plan 05-06 owns exact VM host-app proof. — Added CandidateInfo-backed preview capture commands, but D-36 requires installed Windows host-app evidence later.
+- [Phase 05]: 05-04: Preview screenshots were iteration evidence only and are no longer an acceptance gate. User explicitly replaced Phase 5 screenshot tests with human verification on 2026-06-26.
 - [Phase ?]: [Phase 05]: 05-05: TypeDuckSettings is native Win32 and does not use Qt; standard controls and explicit layout anchors are sufficient for the settings/About executable.
 - [Phase ?]: [Phase 05]: 05-05: Native settings UI applies through MoqLauncher/TypeDuckPreferences.* and saves TypeDuckPreferences.json rather than creating a parallel settings store.
 - [Phase ?]: [Phase 05]: 05-05: About dialog attribution is the concise product copy: TypeDuck Windows IME 版本 Version, TypeDuck-HK librime fork v1.1.4, and TypeDuck-HK schema v2.0.0.
@@ -153,16 +155,16 @@ Recent decisions affecting current work:
 - [Phase 05-candidate-dictionary-settings-and-about-ui-parity]: 05-12: Uninstall display icon resolves from the compiled uninstaller executable instead of an app-root TypeDuck.ico file.
 - [Phase 05-candidate-dictionary-settings-and-about-ui-parity]: 05-12: Backend package build stamps server.exe from TypeDuck_Transparent.ico and removes legacy input_methods/rime/icon.ico.
 - [Phase 05-candidate-dictionary-settings-and-about-ui-parity]: 05-13: Keep installer/dist and installer/stage as ignored generated outputs; commit package SHA-256 and staged artifact hashes in provenance instead.
-- [Phase 05-candidate-dictionary-settings-and-about-ui-parity]: 05-13: VmEvidenceMissing expected-red mode keeps fixed settings/About and icon child guards green; only VM/manual slots remain unresolved.
-- [Phase 05-candidate-dictionary-settings-and-about-ui-parity]: 05-13: All required VM/manual evidence slots remain status=missing for Plan 05-14, even where older VM BMP files still exist on disk.
+- [Phase 05-candidate-dictionary-settings-and-about-ui-parity]: 05-14: The VM/manual screenshot manifest path was skipped by explicit user direction; `.planning/product/ui-fixtures` was removed and Phase 5 acceptance is human verification plus guards.
+- [Phase 05-candidate-dictionary-settings-and-about-ui-parity]: 05-15: Final Phase 5 closeout lives in `05-UAT.md`, `05-VERIFICATION.md`, `05-06-SUMMARY.md`, `05-14-SUMMARY.md`, and `05-15-SUMMARY.md`.
 
 ### Pending Todos
 
-None yet.
+Phase 6 planning is next.
 
 ### Blockers/Concerns
 
-- [Phase 5]: TypeDuck Web alpha can drift; UI/settings planning should refresh fixtures before implementation.
+- [Phase 6]: Visible scaffold leakage, bilingual copy audit, data/log path cleanup, diagnostics safety, pipe hardening, and legacy feature removal remain the next risk area.
 
 ## Deferred Items
 
@@ -174,9 +176,10 @@ None yet.
 | Typing MVP proof harness | `scripts\Test-TypeDuckTypingMvpProof.ps1 -Strict` still expects executable launcher fault-injection probes; Phase 4 is accepted on static guards plus live VM UAT, and deeper probes should move to release verification. | Deferred to compatibility/release verification | Phase 4 closeout |
 | Settings-backed schema customization | `common.custom.yaml` should be generated and updated by frontend settings instead of treated as static packaged data. | Deferred to settings UI | Phase 4 closeout |
 | Residual Moqi paths | Logs/config still use legacy paths such as `%LOCALAPPDATA%\MoqiIM`; product-owned path cleanup belongs with broader scaffold cleanup. | Deferred to scaffold cleanup | Phase 4 closeout |
+| Release-grade screenshot matrix | Phase 5 screenshot fixtures and screenshot tests were explicitly retired and replaced by human verification; fresh screenshots, if desired, belong to final compatibility/release evidence. | Deferred to release verification | Phase 5 closeout |
 
 ## Session Continuity
 
-Last session: 2026-06-24T08:43:23.904Z
-Stopped at: Completed 05-13-PLAN.md
+Last session: 2026-06-26T09:38:50Z
+Stopped at: Completed Phase 5 closeout
 Resume file: None

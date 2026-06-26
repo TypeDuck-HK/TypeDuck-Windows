@@ -29,20 +29,19 @@ Hong Kong users can install TypeDuck under Chinese (Traditional, Hong Kong) and 
 - ✓ Phase 2 proved Cantonese composition, candidate pages, Jyutping/comment data, commit output, and raw lookup-filter dictionary payload evidence through the internal moqi-ime adapter boundary.
 - ✓ Phase 4 proved the Windows typing MVP through bounded protocol/static guards, rebuilt installer packaging, and live VM user acceptance that TypeDuck typing works instead of ASCII fallback.
 - ✓ Phase 4 established that schema packaging belongs in the sibling `moqi-ime` runtime build; `moqi-im-windows` should consume packaged runtime assets rather than carry a schema submodule.
+- ✓ Phase 5 mapped lookup-filter raw payloads into native `CandidateInfo`/`CandidateEntry` rendering fields without moving dictionary parsing into launcher/backend transport.
+- ✓ Phase 5 delivered the native candidate and dictionary popup with accepted compact TypeDuck styling, multi-row compound candidates, Jyutping/comment/translation fields, POS/register/label pills, multilingual rows, dictionary scrolling, stable hover behavior, page navigation, and dynamic sizing.
+- ✓ Phase 5 delivered TypeDuck settings from installer and post-install entry points, with Display Languages first, grouped language controls, JSON preferences, Rime `default.custom.yaml`/`common.custom.yaml` side effects, fast redeploy, and bounded error surfacing.
+- ✓ Phase 5 delivered a separate native About executable with current accepted attribution text, product/credit resources, links, version/engine/schema attribution, Start Menu/tray access, and duplicate-instance prevention.
+- ✓ Phase 5 cleaned icon/resource packaging for the visible TypeDuck surfaces, including TypeDuck executable/input-picker/installer icon usage and frontend-owned About bitmap resources.
+- ✓ Phase 5 visual acceptance is recorded by user human verification. All Phase 5 screenshot tests and `.planning/product/ui-fixtures` artifacts were explicitly retired by user direction on 2026-06-26.
 
 ### Active
 
-- [ ] Map Phase 2 lookup-filter raw payload evidence into TypeDuck protocol and native candidate/dictionary UI fields.
 - [ ] Remove transitional product reliance on backend `ime.json`; TypeDuck-owned code/config must ultimately own profile identity, settings entry points, and runtime capability contracts.
 - [ ] Replace Moqi product identity with TypeDuck identity across binaries, resources, installer, registry/profile metadata, data/log paths, and release artifacts.
-- [ ] Install/register the IME under Chinese (Traditional, Hong Kong), not Chinese (Simplified).
-- [ ] Mirror TypeDuck Web alpha settings in a native Windows settings dialog, with the language picker as the first priority.
-- [ ] Show the settings dialog during installation.
 - [ ] Display all user-facing text bilingually in Traditional Hong Kong Chinese and English.
-- [ ] Render candidates with candidate text, Jyutping pronunciation, multilingual prompts, translations, and dictionary-like lookup details.
-- [ ] Match TypeDuck Web alpha visual tone for candidate UI and settings: light neutral surface, warm amber primary accents, compact rounded controls, readable HK Chinese/English font stack, and clear two-language labels.
 - [ ] Remove or hide unused scaffold features such as fcitx references, WebDAV/cloud clipboard, AI controls, and excessive customization not present in TypeDuck Web alpha.
-- [ ] Add an About dialog for TypeDuck Windows IME.
 
 ### Out of Scope
 
@@ -57,7 +56,8 @@ Hong Kong users can install TypeDuck under Chinese (Traditional, Hong Kong) and 
 - The local TypeDuck Web clone lives at `I:\GitHub\TypeDuck-Web`; the alpha dev server is `http://localhost:5173/TypeDuck-Web/aap2-alpha/`.
 - The TypeDuck Web alpha settings observed on 2026-06-23 include: Display Languages, Candidates Jyutping, Auto-completion, Auto-correction, Auto-composition, Input Memory, Reverse Lookup Settings, Show Full Input Code, Cangjie Version, Chinese Typeface, and No. of Candidates Per Page.
 - Display language options currently visible in the alpha are English, Hindi, Indonesian, Nepali, and Urdu, with a main-language marker and per-language enablement.
-- Candidate UI screenshots show the candidate list plus a larger dictionary panel containing Chinese terms, Jyutping, part-of-speech labels, English meanings, reading notes, and "More Languages" blocks when additional languages are enabled.
+- Phase 5 human verification accepted the native candidate list plus dictionary panel containing Chinese terms, Jyutping, part-of-speech/register/label pills, English meanings, reading notes, canonical/written/vernacular/other-data rows, and multilingual rows when available.
+- Phase 5 screenshot fixtures under `.planning/product/ui-fixtures` were removed. Historical Web alpha fixtures under `.planning/product/web-alpha-fixtures` remain source references, but Phase 5 acceptance no longer uses screenshot tests.
 - The current scaffold uses C++20, Win32/COM/TSF, libIME2, libuv, protobuf, JsonCpp, spdlog, Inno Setup, and PowerShell packaging.
 - Project `.ps1` scripts should be run with PowerShell 7+ (`pwsh`), not Windows PowerShell `powershell.exe`, to avoid character-encoding failures with Cantonese/Traditional Chinese literals, paths, and proof evidence.
 - Documentation/evidence timestamps must use invariant UTC formatting so locale-specific time separators do not leak into docs. Use `pwsh -NoProfile -Command "([DateTime]::UtcNow.ToString('s', [Globalization.CultureInfo]::InvariantCulture) + 'Z')"`.
@@ -80,7 +80,7 @@ Hong Kong users can install TypeDuck under Chinese (Traditional, Hong Kong) and 
 
 - **Phase 3 requires Windows VM evidence.** Installer, TSF registration, dual-bitness DLL deployment, language profile placement, uninstall/reinstall, and reboot-required registration behavior must be verified in a clean Windows 10/11 VM or equivalent disposable Windows test environment. Prefer Hyper-V checkpoints before install tests.
 - **Phase 4 is mostly code-testable, with a VM smoke once TSF typing is wired.** Protocol, frame bounds, payload parsing, engine adapter behavior, and timeout handling should have automated code tests; real TSF typing and host-process responsiveness still need a targeted Windows VM smoke test before the phase is accepted.
-- **Phase 5 requires Windows VM/host-app UI evidence.** Preview harnesses are useful for fast layout iteration, but candidate placement, focus behavior, settings launch, installer-first-run settings, high DPI, and representative host apps must be verified in a Windows VM or equivalent test machine.
+- **Phase 5 is closed by human verification.** Earlier VM screenshot-manifest tests were explicitly replaced by user human verification on 2026-06-26. Do not recreate `.planning/product/ui-fixtures` as a Phase 5 acceptance gate; future screenshots belong to Phase 7 release evidence if desired.
 - **Phase 6 is mixed.** Static audits and code tests can cover banned strings, removed handlers, parser bounds, and logging defaults, but installed-path privacy, launcher/runtime behavior, config-tool removal, pipe behavior, and absence of legacy feature surfaces should receive targeted Windows VM smoke evidence.
 - **Phase 7 formalizes the full matrix.** It should gather the final clean install, upgrade/reinstall, uninstall, reboot, host app, DPI, bitness, protocol recovery, and release artifact evidence.
 
@@ -101,6 +101,7 @@ Hong Kong users can install TypeDuck under Chinese (Traditional, Hong Kong) and 
 | Use disposable Windows VM evidence for Windows-integrated phases | TSF registration, system DLL registration, host-app candidate placement, and installed launcher behavior cannot be proven by code-only tests. | Accepted before Phase 3 planning |
 | Close Phase 4 on live VM UAT plus static guards | The user installed the rebuilt installer in the VM and confirmed TypeDuck typing and schema replacement worked; deeper launcher fault-injection probes are valuable but not blocking for this MVP phase. | Accepted in Phase 4 |
 | Keep TypeDuck schemas in the sibling runtime build | Schema filtering, prebuild with `rime_deployer.exe --build`, and packaged `build` artifacts belong to `moqi-ime`; this repo should not add a schema submodule. | Accepted in Phase 4 |
+| Close Phase 5 on human verification plus static guards | The user iteratively verified candidate/dictionary/settings/About behavior in the VM and explicitly retired screenshot tests and `.planning/product/ui-fixtures`; release-grade screenshot matrices move to Phase 7. | Accepted in Phase 5 |
 
 ## Evolution
 
@@ -118,4 +119,4 @@ After each milestone:
 4. Confirm candidate/dictionary display against TypeDuck Web alpha.
 
 ---
-*Last updated: 2026-06-24 after Phase 4 verification*
+*Last updated: 2026-06-26 after Phase 5 closeout*

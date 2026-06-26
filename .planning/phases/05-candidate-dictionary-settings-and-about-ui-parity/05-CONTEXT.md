@@ -73,7 +73,7 @@ L"This input method is developed by the Department of Linguistics and Modern Lan
 - **D-34:** Candidate-row definitions should obey the enabled display languages and main display language from settings, matching the Web alpha behavior rather than hardcoding English-only display.
 
 ### Verification and Evidence
-- **D-36:** Preview harness screenshots are useful for layout iteration, but acceptance requires VM or equivalent Windows evidence for candidate placement, focus behavior, settings entry points, installer-first-run settings, high DPI, multi-monitor, UI-less/imperfect composition rectangles, and representative host apps.
+- **D-36:** Superseded on 2026-06-26 by explicit user direction: Phase 5 screenshot tests, screenshot manifests, and `.planning/product/ui-fixtures` were retired and replaced by iterative user human verification plus focused static/build/package guards. Preview harness screenshots remain useful for debugging only, not Phase 5 acceptance. Fresh release screenshots or broader host-app/DPI evidence belong to Phase 7 if desired.
 - **D-37:** Add focused automated tests where possible: theme JSON schema/loader, duplicate theme-file package behavior, settings persistence, lookup payload parser, candidate/dictionary view-model mapping, About resource/text/link presence, icon assignment, and banned Moqi theme/string leakage in Phase 5 surfaces.
 
 ### Candidate Data Parsing Style
@@ -104,7 +104,7 @@ The planner may choose the exact implementation split, drawing API, internal C++
 - `.planning/PROJECT.md` - Product truth: TypeDuck Web alpha is authoritative; Moqi is scaffold only.
 - `.planning/REQUIREMENTS.md` - Phase 5 requirement mapping for INST-06, CAND-01 through CAND-07, SET-01 through SET-10, and LANG-03.
 - `.planning/ROADMAP.md` - Phase 5 goal, success criteria, dependencies, and VM verification expectations.
-- `.planning/STATE.md` - Current project position, Phase 5 focus, and deferred settings/schema customization work.
+- `.planning/STATE.md` - Current project position, Phase 5 closeout, and Phase 6 handoff.
 - `.planning/phases/01-identity-and-web-parity-contract/01-VERIFICATION.md` - Human verification that exact UI layout should be followed from TypeDuck Web source code, with screenshots serving as visual references.
 - `.planning/phases/02-engine-runtime-contract-spike/02-CONTEXT.md` - Raw lookup-filter CSV/comment contract handoff.
 - `.planning/phases/03-zh-hk-tsf-registration-and-installer-skeleton/03-CONTEXT.md` - Installer-first-run settings boundary and TypeDuck installed identity.
@@ -144,7 +144,7 @@ The planner may choose the exact implementation split, drawing API, internal C++
 - `MoqiTextService/MoqiTextService.h` - Product UI state fields for candidate list/page/preedit/settings integration.
 - `MoqiTextService/MoqiClient.cpp` - Backend response handling, `CandidateEntry` conversion, `CustomizeUi` application, and settings protocol bridge.
 - `proto/moqi.proto` - Current TypeDuck protocol fields for candidate entries, candidate page, settings snapshot/update, capabilities, health, and error data.
-- `Preview/main.cpp` - Candidate preview harness useful for layout screenshots but not sufficient for final TSF placement/focus proof.
+- `Preview/main.cpp` - Candidate preview harness useful for local layout debugging; screenshot output is no longer a Phase 5 acceptance gate.
 
 ### Backend Runtime and Theme Code
 - `D:\VSProjects\moqi-ime\input_methods\rime\appearance_themes.json` - Current embedded builtin theme source file to replace with TypeDuck light/dark semantic theme contract.
@@ -201,7 +201,7 @@ The planner may choose the exact implementation split, drawing API, internal C++
 - About UI connects resource packaging, exact bilingual content, external link opening, executable/icon resources, and product attribution.
 - Icon assignment connects CMake/resources for `TypeDuckLauncher.exe`, `TypeDuckSetupHelper.exe`, backend `server.exe`, TSF profile/input-picker icon metadata, and installer/uninstaller branding.
 - Theme JSON changes connect the sibling backend source, backend loader search order, installer staging, and frontend `CustomizeUi`/native rendering tokens.
-- Verification must connect preview screenshots, automated parser/settings/theme tests, and VM evidence from real TSF host apps.
+- Verification now connects user human verification with automated parser/settings/theme/window/package guards. Screenshot fixtures under `.planning/product/ui-fixtures` are retired for Phase 5.
 
 </code_context>
 

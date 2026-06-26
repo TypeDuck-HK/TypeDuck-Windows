@@ -49,6 +49,8 @@
 
 ### Candidate and Dictionary UI
 
+Phase 5 closeout note: CAND-01 through CAND-07 are accepted by iterative user human verification in the Windows VM plus focused static/build/package guards. The earlier screenshot-manifest tests were explicitly retired by user direction on 2026-06-26, and `.planning/product/ui-fixtures` was removed. Formal release screenshots or broader host-app/DPI matrices, if desired, belong to Phase 7.
+
 - [x] **CAND-01**: User sees a native candidate panel styled to match TypeDuck Web alpha visual tone: light neutral surface, warm amber highlight/accent, compact rows, readable HK Chinese/English font stack, and restrained rounded controls.
 - [x] **CAND-02**: User sees each candidate's Chinese text and relevant input code/Jyutping/comment/translation fields according to settings and available engine data.
 - [x] **CAND-03**: User can inspect a selected or highlighted candidate's dictionary-like detail panel with headword, Jyutping, part-of-speech labels, English meaning, reading notes, and More Languages rows when available.
@@ -58,6 +60,8 @@
 - [x] **CAND-07**: Candidate UI remains coherent under high DPI, multi-monitor placement, UI-less TSF hosts, and host applications with imperfect composition rectangles.
 
 ### Settings and About
+
+Phase 5 closeout note: SET-01 through SET-10 are accepted by user human verification and guard coverage. Settings apply through TypeDuck JSON preferences plus generated Rime custom settings/redeploy side effects; About is a separate first-party executable with the current accepted attribution text and product links.
 
 - [x] **SET-01**: User can open a TypeDuck settings dialog from the installer flow.
 - [x] **SET-02**: User can open the same TypeDuck settings dialog after installation from a TypeDuck configuration entry point.
@@ -85,6 +89,8 @@
 - [ ] **SEC-05**: Installer avoids broad legacy process kills and uses TypeDuck-specific process names and cleanup operations.
 
 ### Verification and Release Readiness
+
+Phase 5 evidence note: screenshot tests and `.planning/product/ui-fixtures` were explicitly replaced by human verification. This does not complete the release-readiness requirements below; Phase 7 still owns final compatibility, install/upgrade/uninstall, host-app, DPI, protocol recovery, screenshot, and release artifact evidence.
 
 - [x] **VER-01**: Developer has a dated TypeDuck Web alpha parity fixture set covering settings defaults, labels, candidate list, dictionary panel, and visual references.
 - [ ] **VER-02**: Developer can run automated or scripted checks that fail when visible Moqi, fcitx, WebDAV/cloud clipboard, AI, or Simplified-only strings remain in user-facing resources.
@@ -205,4 +211,4 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 ---
 *Requirements defined: 2026-06-23*
-*Last updated: 2026-06-23 after roadmap creation*
+*Last updated: 2026-06-26 after Phase 5 closeout*

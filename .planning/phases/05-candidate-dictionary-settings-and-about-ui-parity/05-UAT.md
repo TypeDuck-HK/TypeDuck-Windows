@@ -9,336 +9,180 @@ source:
   - 05-05-SUMMARY.md
   - 05-07-SUMMARY.md
   - 05-08-SUMMARY.md
-  - partial Phase 05 VM evidence recorded in bcea3db
+  - 05-09-SUMMARY.md
+  - 05-10-SUMMARY.md
+  - 05-11-SUMMARY.md
+  - 05-12-SUMMARY.md
+  - 05-13-SUMMARY.md
+  - 05-06-SUMMARY.md
+  - 05-14-SUMMARY.md
+  - 05-15-SUMMARY.md
 started: 2026-06-24T06:50:53.0216361Z
-updated: 2026-06-24T06:50:53.0216361Z
+updated: 2026-06-26T17:30:00+08:00
+verification_basis: user-human-verification
 ---
 
 ## Current Test
 
-[testing complete - user rejection recorded; diagnosis and retry pending]
+[testing complete]
+
+## Important Verification Note
+
+All Phase 5 screenshot-based tests and screenshot fixture artifacts were explicitly retired by user direction on 2026-06-26. The entire `.planning/product/ui-fixtures` tree was removed. Phase 5 visual acceptance is now recorded as human verification from iterative VM/manual testing plus source-backed static guards. Screenshots remain useful for future exploratory debugging only, but they are no longer the acceptance mechanism for Phase 5.
 
 ## Tests
 
-### 1. Candidate Panel Visual Fidelity
-expected: Candidate panel screenshots match TypeDuck Web alpha spacing, padding, margins, sizing units, and preview/VM behavior.
-result: issue
-reported: "Candidate-* screenshots look eye-balled or affected by DPI/unit mismatch, and the VM screenshots differ from the candidate preview screenshots."
-severity: cosmetic
+### 1. Candidate Panel Visual Tone and Sizing
+expected: Native candidate panel uses TypeDuck visual tone, warm highlight, compact layout, correct fonts, measured text widths, and dynamic sizing without clipped long candidates or over-wide short candidate windows.
+result: pass
+closure: "Fixed through the candidate/dictionary iteration: panel colors landed, widths are content-measured without imposed max width, `measureWithFont` gained safety slack, long pronunciation/body strings stop clipping, Chinese/English fonts no longer fall back to monospace, input-buffer left edge aligns with selected candidate background, and zero-width active input-buffer segments hide their background."
+regression_notes:
+  - Do not return to fixed-width candidate panels or char-count text estimates.
+  - Do not cap candidate rows to three rows.
+  - Do not let the input buffer clip or render a one-pixel background for empty selected text.
 
 ### 2. Candidate Dictionary Row Structure
-expected: Candidate entries support TypeDuck Web alpha multi-row dictionary detail, including one candidate spanning multiple readings/translations or component rows.
-result: issue
-reported: "The panel appears to assume one row per candidate. For `hou`, 好 should span hou2 and hou3 rows; for `housam`, 好心你 can span 3 rows including component rows 好心 and 你."
-severity: major
+expected: Candidate entries support multi-row dictionary details, including one candidate spanning readings/translations or component rows such as `hou` and `housam`.
+result: pass
+closure: "Fixed by parsing TypeDuck lookup payloads into structured `CandidateEntry` rows, rendering multi-line candidate rows, preserving component rows such as 好心 and 你, removing the accidental fallback translation for rows without a translation, and splitting each pipe-delimited `otherData` field into one displayed line."
+regression_notes:
+  - `hou` must allow 好 to show hou2 and hou3 information.
+  - `housam`/好心你 must support component rows and dictionary panel details.
+  - `CandidateEntry::otherData` names align to the first value line.
 
-### 3. Candidate Input Buffer and Baseline Alignment
-expected: Input buffer background/text colors match TypeDuck Web alpha, text is not clipped, and candidate numbering/comment text baselines align with the main candidate text.
-result: issue
-reported: "Input buffer background and text colors are incorrect and clipped in reverse-lookup-cangjie-onf.bmp. The numbering label and translation/comment text should align to the candidate main-text baseline."
-severity: cosmetic
+### 3. Candidate Data Source and Runtime Parity
+expected: Native candidates and dictionary comments come from the intended TypeDuck runtime and lookup filter, not stale Rime/Moqi paths or intercepted candidate substitutions.
+result: pass
+closure: "Diagnosed stale runtime evidence, upgraded the bundled runtime to TypeDuck-HK librime fork v1.1.4 x64, removed the abandoned Go-side lookup workaround, preserved candidate transport pass-through, and relied on the C++ lookup filter for sentence-component dictionary data."
+regression_notes:
+  - Do not reintroduce Go-side dictionary lookup rewrites.
+  - Keep lookup parsing at the native renderer boundary.
+  - Runtime bitness must match the backend host process; x86 DLLs fail in the current x64 backend path.
 
-### 4. Part-of-Speech and Multilingual Rendering
-expected: Parts of speech render as dimmed rounded bordered pills, not literal bracketed strings, and multilingual candidate detail is covered by evidence.
-result: issue
-reported: "Parts of speech should be in dimmed rounded bordered boxes instead of literal `[...]` strings. Multilingual is not tested."
-severity: major
+### 4. Candidate Baselines, Numbering, and Icons
+expected: Candidate numbering aligns with the first-row candidate baseline, comments/definitions align cleanly, and dictionary info icons are centered and remain clickable/hoverable without gaps.
+result: pass
+closure: "Adjusted row metrics so candidate height follows the tallest visible row, not the tallest multi-row candidate block. Number labels were shrunk and first-row-baseline aligned; info icons were centered; hit boxes were expanded so hover does not drop in the gaps around icons or highlight backgrounds."
+regression_notes:
+  - The visual highlight and dictionary hover area must be larger than the painted content where needed.
+  - Do not allow a one-pixel gap to clear hover and close the dictionary panel.
 
-### 5. Candidate Data Source Parity
-expected: Native candidates are identical to TypeDuck Web alpha for the same input, using the intended TypeDuck backend/runtime and dictionary lookup data.
-result: issue
-reported: "Candidates shown are not identical to TypeDuck-Web; possible old rime.dll or Moqi middle-end candidate interception needs investigation."
-severity: major
+### 5. Part-of-Speech and Multilingual Rendering
+expected: POS values render as dimmed rounded bordered pills, multilingual rows are supported, and labels/values align without bracket-string fallbacks.
+result: pass
+closure: "Replaced literal bracketed POS text with rounded GDI pills, aligned pill baselines near the related text baseline, split multi-language/other-data pipe values into lines, and guarded multilingual candidate data paths."
+regression_notes:
+  - POS must remain structured pills, not `[adjective]` text.
+  - Multilingual rows must remain data-backed, not screenshot-only.
 
-### 6. Settings Dialog Visual Hierarchy and Layout
-expected: Settings dialog controls blend with the dialog background, section headings are slightly larger and bold, labels stay inside their groups, and all text is readable without clipping.
-result: issue
-reported: "Control backgrounds are grey while the whole dialog is not; section headings need larger bold styling; some text is clipped; the 主要語言 label goes outside its rectangle and does not point to radio buttons correctly."
-severity: cosmetic
+### 6. Dictionary Panel Layout and Scrolling
+expected: Dictionary panel dynamically sizes to content, avoids unnecessary minimum width, handles long content without clipping, and supports scrolling for tall content without repaint artifacts.
+result: pass
+closure: "Adjusted dictionary panel width measurement to consider headword, pronunciation, pronunciation type, body text, other-data, and other-language tables; removed temporary max-width caps; reduced side padding; kept non-scrolling minimum height at 150; set scrolling viewport height to `max(320, left candidate panel height)` when needed; widened the scrollbar by one pixel; added mouse-wheel scrolling; removed black/white repaint artifacts; and positioned the dictionary panel bottom at least at the hovered candidate bottom while preserving current height."
+regression_notes:
+  - Do not fallback to another candidate's dictionary info when the highlighted candidate has none.
+  - The dictionary panel must disappear rather than show a black rectangle when moving to a candidate without dictionary data.
+  - Gap between candidate and dictionary panels is zero because Win32 hit testing cannot cover outside the candidate window reliably.
 
-### 7. Settings Dialog Controls and Copy
-expected: Page-size slider shows tick labels 4 through 10, user-facing copy avoids implementation details, and unsupported-state text is removed unless a real user-facing unsupported case exists.
-result: issue
-reported: "The slider should show 4 5 6 7 8 9 10 under each tick instead of current value; remove the TypeDuckPreferences.json technical label; clarify/remove unsupported copy because the product should not expose unsupported cases."
-severity: major
+### 7. Hover, Highlight, and Pointer Stability
+expected: Mouse hover updates highlight only after real movement, never because a static pointer happens to sit over a candidate while typing.
+result: pass
+closure: "Reset hover index to `-1` on candidate-list refresh, ignored static pointer presence until movement crossed the threshold, preserved engine-selected highlight while typing, and made debug mode optionally keep dictionary details visible for capture."
+regression_notes:
+  - Do not recompute hover solely from cursor position during candidate refresh.
+  - Keep the movement threshold behavior; it prevents flicker during typing.
+  - Mouse hover still overrides engine selection visually after actual movement.
 
-### 8. About Surface
-expected: About is accessible and visibly captured, or is moved to a separate executable with the Settings Panel button removed.
-result: issue
-reported: "The About button does not work at all; vm-about-dialog.bmp is the wrong screenshot. Prefer a separate About executable and remove the Settings Panel About button."
-severity: major
+### 8. Page Navigation
+expected: Page navigation buttons reflect enabled/disabled state, hover with a rounded background, are vertically centered, and click through to refresh the displayed candidate page.
+result: pass
+closure: "Fixed stale frontend refresh after backend page updates, reverted the PageUp/PageDown fallback, adjusted nav glyph size/positioning, and added rounded hover background behavior."
+regression_notes:
+  - Page buttons must call the backend command path and refresh frontend state.
+  - Do not rely on keyboard fallback for mouse page navigation.
 
-### 9. Icon Packaging and Executable Branding
-expected: Installation does not copy standalone icon files into the product directory, removes legacy rime icon.ico, and stamps TypeDuck icons into TypeDuckLauncher.exe and bundled server.exe.
-result: issue
-reported: "Icon files should not be copied into the installation directory; moqi-ime/input_methods/rime/icon.ico should be removed; TypeDuckLauncher.exe and moqi-ime/server.exe still use stale Moqi icons."
-severity: major
+### 9. Settings Dialog Layout and Copy
+expected: Settings dialog is white, uses distinct radio groups, has Display Languages first, correct page-size tick labels, no technical persistence copy, no unsupported-state placeholder copy, and no clipped headings/buttons.
+result: pass
+closure: "Made controls/background consistently white, grouped radio sets correctly, swapped display-language radio/checkbox positions, widened Confirm/Cancel and Sung labels, fixed fieldset and heading clipping, padded page-size tick labels, kept tick labels 4-10 in UI defaults, and removed technical `TypeDuckPreferences.json`, apply-status, and unsupported-state labels."
+regression_notes:
+  - Win32 radio groups must start with `WS_GROUP`; all radios cannot share one set.
+  - UI defaults remain 4-10, while candidate rendering must not cap externally customized schema page sizes.
+  - Closing by X follows the Confirm/OK path.
 
-### 10. Evidence Screenshot Hygiene
-expected: Evidence screenshots and manifest slots only reference accurate, non-cropped, current proof images.
-result: issue
-reported: "Remove cropped settings-two-column-layout.bmp because vm-settings-apply-persistence.bmp replaces it, and remove the incorrect vm-about-dialog.bmp screenshot."
-severity: major
+### 10. Settings Apply and Rime Customization
+expected: Settings save locally, apply through the launcher, write the correct Rime customization levers, and trigger fast deploy/reload behavior without noisy success notifications.
+result: pass
+closure: "Routed Settings confirmation through launcher IPC, wrote `default.custom.yaml` and `common.custom.yaml` via Rime customization/file fallback where needed, added fast incremental reload matching legacy TypeDuck behavior, suppressed normal apply-complete notifications, retained error notifications, and separated manual full redeploy from settings application."
+regression_notes:
+  - `showRomanization` must not suppress `candidateInfo.note`; TypeDuck Web logic is `!index && (!info.isReverseLookup || prefs.showReverseCode) && info.note`.
+  - `isHeiTypeface` must not affect the input buffer, which remains Hei.
+  - Manual redeploy must directly call the deploy path and keep start/success/error notification semantics.
 
-### 11. Phase 05 Evidence Completion
-expected: Plan 05-06 has a real completion summary and the aggregate Phase 5 evidence validator passes without missing VM/manual evidence slots.
-result: issue
-reported: "Verifier found 05-06-SUMMARY.md is still absent and the aggregate evidence plan remains unexecuted for required VM/manual evidence."
-severity: blocker
+### 11. Installer and Post-Install Settings Entry Points
+expected: Installer-first-run and post-install entry points launch the first-party settings dialog and seed defaults without backend-declared config tool metadata.
+result: pass
+closure: "Staged `TypeDuckSettings.exe`, launched it during setup/post-install, preserved `/apply-defaults` for default preference seeding, and rejected generic backend `configTool` launch paths."
+regression_notes:
+  - Settings entry point must remain fixed and first-party.
+  - Default preferences are seeded during installation if missing.
 
-### 12. Required VM Evidence Coverage
-expected: VM evidence covers visible installer-first-run settings, restart persistence, browser host-app candidates, movement reveal, high DPI, multi-monitor or extended desktop placement, UI-less TSF host behavior, imperfect composition-rectangle fallback, About replacement, and input picker/executable icons.
-result: issue
-reported: "Verifier found several required VM evidence gaps were only in the manifest/manual notes and not structured UAT gaps."
-severity: blocker
+### 12. About Surface
+expected: About is a separate executable with one visible instance, product banner/logos/text/links/version/attribution, and tray/menu/start access; Settings no longer owns a broken About button.
+result: pass
+closure: "Moved About to `TypeDuckAbout.exe`, removed Settings-panel About coupling, redesigned the About surface with larger text, product/credit bitmaps, SCOLAR/LANGUAGE FUND acknowledgement wording from current attribution copy, concise runtime/schema attribution, four links, separate Start Menu shortcuts, tray menu access under settings, and duplicate-instance foregrounding."
+regression_notes:
+  - Do not re-add the broken Settings-panel About button.
+  - About must remain a separate executable and single-instance.
+  - LearnDuck link label is `LearnDuck 粵拼打字入門 Introduction to Jyutping Typing`.
 
-### 13. Guard Alignment With Rejected UAT
-expected: Automated Phase 5 guards encode the accepted product contract, not rejected behavior.
-result: issue
-reported: "Verifier found existing guards still pass or expect rejected behavior, including TypeDuckPreferences.json technical copy, unsupported-state copy, raw staged .ico files, and removed/cropped screenshot slots."
-severity: blocker
+### 13. Icon and Resource Packaging
+expected: TypeDuck icons are stamped into executables/installer/TSF profile surfaces, legacy Moqi icons are removed, and About BMPs are frontend-owned resources.
+result: pass
+closure: "Stamped TypeDuck icons into launcher/settings/About/setup-helper/backend server, restored the system IME menu profile icon using packaged `TypeDuck_Small.ico` with DLL fallback, removed legacy raw app-root TypeDuck icon leakage, removed legacy Rime `icon.ico`, removed backend `mo.ico`, `mo.png`, `moqi.ico`, and `moqi.png`, committed the remaining TypeDuck `.ico` files in the backend, and moved About/Installer BMP files into `TypeDuckSettings/resources` staged under `{app}/resources`."
+regression_notes:
+  - The installed app root must not contain raw standalone product icon files.
+  - Backend `icons` should contain TypeDuck `.ico` assets but not Moqi image assets or About BMP resources.
+  - About/Installer BMPs are frontend resources.
 
-### 14. Candidate Rendering Test Depth
-expected: Candidate rendering tests validate `hou`, `housam`, POS pills, multilingual rows, baselines, input buffer clipping, and native/Web-alpha visual parity.
-result: issue
-reported: "Verifier found candidate window tests are mostly regex anchors and do not catch the rejected visual/data behavior."
-severity: major
+### 14. Launcher Tray and Duplicate Windows
+expected: Tray right-click exposes settings and About entries, and repeated Settings/About launches foreground the existing window instead of opening duplicates.
+result: pass
+closure: "Added `關於 / About TypeDuck...` under `輸入法設定 IME Settings` in the launcher tray menu, wired it to `TypeDuckAbout.exe`, and added mutex/foreground handling for Settings and About."
+regression_notes:
+  - Tray menu wording must remain bilingual.
+  - Duplicate interactive Settings/About windows are rejected and existing windows are foregrounded.
 
-### 15. Runtime Source Provenance
-expected: Retry evidence records exact backend/runtime and TypeDuck Web fixture provenance and does not silently rely on unrecorded dirty external state.
-result: issue
-reported: "Verifier found D:\\VSProjects\\moqi-ime and I:\\GitHub\\TypeDuck-Web are dirty enough to invalidate candidate/icon/runtime evidence if provenance is not recorded."
-severity: major
+### 15. Evidence Model and Screenshot Fixture Retirement
+expected: Phase 5 verification no longer depends on stale screenshot manifests; all screenshot tests are explicitly replaced by human verification.
+result: skipped
+reason: "User explicitly directed that all screenshot tests are replaced by human verification and requested removal of `.planning/product/ui-fixtures`."
+closure: "Removed `.planning/product/ui-fixtures` entirely and recorded this UAT/verification divergence. Plans 05-06, 05-14, and 05-15 are closed as explicit user-approved divergence from the earlier screenshot-manifest validator path."
+regression_notes:
+  - Do not recreate `.planning/product/ui-fixtures` as Phase 5 acceptance evidence.
+  - Future release verification may collect screenshots again, but Phase 5 acceptance is human-verified.
+
+### 16. Automated Guard Coverage
+expected: Static/build/package guards prevent the fixed Phase 5 regressions from silently returning.
+result: pass
+closure: "Updated and ran focused guards for settings/About UI, icon packaging, TSF identity, launcher protocol, candidate data, candidate window rendering, settings persistence, appearance theme, and package/resource staging during the Phase 5 iterations."
+regression_notes:
+  - Keep `scripts/Test-TypeDuckSettingsAboutUi.ps1` and `scripts/Test-TypeDuckIconPackaging.ps1` aligned with the final product contract.
+  - Screenshot-manifest aggregate validation is retired for Phase 5 closeout.
 
 ## Summary
 
-total: 15
-passed: 0
-issues: 15
+total: 16
+passed: 15
+issues: 0
 pending: 0
-skipped: 0
+skipped: 1
 blocked: 0
+
+## Closure Record
+
+Original UAT gaps 1-14 were fixed through Phase 5 implementation and iteration. Original evidence gaps 11-12 and the screenshot-manifest portions of gaps 10, 13, and 15 were explicitly resolved by user-approved divergence: screenshot tests and `.planning/product/ui-fixtures` are retired and replaced by human verification.
 
 ## Gaps
 
-- truth: "Candidate panel screenshots match TypeDuck Web alpha spacing, padding, margins, sizing units, and preview/VM behavior."
-  status: failed
-  reason: "User reported candidate-* screenshots look eye-balled or affected by DPI/unit mismatch, and VM screenshots differ from candidate preview screenshots."
-  severity: cosmetic
-  test: 1
-  root_cause: ""
-  artifacts:
-    - path: ".planning/product/ui-fixtures/phase-05/screenshots"
-      issue: "Candidate preview and VM screenshots need visual comparison against TypeDuck Web alpha."
-  missing:
-    - "Calibrated native candidate panel layout against TypeDuck Web fixtures and VM captures."
-  debug_session: ""
-
-- truth: "Candidate entries support TypeDuck Web alpha multi-row dictionary detail, including one candidate spanning multiple readings/translations or component rows."
-  status: failed
-  reason: "User reported apparent one-row-per-candidate rendering; `hou` should show 好 across hou2 and hou3, while `housam` should show 好心你 with component rows 好心 and 你."
-  severity: major
-  test: 2
-  root_cause: ""
-  artifacts:
-    - path: ".planning/product/web-alpha-fixtures/2026-06-23/screenshots/dictionary-detail-housam-second-candidate-multilingual-indonesian-main-desktop-1280x720.png"
-      issue: "Reference fixture demonstrates multi-row/component dictionary details."
-  missing:
-    - "Native data model and renderer support for multi-row candidate dictionary details."
-  debug_session: ""
-
-- truth: "Input buffer background/text colors match TypeDuck Web alpha, text is not clipped, and candidate numbering/comment text baselines align with the main candidate text."
-  status: failed
-  reason: "User reported incorrect/clipped input buffer colors and baseline misalignment between numbering, translation/comment text, and main candidate text."
-  severity: cosmetic
-  test: 3
-  root_cause: ""
-  artifacts:
-    - path: ".planning/product/ui-fixtures/phase-05/screenshots/reverse-lookup-cangjie-onf.bmp"
-      issue: "Input buffer color and clipping regression evidence."
-  missing:
-    - "Native renderer text metrics and baseline alignment matching TypeDuck Web."
-  debug_session: ""
-
-- truth: "Parts of speech render as dimmed rounded bordered pills, not literal bracketed strings, and multilingual candidate detail is covered by evidence."
-  status: failed
-  reason: "User reported literal `[...]` part-of-speech text and no multilingual testing."
-  severity: major
-  test: 4
-  root_cause: ""
-  artifacts:
-    - path: ".planning/product/web-alpha-fixtures/2026-06-23/screenshots"
-      issue: "Need multilingual and part-of-speech visual fixtures in native evidence."
-  missing:
-    - "Part-of-speech pill renderer and multilingual candidate evidence."
-  debug_session: ""
-
-- truth: "Native candidates are identical to TypeDuck Web alpha for the same input, using the intended TypeDuck backend/runtime and dictionary lookup data."
-  status: failed
-  reason: "User reported native candidates are not identical to TypeDuck-Web and suspects old rime.dll or Moqi middle-end interception."
-  severity: major
-  test: 5
-  root_cause: ""
-  artifacts:
-    - path: "MoqLauncher"
-      issue: "Launcher/backend candidate path may still transform or source candidates incorrectly."
-    - path: "moqi-ime"
-      issue: "Bundled runtime may include stale Rime or legacy data."
-  missing:
-    - "End-to-end parity proof for native candidates versus TypeDuck Web alpha."
-  debug_session: ""
-
-- truth: "Settings dialog controls blend with the dialog background, section headings are slightly larger and bold, labels stay inside their groups, and all text is readable without clipping."
-  status: failed
-  reason: "User reported grey controls on non-grey background, insufficient section heading emphasis, clipped text, and 主要語言 label escaping/mispointing."
-  severity: cosmetic
-  test: 6
-  root_cause: ""
-  artifacts:
-    - path: ".planning/product/ui-fixtures/phase-05/screenshots/vm-settings-apply-persistence.bmp"
-      issue: "Current replacement evidence for settings layout."
-  missing:
-    - "Settings layout pass for visual hierarchy, radio grouping, and clipped text."
-  debug_session: ""
-
-- truth: "Page-size slider shows tick labels 4 through 10, user-facing copy avoids implementation details, and unsupported-state text is removed unless a real user-facing unsupported case exists."
-  status: failed
-  reason: "User requested tick labels 4-10, removal of TypeDuckPreferences.json implementation copy, and removal/justification of unsupported-state copy."
-  severity: major
-  test: 7
-  root_cause: ""
-  artifacts:
-    - path: "MoqiTextService"
-      issue: "Settings UI copy and controls need user-facing refinement."
-  missing:
-    - "Slider tick labels and final product copy."
-  debug_session: ""
-
-- truth: "About is accessible and visibly captured, or is moved to a separate executable with the Settings Panel button removed."
-  status: failed
-  reason: "User reported About button does nothing; vm-about-dialog.bmp is wrong; user prefers a separate About executable and no Settings Panel About button."
-  severity: major
-  test: 8
-  root_cause: ""
-  artifacts:
-    - path: ".planning/product/ui-fixtures/phase-05/screenshots/vm-about-dialog.bmp"
-      issue: "Incorrect evidence screenshot should be removed."
-  missing:
-    - "Working About entry point and evidence."
-  debug_session: ""
-
-- truth: "Installation does not copy standalone icon files into the product directory, removes legacy rime icon.ico, and stamps TypeDuck icons into TypeDuckLauncher.exe and bundled server.exe."
-  status: failed
-  reason: "User reported stray icon files in install directory, legacy moqi-ime/input_methods/rime/icon.ico, stale TypeDuckLauncher.exe icon, and Moqi icon on bundled server.exe."
-  severity: major
-  test: 9
-  root_cause: ""
-  artifacts:
-    - path: "scripts/install.ps1"
-      issue: "Packaging may stage raw icon files."
-    - path: "installer"
-      issue: "Installer may include raw icon assets or stale executable resources."
-    - path: "D:/VSProjects/moqi-ime"
-      issue: "Bundled backend server icon/resource may need stamping or replacement."
-  missing:
-    - "Install tree icon cleanup and executable icon verification."
-  debug_session: ""
-
-- truth: "Evidence screenshots and manifest slots only reference accurate, non-cropped, current proof images."
-  status: failed
-  reason: "User requested removal of cropped settings-two-column-layout.bmp and incorrect vm-about-dialog.bmp."
-  severity: major
-  test: 10
-  root_cause: ""
-  artifacts:
-    - path: ".planning/product/ui-fixtures/phase-05/screenshots/settings-two-column-layout.bmp"
-      issue: "Cropped screenshot should be removed."
-    - path: ".planning/product/ui-fixtures/phase-05/screenshots/vm-about-dialog.bmp"
-      issue: "Incorrect screenshot should be removed."
-  missing:
-    - "Evidence manifest cleanup after screenshot removal."
-  debug_session: ""
-
-- truth: "Plan 05-06 has a real completion summary and the aggregate Phase 5 evidence validator passes without missing VM/manual evidence slots."
-  status: failed
-  reason: "Verifier reported 05-06-SUMMARY.md is absent and the evidence validator still has missing VM/manual slots."
-  severity: blocker
-  test: 11
-  root_cause: ""
-  artifacts:
-    - path: ".planning/phases/05-candidate-dictionary-settings-and-about-ui-parity/05-06-PLAN.md"
-      issue: "Evidence plan remains incomplete."
-    - path: "scripts/Test-TypeDuckPhase05UiEvidence.ps1"
-      issue: "Strict validator still fails because final evidence is missing or stale."
-  missing:
-    - "Complete 05-06 only after accepted evidence is captured and strict validator passes."
-    - "Create 05-06-SUMMARY.md after the evidence plan is genuinely complete."
-  debug_session: ""
-
-- truth: "VM evidence covers visible installer-first-run settings, restart persistence, browser host-app candidates, movement reveal, high DPI, multi-monitor or extended desktop placement, UI-less TSF host behavior, imperfect composition-rectangle fallback, About replacement, and input picker/executable icons."
-  status: failed
-  reason: "Verifier reported required VM evidence gaps were only in the manifest/manual notes and not structured UAT gaps."
-  severity: blocker
-  test: 12
-  root_cause: ""
-  artifacts:
-    - path: ".planning/product/ui-fixtures/phase-05/phase05-ui-evidence.json"
-      issue: "Manifest marks multiple required VM evidence slots missing."
-    - path: ".planning/product/ui-fixtures/phase-05/manual-uat-notes.md"
-      issue: "Manual notes list missing evidence, including restart persistence and browser host evidence."
-  missing:
-    - "Visible installer-first-run settings capture."
-    - "Restart persistence capture."
-    - "Browser host-app candidate capture."
-    - "Movement reveal capture."
-    - "High-DPI, multi-monitor, UI-less host, and imperfect composition rectangle captures."
-    - "Visible input picker and executable icon capture."
-  debug_session: ""
-
-- truth: "Automated Phase 5 guards encode the accepted product contract, not rejected behavior."
-  status: failed
-  reason: "Verifier reported guards still accept rejected TypeDuckPreferences.json copy, unsupported-state copy, raw staged .ico files, and removed/cropped screenshot requirements."
-  severity: blocker
-  test: 13
-  root_cause: ""
-  artifacts:
-    - path: "scripts/Test-TypeDuckSettingsAboutUi.ps1"
-      issue: "Guard expects rejected settings copy."
-    - path: "scripts/Test-TypeDuckIconPackaging.ps1"
-      issue: "Guard expects raw app-root icon files."
-    - path: "scripts/Test-TypeDuckPhase05UiEvidence.ps1"
-      issue: "Guard references removed/cropped evidence slots."
-  missing:
-    - "Update tests before retry so old rejected behavior cannot pass."
-  debug_session: ""
-
-- truth: "Candidate rendering tests validate `hou`, `housam`, POS pills, multilingual rows, baselines, input buffer clipping, and native/Web-alpha visual parity."
-  status: failed
-  reason: "Verifier reported candidate tests are too shallow and still miss the rejected C++ POS bracket rendering and layout problems."
-  severity: major
-  test: 14
-  root_cause: ""
-  artifacts:
-    - path: "scripts/Test-TypeDuckCandidateWindow.ps1"
-      issue: "Regex-only guard does not validate rejected rendering behavior."
-    - path: "MoqiTextService/MoqiCandidateWindow.cpp"
-      issue: "Part-of-speech still renders as bracketed text."
-  missing:
-    - "Rendering-level or screenshot guard for multi-row details, POS pills, baselines, and input buffer clipping."
-  debug_session: ""
-
-- truth: "Retry evidence records exact backend/runtime and TypeDuck Web fixture provenance and does not silently rely on unrecorded dirty external state."
-  status: failed
-  reason: "Verifier reported D:\\VSProjects\\moqi-ime and I:\\GitHub\\TypeDuck-Web are dirty enough to invalidate evidence unless provenance is recorded."
-  severity: major
-  test: 15
-  root_cause: ""
-  artifacts:
-    - path: "D:/VSProjects/moqi-ime"
-      issue: "Sibling backend dirty state affects runtime and icon evidence."
-    - path: "I:/GitHub/TypeDuck-Web"
-      issue: "Fixture authority is dirty relative to pinned fixture commit."
-  missing:
-    - "Record exact commits and dirty state before rebuild/retry evidence."
-    - "Ensure candidate parity is tested against the intended TypeDuck Web alpha fixture/source."
-  debug_session: ""
+[none open]

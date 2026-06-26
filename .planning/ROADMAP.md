@@ -17,7 +17,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 2: Engine Runtime Contract Spike** - The TypeDuck-HK librime fork, lookup-filter plugin, and TypeDuck runtime assets are proven on Windows. (completed 2026-06-23)
 - [x] **Phase 3: zh-HK TSF Registration and Installer Skeleton** - TypeDuck installs, registers, unregisters, and appears under Chinese (Traditional, Hong Kong). (completed 2026-06-24)
 - [x] **Phase 4: TypeDuck Protocol and Typing MVP** - TSF, launcher, and engine communicate with a bounded TypeDuck protocol that supports real Cantonese typing behavior. (completed 2026-06-24)
-- [ ] **Phase 5: Candidate, Dictionary, Settings, and About UI Parity** - Users see and configure the TypeDuck Web alpha experience in native Windows surfaces.
+- [x] **Phase 5: Candidate, Dictionary, Settings, and About UI Parity** - Users see and configure the TypeDuck Web alpha experience in native Windows surfaces. (completed 2026-06-26 by human verification and explicit screenshot-evidence divergence)
 - [ ] **Phase 6: Privacy, Security, and Scaffold Cleanup** - Off-scope Moqi/fcitx/cloud/AI behavior is removed or gated, diagnostics are safe, and visible strings are audited.
 - [ ] **Phase 7: Compatibility and Release Verification** - The v1 installer and IME are verified across Windows install paths, host apps, DPI, bitness, protocol recovery, and release artifacts.
 
@@ -133,9 +133,9 @@ Plans:
   5. User can configure display languages, main display language, candidate count, Jyutping visibility, Chinese typeface, Auto-completion, Auto-correction, Auto-composition, Input Memory, Reverse Lookup Settings, Show Full Input Code, and supported Cangjie behavior; settings persist locally and apply to subsequent IME sessions.
   6. User can open an About dialog showing TypeDuck Windows IME identity, version, and relevant engine/schema attribution in bilingual text.
 
-**Verification Environment**: Requires Windows VM or equivalent Windows test machine evidence for real TSF candidate placement, focus behavior, settings entry points, installer-first-run settings, high DPI, and representative host apps. Preview harness screenshots are helpful but insufficient alone.
+**Verification Environment**: Closed by iterative human verification in the Windows VM plus static/build/package guards. The earlier screenshot-manifest evidence path was explicitly retired by user direction on 2026-06-26; `.planning/product/ui-fixtures` was removed and all Phase 5 screenshot tests were replaced by human verification. Formal release screenshots and broader compatibility matrix evidence are deferred to Phase 7.
 
-**Plans**: 12/15 plans executed
+**Plans**: 15/15 plans closed
 Plans:
 **Wave 1**
 
@@ -164,7 +164,7 @@ Plans:
 
 **Wave 7** *(blocked on Wave 4 candidate UI plus Wave 5/6 launch and packaging completion)*
 
-- [ ] 05-06-PLAN.md — Collect automated package checks and Windows VM evidence for Phase 5 UI parity.
+- [x] 05-06-PLAN.md — Collect automated package checks and Windows VM evidence for Phase 5 UI parity. Closed by explicit user-approved divergence; see 05-06-SUMMARY.md and 05-VERIFICATION.md.
 
 **Gap Closure Wave 8** *(blocked on Wave 6 packaging completion)*
 
@@ -188,11 +188,11 @@ Plans:
 
 **Gap Closure Wave 13** *(blocked on automated/package evidence refresh)*
 
-- [ ] 05-14-PLAN.md — Capture and approve required Windows VM/manual evidence.
+- [x] 05-14-PLAN.md — Capture and approve required Windows VM/manual evidence. Skipped by explicit user direction after human verification replaced screenshot evidence; see 05-14-SUMMARY.md.
 
 **Gap Closure Wave 14** *(blocked on VM/manual evidence approval)*
 
-- [ ] 05-15-PLAN.md — Write the final 05-06 evidence summary and close the UAT gap record.
+- [x] 05-15-PLAN.md — Write the final 05-06 evidence summary and close the UAT gap record.
 
 **UI hint**: yes
 
@@ -239,7 +239,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7
 | 1. Identity and Web Parity Contract | 2/2 | Complete   | 2026-06-23 |
 | 2. Engine Runtime Contract Spike | 3/3 | Complete    | 2026-06-23 |
 | 3. zh-HK TSF Registration and Installer Skeleton | 3/3 | Complete    | 2026-06-24 |
-| 4. TypeDuck Protocol and Typing MVP | 3/4 | In Progress|  |
-| 5. Candidate, Dictionary, Settings, and About UI Parity | 12/15 | In Progress|  |
+| 4. TypeDuck Protocol and Typing MVP | 4/4 | Complete | 2026-06-24 |
+| 5. Candidate, Dictionary, Settings, and About UI Parity | 15/15 | Complete | 2026-06-26 |
 | 6. Privacy, Security, and Scaffold Cleanup | 0/TBD | Not started | - |
 | 7. Compatibility and Release Verification | 0/TBD | Not started | - |
