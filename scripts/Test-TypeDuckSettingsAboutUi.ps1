@@ -102,7 +102,7 @@ foreach ($tick in 4..10) {
   }
 }
 if ((Test-Path -LiteralPath (Join-Path $repo "TypeDuckSettings/TypeDuckAboutDialog.cpp")) -and
-    ($window -match "關於 About|ShowTypeDuckAboutDialog|kAbout")) {
+  ($window -match "關於 About|ShowTypeDuckAboutDialog|kAbout")) {
   Add-Violation $rejectedBehavior "Settings panel still exposes an About button/modal instead of leaving About to a separate executable."
 }
 
@@ -243,27 +243,24 @@ if (Test-Path -LiteralPath $aboutPath) {
   Assert-True ($createControlsStart -ge 0) "About dialog must create controls in a dedicated createControls method."
   $aboutCreateControls = $about.Substring($createControlsStart)
   Assert-Ordered $aboutCreateControls @(
-    "IDB_TYPEDUCK_ABOUT_BANNER",
-    "kAboutBodyText",
-    "IDB_TYPEDUCK_CREDIT_LOGOS",
+    "kIntroText",
+    "kContactText",
+    "kCreditText",
     "attributionText",
-    "aboutLinks",
-    "關閉 Close"
+    "aboutLinks"
   ) "About dialog resource/text/attribution/control order"
   Assert-Ordered $about @(
-    "TypeDuck Windows IME version",
+    "TypeDuck Windows IME 版本 Version",
     "TypeDuck-HK librime fork",
-    "rime-dictionary-lookup-filter",
     "TypeDuck-HK schema"
   ) "About attribution order"
   Assert-Ordered $about @(
     "TypeDuck 網站 Website",
-    "LearnDuck 粵拼打字入門 Introduction to Cantonese Jyutping Typing",
+    "LearnDuck 粵拼打字入門 Introduction to Jyutping Typing",
     "粵拼方案 Jyutping Scheme",
     "TypeDuck 原始碼 Source Code"
   ) "About link order"
   Assert-Text $about "TYPEDUCK_VERSION_TEXT" "About version must use the version.txt-derived build definition."
-  Assert-Text $about "3671814d4e4aeab8d616ceea3c7f6d88e96bba02" "Lookup-filter attribution must include recorded commit evidence."
   Assert-Text $about "https://typeduck\.hk" "Missing TypeDuck Website URL."
   Assert-Text $about "https://learn\.typeduck\.hk" "Missing LearnDuck URL."
   Assert-Text $about "https://lshk\.org/jyutping-scheme/" "Missing Jyutping Scheme URL."

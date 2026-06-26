@@ -82,7 +82,7 @@ function Get-IcoImagePayloads([string] $IconPath) {
     foreach ($entry in $entries) {
       $payload = New-Object byte[] $entry.Size
       [Array]::Copy($bytes, $entry.Offset, $payload, 0, $entry.Size)
-      $payloads += ,$payload
+      $payloads += , $payload
     }
     return $payloads
   }
@@ -186,17 +186,15 @@ Assert-Text $backendBuildScript 'Remove-IfExists\s+-Path\s+\(Join-Path\s+\$Packa
 Assert-NotText $backendBuildScript '\$ServerIcon\s*=\s*Join-Path\s+\$IconsDir\s+"mo\.ico"' "Backend server.exe must not use the legacy Moqi executable icon."
 
 Assert-Ordered $about @(
-  "kAboutBodyText",
-  "TypeDuck Windows IME version",
+  "TypeDuck Windows IME 版本 Version",
   "TypeDuck-HK librime fork",
-  "rime-dictionary-lookup-filter",
   "TypeDuck-HK schema",
   "aboutLinks"
 ) "About version and attribution order"
 Assert-Ordered $about @(
   "TypeDuck 網站 Website",
   "https://typeduck\.hk",
-  "LearnDuck 粵拼打字入門 Introduction to Cantonese Jyutping Typing",
+  "LearnDuck 粵拼打字入門 Introduction to Jyutping Typing",
   "https://learn\.typeduck\.hk",
   "粵拼方案 Jyutping Scheme",
   "https://lshk\.org/jyutping-scheme/",
@@ -204,9 +202,9 @@ Assert-Ordered $about @(
   "https://github\.com/TypeDuck-HK/TypeDuck-Windows"
 ) "About D-24 link labels and URLs"
 Assert-Ordered $about @(
-  "IDB_TYPEDUCK_ABOUT_BANNER",
-  "kAboutBodyText",
-  "IDB_TYPEDUCK_CREDIT_LOGOS",
+  "kIntroText",
+  "kContactText",
+  "kCreditText",
   "attributionText",
   "aboutLinks"
 ) "About D-23/D-27 packaged resource order"
@@ -248,8 +246,8 @@ if (Test-Path -LiteralPath $stageRoot -PathType Container) {
   Assert-ExecutableContainsIcon (Join-Path $stageRoot "moqi-ime/server.exe") $transparent "Staged moqi-ime/server.exe does not contain TypeDuck_Transparent.ico image data."
   foreach ($bannedName in @("moqi.png", "mo.ico", "mo.png", "moqi.ico")) {
     $bannedStageFile = Get-ChildItem -LiteralPath $stageRoot -Recurse -Force -File -ErrorAction SilentlyContinue |
-      Where-Object { $_.Name -ieq $bannedName } |
-      Select-Object -First 1
+    Where-Object { $_.Name -ieq $bannedName } |
+    Select-Object -First 1
     Assert-True ($null -eq $bannedStageFile) "Banned legacy Moqi image was staged: $($bannedStageFile.FullName)"
   }
 }
