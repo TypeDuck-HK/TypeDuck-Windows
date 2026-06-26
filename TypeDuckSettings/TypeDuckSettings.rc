@@ -6,7 +6,7 @@
 LANGUAGE LANG_CHINESE, SUBLANG_CHINESE_HONGKONG
 
 IDI_TYPEDUCK_SETTINGS ICON "assets/TypeDuck_Transparent.ico"
-IDB_TYPEDUCK_ABOUT_BANNER BITMAP "assets/About_Banner.bmp"
-IDB_TYPEDUCK_CREDIT_LOGOS BITMAP "assets/Credit_Logos.bmp"
+IDB_TYPEDUCK_ABOUT_BANNER BITMAP "resources/About_Banner.bmp"
+IDB_TYPEDUCK_CREDIT_LOGOS BITMAP "resources/Credit_Logos.bmp"
 
 #include "TypeDuckSettingsVersion.rc"

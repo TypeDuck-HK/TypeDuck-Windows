@@ -297,7 +297,15 @@ function Copy-MoqiImeRuntime {
         New-Item -ItemType Directory -Path $targetDir -Force | Out-Null
     }
 
-    $bannedLegacyIconNames = @("moqi.png", "mo.ico", "mo.png", "moqi.ico")
+    $bannedLegacyIconNames = @(
+        "moqi.png",
+        "mo.ico",
+        "mo.png",
+        "moqi.ico",
+        "About_Banner.bmp",
+        "Credit_Logos.bmp",
+        "Installer.bmp"
+    )
     $files = Get-ChildItem -Path $SourceRoot -Recurse -Force -File | Where-Object {
         $relativePath = $_.FullName.Substring($SourceRoot.Length).TrimStart('\', '/')
         $_.Extension -ne ".go" -and
@@ -334,19 +342,28 @@ $stageWin32Root = Join-Path $StageDir "win32\TypeDuckIME"
 $stageX64Root = Join-Path $StageDir "x64\TypeDuckIME"
 $stageWin32X64Root = Join-Path $stageWin32Root "x64"
 $iconSourceRoot = Join-Path $RepoRoot "TypeDuckSettings\assets"
+$resourceSourceRoot = Join-Path $RepoRoot "TypeDuckSettings\resources"
+$stageResourceRoot = Join-Path $stageWin32Root "resources"
 $transparentIcon = Join-Path $iconSourceRoot "TypeDuck_Transparent.ico"
 $smallIcon = Join-Path $iconSourceRoot "TypeDuck_Small.ico"
 $productIcon = Join-Path $iconSourceRoot "TypeDuck.ico"
+$aboutBanner = Join-Path $resourceSourceRoot "About_Banner.bmp"
+$creditLogos = Join-Path $resourceSourceRoot "Credit_Logos.bmp"
+$installerBitmap = Join-Path $resourceSourceRoot "Installer.bmp"
 New-CleanDirectory -Path $StageDir
 New-Item -ItemType Directory -Path $stageWin32Root -Force | Out-Null
 New-Item -ItemType Directory -Path $stageX64Root -Force | Out-Null
 New-Item -ItemType Directory -Path $stageWin32X64Root -Force | Out-Null
+New-Item -ItemType Directory -Path $stageResourceRoot -Force | Out-Null
 
 $backends = Join-Path $RepoRoot "backends.json"
 if (-not (Test-Path -LiteralPath $backends)) {
     throw "Missing backends.json at $backends"
 }
 Copy-Item -LiteralPath $backends -Destination (Join-Path $stageWin32Root "backends.json") -Force
+Copy-IfExists -Source $aboutBanner -Destination (Join-Path $stageResourceRoot "About_Banner.bmp")
+Copy-IfExists -Source $creditLogos -Destination (Join-Path $stageResourceRoot "Credit_Logos.bmp")
+Copy-IfExists -Source $installerBitmap -Destination (Join-Path $stageResourceRoot "Installer.bmp")
 
 $launcher = Resolve-ArtifactPath -Label "TypeDuckLauncher.exe" -Candidates @(
     (Join-Path $Win32BuildDir "TypeDuckLauncher.exe"),

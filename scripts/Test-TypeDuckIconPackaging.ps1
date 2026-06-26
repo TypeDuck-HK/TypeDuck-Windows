@@ -134,10 +134,14 @@ $repo = Resolve-FullPath $RepoRoot
 $backend = Resolve-FullPath $BackendRoot
 
 $assetRoot = Join-Path $repo "TypeDuckSettings/assets"
+$resourceRoot = Join-Path $repo "TypeDuckSettings/resources"
 $backendIconRoot = Join-Path $backend "icons"
 $transparent = Join-Path $assetRoot "TypeDuck_Transparent.ico"
 $small = Join-Path $assetRoot "TypeDuck_Small.ico"
 $product = Join-Path $assetRoot "TypeDuck.ico"
+$aboutBanner = Join-Path $resourceRoot "About_Banner.bmp"
+$creditLogos = Join-Path $resourceRoot "Credit_Logos.bmp"
+$installerBitmap = Join-Path $resourceRoot "Installer.bmp"
 $backendTransparent = Join-Path $backendIconRoot "TypeDuck_Transparent.ico"
 $backendSmall = Join-Path $backendIconRoot "TypeDuck_Small.ico"
 $backendProduct = Join-Path $backendIconRoot "TypeDuck.ico"
@@ -163,10 +167,22 @@ $about = Get-FileText (Join-Path $repo "TypeDuckSettings/TypeDuckAboutDialog.cpp
 Assert-Text $settingsResource "IDI_TYPEDUCK_SETTINGS" "Settings icon resource id must remain addressable."
 Assert-Text $settingsRc "IDI_TYPEDUCK_SETTINGS\s+ICON\s+`"assets/TypeDuck_Transparent\.ico`"" "TypeDuckSettings executable must use TypeDuck_Transparent.ico."
 Assert-Text $aboutRc "IDI_TYPEDUCK_SETTINGS\s+ICON\s+`"assets/TypeDuck_Transparent\.ico`"" "TypeDuckAbout executable must use TypeDuck_Transparent.ico."
+Assert-True (Test-Path -LiteralPath $aboutBanner) "About_Banner.bmp must be frontend-owned under TypeDuckSettings/resources."
+Assert-True (Test-Path -LiteralPath $creditLogos) "Credit_Logos.bmp must be frontend-owned under TypeDuckSettings/resources."
+Assert-True (Test-Path -LiteralPath $installerBitmap) "Installer.bmp must be frontend-owned under TypeDuckSettings/resources."
+Assert-Text $settingsRc "resources/About_Banner\.bmp" "TypeDuckSettings About banner resource must come from TypeDuckSettings/resources."
+Assert-Text $settingsRc "resources/Credit_Logos\.bmp" "TypeDuckSettings credit logos resource must come from TypeDuckSettings/resources."
+Assert-Text $aboutRc "resources/About_Banner\.bmp" "TypeDuckAbout banner resource must come from TypeDuckSettings/resources."
+Assert-Text $aboutRc "resources/Credit_Logos\.bmp" "TypeDuckAbout credit logos resource must come from TypeDuckSettings/resources."
 Assert-Text $launcherRc "IDI_MOQI_LAUNCHER\s+ICON\s+`"\.\./TypeDuckSettings/assets/TypeDuck_Transparent\.ico`"" "TypeDuckLauncher executable must use TypeDuck_Transparent.ico."
 Assert-Text $setupHelperCmake "SetupHelper\.rc" "TypeDuckSetupHelper must compile a resource script."
 Assert-Text $setupHelperRc "TypeDuck_Transparent\.ico" "TypeDuckSetupHelper executable must use TypeDuck_Transparent.ico."
 Assert-Text $installScript '\$transparentIcon\s*=\s*Join-Path\s+\$iconSourceRoot\s+"TypeDuck_Transparent\.ico"' "Staging must resolve TypeDuck_Transparent.ico from product assets."
+Assert-Text $installScript '\$resourceSourceRoot\s*=\s*Join-Path\s+\$RepoRoot\s+"TypeDuckSettings\\resources"' "Staging must resolve bitmap resources from TypeDuckSettings/resources."
+Assert-Text $installScript '\$stageResourceRoot\s*=\s*Join-Path\s+\$stageWin32Root\s+"resources"' "Staging must copy frontend bitmap resources to a dedicated product resources folder."
+Assert-Text $installScript 'Copy-IfExists\s+-Source\s+\$aboutBanner\s+-Destination\s+\(Join-Path\s+\$stageResourceRoot\s+"About_Banner\.bmp"\)' "Staging must copy About_Banner.bmp into the product resources folder."
+Assert-Text $installScript 'Copy-IfExists\s+-Source\s+\$creditLogos\s+-Destination\s+\(Join-Path\s+\$stageResourceRoot\s+"Credit_Logos\.bmp"\)' "Staging must copy Credit_Logos.bmp into the product resources folder."
+Assert-Text $installScript 'Copy-IfExists\s+-Source\s+\$installerBitmap\s+-Destination\s+\(Join-Path\s+\$stageResourceRoot\s+"Installer\.bmp"\)' "Staging must copy Installer.bmp into the product resources folder."
 Assert-NotText $installScript 'Copy-IfExists\s+-Source\s+\$(transparentIcon|smallIcon|productIcon)\s+-Destination\s+\(Join-Path\s+\$stageWin32Root\s+"TypeDuck[^"]*\.ico"\)' "Staging must not copy raw TypeDuck icon files into the installed app root."
 Assert-Text $installScript 'Set-WindowsExecutableIcon\s+-ExecutablePath\s+\(Join-Path\s+\$stageWin32Root\s+"TypeDuckLauncher\.exe"\)\s+-IconPath\s+\$transparentIcon' "Staging must stamp TypeDuckLauncher.exe with TypeDuck_Transparent.ico."
 Assert-Text $installScript 'Set-WindowsExecutableIcon\s+-ExecutablePath\s+\(Join-Path\s+\$stageWin32Root\s+"TypeDuckSetupHelper\.exe"\)\s+-IconPath\s+\$transparentIcon' "Staging must stamp TypeDuckSetupHelper.exe with TypeDuck_Transparent.ico."
@@ -210,7 +226,7 @@ Assert-Ordered $about @(
   "aboutLinks"
 ) "About D-23/D-27 packaged resource order"
 
-$installScriptForBannedScan = $installScript -replace '\$bannedLegacyIconNames\s*=\s*@\("moqi\.png",\s*"mo\.ico",\s*"mo\.png",\s*"moqi\.ico"\)', ''
+$installScriptForBannedScan = $installScript -replace '(?s)\$bannedLegacyIconNames\s*=\s*@\([\s\S]*?\)', ''
 $packagingText = @($settingsRc, $textServiceRc, $typeDuckProfile, $launcherRc, $setupHelperRc, $installer, $installScriptForBannedScan, $packageScript, $about) -join "`n"
 foreach ($banned in @("moqi\.png", "mo\.ico", "mo\.png", "moqi\.ico")) {
   Assert-NotText $packagingText $banned "Banned legacy Moqi image reference found in Phase 5 resource packaging: $banned"
@@ -239,6 +255,9 @@ if ($ExpectRed -eq "RejectedUatBehavior") {
 Assert-True ($rejectedBehavior.Count -eq 0) "Rejected UAT icon packaging behavior found: $($rejectedBehavior -join '; ')"
 
 if (Test-Path -LiteralPath $stageRoot -PathType Container) {
+  foreach ($resourceName in @("About_Banner.bmp", "Credit_Logos.bmp", "Installer.bmp")) {
+    Assert-True (Test-Path -LiteralPath (Join-Path $stageRoot "resources/$resourceName")) "Missing staged frontend resource: resources/$resourceName"
+  }
   Assert-ExecutableContainsIcon (Join-Path $stageRoot "TypeDuckLauncher.exe") $transparent "Staged TypeDuckLauncher.exe does not contain TypeDuck_Transparent.ico image data."
   Assert-ExecutableContainsIcon (Join-Path $stageRoot "TypeDuckSetupHelper.exe") $transparent "Staged TypeDuckSetupHelper.exe does not contain TypeDuck_Transparent.ico image data."
   Assert-ExecutableContainsIcon (Join-Path $stageRoot "TypeDuckSettings.exe") $transparent "Staged TypeDuckSettings.exe does not contain TypeDuck_Transparent.ico image data."
@@ -259,8 +278,9 @@ if (Test-Path -LiteralPath $installerOutput) {
 }
 
 if ($Strict) {
-  Assert-True (Test-Path -LiteralPath (Join-Path $backendIconRoot "About_Banner.bmp")) "Backend source About_Banner.bmp is missing."
-  Assert-True (Test-Path -LiteralPath (Join-Path $backendIconRoot "Credit_Logos.bmp")) "Backend source Credit_Logos.bmp is missing."
+  Assert-True (-not (Test-Path -LiteralPath (Join-Path $backendIconRoot "About_Banner.bmp"))) "Backend source must not own About_Banner.bmp."
+  Assert-True (-not (Test-Path -LiteralPath (Join-Path $backendIconRoot "Credit_Logos.bmp"))) "Backend source must not own Credit_Logos.bmp."
+  Assert-True (-not (Test-Path -LiteralPath (Join-Path $backendIconRoot "Installer.bmp"))) "Backend source must not own Installer.bmp."
 }
 
 Write-Host "[PASS] TypeDuck icon packaging guard passed."

@@ -242,14 +242,16 @@ if (Test-Path -LiteralPath $aboutPath) {
   $about = Get-Content -Raw -Encoding UTF8 -LiteralPath $aboutPath
   $rc = Get-Content -Raw -Encoding UTF8 -LiteralPath $rcPath
   $aboutRc = Get-Content -Raw -Encoding UTF8 -LiteralPath $aboutRcPath
-  $banner = Join-Path $repo "TypeDuckSettings/assets/About_Banner.bmp"
-  $credits = Join-Path $repo "TypeDuckSettings/assets/Credit_Logos.bmp"
-  Assert-True (Test-Path -LiteralPath $banner) "About_Banner.bmp must live under TypeDuckSettings/assets."
-  Assert-True (Test-Path -LiteralPath $credits) "Credit_Logos.bmp must live under TypeDuckSettings/assets."
-  Assert-Text $rc "About_Banner\.bmp" "About banner bitmap must be compiled as a resource."
-  Assert-Text $rc "Credit_Logos\.bmp" "Credit logos bitmap must be compiled as a resource."
-  Assert-Text $aboutRc "About_Banner\.bmp" "Separate About executable must compile the About banner bitmap."
-  Assert-Text $aboutRc "Credit_Logos\.bmp" "Separate About executable must compile the credit logos bitmap."
+  $banner = Join-Path $repo "TypeDuckSettings/resources/About_Banner.bmp"
+  $credits = Join-Path $repo "TypeDuckSettings/resources/Credit_Logos.bmp"
+  $installerBitmap = Join-Path $repo "TypeDuckSettings/resources/Installer.bmp"
+  Assert-True (Test-Path -LiteralPath $banner) "About_Banner.bmp must live under TypeDuckSettings/resources."
+  Assert-True (Test-Path -LiteralPath $credits) "Credit_Logos.bmp must live under TypeDuckSettings/resources."
+  Assert-True (Test-Path -LiteralPath $installerBitmap) "Installer.bmp must live under TypeDuckSettings/resources."
+  Assert-Text $rc "resources/About_Banner\.bmp" "About banner bitmap must be compiled from TypeDuckSettings/resources."
+  Assert-Text $rc "resources/Credit_Logos\.bmp" "Credit logos bitmap must be compiled from TypeDuckSettings/resources."
+  Assert-Text $aboutRc "resources/About_Banner\.bmp" "Separate About executable must compile the About banner bitmap from resources."
+  Assert-Text $aboutRc "resources/Credit_Logos\.bmp" "Separate About executable must compile the credit logos bitmap from resources."
   Assert-True ($about -notmatch "Installer\.bmp" -and $rc -notmatch "Installer\.bmp" -and $aboutRc -notmatch "Installer\.bmp") "Installer.bmp must not be referenced in Phase 5 settings/About."
   Assert-Text $about "Local\\\\TypeDuckAboutWindowInstance" "About executable must prevent duplicate interactive windows."
   Assert-Text $about "bringExistingAboutToForeground" "About duplicate launch must foreground the existing window."
@@ -284,8 +286,9 @@ if (Test-Path -LiteralPath $aboutPath) {
 }
 
 if ($Strict) {
-  Assert-True (Test-Path -LiteralPath (Join-Path $backend "icons/About_Banner.bmp")) "Backend source About_Banner.bmp is missing."
-  Assert-True (Test-Path -LiteralPath (Join-Path $backend "icons/Credit_Logos.bmp")) "Backend source Credit_Logos.bmp is missing."
+  Assert-True (-not (Test-Path -LiteralPath (Join-Path $backend "icons/About_Banner.bmp"))) "Backend source must not own About_Banner.bmp."
+  Assert-True (-not (Test-Path -LiteralPath (Join-Path $backend "icons/Credit_Logos.bmp"))) "Backend source must not own Credit_Logos.bmp."
+  Assert-True (-not (Test-Path -LiteralPath (Join-Path $backend "icons/Installer.bmp"))) "Backend source must not own Installer.bmp."
 }
 
 Write-Host "[PASS] TypeDuck settings/About UI guard passed."
