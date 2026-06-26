@@ -73,7 +73,7 @@ All Phase 5 screenshot tests are explicitly replaced by human verification. The 
 
 - Installer-first-run and post-install settings entry points launch fixed first-party `TypeDuckSettings.exe`.
 - Settings/About duplicate launches foreground the existing window.
-- Tray menu exposes `輸入法設定 IME Settings` and `關於 / About TypeDuck...` in the expected order.
+- Tray menu exposes `輸入法設定 / IME Settings` and `關於 / About TypeDuck...` in the expected order.
 - TypeDuck executable icons are stamped into launcher, settings, About, setup helper, backend server, TSF profile/input picker, installer, and uninstaller surfaces.
 - Legacy raw product-root icon staging is removed.
 - Backend legacy images `mo.ico`, `mo.png`, `moqi.ico`, and `moqi.png` are removed; backend `icons` now carries the three TypeDuck `.ico` files.

@@ -148,7 +148,7 @@ regression_notes:
 ### 14. Launcher Tray and Duplicate Windows
 expected: Tray right-click exposes settings and About entries, and repeated Settings/About launches foreground the existing window instead of opening duplicates.
 result: pass
-closure: "Added `關於 / About TypeDuck...` under `輸入法設定 IME Settings` in the launcher tray menu, wired it to `TypeDuckAbout.exe`, and added mutex/foreground handling for Settings and About."
+closure: "Added `關於 / About TypeDuck...` under `輸入法設定 / IME Settings` in the launcher tray menu, wired it to `TypeDuckAbout.exe`, and added mutex/foreground handling for Settings and About."
 regression_notes:
   - Tray menu wording must remain bilingual.
   - Duplicate interactive Settings/About windows are rejected and existing windows are foregrounded.

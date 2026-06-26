@@ -788,7 +788,7 @@ void PipeServer::showPopupMenu() const {
   // FIXME: make this translatable later
   bool debugEnabled = logLevel_ <= spdlog::level::debug;
   ::AppendMenu(hmenu, MF_STRING | MF_ENABLED, ID_OPEN_TYPEDUCK_SETTINGS,
-               L"輸入法設定 IME Settings");
+               L"輸入法設定 / IME Settings");
   ::AppendMenu(hmenu, MF_STRING | MF_ENABLED, ID_OPEN_TYPEDUCK_ABOUT,
                L"關於 / About TypeDuck…");
   ::AppendMenu(hmenu, MF_STRING | MF_ENABLED | (debugEnabled ? MF_CHECKED : 0),

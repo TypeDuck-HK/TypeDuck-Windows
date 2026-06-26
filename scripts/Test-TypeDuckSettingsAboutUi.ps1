@@ -159,14 +159,14 @@ Assert-Text $pipeServer "TypeDuckSettings\.exe" "Launcher post-install entry poi
 Assert-Text $pipeServer "openTypeDuckSettings" "Launcher must expose a fixed TypeDuck settings launch helper."
 Assert-Text $pipeServer "TypeDuckAbout\.exe" "Launcher tray entry must launch TypeDuckAbout.exe."
 Assert-Text $pipeServer "openTypeDuckAbout" "Launcher must expose a fixed TypeDuck About launch helper."
-Assert-Text $pipeServer "輸入法設定 IME Settings" "Launcher settings menu label must be bilingual."
+Assert-Text $pipeServer "輸入法設定 / IME Settings" "Launcher settings menu label must be bilingual."
 Assert-Text $pipeServer "關於 / About TypeDuck" "Launcher About menu label must be bilingual."
 Assert-Ordered $pipeServer @(
   "ID_OPEN_TYPEDUCK_SETTINGS",
   "ID_OPEN_TYPEDUCK_ABOUT"
 ) "Launcher tray settings/About command ordering"
 Assert-Ordered $pipeServer @(
-  "輸入法設定 IME Settings",
+  "輸入法設定 / IME Settings",
   "關於 / About TypeDuck"
 ) "Launcher tray settings/About menu ordering"
 Assert-True ($pipeServer -notmatch "configTool|configToolParams|configToolDir") "Launcher settings entry point must not use backend-declared config tool metadata."
