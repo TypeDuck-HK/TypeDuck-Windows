@@ -50,6 +50,11 @@ struct RimeSideEffects {
   std::string defaultCustomFile;
   std::string defaultCustomPath;
   int pageSize = 6;
+  bool enableCompletion = true;
+  bool enableCorrection = false;
+  bool enableSentence = true;
+  bool enableLearning = true;
+  bool isCangjie5 = true;
   std::string commonCustomFile;
   std::string commonPatchKey;
   std::vector<std::string> commonPatches;

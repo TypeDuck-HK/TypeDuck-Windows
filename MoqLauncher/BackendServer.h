@@ -70,6 +70,8 @@ public:
 
 	TypeDuck::ApplyResult applyTypeDuckPreferences(const TypeDuck::RimeSideEffects& effects);
 
+	TypeDuck::ApplyResult requestTypeDuckDeploy();
+
 	void uploadCloudClipboardText(const std::string& utf8Text);
 
 private:

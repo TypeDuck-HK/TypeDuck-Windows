@@ -213,6 +213,11 @@ RimeSideEffects rimeSideEffects(const Preferences& preferences) {
   effects.defaultCustomFile = "default.custom.yaml";
   effects.defaultCustomPath = "menu/page_size";
   effects.pageSize = normalized.pageSize;
+  effects.enableCompletion = normalized.enableCompletion;
+  effects.enableCorrection = normalized.enableCorrection;
+  effects.enableSentence = normalized.enableSentence;
+  effects.enableLearning = normalized.enableLearning;
+  effects.isCangjie5 = normalized.isCangjie5;
   effects.commonCustomFile = "common.custom.yaml";
   effects.commonPatchKey = "__patch";
   effects.commonPatches.push_back("common:/show_cangjie_roots");

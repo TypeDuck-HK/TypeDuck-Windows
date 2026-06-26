@@ -68,6 +68,7 @@ public:
 
 	void enqueueTrayNotification(const std::wstring& title, const std::wstring& message,
 	                             DWORD infoFlags);
+	void clearTrayNotification();
 
 	BackendServer* backendFromLangProfileGuid(const char* guid);
 
@@ -112,6 +113,8 @@ private:
 	void initBackendServers(const std::wstring& topDirPath);
 	void seedTypeDuckProfileBackendMapping();
 	void initInputMethods(const std::wstring& topDirPath);
+	void asyncRedeployTypeDuckBackend();
+	void redeployTypeDuckBackend();
 	void asyncRestartAllBackends();
     void restartAllBackends();
     void asyncTerminateAllBackends();

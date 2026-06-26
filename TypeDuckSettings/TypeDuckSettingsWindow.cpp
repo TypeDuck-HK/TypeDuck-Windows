@@ -28,12 +28,12 @@ constexpr int kMargin = 22;
 constexpr int kLeftColumnX = 28;
 constexpr int kRightColumnX = 486;
 constexpr int kColumnWidth = 412;
-constexpr int kDisplayLanguageGroupHeight = 193;
+constexpr int kDisplayLanguageGroupHeight = 196;
 constexpr int kDisplayLanguageMainX = kLeftColumnX + 20;
 constexpr int kDisplayLanguageDisplayX = kLeftColumnX + 248;
 constexpr int kDisplayLanguageMainWidth = 190;
 constexpr int kDisplayLanguageDisplayWidth = 160;
-constexpr int kPageSizeTrackInset = 18;
+constexpr int kPageSizeTrackInset = 14;
 constexpr int kPageSizeTrackWidth = kColumnWidth - (kPageSizeTrackInset * 2);
 constexpr int kRowHeight = 28;
 constexpr int kPageTickWidth = 32;
@@ -458,7 +458,7 @@ class SettingsWindow {
               kColumnWidth, 24);
     pageSizeTrack_ = CreateWindowExW(
         0, TRACKBAR_CLASSW, L"", WS_CHILD | WS_VISIBLE | WS_TABSTOP | TBS_AUTOTICKS,
-        kLeftColumnX + kPageSizeTrackInset, y + 28, kPageSizeTrackWidth, 34, window_,
+        kLeftColumnX, y + 28, kColumnWidth, 34, window_,
         reinterpret_cast<HMENU>(static_cast<INT_PTR>(kPageSizeTrack)), instance_,
         nullptr);
     SendMessageW(pageSizeTrack_, TBM_SETRANGE, TRUE, MAKELPARAM(4, 10));

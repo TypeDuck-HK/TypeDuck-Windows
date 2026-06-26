@@ -77,6 +77,7 @@ static constexpr UINT ID_SHOW_DEBUG_LOGS = 1001;
 static constexpr UINT ID_RESTART_Moqi_BACKENDS = 1002;
 static constexpr UINT ID_EXIT_Moqi = 1003;
 static constexpr UINT ID_OPEN_TYPEDUCK_SETTINGS = 1004;
+static constexpr UINT ID_REDEPLOY_TYPEDUCK_BACKEND = 1005;
 
 static constexpr size_t MAX_LOG_FILE_SIZE =
     5 * 1024 * 1024;                    // log file size: 5 MB
@@ -244,6 +245,42 @@ void PipeServer::restartAllBackends() {
       backend->restartProcess();
     }
   }
+}
+
+void PipeServer::redeployTypeDuckBackend() {
+  BackendServer *backend = backendFromName(kTypeDuckBackendBridgeName);
+  if (backend == nullptr) {
+    enqueueTrayNotification(L"Rime", L"重新部署失敗 / Redeploy failed",
+                            NIIF_ERROR);
+    return;
+  }
+  enqueueTrayNotification(L"Rime", L"正在重新部署 / Redeploying...",
+                          NIIF_INFO);
+  const auto result = backend->requestTypeDuckDeploy();
+  if (!result.ok) {
+    enqueueTrayNotification(
+        L"Rime",
+        utf8Codec.from_bytes(result.message.empty()
+                                 ? "重新部署失敗 / Redeploy failed"
+                                 : result.message),
+        NIIF_ERROR);
+  }
+}
+
+void PipeServer::asyncRedeployTypeDuckBackend() {
+  auto callback = [](uv_async_t *asyncTask) {
+    auto this_ = reinterpret_cast<PipeServer *>(asyncTask->data);
+    this_->redeployTypeDuckBackend();
+
+    uv_close(reinterpret_cast<uv_handle_t *>(asyncTask),
+             [](uv_handle_t *handle) {
+               delete reinterpret_cast<uv_async_t *>(handle);
+             });
+  };
+  auto asyncTask = new uv_async_t{};
+  asyncTask->data = this;
+  uv_async_init(uv_default_loop(), asyncTask, callback);
+  uv_async_send(asyncTask);
 }
 
 void PipeServer::asyncRestartAllBackends() {
@@ -473,6 +510,10 @@ void PipeServer::enqueueTrayNotification(const std::wstring &title,
   }
 }
 
+void PipeServer::clearTrayNotification() {
+  enqueueTrayNotification(L"", L"", 0);
+}
+
 void PipeServer::onNewClientConnected(uv_stream_t *server, int status) {
   auto server_pipe = reinterpret_cast<uv_pipe_t *>(server);
   auto client = new PipeClient{this, server_pipe->pipe_mode,
@@ -594,6 +635,9 @@ LRESULT PipeServer::wndProc(UINT msg, WPARAM wp, LPARAM lp) {
     switch (LOWORD(wp)) {
     case ID_RESTART_Moqi_BACKENDS:
       asyncRestartAllBackends();
+      return 0;
+    case ID_REDEPLOY_TYPEDUCK_BACKEND:
+      asyncRedeployTypeDuckBackend();
       return 0;
     case ID_EXIT_Moqi:
       asyncTerminateAllBackends();
@@ -731,6 +775,8 @@ void PipeServer::showPopupMenu() const {
   ::AppendMenu(hmenu, MF_STRING | MF_ENABLED, ID_SHOW_DEBUG_LOGS,
                L"開啟記錄 / Open Logs");
   ::AppendMenu(hmenu, MF_SEPARATOR, 0, 0);
+  ::AppendMenu(hmenu, MF_STRING | MF_ENABLED, ID_REDEPLOY_TYPEDUCK_BACKEND,
+               L"重新部署 TypeDuck / Redeploy TypeDuck");
   ::AppendMenu(hmenu, MF_STRING | MF_ENABLED, ID_RESTART_Moqi_BACKENDS,
                L"重新啟動 TypeDuck 引擎 / Restart TypeDuck Engine");
   ::AppendMenu(hmenu, MF_STRING | MF_ENABLED, ID_EXIT_Moqi,
