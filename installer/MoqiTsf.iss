@@ -41,12 +41,13 @@ DisableWelcomePage=no
 SetupIconFile=..\TypeDuckSettings\assets\TypeDuck.ico
 WizardImageFile=..\TypeDuckSettings\resources\Installer.bmp
 UninstallDisplayIcon={uninstallexe}
+DefaultDialogFontName=Microsoft JhengHei UI
 
 [Messages]
 SetupAppTitle=TypeDuck 安裝 / TypeDuck Setup
-SetupWindowTitle=安裝 - %1 / Setup - %1
+SetupWindowTitle=TypeDuck 安裝 / TypeDuck Setup
 UninstallAppTitle=TypeDuck 解除安裝 / TypeDuck Uninstall
-UninstallAppFullTitle=%1 解除安裝 / %1 Uninstall
+UninstallAppFullTitle=TypeDuck 解除安裝 / TypeDuck Uninstall
 ConfirmTitle=確認 / Confirm
 ErrorTitle=錯誤 / Error
 ButtonBack=< 返回 Back
@@ -60,22 +61,22 @@ ButtonFinish=完成 Finish
 ButtonBrowse=瀏覽 Browse...
 ButtonWizardBrowse=瀏覽 Browse...
 ExitSetupTitle=離開安裝程式 / Exit Setup
-ExitSetupMessage=TypeDuck 尚未完成安裝。如現在離開，TypeDuck 不會安裝到這部電腦。%n%n要離開安裝程式嗎？%n%nTypeDuck setup is not complete. If you exit now, TypeDuck will not be installed on this computer.%n%nExit Setup?
+ExitSetupMessage=TypeDuck 尚未完成安裝。如現在離開，TypeDuck 不會安裝至此電腦。%n要離開安裝程式嗎？%n%nTypeDuck setup is not complete. If you exit now, TypeDuck will not be installed on this computer.%nExit Setup?
 WizardSelectDir=選擇安裝位置 / Select Destination Location
-SelectDirDesc=TypeDuck 應安裝在哪裏？ / Where should TypeDuck be installed?
+SelectDirDesc=TypeDuck 應安裝在何處？ / Where should TypeDuck be installed?
 SelectDirLabel3=安裝程式會將 TypeDuck 安裝到以下資料夾。%nSetup will install TypeDuck into the following folder.
 SelectDirBrowseLabel=要繼續，請按「下一步 Next」。如要選擇其他資料夾，請按「瀏覽 Browse」。%nTo continue, click Next. To select a different folder, click Browse.
 DiskSpaceGBLabel=至少需要 [gb] GB 可用磁碟空間。%nAt least [gb] GB of free disk space is required.
 DiskSpaceMBLabel=至少需要 [mb] MB 可用磁碟空間。%nAt least [mb] MB of free disk space is required.
 WizardReady=準備安裝 / Ready to Install
-ReadyLabel1=TypeDuck 已準備好安裝到這部電腦。%nSetup is ready to install TypeDuck on this computer.
+ReadyLabel1=TypeDuck 已準備好安裝至此電腦。%nSetup is ready to install TypeDuck on this computer.
 ReadyLabel2a=按「安裝 Install」開始安裝；如要檢查或更改設定，請按「返回 Back」。%nClick Install to begin. Click Back to review or change settings.
 ReadyLabel2b=按「安裝 Install」開始安裝。%nClick Install to begin.
 ReadyMemoDir=安裝位置 / Destination location:
 ReadyMemoGroup=開始功能表資料夾 / Start Menu folder:
 ReadyMemoTasks=其他工作 / Additional tasks:
 WizardInstalling=安裝中 / Installing
-InstallingLabel=請稍候，TypeDuck 正在安裝到這部電腦。%nPlease wait while TypeDuck is installed on this computer.
+InstallingLabel=請稍候，TypeDuck 正在安裝至此電腦。%nPlease wait while TypeDuck is installed on this computer.
 StatusClosingApplications=正在關閉 TypeDuck / Closing TypeDuck...
 StatusCreateDirs=正在建立資料夾 / Creating folders...
 StatusExtractFiles=正在解壓縮檔案 / Extracting files...
@@ -84,15 +85,15 @@ StatusCreateRegistryEntries=正在寫入設定 / Saving settings...
 StatusSavingUninstall=正在儲存解除安裝資訊 / Saving uninstall information...
 StatusRunProgram=正在完成安裝 / Finishing installation...
 StatusRollback=正在復原變更 / Rolling back changes...
-FinishedHeadingLabel=完成 TypeDuck 安裝精靈 / Completing the TypeDuck Setup Wizard
+FinishedHeadingLabel=安裝完成 / Installation Completed
 FinishedLabelNoIcons=TypeDuck 安裝已完成。%nTypeDuck setup has finished.
 FinishedLabel=TypeDuck 安裝已完成。%nTypeDuck setup has finished.
 WizardUninstalling=解除安裝狀態 / Uninstall Status
-UninstallStatusLabel=請稍候，TypeDuck 正在從這部電腦移除。%nPlease wait while TypeDuck is removed from this computer.
+UninstallStatusLabel=請稍候，TypeDuck 正在從此電腦移除。%nPlease wait while TypeDuck is removed from this computer.
 StatusUninstalling=正在解除安裝 TypeDuck / Uninstalling TypeDuck...
 ConfirmUninstall=是否要移除 %1 及其所有元件？%n%nDo you want to remove %1 and all of its components?
 UninstalledAll=TypeDuck 已解除安裝。如 TypeDuck 仍然出現，請重新啟動電腦。%nTypeDuck is uninstalled. If TypeDuck still appears, restart your computer.
-UninstalledMost=TypeDuck 已解除安裝，但有部分檔案未能自動移除。請重新啟動電腦後再檢查。%nTypeDuck uninstall is complete, but some files could not be removed automatically. Restart your computer, then check again.
+UninstalledMost=TypeDuck 已解除安裝，但有部分檔案需重新啟動電腦方可自動移除。如 TypeDuck 仍然出現，請重新啟動電腦。%nTypeDuck uninstall is complete, but some files require a computer restart in order to be removed automatically. If TypeDuck still appears, restart your computer.
 UninstalledAndNeedsRestart=TypeDuck 已解除安裝。如 TypeDuck 仍然出現，請重新啟動電腦。%nTypeDuck is uninstalled. If TypeDuck still appears, restart your computer.
 
 [Files]
@@ -163,15 +164,13 @@ end;
 procedure InitializeWizard;
 begin
   WizardForm.WelcomeLabel1.Caption := Bilingual('歡迎使用 TypeDuck', 'Welcome to TypeDuck');
-  WizardForm.WelcomeLabel1.Top := ScaleY(18);
+  WizardForm.WelcomeLabel1.Top := ScaleY(12);
   WizardForm.WelcomeLabel1.Height := ScaleY(62);
-  WizardForm.WelcomeLabel1.Font.Name := 'Microsoft JhengHei UI';
-  WizardForm.WelcomeLabel1.Font.Size := 12;
+  WizardForm.WelcomeLabel1.Font.Size := 14;
   WizardForm.WelcomeLabel2.Caption := AboutTextBlock;
-  WizardForm.WelcomeLabel2.Top := ScaleY(108);
-  WizardForm.WelcomeLabel2.Height := ScaleY(236);
-  WizardForm.WelcomeLabel2.Font.Name := 'Microsoft JhengHei UI';
-  WizardForm.WelcomeLabel2.Font.Size := 8;
+  WizardForm.WelcomeLabel2.Top := ScaleY(70);
+  WizardForm.WelcomeLabel2.Height := ScaleY(300);
+  WizardForm.WelcomeLabel2.Font.Size := 10;
 end;
 
 function InstallFinishedText: String;
