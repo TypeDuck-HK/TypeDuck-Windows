@@ -270,5 +270,5 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7
 | 3. zh-HK TSF Registration and Installer Skeleton | 3/3 | Complete    | 2026-06-24 |
 | 4. TypeDuck Protocol and Typing MVP | 4/4 | Complete | 2026-06-24 |
 | 5. Candidate, Dictionary, Settings, and About UI Parity | 15/15 | Complete | 2026-06-26 |
-| 6. Privacy, Security, and Scaffold Cleanup | 7/7 | Complete   | 2026-06-27 |
+| 6. Privacy, Security, and Scaffold Cleanup | 7/7 | Complete    | 2026-06-27 |
 | 7. Compatibility and Release Verification | 0/4 | Not started | - |
