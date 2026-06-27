@@ -5,8 +5,10 @@
 #define MyAppName "TypeDuck 粵語輸入法 / TypeDuck Cantonese IME"
 #define MyAppPublisher "香港教育大學 The Education University of Hong Kong"
 #define MyAppURL "https://www.typeduck.hk/"
+; Inno Setup directives escape a literal leading "{" as "{{".
+; AppId therefore intentionally uses a doubled opening brace; code and registry
+; strings use normal single-braced GUID constants below.
 #define MyAppId "{{9B52CF20-1C5D-4C74-9F5D-9E66377C8F37}"
-#define ImeClsid "{{7D92985A-BC53-47B5-A5CC-6E47F86B9D18}}"
 #define ImeClsidCode "{7D92985A-BC53-47B5-A5CC-6E47F86B9D18}"
 #define ImeProfileGuidCode "{C6E8F5DF-6504-44F9-B7CF-17A195373A83}"
 
@@ -40,13 +42,58 @@ SetupIconFile=..\TypeDuckSettings\assets\TypeDuck.ico
 WizardImageFile=..\TypeDuckSettings\resources\Installer.bmp
 UninstallDisplayIcon={uninstallexe}
 
-[Languages]
-Name: "english"; MessagesFile: "compiler:Default.isl"
-; Traditional Chinese Hong Kong-compatible entry without the old Simplified-only
-; vendored chrome. This Inno install may not include ChineseTraditional.isl, so
-; TypeDuck-controlled copy below remains bilingual while standard chrome falls
-; back to Inno's English resource until a vetted Traditional pack is bundled.
-Name: "chinesetraditional"; MessagesFile: "compiler:Default.isl"
+[Messages]
+SetupAppTitle=TypeDuck 安裝 / TypeDuck Setup
+SetupWindowTitle=安裝 - %1 / Setup - %1
+UninstallAppTitle=TypeDuck 解除安裝 / TypeDuck Uninstall
+UninstallAppFullTitle=%1 解除安裝 / %1 Uninstall
+ConfirmTitle=確認 / Confirm
+ErrorTitle=錯誤 / Error
+ButtonBack=< 返回 Back
+ButtonNext=下一步 Next >
+ButtonInstall=安裝 Install
+ButtonOK=確定 OK
+ButtonCancel=取消 Cancel
+ButtonYes=是 Yes
+ButtonNo=否 No
+ButtonFinish=完成 Finish
+ButtonBrowse=瀏覽 Browse...
+ButtonWizardBrowse=瀏覽 Browse...
+ExitSetupTitle=離開安裝程式 / Exit Setup
+ExitSetupMessage=TypeDuck 尚未完成安裝。如現在離開，TypeDuck 不會安裝到這部電腦。%n%n要離開安裝程式嗎？%n%nTypeDuck setup is not complete. If you exit now, TypeDuck will not be installed on this computer.%n%nExit Setup?
+WizardSelectDir=選擇安裝位置 / Select Destination Location
+SelectDirDesc=TypeDuck 應安裝在哪裏？ / Where should TypeDuck be installed?
+SelectDirLabel3=安裝程式會將 TypeDuck 安裝到以下資料夾。%nSetup will install TypeDuck into the following folder.
+SelectDirBrowseLabel=要繼續，請按「下一步 Next」。如要選擇其他資料夾，請按「瀏覽 Browse」。%nTo continue, click Next. To select a different folder, click Browse.
+DiskSpaceGBLabel=至少需要 [gb] GB 可用磁碟空間。%nAt least [gb] GB of free disk space is required.
+DiskSpaceMBLabel=至少需要 [mb] MB 可用磁碟空間。%nAt least [mb] MB of free disk space is required.
+WizardReady=準備安裝 / Ready to Install
+ReadyLabel1=TypeDuck 已準備好安裝到這部電腦。%nSetup is ready to install TypeDuck on this computer.
+ReadyLabel2a=按「安裝 Install」開始安裝；如要檢查或更改設定，請按「返回 Back」。%nClick Install to begin. Click Back to review or change settings.
+ReadyLabel2b=按「安裝 Install」開始安裝。%nClick Install to begin.
+ReadyMemoDir=安裝位置 / Destination location:
+ReadyMemoGroup=開始功能表資料夾 / Start Menu folder:
+ReadyMemoTasks=其他工作 / Additional tasks:
+WizardInstalling=安裝中 / Installing
+InstallingLabel=請稍候，TypeDuck 正在安裝到這部電腦。%nPlease wait while TypeDuck is installed on this computer.
+StatusClosingApplications=正在關閉 TypeDuck / Closing TypeDuck...
+StatusCreateDirs=正在建立資料夾 / Creating folders...
+StatusExtractFiles=正在解壓縮檔案 / Extracting files...
+StatusCreateIcons=正在建立捷徑 / Creating shortcuts...
+StatusCreateRegistryEntries=正在寫入設定 / Saving settings...
+StatusSavingUninstall=正在儲存解除安裝資訊 / Saving uninstall information...
+StatusRunProgram=正在完成安裝 / Finishing installation...
+StatusRollback=正在復原變更 / Rolling back changes...
+FinishedHeadingLabel=完成 TypeDuck 安裝精靈 / Completing the TypeDuck Setup Wizard
+FinishedLabelNoIcons=TypeDuck 安裝已完成。%nTypeDuck setup has finished.
+FinishedLabel=TypeDuck 安裝已完成。%nTypeDuck setup has finished.
+WizardUninstalling=解除安裝狀態 / Uninstall Status
+UninstallStatusLabel=請稍候，TypeDuck 正在從這部電腦移除。%nPlease wait while TypeDuck is removed from this computer.
+StatusUninstalling=正在解除安裝 TypeDuck / Uninstalling TypeDuck...
+ConfirmUninstall=是否要移除 %1 及其所有元件？%n%nDo you want to remove %1 and all of its components?
+UninstalledAll=TypeDuck 已解除安裝。如 TypeDuck 仍然出現，請重新啟動電腦。%nTypeDuck is uninstalled. If TypeDuck still appears, restart your computer.
+UninstalledMost=TypeDuck 已解除安裝，但有部分檔案未能自動移除。請重新啟動電腦後再檢查。%nTypeDuck uninstall is complete, but some files could not be removed automatically. Restart your computer, then check again.
+UninstalledAndNeedsRestart=TypeDuck 已解除安裝。如 TypeDuck 仍然出現，請重新啟動電腦。%nTypeDuck is uninstalled. If TypeDuck still appears, restart your computer.
 
 [Files]
 Source: "{#StageDir}\win32\TypeDuckIME\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
@@ -70,13 +117,13 @@ Root: HKCU; Subkey: "Software\Microsoft\Windows\CurrentVersion\Run"; \
 
 [InstallDelete]
 Type: filesandordirs; Name: "{app}\x64"
-; TypeDuck-owned runtime cleanup inside this app directory only.
-Type: filesandordirs; Name: "{app}\moqi-ime"
+Type: filesandordirs; Name: "{app}\TypeDuckRuntime"
+Type: filesandordirs; Name: "{app}\resources"
 
 [UninstallDelete]
 Type: filesandordirs; Name: "{app}"
 Type: filesandordirs; Name: "{localappdata}\TypeDuckIME"
-Type: filesandordirs; Name: "{userappdata}\TypeDuckIME"
+Type: filesandordirs; Name: "{userappdata}\TypeDuckIME"; Check: ShouldDeleteUserDataOnUninstall
 
 [Code]
 const
@@ -93,6 +140,7 @@ var
   HelperUninstallFailed: Boolean;
   HelperUninstallNeedsRestart: Boolean;
   HadExistingInstall: Boolean;
+  DeleteUserDataOnUninstall: Boolean;
 
 function Bilingual(const Zh: String; const En: String): String;
 begin
@@ -115,7 +163,15 @@ end;
 procedure InitializeWizard;
 begin
   WizardForm.WelcomeLabel1.Caption := Bilingual('歡迎使用 TypeDuck', 'Welcome to TypeDuck');
+  WizardForm.WelcomeLabel1.Top := ScaleY(18);
+  WizardForm.WelcomeLabel1.Height := ScaleY(62);
+  WizardForm.WelcomeLabel1.Font.Name := 'Microsoft JhengHei UI';
+  WizardForm.WelcomeLabel1.Font.Size := 12;
   WizardForm.WelcomeLabel2.Caption := AboutTextBlock;
+  WizardForm.WelcomeLabel2.Top := ScaleY(108);
+  WizardForm.WelcomeLabel2.Height := ScaleY(236);
+  WizardForm.WelcomeLabel2.Font.Name := 'Microsoft JhengHei UI';
+  WizardForm.WelcomeLabel2.Font.Size := 8;
 end;
 
 function InstallFinishedText: String;
@@ -341,6 +397,76 @@ begin
   Result := HelperInstallSucceeded and (not HelperInstallNeedsRestart);
 end;
 
+function PromptDeleteUserDataOnUninstall(): Boolean;
+var
+  Form: TSetupForm;
+  PromptLabel: TNewStaticText;
+  DataCheckBox: TNewCheckBox;
+  ContinueButton: TNewButton;
+  CancelButton: TNewButton;
+begin
+  Form := TSetupForm.Create(nil);
+  try
+    Form.Caption := Bilingual('TypeDuck 解除安裝選項', 'TypeDuck Uninstall Options');
+    Form.ClientWidth := ScaleX(470);
+    Form.ClientHeight := ScaleY(170);
+    Form.Position := poScreenCenter;
+
+    PromptLabel := TNewStaticText.Create(Form);
+    PromptLabel.Parent := Form;
+    PromptLabel.SetBounds(ScaleX(16), ScaleY(16), ScaleX(438), ScaleY(58));
+    PromptLabel.AutoSize := False;
+    PromptLabel.WordWrap := True;
+    PromptLabel.Caption := Bilingual(
+      'TypeDuck 可以保留你的個人設定和詞庫資料，方便日後重新安裝時繼續使用。',
+      'TypeDuck can keep your personal settings and dictionary data so they remain available after reinstalling.');
+
+    DataCheckBox := TNewCheckBox.Create(Form);
+    DataCheckBox.Parent := Form;
+    DataCheckBox.SetBounds(ScaleX(16), ScaleY(82), ScaleX(438), ScaleY(42));
+    DataCheckBox.Caption := Bilingual(
+      '同時刪除 TypeDuck 個人資料',
+      'Also delete TypeDuck user data');
+    DataCheckBox.Checked := False;
+
+    ContinueButton := TNewButton.Create(Form);
+    ContinueButton.Parent := Form;
+    ContinueButton.SetBounds(ScaleX(254), ScaleY(132), ScaleX(96), ScaleY(30));
+    ContinueButton.Caption := Bilingual('繼續', 'Continue');
+    ContinueButton.Default := True;
+    ContinueButton.ModalResult := mrOk;
+
+    CancelButton := TNewButton.Create(Form);
+    CancelButton.Parent := Form;
+    CancelButton.SetBounds(ScaleX(358), ScaleY(132), ScaleX(96), ScaleY(30));
+    CancelButton.Caption := Bilingual('取消', 'Cancel');
+    CancelButton.Cancel := True;
+    CancelButton.ModalResult := mrCancel;
+
+    Result := Form.ShowModal = mrOk;
+    if Result then
+      DeleteUserDataOnUninstall := DataCheckBox.Checked;
+  finally
+    Form.Free;
+  end;
+end;
+
+function InitializeUninstall(): Boolean;
+begin
+  DeleteUserDataOnUninstall := False;
+  if UninstallSilent then
+  begin
+    Result := True;
+    Exit;
+  end;
+  Result := PromptDeleteUserDataOnUninstall;
+end;
+
+function ShouldDeleteUserDataOnUninstall(): Boolean;
+begin
+  Result := DeleteUserDataOnUninstall;
+end;
+
 procedure CurUninstallStepChanged(CurUninstallStep: TUninstallStep);
 var
   ResultCode: Integer;
@@ -365,6 +491,5 @@ begin
   if CurUninstallStep = usPostUninstall then
   begin
     RegPurgeTypeDuckResiduals;
-    UninstallProgressForm.StatusLabel.Caption := UninstallFinishedText;
   end;
 end;

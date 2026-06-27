@@ -157,8 +157,16 @@ function Assert-InstallerScript {
         "This input method is developed by the Department of Linguistics and Modern Language Studies, the Education University of Hong Kong\. Special thanks to the Standing Committee on Language Education and Research for funding this project\."
     ) "Installer welcome page must source the exact Phase 5 About intro/contact/credit bilingual text."
 
-    Assert-Match $Failures $Iss "Name:\s*`"english`"" "Installer must include English wizard resources."
-    Assert-Match $Failures $Iss "chinesetraditional|ChineseTraditional|Traditional Chinese" "Installer must use Traditional Chinese-compatible resources."
+    Assert-NotMatch $Failures $Iss "MessagesFile\s*=" "Installer must not depend on external Inno message files for visible setup/uninstall chrome."
+    Assert-AllMatch $Failures $Iss @(
+        "\[Messages\]",
+        "ButtonNext=.*下一步.*Next",
+        "WizardSelectDir=.*選擇安裝位置.*Select Destination Location",
+        "ReadyLabel1=.*TypeDuck",
+        "InstallingLabel=.*TypeDuck",
+        "ConfirmUninstall=.*是否要移除.*Do you want to remove",
+        "UninstalledAll=.*TypeDuck 已解除安裝.*TypeDuck is uninstalled"
+    ) "Installer must provide TypeDuck-controlled bilingual setup and uninstall chrome in installer/MoqiTsf.iss."
     Assert-BilingualCopy $Failures $Iss "installer/MoqiTsf.iss"
     Assert-NotMatch $Failures $Iss "MoqiLauncher\.exe|(?<!TypeDuck)SetupHelper\.exe|MoqiTextService\.dll|DefaultDirName=\{autopf32\}\\MoqiIM|OutputBaseFilename=moqi-im-windows-setup" `
         "Installer-controlled payload, install directory, and artifact names must not use Moqi deployed names."
@@ -179,14 +187,23 @@ function Assert-InstallerScript {
         "DeleteTypeDuckReregisterTask",
         "Type:\s*filesandordirs;\s*Name:\s*`"\{app\}`"",
         "Type:\s*filesandordirs;\s*Name:\s*`"\{localappdata\}\\TypeDuckIME`"",
-        "Type:\s*filesandordirs;\s*Name:\s*`"\{userappdata\}\\TypeDuckIME`""
-    ) "Uninstall cleanup must cover TypeDuck registration, startup, task, install files, and TypeDuck-owned state."
+        "Type:\s*filesandordirs;\s*Name:\s*`"\{userappdata\}\\TypeDuckIME`";\s*Check:\s*ShouldDeleteUserDataOnUninstall",
+        "PromptDeleteUserDataOnUninstall",
+        "DeleteUserDataOnUninstall := False"
+    ) "Uninstall cleanup must cover TypeDuck registration, startup, task, install files, and make roaming user-data deletion opt-in."
+    Assert-AllMatch $Failures $Iss @(
+        "Type:\s*filesandordirs;\s*Name:\s*`"\{app\}\\x64`"",
+        "Type:\s*filesandordirs;\s*Name:\s*`"\{app\}\\TypeDuckRuntime`"",
+        "Type:\s*filesandordirs;\s*Name:\s*`"\{app\}\\resources`""
+    ) "InstallDelete must pre-clean only the current staged TypeDuck app folders."
+    Assert-NotMatch $Failures $Iss "\{app\}\\moqi-ime|Legacy transitional cleanup" `
+        "Installer cleanup must not include legacy Moqi runtime folders because TypeDuck has not been distributed with that layout."
     Assert-AllMatch $Failures $Iss @(
         "CurPageChanged\(CurPageID: Integer\)",
         "WizardForm\.FinishedLabel\.Caption := InstallFinishedText",
         "HelperInstallFailed",
         "could not finish installation",
-        "UninstallProgressForm\.StatusLabel\.Caption := UninstallFinishedText",
+        "UninstalledAll=.*If TypeDuck still appears, restart your computer",
         "HadExistingInstall := ExistingImeInstallationPresent",
         "歡迎使用 TypeDuck",
         "Welcome to TypeDuck",
