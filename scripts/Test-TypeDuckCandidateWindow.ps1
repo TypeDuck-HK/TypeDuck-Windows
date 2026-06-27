@@ -170,6 +170,7 @@ if ($Strict) {
   Assert-Contains $windowSource 'candidateHasPrevious|candidateHasNext' "candidate page navigation must consume backend page availability"
   Assert-Contains $clientSource 'setCandidateHasPrevious|setCandidateHasNext' "backend page availability must be applied to the text service"
   Assert-Contains $windowSource 'GetDpiForWindow|LOGPIXELSX|scalePx' "DPI-aware sizing"
+  Assert-Contains $windowSource 'dpiForOwnerWindow|createPointFontForDpi|ThreadDpiAwarenessScope' "candidate popup must use owner DPI instead of host-virtualized window DC sizing"
   Assert-Contains $textServiceSource 'clampCandidateWindowToWorkArea|MonitorFromRect|GetMonitorInfo' "multi-monitor work-area placement"
   Assert-Contains $textServiceSource 'fallbackAnchorRect|GetGUIThreadInfo' "composition rectangle fallback"
   Assert-Contains $textServiceSource 'SWP_NOACTIVATE' "non-activating SetWindowPos placement"

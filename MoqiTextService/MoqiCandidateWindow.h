@@ -75,6 +75,7 @@ public:
 
     void add(CandidateUiItem item, wchar_t selKey);
     void clear();
+    void setFont(HFONT font);
     void setCandPerRow(int n);
     void setCandSpacing(int spacing);
     void setCurrentSel(int sel);
@@ -125,6 +126,8 @@ private:
     void paintPreeditCursor(HDC hdc, const RECT& preeditRc, int cursorX);
     void applyWindowShape();
     int scalePx(int value) const;
+    bool updateDpiFromOwner(HWND owner);
+    void refreshOwnedFonts();
     int entryRowCount(const CandidateUiItem& item) const;
     bool dictionaryPanelVisible() const;
     int effectiveDictionaryIndex() const;
@@ -199,6 +202,10 @@ private:
     int pressedSel_;
     int pressedPageNavDirection_;
     int hoveredPageNavDirection_;
+    int dpiX_;
+    int dpiY_;
+    HFONT ownedFont_;
+    HFONT ownedCommentFont_;
     bool draggingWindow_;
     bool trackingMouse_;
     bool useCursor_;

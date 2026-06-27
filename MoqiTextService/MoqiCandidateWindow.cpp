@@ -43,6 +43,8 @@ constexpr int kPageNavNone = -1;
 constexpr int kPageNavPrevious = 0;
 constexpr int kPageNavNext = 1;
 constexpr int kWindowDpiBaseline = 96;
+constexpr const wchar_t* kDefaultCandidateFontName = L"Microsoft JhengHei";
+constexpr const wchar_t* kDefaultCommentFontName = L"Segoe UI";
 constexpr int kBorderWidth = 1;
 constexpr int kInitialCompactPanelPaddingX = 7;
 constexpr int kInitialCompactPanelPaddingY = 3;
@@ -127,6 +129,133 @@ Moqi::TextService* productTextService(Ime::TextService* service) {
     return static_cast<Moqi::TextService*>(service);
 }
 
+struct DpiPair {
+    int x = kWindowDpiBaseline;
+    int y = kWindowDpiBaseline;
+};
+
+using SetThreadDpiAwarenessContextProc = DPI_AWARENESS_CONTEXT(WINAPI*)(DPI_AWARENESS_CONTEXT);
+using GetDpiForWindowProc = UINT(WINAPI*)(HWND);
+using GetDpiForMonitorProc = HRESULT(WINAPI*)(HMONITOR, int, UINT*, UINT*);
+using GetScaleFactorForMonitorProc = HRESULT(WINAPI*)(HMONITOR, int*);
+
+SetThreadDpiAwarenessContextProc setThreadDpiAwarenessContextProc() {
+    static auto proc = reinterpret_cast<SetThreadDpiAwarenessContextProc>(
+        ::GetProcAddress(::GetModuleHandleW(L"user32.dll"), "SetThreadDpiAwarenessContext"));
+    return proc;
+}
+
+class ThreadDpiAwarenessScope {
+public:
+    ThreadDpiAwarenessScope() {
+        auto proc = setThreadDpiAwarenessContextProc();
+        if (proc) {
+            oldContext_ = proc(reinterpret_cast<DPI_AWARENESS_CONTEXT>(-4));
+        }
+    }
+
+    ~ThreadDpiAwarenessScope() {
+        auto proc = setThreadDpiAwarenessContextProc();
+        if (proc && oldContext_) {
+            proc(oldContext_);
+        }
+    }
+
+private:
+    DPI_AWARENESS_CONTEXT oldContext_ = nullptr;
+};
+
+DpiPair dpiFromScreenDc() {
+    DpiPair dpi;
+    HDC hdc = ::GetDC(nullptr);
+    if (hdc) {
+        dpi.x = (std::max)(kWindowDpiBaseline, ::GetDeviceCaps(hdc, LOGPIXELSX));
+        dpi.y = (std::max)(kWindowDpiBaseline, ::GetDeviceCaps(hdc, LOGPIXELSY));
+        ::ReleaseDC(nullptr, hdc);
+    }
+    return dpi;
+}
+
+DpiPair dpiFromMonitor(HMONITOR monitor) {
+    DpiPair dpi = dpiFromScreenDc();
+    if (!monitor) {
+        return dpi;
+    }
+
+    HMODULE shcore = ::LoadLibraryW(L"Shcore.dll");
+    if (shcore) {
+        auto getDpiForMonitor = reinterpret_cast<GetDpiForMonitorProc>(
+            ::GetProcAddress(shcore, "GetDpiForMonitor"));
+        if (getDpiForMonitor) {
+            UINT x = 0;
+            UINT y = 0;
+            if (SUCCEEDED(getDpiForMonitor(monitor, 0, &x, &y)) && x > 0 && y > 0) {
+                dpi.x = (std::max)(dpi.x, static_cast<int>(x));
+                dpi.y = (std::max)(dpi.y, static_cast<int>(y));
+            }
+        }
+
+        auto getScaleFactorForMonitor = reinterpret_cast<GetScaleFactorForMonitorProc>(
+            ::GetProcAddress(shcore, "GetScaleFactorForMonitor"));
+        if (getScaleFactorForMonitor) {
+            int scalePercent = 100;
+            if (SUCCEEDED(getScaleFactorForMonitor(monitor, &scalePercent)) && scalePercent > 0) {
+                const int scaledDpi = ::MulDiv(kWindowDpiBaseline, scalePercent, 100);
+                dpi.x = (std::max)(dpi.x, scaledDpi);
+                dpi.y = (std::max)(dpi.y, scaledDpi);
+            }
+        }
+        ::FreeLibrary(shcore);
+    }
+    return dpi;
+}
+
+DpiPair dpiForOwnerWindow(HWND owner) {
+    DpiPair dpi = dpiFromScreenDc();
+    HWND target = owner ? owner : ::GetForegroundWindow();
+    if (target) {
+        auto getDpiForWindow = reinterpret_cast<GetDpiForWindowProc>(
+            ::GetProcAddress(::GetModuleHandleW(L"user32.dll"), "GetDpiForWindow"));
+        if (getDpiForWindow) {
+            const UINT windowDpi = getDpiForWindow(target);
+            if (windowDpi > 0) {
+                dpi.x = (std::max)(dpi.x, static_cast<int>(windowDpi));
+                dpi.y = (std::max)(dpi.y, static_cast<int>(windowDpi));
+            }
+        }
+        const DpiPair monitorDpi = dpiFromMonitor(::MonitorFromWindow(target, MONITOR_DEFAULTTONEAREST));
+        dpi.x = (std::max)(dpi.x, monitorDpi.x);
+        dpi.y = (std::max)(dpi.y, monitorDpi.y);
+    }
+    return dpi;
+}
+
+int fontPointHeightForDpi(int dpiY, int point) {
+    return -::MulDiv(point, (std::max)(kWindowDpiBaseline, dpiY), 72);
+}
+
+HFONT createPointFontForDpi(int dpiY,
+                            const wchar_t* faceName,
+                            int pointSize,
+                            int weight = FW_NORMAL,
+                            bool italic = false) {
+    return ::CreateFontW(
+        fontPointHeightForDpi(dpiY, pointSize),
+        0,
+        0,
+        0,
+        weight,
+        italic ? TRUE : FALSE,
+        FALSE,
+        FALSE,
+        DEFAULT_CHARSET,
+        OUT_DEFAULT_PRECIS,
+        CLIP_DEFAULT_PRECIS,
+        CLEARTYPE_QUALITY,
+        DEFAULT_PITCH | FF_DONTCARE,
+        faceName);
+}
+
 std::wstring currentProcessPath() {
     std::wstring buffer(MAX_PATH, L'\0');
     DWORD len = ::GetModuleFileNameW(nullptr, &buffer[0], static_cast<DWORD>(buffer.size()));
@@ -169,33 +298,6 @@ std::wstring formatCandidateWindowLogLine(const std::wstring& message) {
          << L"[exe=" << (exeName.empty() ? L"<unknown>" : exeName) << L"] "
          << message;
     return line.str();
-}
-
-int fontPointHeight(HDC hdc, int point) {
-    const int dpiY = hdc ? ::GetDeviceCaps(hdc, LOGPIXELSY) : kWindowDpiBaseline;
-    return -::MulDiv(point, dpiY, 72);
-}
-
-HFONT createPanelFont(HDC hdc,
-                      const wchar_t* faceName,
-                      int pointSize,
-                      int weight = FW_NORMAL,
-                      bool italic = false) {
-    return ::CreateFontW(
-        fontPointHeight(hdc, pointSize),
-        0,
-        0,
-        0,
-        weight,
-        italic ? TRUE : FALSE,
-        FALSE,
-        FALSE,
-        DEFAULT_CHARSET,
-        OUT_DEFAULT_PRECIS,
-        CLIP_DEFAULT_PRECIS,
-        CLEARTYPE_QUALITY,
-        DEFAULT_PITCH | FF_DONTCARE,
-        faceName);
 }
 
 HFONT createDerivedFont(HFONT baseFont, const wchar_t* faceName) {
@@ -437,6 +539,10 @@ CandidateWindow::CandidateWindow(Ime::TextService* service, Ime::EditSession* se
       pressedSel_(-1),
       pressedPageNavDirection_(kPageNavNone),
       hoveredPageNavDirection_(kPageNavNone),
+      dpiX_(kWindowDpiBaseline),
+      dpiY_(kWindowDpiBaseline),
+      ownedFont_(nullptr),
+      ownedCommentFont_(nullptr),
       draggingWindow_(false),
       trackingMouse_(false),
       useCursor_(false),
@@ -445,18 +551,31 @@ CandidateWindow::CandidateWindow(Ime::TextService* service, Ime::EditSession* se
 
     const HWND rawOwner = resolveCandidateOwnerWindow(session);
     const HWND owner = normalizeCandidateOwnerWindow(rawOwner, service->isImmersive(), L"ctor");
-    create(owner, WS_POPUP | WS_CLIPCHILDREN,
-           WS_EX_TOOLWINDOW | WS_EX_TOPMOST | WS_EX_NOACTIVATE);
+    updateDpiFromOwner(owner);
+    {
+        ThreadDpiAwarenessScope dpiScope;
+        create(owner, WS_POPUP | WS_CLIPCHILDREN,
+               WS_EX_TOOLWINDOW | WS_EX_TOPMOST | WS_EX_NOACTIVATE);
+    }
 
     std::wostringstream log;
     log << L"[CandidateWindow::ctor] hwnd=" << hwnd_
         << L" raw_owner=" << rawOwner
-        << L" owner=" << owner;
+        << L" owner=" << owner
+        << L" dpi=" << dpiX_ << L"x" << dpiY_;
     appendCandidateWindowLog(log.str());
     logCandidateWindowState(L"[CandidateWindow::ctor.state]", hwnd_);
 }
 
 CandidateWindow::~CandidateWindow(void) {
+    if (ownedFont_) {
+        ::DeleteObject(ownedFont_);
+        ownedFont_ = nullptr;
+    }
+    if (ownedCommentFont_) {
+        ::DeleteObject(ownedCommentFont_);
+        ownedCommentFont_ = nullptr;
+    }
 }
 
 STDMETHODIMP CandidateWindow::GetDescription(BSTR* pbstrDescription) {
@@ -651,6 +770,14 @@ void CandidateWindow::clear() {
     }
 }
 
+void CandidateWindow::setFont(HFONT) {
+    refreshOwnedFonts();
+    recalculateSize();
+    if (isVisible()) {
+        ::InvalidateRect(hwnd_, NULL, TRUE);
+    }
+}
+
 void CandidateWindow::setCandPerRow(int n) {
     n = (std::max)(1, n);
     if (candPerRow_ != n) {
@@ -746,13 +873,11 @@ void CandidateWindow::setPreeditSelection(int start, int end) {
     }
 }
 
-void CandidateWindow::setCommentFont(HFONT font) {
-    if (commentFont_ != font) {
-        commentFont_ = font;
-        recalculateSize();
-        if (isVisible()) {
-            ::InvalidateRect(hwnd_, NULL, TRUE);
-        }
+void CandidateWindow::setCommentFont(HFONT) {
+    refreshOwnedFonts();
+    recalculateSize();
+    if (isVisible()) {
+        ::InvalidateRect(hwnd_, NULL, TRUE);
     }
 }
 
@@ -856,6 +981,11 @@ void CandidateWindow::syncOwner(Ime::EditSession* session) {
     if (shown_) {
         enforceCandidateWindowTopmost(hwnd_, true, L"syncOwner");
     }
+    const bool dpiChanged = updateDpiFromOwner(owner);
+    if (dpiChanged) {
+        refreshOwnedFonts();
+        recalculateSize();
+    }
 
     std::wostringstream log;
     log << L"[CandidateWindow::syncOwner] hwnd=" << hwnd_
@@ -863,6 +993,7 @@ void CandidateWindow::syncOwner(Ime::EditSession* session) {
         << L" old_gw_owner=" << currentGwOwner
         << L" raw_owner=" << rawOwner
         << L" new_owner=" << owner
+        << L" dpi=" << dpiX_ << L"x" << dpiY_
         << L" shown=" << shown_
         << L" owner_updated=" << (ownerUpdated ? L"true" : L"false");
     if (ownerError != 0) {
@@ -872,7 +1003,42 @@ void CandidateWindow::syncOwner(Ime::EditSession* session) {
     logCandidateWindowState(L"[CandidateWindow::syncOwner.state]", hwnd_);
 }
 
+bool CandidateWindow::updateDpiFromOwner(HWND owner) {
+    const DpiPair dpi = dpiForOwnerWindow(owner ? owner : hwnd_);
+    if (dpi.x == dpiX_ && dpi.y == dpiY_) {
+        return false;
+    }
+    dpiX_ = dpi.x;
+    dpiY_ = dpi.y;
+    return true;
+}
+
+void CandidateWindow::refreshOwnedFonts() {
+    auto* service = productTextService(textService_);
+    const std::wstring candidateFace = service->candFontName().empty()
+                                           ? kDefaultCandidateFontName
+                                           : service->candFontName();
+    const std::wstring commentFace = service->candCommentFontName().empty()
+                                         ? kDefaultCommentFontName
+                                         : service->candCommentFontName();
+
+    HFONT nextFont = createPointFontForDpi(dpiY_, candidateFace.c_str(), service->candFontSize());
+    HFONT nextCommentFont = createPointFontForDpi(dpiY_, commentFace.c_str(), service->candCommentFontSize());
+
+    if (ownedFont_) {
+        ::DeleteObject(ownedFont_);
+    }
+    if (ownedCommentFont_) {
+        ::DeleteObject(ownedCommentFont_);
+    }
+    ownedFont_ = nextFont;
+    ownedCommentFont_ = nextCommentFont;
+    font_ = ownedFont_ ? ownedFont_ : static_cast<HFONT>(::GetStockObject(DEFAULT_GUI_FONT));
+    commentFont_ = ownedCommentFont_;
+}
+
 void CandidateWindow::recalculateSize() {
+    ThreadDpiAwarenessScope dpiScope;
     if (items_.empty() && preedit_.empty()) {
         selKeyWidth_ = 0;
         textWidth_ = 0;
@@ -940,7 +1106,7 @@ void CandidateWindow::recalculateSize() {
     bool hasIndicatorColumn = false;
 
     HGDIOBJ oldFont = ::SelectObject(hdc, font_);
-    HFONT rowMetaFont = createPanelFont(hdc, L"Segoe UI", 12);
+    HFONT rowMetaFont = createPointFontForDpi(dpiY_, L"Segoe UI", 12);
     TEXTMETRICW metrics = {};
     TEXTMETRICW commentMetrics = {};
     ::GetTextMetricsW(hdc, &metrics);
@@ -1065,13 +1231,13 @@ void CandidateWindow::recalculateSize() {
     int dictionaryContentWidth = 0;
     dictionaryContentHeight_ = 0;
     if (dictionaryPanelVisible()) {
-        HFONT entryFont = createPanelFont(hdc, L"DFKai-SB", 32);
-        HFONT pronFont = createPanelFont(hdc, L"Segoe UI", 15);
-        HFONT pronTypeFont = createPanelFont(hdc, L"Segoe UI", 12);
-        HFONT posFont = createPanelFont(hdc, L"Segoe UI", 10);
-        HFONT bodyFont = createPanelFont(hdc, L"Segoe UI", 12);
-        HFONT valueFont = createPanelFont(hdc, L"Microsoft JhengHei", 12);
-        HFONT captionFont = createPanelFont(hdc, L"Segoe UI", 13, FW_SEMIBOLD);
+        HFONT entryFont = createPointFontForDpi(dpiY_, L"DFKai-SB", 32);
+        HFONT pronFont = createPointFontForDpi(dpiY_, L"Segoe UI", 15);
+        HFONT pronTypeFont = createPointFontForDpi(dpiY_, L"Segoe UI", 12);
+        HFONT posFont = createPointFontForDpi(dpiY_, L"Segoe UI", 10);
+        HFONT bodyFont = createPointFontForDpi(dpiY_, L"Segoe UI", 12);
+        HFONT valueFont = createPointFontForDpi(dpiY_, L"Microsoft JhengHei", 12);
+        HFONT captionFont = createPointFontForDpi(dpiY_, L"Segoe UI", 13, FW_SEMIBOLD);
         const int titleGap = scalePx(kDictionaryHeaderGap);
         const int posPadding = scalePx(kDictionaryPosPadding);
         const int posGap = scalePx(kDictionaryPosGap);
@@ -1535,7 +1701,7 @@ void CandidateWindow::paintPageNavigation(HDC hdc, const RECT& panelRc) {
     paintNavBackground(kPageNavPrevious, prevRc, hasPrev);
     paintNavBackground(kPageNavNext, nextRc, hasNext);
 
-    HFONT navFont = createPanelFont(hdc, L"Segoe UI Symbol", kPageNavGlyphPointSize);
+    HFONT navFont = createPointFontForDpi(dpiY_, L"Segoe UI Symbol", kPageNavGlyphPointSize);
     HGDIOBJ oldFont = ::SelectObject(hdc, navFont ? navFont : font_);
     auto drawNavGlyph = [&](const wchar_t* glyph, const RECT& glyphRc, COLORREF color) {
         SIZE glyphSize = {};
@@ -1586,7 +1752,7 @@ void CandidateWindow::paintCandidateRow(HDC hdc, int index, const RECT& rowRc) {
     wchar_t selKey[] = L"?.";
     selKey[0] = selKeys_[index];
     const COLORREF oldColor = ::SetTextColor(hdc, selColor);
-    HFONT rowMetaFont = createPanelFont(hdc, L"Segoe UI", 12);
+    HFONT rowMetaFont = createPointFontForDpi(dpiY_, L"Segoe UI", 12);
     HGDIOBJ oldFont = ::SelectObject(hdc, rowMetaFont ? rowMetaFont : font_);
 
     const CandidateUiItem& item = items_[index];
@@ -1714,13 +1880,13 @@ void CandidateWindow::paintDictionaryEntry(
     const RECT& panelRc,
     const TypeDuck::CandidateEntry& entry,
     bool paint) {
-    HFONT entryFont = createPanelFont(hdc, L"DFKai-SB", 32);
-    HFONT pronFont = createPanelFont(hdc, L"Segoe UI", 15);
-    HFONT pronTypeFont = createPanelFont(hdc, L"Segoe UI", 12);
-    HFONT posFont = createPanelFont(hdc, L"Segoe UI", 10);
-    HFONT bodyFont = createPanelFont(hdc, L"Segoe UI", 12);
-    HFONT valueFont = createPanelFont(hdc, L"Microsoft JhengHei", 12);
-    HFONT captionFont = createPanelFont(hdc, L"Segoe UI", 13, FW_SEMIBOLD);
+    HFONT entryFont = createPointFontForDpi(dpiY_, L"DFKai-SB", 32);
+    HFONT pronFont = createPointFontForDpi(dpiY_, L"Segoe UI", 15);
+    HFONT pronTypeFont = createPointFontForDpi(dpiY_, L"Segoe UI", 12);
+    HFONT posFont = createPointFontForDpi(dpiY_, L"Segoe UI", 10);
+    HFONT bodyFont = createPointFontForDpi(dpiY_, L"Segoe UI", 12);
+    HFONT valueFont = createPointFontForDpi(dpiY_, L"Microsoft JhengHei", 12);
+    HFONT captionFont = createPointFontForDpi(dpiY_, L"Segoe UI", 13, FW_SEMIBOLD);
     HGDIOBJ oldFont = ::SelectObject(hdc, font_);
 
     const int padX = scalePx(kDictionaryPanelHorizontalPadding);
@@ -2198,12 +2364,7 @@ void CandidateWindow::onMouseWheel(WPARAM wp, LPARAM lp) {
 }
 
 int CandidateWindow::scalePx(int value) const {
-    HDC hdc = hwnd_ ? ::GetDC(hwnd_) : ::GetDC(nullptr);
-    const int dpi = hdc ? ::GetDeviceCaps(hdc, LOGPIXELSX) : kWindowDpiBaseline;
-    if (hdc) {
-        ::ReleaseDC(hwnd_ ? hwnd_ : nullptr, hdc);
-    }
-    return ::MulDiv(value, dpi, kWindowDpiBaseline);
+    return ::MulDiv(value, (std::max)(kWindowDpiBaseline, dpiX_), kWindowDpiBaseline);
 }
 
 int CandidateWindow::entryRowCount(const CandidateUiItem& item) const {
