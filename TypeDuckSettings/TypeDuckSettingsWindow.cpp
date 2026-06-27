@@ -159,7 +159,7 @@ std::wstring launcherPipeName() {
   if (!username.empty() && username.back() == L'\0') {
     username.pop_back();
   }
-  return L"\\\\.\\pipe\\" + username + L"\\MoqiIM\\" + kLauncherPipeBaseName;
+  return L"\\\\.\\pipe\\" + username + L"\\TypeDuckIME\\" + kLauncherPipeBaseName;
 }
 
 bool ensureLauncherRunning() {

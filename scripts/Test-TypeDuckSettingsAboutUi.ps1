@@ -213,6 +213,8 @@ Assert-Text $window "kSettingsButtonWidth" "Confirm and Cancel buttons must use 
 Assert-Text $window "kApplyDefaultsSwitch" "Settings executable must expose a quiet default-preference seed mode for installation."
 Assert-Text $window "applyViaLauncher" "Settings confirmation must apply through the launcher so Rime redeploy runs."
 Assert-Text $window "METHOD_TYPEDUCK_SETTINGS_UPDATE" "Settings confirmation must send the TypeDuck settings update IPC request."
+Assert-Text $window 'TypeDuckIME\\\\|TypeDuckIME' "Settings confirmation must connect to the TypeDuck launcher pipe namespace."
+Assert-True ($window -notmatch '\\MoqiIM\\|\\\\MoqiIM\\\\') "Settings confirmation must not connect to the Legacy Moqi launcher pipe namespace."
 Assert-Ordered $window @(
   "主要語言 Main Language",
   "顯示 Display",
