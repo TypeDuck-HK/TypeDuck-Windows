@@ -71,8 +71,8 @@ function Assert-RecoveryResults {
     }
   }
 
-  if ($Strict -and $evidence.screenshot_automation -ne $false) {
-    Add-Failure $failures "Recovery evidence must explicitly record screenshot_automation=false."
+  if ($Strict -and $evidence.non_visual_probe -ne $true) {
+    Add-Failure $failures "Recovery evidence must explicitly record non_visual_probe=true."
   }
 
   if ($failures.Count -gt 0) {
@@ -83,7 +83,7 @@ function Assert-RecoveryResults {
 $root = Resolve-ProbePath -BasePath (Get-Location).Path -Path $RepoRoot
 $buildRoot = Resolve-ProbePath -BasePath $root -Path $BuildDir
 $evidenceFull = Resolve-ProbePath -BasePath $root -Path $EvidencePath
-$logFull = Resolve-ProbePath -BasePath $root -Path ".planning\product\release-fixtures\phase-07\protocol-recovery-probe.ndjson"
+$logFull = Join-Path $buildRoot "TypeDuckProtocolRecovery\protocol-recovery-probe.ndjson"
 
 if (-not (Test-Path -LiteralPath $root -PathType Container)) {
   throw "RepoRoot missing: $root"

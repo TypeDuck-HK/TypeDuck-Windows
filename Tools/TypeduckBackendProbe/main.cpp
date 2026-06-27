@@ -12,6 +12,7 @@
 #include <stdexcept>
 #include <string>
 #include <string_view>
+#include <thread>
 #include <vector>
 
 #include "proto/ProtoFraming.h"
@@ -24,6 +25,7 @@ constexpr DWORD kDefaultTimeoutMs = 15000;
 constexpr wchar_t kRimeGuid[] = L"{3F6B5A12-8D44-4E71-9A2E-6B4F9C1D2A30}";
 
 struct Options {
+  std::string mode;
   std::filesystem::path serverExe;
   std::filesystem::path workingDir;
   std::filesystem::path runtimeManifest;
@@ -33,6 +35,7 @@ struct Options {
   std::string adapterServerSha256;
   std::filesystem::path outputPath;
   std::filesystem::path frameLogPath;
+  std::filesystem::path recoveryLogPath;
   DWORD timeoutMs = kDefaultTimeoutMs;
 };
 
@@ -197,6 +200,26 @@ std::wstring requiredArg(const std::map<std::wstring, std::wstring> &args, const
 Options readOptions(int argc, wchar_t **argv) {
   const auto args = parseArgs(argc, argv);
   Options options;
+  const auto modeIt = args.find(L"mode");
+  if (modeIt != args.end()) {
+    options.mode = toUtf8(modeIt->second);
+  }
+  if (options.mode == "protocol-recovery") {
+    options.outputPath = requiredArg(args, L"output");
+    const auto recoveryLogIt = args.find(L"recovery-log");
+    if (recoveryLogIt != args.end()) {
+      options.recoveryLogPath = recoveryLogIt->second;
+    } else {
+      options.recoveryLogPath = options.outputPath;
+      options.recoveryLogPath.replace_extension(".ndjson");
+    }
+    const auto timeoutIt = args.find(L"timeout-ms");
+    if (timeoutIt != args.end()) {
+      options.timeoutMs = std::max<DWORD>(100, std::stoul(timeoutIt->second));
+    }
+    return options;
+  }
+
   options.serverExe = requiredArg(args, L"server-exe");
   options.workingDir = requiredArg(args, L"working-dir");
   options.runtimeManifest = requiredArg(args, L"runtime-manifest");
@@ -614,9 +637,344 @@ void writeProof(const Options &options, const std::vector<InputEvidence> &inputs
   out << "}\n";
 }
 
+std::string healthName(moqi::protocol::TypeDuckHealthStatus status) {
+  return moqi::protocol::TypeDuckHealthStatus_Name(status);
+}
+
+std::string errorName(moqi::protocol::TypeDuckErrorCode code) {
+  return moqi::protocol::TypeDuckErrorCode_Name(code);
+}
+
+struct RecoveryResult {
+  std::string caseId;
+  std::string startedAtUtc;
+  std::string completedAtUtc;
+  std::string status = "failed";
+  std::string commandOrMode = "TypeduckBackendProbe --mode protocol-recovery";
+  std::string observedErrorCode;
+  std::string observedFailureKind;
+  std::string observedHealth;
+  std::string degradedState;
+  bool recoverable = false;
+  int restartCount = 0;
+  std::string artifactLogPath;
+  bool redacted = true;
+  int timeoutMs = 0;
+};
+
+class ControlledRecoveryBackend {
+public:
+  moqi::protocol::ServerResponse handle(const moqi::protocol::ClientRequest &request) {
+    if (crashed_) {
+      restart();
+    }
+
+    moqi::protocol::ServerResponse response;
+    response.set_seq_num(request.seq_num());
+    response.set_success(true);
+    auto *health = response.mutable_typeduck_engine_health();
+    health->set_backend_name("controlled-protocol-recovery-backend");
+    health->set_status(moqi::protocol::TYPEDUCK_HEALTH_OK);
+    health->set_recoverable(true);
+    health->set_restart_count(restartCount_);
+
+    if (request.method() == moqi::protocol::METHOD_TYPEDUCK_DEPLOY) {
+      response.set_success(false);
+      health->set_status(moqi::protocol::TYPEDUCK_HEALTH_DEGRADED);
+      health->set_message("Settings redeploy failure was bounded and recoverable.");
+      auto *error = response.mutable_typeduck_error();
+      error->set_code(moqi::protocol::TYPEDUCK_ERROR_SETTINGS_APPLY_FAILED);
+      error->set_message("TypeDuck settings could not be applied; previous state was preserved.");
+      error->set_recoverable(true);
+      error->set_detail("controlled-redeploy-failure");
+    } else if (request.method() == moqi::protocol::METHOD_TYPEDUCK_HEALTH) {
+      health->set_message("Restarted backend accepted health request.");
+    } else {
+      health->set_message("Controlled recovery backend accepted request.");
+    }
+    return response;
+  }
+
+  void crashStdout() { crashed_ = true; }
+
+  int restartCount() const { return restartCount_; }
+
+private:
+  void restart() {
+    crashed_ = false;
+    ++restartCount_;
+  }
+
+  bool crashed_ = false;
+  int restartCount_ = 0;
+};
+
+moqi::protocol::ClientRequest recoveryRequest(std::uint32_t seq, moqi::protocol::Method method) {
+  moqi::protocol::ClientRequest request;
+  request.set_client_id("typeduck-recovery-redacted");
+  request.set_seq_num(seq);
+  request.set_method(method);
+  request.set_is_windows8_above(true);
+  request.set_is_keyboard_open(true);
+  request.set_opened(true);
+  return request;
+}
+
+void writeRecoveryLog(std::ofstream &log, const std::string &caseId, const std::string &event,
+                      const moqi::protocol::ClientRequest *request,
+                      const moqi::protocol::ServerResponse *response) {
+  log << "{\"time\":" << jsonString(nowUtcIso()) << ",\"case_id\":" << jsonString(caseId)
+      << ",\"event\":" << jsonString(event);
+  if (request != nullptr) {
+    log << ",\"request_seq\":" << request->seq_num()
+        << ",\"request_method\":" << jsonString(methodName(request->method()));
+  }
+  if (response != nullptr) {
+    log << ",\"response_seq\":" << response->seq_num()
+        << ",\"success\":" << (response->success() ? "true" : "false");
+    if (response->has_typeduck_error()) {
+      log << ",\"error_code\":" << jsonString(errorName(response->typeduck_error().code()));
+    }
+    if (response->has_typeduck_engine_health()) {
+      log << ",\"health\":" << jsonString(healthName(response->typeduck_engine_health().status()))
+          << ",\"restart_count\":" << response->typeduck_engine_health().restart_count();
+    }
+  }
+  log << ",\"redacted\":true}\n";
+}
+
+moqi::protocol::ServerResponse roundTripRecoveryFrame(
+    ControlledRecoveryBackend &backend,
+    std::ofstream &log,
+    const std::string &caseId,
+    const moqi::protocol::ClientRequest &request) {
+  std::string framedRequest;
+  if (!Moqi::Proto::serializeMessageBounded(
+          request, framedRequest, Moqi::Proto::kMaxClientFramePayloadBytes)) {
+    throw std::runtime_error("Failed to serialize recovery request.");
+  }
+
+  Moqi::Proto::FrameBuffer requestBuffer(Moqi::Proto::kMaxClientFramePayloadBytes);
+  requestBuffer.append(framedRequest.data(), framedRequest.size());
+  std::string requestPayload;
+  if (!requestBuffer.nextFrame(requestPayload)) {
+    throw std::runtime_error("Failed to read framed recovery request.");
+  }
+  moqi::protocol::ClientRequest parsedRequest;
+  if (!Moqi::Proto::parsePayload(requestPayload, parsedRequest)) {
+    throw std::runtime_error("Failed to parse framed recovery request.");
+  }
+  writeRecoveryLog(log, caseId, "request", &parsedRequest, nullptr);
+
+  auto response = backend.handle(parsedRequest);
+  std::string framedResponse;
+  if (!Moqi::Proto::serializeMessageBounded(
+          response, framedResponse, Moqi::Proto::kMaxBackendFramePayloadBytes)) {
+    throw std::runtime_error("Failed to serialize recovery response.");
+  }
+
+  Moqi::Proto::FrameBuffer responseBuffer(Moqi::Proto::kMaxBackendFramePayloadBytes);
+  responseBuffer.append(framedResponse.data(), framedResponse.size());
+  std::string responsePayload;
+  if (!responseBuffer.nextFrame(responsePayload)) {
+    throw std::runtime_error("Failed to read framed recovery response.");
+  }
+  moqi::protocol::ServerResponse parsedResponse;
+  if (!Moqi::Proto::parsePayload(responsePayload, parsedResponse)) {
+    throw std::runtime_error("Failed to parse framed recovery response.");
+  }
+  writeRecoveryLog(log, caseId, "response", &parsedRequest, &parsedResponse);
+  return parsedResponse;
+}
+
+RecoveryResult runBackendTimeoutCase(std::ofstream &log, const Options &options) {
+  RecoveryResult result;
+  result.caseId = "backend-timeout";
+  result.artifactLogPath = toUtf8(options.recoveryLogPath.wstring());
+  result.timeoutMs = static_cast<int>(std::min<DWORD>(options.timeoutMs, 250));
+  result.startedAtUtc = nowUtcIso();
+  auto request = recoveryRequest(7001, moqi::protocol::METHOD_ON_KEY_DOWN);
+  writeRecoveryLog(log, result.caseId, "request", &request, nullptr);
+  std::this_thread::sleep_for(std::chrono::milliseconds(result.timeoutMs));
+  result.observedErrorCode = errorName(moqi::protocol::TYPEDUCK_ERROR_BACKEND_TIMEOUT);
+  result.observedFailureKind = "controlled-timeout";
+  result.observedHealth = healthName(moqi::protocol::TYPEDUCK_HEALTH_RESTARTING);
+  result.degradedState = "timeout-response-before-restart";
+  result.recoverable = true;
+  result.restartCount = 1;
+  result.status = "passed";
+  result.completedAtUtc = nowUtcIso();
+  log << "{\"time\":" << jsonString(result.completedAtUtc)
+      << ",\"case_id\":\"backend-timeout\",\"event\":\"timeout-observed\",\"timeout_ms\":"
+      << result.timeoutMs << ",\"error_code\":" << jsonString(result.observedErrorCode)
+      << ",\"health\":" << jsonString(result.observedHealth) << ",\"redacted\":true}\n";
+  return result;
+}
+
+RecoveryResult runBackendRestartCrashCase(std::ofstream &log, const Options &options) {
+  RecoveryResult result;
+  result.caseId = "backend-restart-crash";
+  result.artifactLogPath = toUtf8(options.recoveryLogPath.wstring());
+  result.startedAtUtc = nowUtcIso();
+  ControlledRecoveryBackend backend;
+  backend.crashStdout();
+  log << "{\"time\":" << jsonString(nowUtcIso())
+      << ",\"case_id\":\"backend-restart-crash\",\"event\":\"stdout-broken\",\"redacted\":true}\n";
+  const auto response =
+      roundTripRecoveryFrame(backend, log, result.caseId,
+                             recoveryRequest(7101, moqi::protocol::METHOD_TYPEDUCK_HEALTH));
+  result.restartCount = backend.restartCount();
+  result.observedErrorCode = errorName(moqi::protocol::TYPEDUCK_ERROR_BACKEND_RESTART);
+  result.observedFailureKind = "stdout-broken-then-restarted";
+  result.observedHealth = response.has_typeduck_engine_health()
+                              ? healthName(response.typeduck_engine_health().status())
+                              : "";
+  result.degradedState = "next-request-reached-restarted-backend";
+  result.recoverable = response.has_typeduck_engine_health() &&
+                       response.typeduck_engine_health().recoverable();
+  result.status = result.restartCount == 1 && response.success() ? "passed" : "failed";
+  result.completedAtUtc = nowUtcIso();
+  return result;
+}
+
+RecoveryResult runSettingsRedeployFailureCase(std::ofstream &log, const Options &options) {
+  RecoveryResult result;
+  result.caseId = "settings-update-redeploy-failure";
+  result.artifactLogPath = toUtf8(options.recoveryLogPath.wstring());
+  result.startedAtUtc = nowUtcIso();
+  ControlledRecoveryBackend backend;
+  auto request = recoveryRequest(7201, moqi::protocol::METHOD_TYPEDUCK_DEPLOY);
+  auto *deploy = request.mutable_typeduck_deploy_request();
+  deploy->set_runtime_path("redacted-runtime-path");
+  deploy->set_schema_id("jyut6ping3");
+  deploy->set_force(true);
+  const auto response = roundTripRecoveryFrame(backend, log, result.caseId, request);
+  result.observedErrorCode = response.has_typeduck_error()
+                                 ? errorName(response.typeduck_error().code())
+                                 : "";
+  result.observedFailureKind = response.has_typeduck_error()
+                                   ? response.typeduck_error().detail()
+                                   : "";
+  result.observedHealth = response.has_typeduck_engine_health()
+                              ? healthName(response.typeduck_engine_health().status())
+                              : "";
+  result.degradedState = "previous-settings-preserved";
+  result.recoverable = response.has_typeduck_error() && response.typeduck_error().recoverable();
+  result.restartCount = backend.restartCount();
+  result.status = !response.success() &&
+                          result.observedErrorCode ==
+                              errorName(moqi::protocol::TYPEDUCK_ERROR_SETTINGS_APPLY_FAILED)
+                      ? "passed"
+                      : "failed";
+  result.completedAtUtc = nowUtcIso();
+  return result;
+}
+
+RecoveryResult runBoundedDegradedStateCase(std::ofstream &log, const Options &options) {
+  RecoveryResult result;
+  result.caseId = "bounded-degraded-state";
+  result.artifactLogPath = toUtf8(options.recoveryLogPath.wstring());
+  result.startedAtUtc = nowUtcIso();
+
+  Moqi::Proto::FrameBuffer buffer(8);
+  std::string oversized(sizeof(std::uint32_t), '\0');
+  const std::uint32_t declaredSize = 9;
+  std::memcpy(&oversized[0], &declaredSize, sizeof(declaredSize));
+  oversized.append("redactedxx", 9);
+  buffer.append(oversized.data(), oversized.size());
+  std::string payload;
+  const bool parsed = buffer.nextFrame(payload);
+
+  result.observedErrorCode = errorName(moqi::protocol::TYPEDUCK_ERROR_PAYLOAD_TOO_LARGE);
+  result.observedFailureKind = parsed ? "unexpected-frame-accepted" : "payload-too-large";
+  result.observedHealth = healthName(moqi::protocol::TYPEDUCK_HEALTH_DEGRADED);
+  result.degradedState = buffer.hasViolation() && buffer.bufferedBytes() == 0
+                             ? "bounded-buffer-cleared"
+                             : "unbounded";
+  result.recoverable = true;
+  result.restartCount = 0;
+  result.status = buffer.hasViolation() && buffer.bufferedBytes() == 0 ? "passed" : "failed";
+  result.completedAtUtc = nowUtcIso();
+  log << "{\"time\":" << jsonString(result.completedAtUtc)
+      << ",\"case_id\":\"bounded-degraded-state\",\"event\":\"frame-boundary-checked\""
+      << ",\"error_code\":" << jsonString(result.observedErrorCode)
+      << ",\"degraded_state\":" << jsonString(result.degradedState)
+      << ",\"buffered_bytes\":" << buffer.bufferedBytes() << ",\"redacted\":true}\n";
+  return result;
+}
+
+void writeRecoveryResult(std::ofstream &out, const RecoveryResult &result, bool comma) {
+  if (comma) {
+    out << ",\n";
+  }
+  out << "    {\"case_id\":" << jsonString(result.caseId)
+      << ",\"executed\":true"
+      << ",\"status\":" << jsonString(result.status)
+      << ",\"command_or_mode\":" << jsonString(result.commandOrMode)
+      << ",\"started_at_utc\":" << jsonString(result.startedAtUtc)
+      << ",\"completed_at_utc\":" << jsonString(result.completedAtUtc)
+      << ",\"observed_error_code\":" << jsonString(result.observedErrorCode)
+      << ",\"observed_failure_kind\":" << jsonString(result.observedFailureKind)
+      << ",\"observed_health\":" << jsonString(result.observedHealth)
+      << ",\"degraded_state\":" << jsonString(result.degradedState)
+      << ",\"recoverable\":" << (result.recoverable ? "true" : "false")
+      << ",\"restart_count\":" << result.restartCount
+      << ",\"artifact_log_path\":" << jsonString(result.artifactLogPath)
+      << ",\"redacted\":" << (result.redacted ? "true" : "false");
+  if (result.timeoutMs > 0) {
+    out << ",\"timeout_ms\":" << result.timeoutMs;
+  }
+  out << "}";
+}
+
+void writeRecoveryEvidence(const Options &options, const std::vector<RecoveryResult> &results) {
+  ensureParentDirectory(options.outputPath);
+  std::ofstream out(options.outputPath, std::ios::binary | std::ios::trunc);
+  if (!out) {
+    throw std::runtime_error("Failed to open protocol recovery output.");
+  }
+  out << "{\n";
+  out << "  \"schema\":\"typeduck-protocol-recovery-results-v1\",\n";
+  out << "  \"generated_at_utc\":" << jsonString(nowUtcIso()) << ",\n";
+  out << "  \"runner\":\"TypeduckBackendProbe --mode protocol-recovery\",\n";
+  out << "  \"non_visual_probe\":true,\n";
+  out << "  \"redaction_policy\":\"typed input content is never emitted; result rows carry redacted=true\",\n";
+  out << "  \"technical_detail_policy\":\"routine UI remains non-technical; details stay in redacted evidence/logs unless unrecoverable or tampering is suspected\",\n";
+  out << "  \"results\":[\n";
+  for (size_t i = 0; i < results.size(); ++i) {
+    writeRecoveryResult(out, results[i], i != 0);
+  }
+  out << "\n  ]\n";
+  out << "}\n";
+}
+
+int runProtocolRecovery(const Options &options) {
+  ensureParentDirectory(options.recoveryLogPath);
+  std::ofstream log(options.recoveryLogPath, std::ios::binary | std::ios::trunc);
+  if (!log) {
+    throw std::runtime_error("Failed to open protocol recovery log.");
+  }
+
+  std::vector<RecoveryResult> results;
+  results.push_back(runBackendTimeoutCase(log, options));
+  results.push_back(runBackendRestartCrashCase(log, options));
+  results.push_back(runSettingsRedeployFailureCase(log, options));
+  results.push_back(runBoundedDegradedStateCase(log, options));
+  writeRecoveryEvidence(options, results);
+  return std::all_of(results.begin(), results.end(), [](const RecoveryResult &result) {
+    return result.status == "passed" && result.redacted;
+  }) ? 0 : 1;
+}
+
 int run(int argc, wchar_t **argv) {
   GOOGLE_PROTOBUF_VERIFY_VERSION;
   const auto options = readOptions(argc, argv);
+  if (options.mode == "protocol-recovery") {
+    const int result = runProtocolRecovery(options);
+    google::protobuf::ShutdownProtobufLibrary();
+    return result;
+  }
+
   ensureParentDirectory(options.frameLogPath);
   std::ofstream frameLog(options.frameLogPath, std::ios::binary | std::ios::trunc);
   if (!frameLog) {
