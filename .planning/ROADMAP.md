@@ -212,7 +212,28 @@ Plans:
 
 **Verification Environment**: Mixed. Static/code tests are expected for audits, parser bounds, logging defaults, and removed handlers. Add targeted Windows VM smoke evidence for installed-path privacy, launcher/runtime behavior, config-tool removal, pipe behavior, and absence of legacy feature surfaces after installation.
 
-**Plans**: TBD
+**Plans**: 6 plans
+Plans:
+**Wave 1**
+
+- [ ] 06-01-PLAN.md — Clean installer localization, first-page copy, Start Menu entries, process cleanup, and Simplified Inno dependency.
+- [ ] 06-02-PLAN.md — Prune and rename the shipped TypeDuck runtime package under `TypeDuckRuntime`.
+
+**Wave 2** *(blocked on Wave 1 runtime package cleanup)*
+
+- [ ] 06-03-PLAN.md — Replace manifest-driven backend discovery with a fixed TypeDuck runtime bridge.
+
+**Wave 3** *(blocked on Wave 2 runtime discovery)*
+
+- [ ] 06-04-PLAN.md — Move diagnostics to TypeDuck-owned paths and remove off-scope cloud/AI/fcitx frontend paths.
+
+**Wave 4** *(blocked on Wave 3 diagnostics/off-scope cleanup)*
+
+- [ ] 06-05-PLAN.md — Harden named-pipe namespace, ACLs, frame checks, and launcher identity sanity.
+
+**Wave 5** *(blocked on all prior Phase 6 plans)*
+
+- [ ] 06-06-PLAN.md — Close aggregate guard coverage and TypeDuck CI/release artifact naming.
 **UI hint**: yes
 
 ### Phase 7: Compatibility and Release Verification
@@ -241,5 +262,5 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7
 | 3. zh-HK TSF Registration and Installer Skeleton | 3/3 | Complete    | 2026-06-24 |
 | 4. TypeDuck Protocol and Typing MVP | 4/4 | Complete | 2026-06-24 |
 | 5. Candidate, Dictionary, Settings, and About UI Parity | 15/15 | Complete | 2026-06-26 |
-| 6. Privacy, Security, and Scaffold Cleanup | 0/TBD | Not started | - |
+| 6. Privacy, Security, and Scaffold Cleanup | 0/6 | Not started | - |
 | 7. Compatibility and Release Verification | 0/TBD | Not started | - |
