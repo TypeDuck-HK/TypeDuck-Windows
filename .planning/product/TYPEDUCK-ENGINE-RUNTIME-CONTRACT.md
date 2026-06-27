@@ -18,7 +18,8 @@ Raw lookup-filter payload evidence and the ENG-05 handoff are recorded in `.plan
 |-------|-------|--------------|
 | TypeDuck-HK librime release | `https://github.com/TypeDuck-HK/librime/releases/download/v1.1.3/rime-TypeDuck-v1.1.3-Windows-msvc-x86.7z` | D-05, D-06, ENG-01 |
 | Release artifact handling | Treat the replacement `rime.dll` as available from the release; do not document how it was produced | D-07 |
-| TypeDuck schema source | `https://github.com/TypeDuck-HK/schema`, branch `aap2-alpha` | D-08, ENG-03 |
+| TypeDuck schema source | `https://github.com/TypeDuck-HK/schema`, branch `aap2-alpha`; GitHub workflows reference it as `${{ github.repository_owner }}/schema` for owner consistency | D-08, ENG-03 |
+| TypeDuck schema prune list | `scripts\typeduck-schema-prune-list.txt` removes web/mobile/client-only schema files before Rime deployment and backend proof overlays | ENG-03 |
 | Lookup-filter source relation | `https://github.com/TypeDuck-HK/rime-dictionary-lookup-filter` | ENG-02 |
 | Internal adapter boundary | Current backend-compatible `input_methods\rime\rime.dll` shape | D-01, D-02, D-03, D-04 |
 | Banned product surfaces | `.planning/product/TYPEDUCK-BANNED-SURFACES.md` | D-14, D-15, D-16 |

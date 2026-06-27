@@ -195,8 +195,8 @@ foreach ($command in @($manifest.guard_commands)) {
   }
 }
 
-if ($manifest.release_artifacts.installer_name -ne "typeduck-windows-ime-setup.exe") {
-  Add-Failure $failures "release_artifacts.installer_name must be typeduck-windows-ime-setup.exe."
+if ($manifest.release_artifacts.installer_name -notmatch '^typeduck-windows-ime-setup(\-.+)?\.exe$') {
+  Add-Failure $failures "release_artifacts.installer_name must be typeduck-windows-ime-setup.exe or the tag-or-sha release asset variant."
 }
 if ([string] $manifest.release_artifacts.sha256 -notmatch '^[0-9A-Fa-f]{64}$') {
   Add-Failure $failures "release_artifacts.sha256 must be a SHA-256 hex digest."
@@ -210,11 +210,17 @@ if ($manifest.release_artifacts.workflow_frontend_repo -ne "TypeDuck-Windows") {
 if ($manifest.release_artifacts.workflow_backend_repo -ne "TypeDuck-Windows-backend") {
   Add-Failure $failures "release_artifacts.workflow_backend_repo must be TypeDuck-Windows-backend."
 }
-if ($manifest.release_artifacts.schema_repository -ne "https://github.com/TypeDuck-HK/schema") {
-  Add-Failure $failures "release_artifacts.schema_repository must be https://github.com/TypeDuck-HK/schema."
+if ($manifest.release_artifacts.schema_repository -ne '${{ github.repository_owner }}/schema') {
+  Add-Failure $failures "release_artifacts.schema_repository must be `${{ github.repository_owner }}/schema."
 }
 if ($manifest.release_artifacts.schema_branch -ne "aap2-alpha") {
   Add-Failure $failures "release_artifacts.schema_branch must be aap2-alpha."
+}
+if ($manifest.release_artifacts.schema_prune_list -ne "scripts\typeduck-schema-prune-list.txt") {
+  Add-Failure $failures "release_artifacts.schema_prune_list must reference scripts\typeduck-schema-prune-list.txt."
+}
+if ($manifest.release_artifacts.installer_release_asset_pattern -ne 'typeduck-windows-ime-setup-${{ github.event.release.tag_name || github.sha }}.exe') {
+  Add-Failure $failures "release_artifacts.installer_release_asset_pattern must use the release tag or commit SHA."
 }
 if ($manifest.release_artifacts.standalone_schema_artifact -ne $false) {
   Add-Failure $failures "release_artifacts.standalone_schema_artifact must be false."

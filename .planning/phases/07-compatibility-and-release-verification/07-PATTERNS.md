@@ -198,7 +198,7 @@ if (Test-Path -LiteralPath $installerPath) {
 - Add SHA-256 evidence for `installer/dist/typeduck-windows-ime-setup.exe`.
 - Check final artifact names in `.github/workflows/release.yml` and `.github/workflows/nightly.yml`; current workflow lines 90-102 and 89-99 still reference `moqi-im-windows-*` and `moqi-im-windows-setup.exe`.
 - Check workflow repository/path names: frontend should be `TypeDuck-Windows`; backend should be `TypeDuck-Windows-backend`.
-- Check schema source: workflows must not use `rime-frost`; they should use `https://github.com/TypeDuck-HK/schema` on temporary branch `aap2-alpha`, run those files through the Rime deployer to create the runtime `build` folder, and avoid uploading schema checkout/build output as a standalone artifact.
+- Check schema source: workflows must not use `rime-frost`; they should use `${{ github.repository_owner }}/schema` on temporary branch `aap2-alpha`, prune entries from `scripts/typeduck-schema-prune-list.txt`, run those files through the Rime deployer to create the runtime `build` folder, pass the pruned checkout to the backend build, and avoid uploading schema checkout/build output as a standalone artifact.
 
 ### `scripts/Test-TypeDuckPhase06Cleanup.ps1` (test/script, transform + batch)
 
@@ -551,22 +551,22 @@ Use a disposable Windows VM or equivalent checkpointed machine. Do not install t
   uses: actions/upload-artifact@v4
   with:
     name: typeduck-windows-ime-release-${{ github.event.release.tag_name || github.sha }}
-    path: ${{ github.workspace }}/TypeDuck-Windows/installer/dist/typeduck-windows-ime-setup.exe
+    path: ${{ github.workspace }}/TypeDuck-Windows/installer/dist/typeduck-windows-ime-setup-${{ github.event.release.tag_name || github.sha }}.exe
 
-$assetPath = Join-Path $PWD "installer\dist\typeduck-windows-ime-setup.exe"
+$assetPath = Join-Path $PWD ("installer\dist\typeduck-windows-ime-setup-${{ github.event.release.tag_name || github.sha }}.exe")
 gh release upload $tag $assetPath --clobber
 ```
 
 **Current stale nightly workflow anti-pattern** (`.github/workflows/nightly.yml` lines 86-99):
 ```yaml
 name: typeduck-windows-ime-nightly-${{ github.sha }}
-path: ${{ github.workspace }}/TypeDuck-Windows/installer/dist/typeduck-windows-ime-setup.exe
+path: ${{ github.workspace }}/TypeDuck-Windows/installer/dist/typeduck-windows-ime-setup-${{ github.event.release.tag_name || github.sha }}.exe
 ...
-$assetPath = Join-Path $PWD "installer\dist\typeduck-windows-ime-setup.exe"
+$assetPath = Join-Path $PWD ("installer\dist\typeduck-windows-ime-setup-${{ github.event.release.tag_name || github.sha }}.exe")
 ```
 
 **Planner notes:**
-- Update to `typeduck-windows-ime-release-*`, `typeduck-windows-ime-nightly-*`, and `installer/dist/typeduck-windows-ime-setup.exe`.
+- Keep the generated installer at `installer/dist/typeduck-windows-ime-setup.exe`, then copy/upload the release asset as `typeduck-windows-ime-setup-${{ github.event.release.tag_name || github.sha }}.exe`.
 - Use `pwsh` in new scripts/commands; existing workflow uses `powershell.exe` at release lines 82 and nightly lines 81, which conflicts with project guidance for Unicode-safe scripts.
 - Add artifact hash generation or validation in the release verification script if workflow edits are in scope.
 
@@ -729,7 +729,7 @@ SetupIconFile=..\TypeDuckSettings\assets\TypeDuck.ico
 if CurStep = ssPostInstall then
 begin
   if not RunSetupHelper(BuildInstallSetupHelperParameters('/i'), ResultCode) then
-    HandleSetupHelperResult('TypeDuck setup-helper install / TypeDuck 安裝工具安裝', ResultCode);
+    HandleSetupHelperResult('TypeDuck 安裝工具安裝', 'TypeDuck setup-helper install', ResultCode);
   ...
   else if ResultCode = SetupHelperExitRestartRequired then
     HelperInstallNeedsRestart := True;
@@ -788,7 +788,7 @@ Phase 6 explicitly prefers compatibility-tolerant checks. Do not add signature/v
 - Protocol/recovery coverage must include normal Cantonese input frames, dictionary lookup payload preservation/parsing expectations, reverse lookup where supported, malformed/oversized frames, invalid protobuf, timeouts, backend restart/crash, stale/mismatched sequence, settings update/redeploy failure, and bounded degraded states.
 - Host-app and DPI judgements stay interactive. Required DPI list: 100%, 140% if available, 175%, 200%.
 - Release workflow paths currently still reference Moqi artifact and repo names. Planner should include a release artifact name/hash check and workflow/script corrections unless Phase 6 has already fixed them before execution.
-- Workflow schema packaging must use `TypeDuck-HK/schema` on `aap2-alpha`, run the checked-out schema through the Rime deployer to produce the runtime `build` folder, reject `rime-frost`, and avoid a separate schema artifact.
+- Workflow schema packaging must use `${{ github.repository_owner }}/schema` on `aap2-alpha`, remove `scripts/typeduck-schema-prune-list.txt` entries, run the checked-out schema through the Rime deployer to produce the runtime `build` folder, reject `rime-frost`, pass the pruned checkout to the backend build, and avoid a separate schema artifact.
 
 ## Metadata
 

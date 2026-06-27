@@ -110,7 +110,7 @@ begin
   StopTypeDuckProcesses;
   DeleteTypeDuckReregisterTask;
   if not RunSetupHelper(BuildUninstallSetupHelperParameters('/u'), ResultCode) then
-    HandleSetupHelperResult('TypeDuck setup-helper uninstall / TypeDuck 安裝工具解除安裝', ResultCode);
+    HandleSetupHelperResult('TypeDuck 安裝工具解除安裝', 'TypeDuck setup-helper uninstall', ResultCode);
 end;
 ```
 

@@ -23,6 +23,9 @@
 
 .PARAMETER ProtobufSourceDir
   Optional local protobuf source tree forwarded to scripts\build.ps1.
+
+.PARAMETER RimeDataSource
+  Optional TypeDuck schema checkout forwarded to the sibling backend build.
 #>
 param(
     [string] $RepoRoot = "",
@@ -30,7 +33,8 @@ param(
     [string] $Configuration = "Release",
     [string] $Generator = "Visual Studio 17 2022",
     [string] $ProtobufRoot = "",
-    [string] $ProtobufSourceDir = ""
+    [string] $ProtobufSourceDir = "",
+    [string] $RimeDataSource = ""
 )
 
 $ErrorActionPreference = "Stop"
@@ -122,12 +126,16 @@ foreach ($path in @($moqiImeBuildScript, $windowsBuildScript, $windowsInstallScr
 }
 
 Write-Host "== Step 1/3: Build TypeDuck runtime package =="
-Invoke-Step -FilePath "pwsh" -ArgumentList @(
+$moqiImeBuildArgs = @(
     "-NoProfile",
     "-ExecutionPolicy", "Bypass",
     "-File", "`"$moqiImeBuildScript`"",
     "-RepoRoot", "`"$MoqiImeRoot`""
-) -WorkingDirectory $MoqiImeRoot
+)
+if ($RimeDataSource) {
+    $moqiImeBuildArgs += @("-RimeDataSource", "`"$RimeDataSource`"")
+}
+Invoke-Step -FilePath "pwsh" -ArgumentList $moqiImeBuildArgs -WorkingDirectory $MoqiImeRoot
 
 if (-not (Test-Path -LiteralPath (Join-Path $moqiImeRuntimeDir "server.exe"))) {
     throw "TypeDuckRuntime was not produced: $moqiImeRuntimeDir"

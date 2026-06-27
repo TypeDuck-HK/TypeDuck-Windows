@@ -38,11 +38,12 @@ status: human_checkpoint_pending
 
 # Phase 07 Plan 04: Aggregate Release Verification Summary
 
-Created the final non-interactive release evidence packet. The aggregate now validates TypeDuck release workflow names, schema source, Rime deployer runtime build generation, installer artifact name/hash, Phase 6 cleanup/security guards, install evidence schema, executed protocol recovery results, and the interactive host-app/DPI checklist contract.
+Created the final non-interactive release evidence packet. The aggregate now validates TypeDuck release workflow names, schema source, schema prune list, Rime deployer runtime build generation, installer artifact name/hash, Phase 6 cleanup/security guards, install evidence schema, executed protocol recovery results, and the interactive host-app/DPI checklist contract.
 
 ## Outputs
 
-- `scripts/Test-TypeDuckReleaseArtifacts.ps1` validates `TypeDuck-Windows`, `TypeDuck-Windows-backend`, `https://github.com/TypeDuck-HK/schema`, branch `aap2-alpha`, Rime deployer `build` output, TypeDuck artifact names, and no standalone schema artifact.
+- `scripts/Test-TypeDuckReleaseArtifacts.ps1` validates `TypeDuck-Windows`, `TypeDuck-Windows-backend`, `${{ github.repository_owner }}/schema`, branch `aap2-alpha`, `scripts/typeduck-schema-prune-list.txt`, Rime deployer `build` output, TypeDuck artifact names, and no standalone schema artifact.
+- Release/nightly workflows keep the generated installer at `installer\dist\typeduck-windows-ime-setup.exe`, then copy the GitHub release asset to `typeduck-windows-ime-setup-${{ github.event.release.tag_name || github.sha }}.exe`.
 - `scripts/Invoke-TypeDuckReleaseVerification.ps1` runs the deterministic release guards and writes `.planning/product/release-fixtures/phase-07/release-verification.json` plus `verification-notes.md`.
 - `scripts/Test-TypeDuckReleaseVerification.ps1` validates the aggregate manifest, required case IDs, executed protocol recovery results, artifact hash evidence, and the no-screenshot-capture boundary.
 

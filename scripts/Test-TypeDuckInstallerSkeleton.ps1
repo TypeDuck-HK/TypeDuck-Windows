@@ -185,8 +185,12 @@ function Assert-InstallerScript {
         "CurPageChanged\(CurPageID: Integer\)",
         "WizardForm\.FinishedLabel\.Caption := InstallFinishedText",
         "UninstallProgressForm\.StatusLabel\.Caption := UninstallFinishedText",
+        "HadExistingInstall := ExistingImeInstallationPresent",
+        "歡迎使用 TypeDuck",
+        "Welcome to TypeDuck",
         "close and reopen the apps",
-        "restart Windows only if"
+        "If you are unable to type, restart your computer",
+        "If TypeDuck still appears, restart your computer"
     ) "Restart guidance must be rendered on final installer/uninstaller surfaces with reopen-apps-first wording."
     Assert-NotMatch $Failures $Iss "SuppressibleMsgBox\(" `
         "Restart guidance must not use a separate popup."

@@ -90,6 +90,7 @@ var
   HelperInstallSucceeded: Boolean;
   HelperInstallNeedsRestart: Boolean;
   HelperUninstallNeedsRestart: Boolean;
+  HadExistingInstall: Boolean;
 
 function Bilingual(const Zh: String; const En: String): String;
 begin
@@ -111,22 +112,27 @@ end;
 
 procedure InitializeWizard;
 begin
-  WizardForm.WelcomeLabel1.Caption := '{#MyAppName}';
+  WizardForm.WelcomeLabel1.Caption := Bilingual('歡迎使用 TypeDuck', 'Welcome to TypeDuck');
   WizardForm.WelcomeLabel2.Caption := AboutTextBlock;
 end;
 
 function InstallFinishedText: String;
 begin
-  Result := Bilingual(
-    'TypeDuck 已安裝完成。請先關閉並重新開啟想使用 TypeDuck 的應用程式；如仍未能輸入，或此安裝器提示需要重啟，才重新啟動 Windows。',
-    'TypeDuck is installed. First close and reopen the apps where you want to type with TypeDuck; restart Windows only if typing still does not work, or if this installer says a restart is needed.');
+  if HadExistingInstall then
+    Result := Bilingual(
+      'TypeDuck 已安裝完成。請關閉並重新開啟欲使用 TypeDuck 新版本的應用程式。如未能輸入，請重新啟動電腦。',
+      'TypeDuck is installed. Close and reopen the apps where you want to use the new version of TypeDuck. If you are unable to type, restart your computer.')
+  else
+    Result := Bilingual(
+      'TypeDuck 已安裝完成。如未能輸入，請重新啟動電腦。',
+      'TypeDuck is installed. If you are unable to type, restart your computer.');
 end;
 
 function UninstallFinishedText: String;
 begin
   Result := Bilingual(
-    'TypeDuck 已解除安裝。請先關閉並重新開啟仍顯示 TypeDuck 的應用程式；如仍見到 TypeDuck，或此解除安裝器提示需要重啟，才重新啟動 Windows。',
-    'TypeDuck is uninstalled. First close and reopen any apps that still show TypeDuck; restart Windows only if TypeDuck still appears, or if this uninstaller says a restart is needed.');
+    'TypeDuck 已解除安裝。如 TypeDuck 仍然出現，請重新啟動電腦。',
+    'TypeDuck is uninstalled. If TypeDuck still appears, restart your computer.');
 end;
 
 procedure CurPageChanged(CurPageID: Integer);
@@ -139,6 +145,18 @@ procedure DeleteRegistryTreeIfPresent(const RootKey: Integer; const Subkey: Stri
 begin
   if RegKeyExists(RootKey, Subkey) then
     RegDeleteKeyIncludingSubkeys(RootKey, Subkey);
+end;
+
+function ExistingImeInstallationPresent: Boolean;
+begin
+  Result :=
+    FileExists(ExpandConstant('{app}\TypeDuckLauncher.exe')) or
+    FileExists(ExpandConstant('{syswow64}\TypeDuckTextService.dll')) or
+    FileExists(ExpandConstant('{sys}\TypeDuckTextService.dll')) or
+    RegKeyExists(HKEY_LOCAL_MACHINE, 'SOFTWARE\Microsoft\CTF\TIP\{#ImeClsidCode}') or
+    RegKeyExists(HKEY_CURRENT_USER, 'Software\Microsoft\CTF\TIP\{#ImeClsidCode}') or
+    RegKeyExists(HKEY_CLASSES_ROOT, 'CLSID\{#ImeClsidCode}') or
+    RegKeyExists(HKEY_CURRENT_USER, 'Software\Classes\CLSID\{#ImeClsidCode}');
 end;
 
 procedure RegPurgeTypeDuckResiduals;
@@ -207,7 +225,7 @@ procedure EnsureSetupHelperExists;
 begin
   if not FileExists(GetSetupHelperPath) then
     RaiseException(Bilingual(
-      '找不到 TypeDuck 安裝工具: ' + GetSetupHelperPath,
+      '找不到 TypeDuck 安裝工具：' + GetSetupHelperPath,
       'TypeDuck setup helper not found: ' + GetSetupHelperPath));
 end;
 
@@ -236,11 +254,11 @@ begin
   Result := Result + ' --appdir "' + ExpandConstant('{app}') + '"';
 end;
 
-procedure HandleSetupHelperResult(const Operation: String; const ResultCode: Integer);
+procedure HandleSetupHelperResult(const OperationZh: String; const OperationEn: String; const ResultCode: Integer);
 begin
   RaiseException(Bilingual(
-    Operation + ' 失敗，結束碼: ' + IntToStr(ResultCode),
-    Operation + ' failed (exit code ' + IntToStr(ResultCode) + ').'));
+    OperationZh + '失敗，結束碼：' + IntToStr(ResultCode),
+    OperationEn + ' failed (exit code ' + IntToStr(ResultCode) + ').'));
 end;
 
 procedure CurStepChanged(CurStep: TSetupStep);
@@ -249,6 +267,7 @@ var
 begin
   if CurStep = ssInstall then
   begin
+    HadExistingInstall := ExistingImeInstallationPresent;
     StopTypeDuckProcesses;
     DeleteTypeDuckReregisterTask;
   end;
@@ -256,7 +275,7 @@ begin
   if CurStep = ssPostInstall then
   begin
     if not RunSetupHelper(BuildInstallSetupHelperParameters('/i'), ResultCode) then
-      HandleSetupHelperResult('TypeDuck setup-helper install / TypeDuck 安裝工具安裝', ResultCode);
+      HandleSetupHelperResult('TypeDuck 安裝工具安裝', 'TypeDuck setup-helper install', ResultCode);
 
     if ResultCode = SetupHelperExitSuccess then
     begin
@@ -269,7 +288,7 @@ begin
     end;
     if (ResultCode <> SetupHelperExitSuccess) and
        (ResultCode <> SetupHelperExitRestartRequired) then
-      HandleSetupHelperResult('TypeDuck setup-helper install / TypeDuck 安裝工具安裝', ResultCode);
+      HandleSetupHelperResult('TypeDuck 安裝工具安裝', 'TypeDuck setup-helper install', ResultCode);
   end;
 end;
 
@@ -307,11 +326,11 @@ begin
     StopTypeDuckProcesses;
     DeleteTypeDuckReregisterTask;
     if not RunSetupHelper(BuildUninstallSetupHelperParameters('/u'), ResultCode) then
-      HandleSetupHelperResult('TypeDuck setup-helper uninstall / TypeDuck 安裝工具解除安裝', ResultCode);
+      HandleSetupHelperResult('TypeDuck 安裝工具解除安裝', 'TypeDuck setup-helper uninstall', ResultCode);
     if ResultCode = SetupHelperExitRestartRequired then
       HelperUninstallNeedsRestart := True
     else if ResultCode <> SetupHelperExitSuccess then
-      HandleSetupHelperResult('TypeDuck setup-helper uninstall / TypeDuck 安裝工具解除安裝', ResultCode);
+      HandleSetupHelperResult('TypeDuck 安裝工具解除安裝', 'TypeDuck setup-helper uninstall', ResultCode);
   end;
   if CurUninstallStep = usPostUninstall then
   begin

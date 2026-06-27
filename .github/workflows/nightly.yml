@@ -42,7 +42,7 @@ jobs:
       - name: Checkout TypeDuck schema aap2-alpha
         uses: actions/checkout@v4
         with:
-          repository: TypeDuck-HK/schema
+          repository: ${{ github.repository_owner }}/schema
           ref: aap2-alpha
           path: TypeDuck-HK-schema
           fetch-depth: 1
@@ -75,6 +75,7 @@ jobs:
       - name: Prepare TypeDuck schema runtime build
         run: |
           $schemaSource = Join-Path $env:GITHUB_WORKSPACE "TypeDuck-HK-schema"
+          $schemaPruneList = Join-Path $env:GITHUB_WORKSPACE "TypeDuck-Windows\scripts\typeduck-schema-prune-list.txt"
           $backendRimeRoot = Join-Path $env:GITHUB_WORKSPACE "TypeDuck-Windows-backend\input_methods\rime"
           $schemaDest = Join-Path $backendRimeRoot "data\schema"
           $runtimeBuild = Join-Path $backendRimeRoot "build"
@@ -85,6 +86,19 @@ jobs:
           }
           if (Test-Path -LiteralPath $runtimeBuild) {
             Remove-Item -LiteralPath $runtimeBuild -Recurse -Force
+          }
+
+          if (-not (Test-Path -LiteralPath $schemaPruneList -PathType Leaf)) {
+            throw "Missing TypeDuck schema prune list: $schemaPruneList"
+          }
+          Get-Content -LiteralPath $schemaPruneList | ForEach-Object {
+            $entry = $_.Trim()
+            if (-not [string]::IsNullOrWhiteSpace($entry) -and -not $entry.StartsWith("#")) {
+              $target = Join-Path $schemaSource $entry
+              if (Test-Path -LiteralPath $target) {
+                Remove-Item -LiteralPath $target -Recurse -Force
+              }
+            }
           }
 
           New-Item -ItemType Directory -Path $schemaDest -Force | Out-Null
@@ -107,13 +121,26 @@ jobs:
           pwsh -NoProfile -ExecutionPolicy Bypass -File .\scripts\_all_in_package.ps1 `
             -RepoRoot "$env:GITHUB_WORKSPACE\TypeDuck-Windows" `
             -MoqiImeRoot "$env:GITHUB_WORKSPACE\TypeDuck-Windows-backend" `
+            -RimeDataSource "$env:GITHUB_WORKSPACE\TypeDuck-HK-schema" `
             -ProtobufRoot "$env:PROTOBUF_ROOT"
+
+      - name: Prepare installer asset name
+        working-directory: ${{ github.workspace }}/TypeDuck-Windows
+        run: |
+          $assetName = "typeduck-windows-ime-setup-${{ github.event.release.tag_name || github.sha }}.exe"
+          $sourceAsset = Join-Path $PWD "installer\dist\typeduck-windows-ime-setup.exe"
+          $assetPath = Join-Path $PWD ("installer\dist\" + $assetName)
+          if (-not (Test-Path -LiteralPath $sourceAsset -PathType Leaf)) {
+            throw "Missing installer asset: $sourceAsset"
+          }
+          Copy-Item -LiteralPath $sourceAsset -Destination $assetPath -Force
+          "TYPEDUCK_INSTALLER_ASSET=$assetName" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
 
       - name: Upload workflow artifact
         uses: actions/upload-artifact@v4
         with:
           name: typeduck-windows-ime-nightly-${{ github.sha }}
-          path: ${{ github.workspace }}/TypeDuck-Windows/installer/dist/typeduck-windows-ime-setup.exe
+          path: ${{ github.workspace }}/TypeDuck-Windows/installer/dist/${{ env.TYPEDUCK_INSTALLER_ASSET }}
           if-no-files-found: error
 
       - name: Publish nightly release
@@ -122,7 +149,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           $tag = "nightly"
-          $assetPath = Join-Path $PWD "installer\dist\typeduck-windows-ime-setup.exe"
+          $assetPath = Join-Path $PWD ("installer\dist\" + $env:TYPEDUCK_INSTALLER_ASSET)
           $notesPath = Join-Path $env:RUNNER_TEMP "nightly-notes.md"
           $runUrl = "https://github.com/$env:GITHUB_REPOSITORY/actions/runs/$env:GITHUB_RUN_ID"
 

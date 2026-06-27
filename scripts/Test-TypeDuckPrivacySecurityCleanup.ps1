@@ -286,13 +286,15 @@ $packageScriptText = Get-FileText (Join-Path $repo "scripts/_all_in_package.ps1"
 $installerReadme = Get-FileText (Join-Path $repo "installer/README.txt")
 
 foreach ($pattern in @(
-    'installer/dist/typeduck-windows-ime-setup\.exe',
+    'typeduck-windows-ime-setup-\$\{\{\s*github\.event\.release\.tag_name\s*\|\|\s*github\.sha\s*\}\}\.exe',
     'typeduck-windows-ime-release-',
     'typeduck-windows-ime-nightly-',
     'path:\s+TypeDuck-Windows',
     'path:\s+TypeDuck-Windows-backend',
-    'repository:\s+TypeDuck-HK/schema',
+    'repository:\s+\$\{\{\s*github\.repository_owner\s*\}\}/schema',
     'ref:\s+aap2-alpha',
+    'typeduck-schema-prune-list\.txt',
+    '-RimeDataSource',
     'Rime deployer',
     'rime_deployer\.exe',
     'runtime build folder',
@@ -347,6 +349,8 @@ if ($Strict) {
       'Legacy Moqi coexistence',
       'Legacy Moqi deletion, migration, registry cleanup, scheduled-task cleanup, install-folder cleanup, and process termination',
       '香港教育大學 The Education University of Hong Kong',
+      'typeduck-schema-prune-list',
+      '-RimeDataSource',
       'restart guidance')) {
     if ($scriptText -notmatch $required) {
       Add-Violation $violations "guard-contract" "Guard is missing required D-18/D-19 or source-identifier assertion: $required"

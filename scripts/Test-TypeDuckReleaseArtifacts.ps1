@@ -91,11 +91,13 @@ $releasePath = Join-Path $root ".github\workflows\release.yml"
 $nightlyPath = Join-Path $root ".github\workflows\nightly.yml"
 $packagePath = Join-Path $root "scripts\_all_in_package.ps1"
 $installerBuildPath = Join-Path $root "installer\build-installer.ps1"
+$schemaPruneListPath = Join-Path $root "scripts\typeduck-schema-prune-list.txt"
 
 $release = Read-RequiredText $failures $releasePath ".github/workflows/release.yml"
 $nightly = Read-RequiredText $failures $nightlyPath ".github/workflows/nightly.yml"
 $package = Read-RequiredText $failures $packagePath "scripts/_all_in_package.ps1"
 $installerBuild = Read-RequiredText $failures $installerBuildPath "installer/build-installer.ps1"
+$schemaPruneList = Read-RequiredText $failures $schemaPruneListPath "scripts/typeduck-schema-prune-list.txt"
 $workflows = $release + "`n" + $nightly
 $packageText = $package + "`n" + $installerBuild
 
@@ -111,20 +113,41 @@ foreach ($workflow in @(
   Assert-Text $failures $workflow.Text 'path:\s*TypeDuck-Windows\b' "$($workflow.Name) must checkout the frontend into TypeDuck-Windows."
   Assert-Text $failures $workflow.Text 'repository:\s*\$\{\{\s*github\.repository_owner\s*\}\}/TypeDuck-Windows-backend|repository:\s*TypeDuck-HK/TypeDuck-Windows-backend' "$($workflow.Name) must checkout TypeDuck-Windows-backend."
   Assert-Text $failures $workflow.Text 'path:\s*TypeDuck-Windows-backend\b' "$($workflow.Name) must checkout the backend into TypeDuck-Windows-backend."
-  Assert-Text $failures $workflow.Text 'repository:\s*TypeDuck-HK/schema' "$($workflow.Name) must use TypeDuck-HK/schema."
+  Assert-Text $failures $workflow.Text 'repository:\s*\$\{\{\s*github\.repository_owner\s*\}\}/schema' "$($workflow.Name) must use the current owner schema repository."
   Assert-Text $failures $workflow.Text 'ref:\s*aap2-alpha' "$($workflow.Name) must pin the temporary schema branch aap2-alpha."
+  Assert-Text $failures $workflow.Text 'typeduck-schema-prune-list\.txt' "$($workflow.Name) must prune TypeDuck schema files from the shared list."
+  Assert-Text $failures $workflow.Text 'Remove-Item\s+-LiteralPath\s+\$target\s+-Recurse\s+-Force' "$($workflow.Name) must remove listed schema files before Rime deployment."
+  Assert-Text $failures $workflow.Text '-RimeDataSource\s+"?\$env:GITHUB_WORKSPACE\\TypeDuck-HK-schema' "$($workflow.Name) must pass the pruned schema checkout to the backend build."
   Assert-Text $failures $workflow.Text 'rime_deployer\.exe' "$($workflow.Name) must invoke the Rime deployer."
   Assert-Text $failures $workflow.Text '--build\s+\$backendRimeRoot|--build\s+"?\$backendRimeRoot"?' "$($workflow.Name) must run the schema through the Rime deployer build command."
   Assert-Text $failures $workflow.Text 'runtimeBuild.*\bbuild\b|backendRimeRoot.*\bbuild\b' "$($workflow.Name) must validate the generated runtime build folder."
   Assert-Text $failures $workflow.Text $workflow.ArtifactPattern "$($workflow.Name) must use TypeDuck-owned workflow artifact names."
-  Assert-Text $failures $workflow.Text 'installer/dist/typeduck-windows-ime-setup\.exe|installer\\dist\\typeduck-windows-ime-setup\.exe' "$($workflow.Name) must upload typeduck-windows-ime-setup.exe."
+  Assert-Text $failures $workflow.Text 'typeduck-windows-ime-setup-\$\{\{\s*github\.event\.release\.tag_name\s*\|\|\s*github\.sha\s*\}\}\.exe' "$($workflow.Name) must prepare the tag-or-sha installer asset name."
+  Assert-Text $failures $workflow.Text 'installer/dist/\$\{\{\s*env\.TYPEDUCK_INSTALLER_ASSET\s*\}\}|installer\\dist\\.*TYPEDUCK_INSTALLER_ASSET' "$($workflow.Name) must upload the renamed installer asset."
 
   foreach ($block in (Get-UploadArtifactBlocks $workflow.Text)) {
     Assert-NoText $failures $block '(?i)TypeDuck-HK-schema|schema\b|rime_deployer|input_methods[\\/]+rime[\\/]+build' "$($workflow.Name) must not upload schema checkout/build output as a standalone artifact."
   }
 }
 
+foreach ($entry in @(
+    ".gitignore",
+    "common.custom.yaml",
+    "default.custom.yaml",
+    "jyut6ping3_mobile_10keys.schema.yaml",
+    "jyut6ping3_mobile_initial_final.schema.yaml",
+    "jyut6ping3_mobile_longpress.schema.yaml",
+    "jyut6ping3_mobile.schema.yaml",
+    "loengfan_longpress.schema.yaml",
+    "trime.yaml",
+    "weasel.yaml"
+  )) {
+  Assert-Text $failures $schemaPruneList ("(?m)^" + [regex]::Escape($entry) + "$") "Schema prune list must include $entry."
+  Assert-NoText $failures $workflows ([regex]::Escape($entry)) "Workflows must reference the schema prune list, not hard-code $entry."
+}
+
 Assert-Text $failures $packageText 'installer\\dist\\typeduck-windows-ime-setup\.exe|installer/dist/typeduck-windows-ime-setup\.exe' "Package scripts must point at installer/dist/typeduck-windows-ime-setup.exe."
+Assert-Text $failures $packageText 'RimeDataSource' "Package scripts must forward the TypeDuck schema source to the backend build."
 
 $installerFullPath = Resolve-FullPath -BasePath $root -Path $InstallerPath
 if (Test-Path -LiteralPath $installerFullPath -PathType Leaf) {

@@ -40,8 +40,8 @@ This phase proves the TypeDuck v1 installer and IME are shippable after Phase 6 
 ### GitHub Workflow and Schema Source
 - **D-17:** GitHub workflow references should use the frontend repository name `TypeDuck-Windows`, replacing `moqi-im-windows`.
 - **D-18:** GitHub workflow references should use the backend repository name `TypeDuck-Windows-backend`, replacing `moqi-ime`.
-- **D-19:** Release/nightly workflow packaging must not use `rime-frost`. Use `https://github.com/TypeDuck-HK/schema` on the temporary `aap2-alpha` branch.
-- **D-20:** The workflow/package path should run the schema files through the Rime deployer to generate the runtime `build` folder as described by the engine-runtime contract. Do not upload or publish the schema checkout as its own artifact; only the final installer/release evidence should be artifacts.
+- **D-19:** Release/nightly workflow packaging must not use `rime-frost`. Use `${{ github.repository_owner }}/schema` on the temporary `aap2-alpha` branch; the owner resolves to TypeDuck-HK for the release repositories.
+- **D-20:** The workflow/package path should remove entries from `scripts/typeduck-schema-prune-list.txt`, run the remaining schema files through the Rime deployer to generate the runtime `build` folder as described by the engine-runtime contract, and pass that same schema checkout to the backend build. Do not upload or publish the schema checkout as its own artifact; only the final installer/release evidence should be artifacts.
 
 ### the agent's Discretion
 The planner may choose the exact release checklist and test/script split, but must keep screenshot capture out of automation, treat DPI as user-judged interactive VM work, and include only repeatable non-screenshot protocol/recovery checks in automated release verification.
@@ -118,7 +118,7 @@ The planner may choose the exact release checklist and test/script split, but mu
 - Include important protocol recovery scenarios only when they are repeatedly testable without screenshots.
 - Other broad integration-test setup is outside v1 scope.
 - Non-test product code changes belong in Phase 6 unless Phase 7 discovers a real failure.
-- GitHub workflow checks should use `TypeDuck-Windows` and `TypeDuck-Windows-backend`, fetch `TypeDuck-HK/schema` on `aap2-alpha`, run the schema through the Rime deployer to create a runtime `build` folder, avoid `rime-frost`, and avoid producing a separate schema artifact.
+- GitHub workflow checks should use `TypeDuck-Windows` and `TypeDuck-Windows-backend`, fetch `${{ github.repository_owner }}/schema` on `aap2-alpha`, remove `scripts/typeduck-schema-prune-list.txt` entries before deploy, run the schema through the Rime deployer to create a runtime `build` folder, avoid `rime-frost`, and avoid producing a separate schema artifact.
 
 </specifics>
 
