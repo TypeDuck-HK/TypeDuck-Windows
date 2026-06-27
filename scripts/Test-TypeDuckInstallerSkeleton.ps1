@@ -128,15 +128,29 @@ function Assert-InstallerScript {
         "9B52CF20-1C5D-4C74-9F5D-9E66377C8F37",
         "7D92985A-BC53-47B5-A5CC-6E47F86B9D18",
         "TypeDuck\s+粵語輸入法\s*/\s*TypeDuck\s+Cantonese\s+IME",
+        "MyAppPublisher\s+`"香港教育大學 The Education University of Hong Kong`"",
         "AppPublisher=\{#MyAppPublisher\}",
         "DefaultDirName=\{autopf32\}\\TypeDuckIME",
         "OutputBaseFilename=typeduck-windows-ime-setup",
+        "WizardImageFile=\.\.\\TypeDuckSettings\\resources\\Installer\.bmp",
         "TypeDuckLauncher\.exe",
         "TypeDuckSetupHelper\.exe",
         "TypeDuckTextService\.dll",
         "ValueName:\s*`"TypeDuckLauncher`"",
-        "TypeDuckIME-ReRegisterTSF"
+        "TypeDuckIME-ReRegisterTSF",
+        "\{autoprograms\}\\TypeDuckIME\\輸入法設定 IME Settings",
+        "\{autoprograms\}\\TypeDuckIME\\關於 About TypeDuck…",
+        "\{autoprograms\}\\TypeDuckIME\\解除安裝 Uninstall"
     ) "Installer script must use TypeDuck AppId, CLSID, names, paths, startup, and scheduled-task identity."
+
+    Assert-AllMatch $Failures $Iss @(
+        "歡迎使用 TypeDuck 打得 —— 設有少數族裔語言提示粵拼輸入法！有字想打？一裝即用，毋須再等，即刻打得！",
+        "Welcome to TypeDuck: a Cantonese input keyboard with minority language prompts! Got something you want to type\? Have your fingers ready, get, set, TYPE DUCK!",
+        "如有任何查詢，歡迎電郵至 info@typeduck\.hk 或 lchaakming@eduhk\.hk。",
+        "Should you have any enquiries, please email info@typeduck\.hk or lchaakming@eduhk\.hk\.",
+        "本輸入法由香港教育大學語言學及現代語言系開發。特別鳴謝「語文教育及研究常務委員會」資助本計劃。",
+        "This input method is developed by the Department of Linguistics and Modern Language Studies, the Education University of Hong Kong\. Special thanks to the Standing Committee on Language Education and Research for funding this project\."
+    ) "Installer welcome page must source the exact Phase 5 About intro/contact/credit bilingual text."
 
     Assert-Match $Failures $Iss "Name:\s*`"english`"" "Installer must include English wizard resources."
     Assert-Match $Failures $Iss "chinesetraditional|ChineseTraditional|Traditional Chinese" "Installer must use Traditional Chinese-compatible resources."
