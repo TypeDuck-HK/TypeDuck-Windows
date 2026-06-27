@@ -70,7 +70,7 @@ std::wstring rpcGuardLogPath() {
   if (!localAppData || !*localAppData) {
     return L"";
   }
-  return std::wstring(localAppData) + L"\\MoqiIM\\Log\\tsf-debug.log";
+  return std::wstring(localAppData) + L"\\TypeDuckIME\\Log\\tsf-debug.log";
 }
 
 void appendRpcGuardLog(const std::wstring &message) {
@@ -137,7 +137,7 @@ std::wstring quotePairLogPath() {
   if (!localAppData || !*localAppData) {
     return L"";
   }
-  return std::wstring(localAppData) + L"\\MoqiIM\\Log\\quote-pair-debug.log";
+  return std::wstring(localAppData) + L"\\TypeDuckIME\\Log\\quote-pair-debug.log";
 }
 
 void appendQuotePairLog(const std::wstring &message) {
@@ -868,16 +868,16 @@ void Client::updateCommitString(Json::Value &msg, Ime::EditSession *session,
     const bool isAutoPairSymbol =
         shouldAutoPairSymbol(rawCommitString, autoPairRules_, pairedCommitString);
     if (isAutoPairSymbol) {
-      appendQuotePairLog(L"[updateCommitString] raw=" +
-                         formatCodePoints(rawCommitString) + L" auto_pair_quotes=" +
+      appendQuotePairLog(L"[updateCommitString] raw_redacted length=" +
+                         std::to_wstring(rawCommitString.size()) + L" auto_pair_quotes=" +
                          (autoPairQuotesEnabled ? L"true" : L"false"));
     }
 
     const bool autoPairedSymbols = autoPairQuotesEnabled && isAutoPairSymbol;
     if (autoPairedSymbols) {
       commitString = pairedCommitString;
-      appendQuotePairLog(L"[updateCommitString] paired=" +
-                         formatCodePoints(commitString));
+      appendQuotePairLog(L"[updateCommitString] paired_redacted length=" +
+                         std::to_wstring(commitString.size()));
     }
     if (!commitString.empty()) {
       HWND targetWindow = ::GetForegroundWindow();
@@ -2120,7 +2120,7 @@ wstring Client::getPipeName(const wchar_t *base_name) {
   if (!::GetUserNameW(username.get(), &len))
     return wstring();
   pipeName += username.get();
-  pipeName += L"\\MoqiIM\\";
+  pipeName += L"\\TypeDuckIME\\";
   pipeName += base_name;
   return pipeName;
 }

@@ -167,7 +167,7 @@ void appendCandidateWindowLog(const std::wstring& message) {
 		return;
 	}
 
-	std::wstring logDir = std::wstring(localAppData) + L"\\MoqiIM\\Log";
+	std::wstring logDir = std::wstring(localAppData) + L"\\TypeDuckIME\\Log";
 	std::wstring logPath = Ime::DebugLogFile::prepareDailyLogFilePath(
 		logDir, L"candidate-window.log");
 	if (logPath.empty()) {
@@ -191,7 +191,7 @@ void appendTsfDebugLog(const std::wstring& message) {
 		return;
 	}
 
-	std::wstring logDir = std::wstring(localAppData) + L"\\MoqiIM\\Log";
+	std::wstring logDir = std::wstring(localAppData) + L"\\TypeDuckIME\\Log";
 	std::wstring logPath = Ime::DebugLogFile::prepareDailyLogFilePath(
 		logDir, L"tsf-debug.log");
 	if (logPath.empty()) {

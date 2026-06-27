@@ -37,14 +37,14 @@ void appendDllMainLog(const wchar_t* line) {
 		return;
 	}
 
-	wchar_t moqiDir[MAX_PATH] = {};
-	if (FAILED(StringCchPrintfW(moqiDir, _countof(moqiDir), L"%s\\MoqiIM", localAppData))) {
+	wchar_t typeDuckDir[MAX_PATH] = {};
+	if (FAILED(StringCchPrintfW(typeDuckDir, _countof(typeDuckDir), L"%s\\TypeDuckIME", localAppData))) {
 		return;
 	}
-	::CreateDirectoryW(moqiDir, nullptr);
+	::CreateDirectoryW(typeDuckDir, nullptr);
 
 	wchar_t logDir[MAX_PATH] = {};
-	if (FAILED(StringCchPrintfW(logDir, _countof(logDir), L"%s\\Log", moqiDir))) {
+	if (FAILED(StringCchPrintfW(logDir, _countof(logDir), L"%s\\Log", typeDuckDir))) {
 		return;
 	}
 	const std::wstring preparedLogPath = Ime::DebugLogFile::prepareDailyLogFilePath(

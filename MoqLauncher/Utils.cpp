@@ -45,12 +45,22 @@ std::wstring getAppLocalDir() {
     return result;
 }
 
-std::wstring getMoqiAppDataDir() {
+std::wstring getTypeDuckLocalDataDir() {
+    wchar_t* appLocalDataDirPath = nullptr;
+    if (FAILED(::SHGetKnownFolderPath(FOLDERID_LocalAppData, 0, nullptr, &appLocalDataDirPath))) {
+        return L"";
+    }
+    std::wstring result = std::wstring(appLocalDataDirPath) + L"\\TypeDuckIME";
+    ::CoTaskMemFree(appLocalDataDirPath);
+    return result;
+}
+
+std::wstring getTypeDuckRoamingDataDir() {
     wchar_t* appDataDirPath = nullptr;
     if (FAILED(::SHGetKnownFolderPath(FOLDERID_RoamingAppData, 0, nullptr, &appDataDirPath))) {
         return L"";
     }
-    std::wstring result = std::wstring(appDataDirPath) + L"\\Moqi";
+    std::wstring result = std::wstring(appDataDirPath) + L"\\TypeDuckIME";
     ::CoTaskMemFree(appDataDirPath);
     return result;
 }

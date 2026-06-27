@@ -14,7 +14,9 @@ std::wstring getCurrentExecutableDir();
 
 std::wstring getAppLocalDir();
 
-std::wstring getMoqiAppDataDir();
+std::wstring getTypeDuckLocalDataDir();
+
+std::wstring getTypeDuckRoamingDataDir();
 
 bool makeDirs(const std::wstring& path);
 

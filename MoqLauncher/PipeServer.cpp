@@ -87,7 +87,7 @@ static constexpr size_t MAX_LOG_FILE_SIZE =
     5 * 1024 * 1024;                    // log file size: 5 MB
 static constexpr int NUM_LOG_FILES = 5; // backup 3 copies of the log file
 
-static constexpr wchar_t CONFIG_FILE_REL_PATH[] = L"\\MoqiLauncher.json";
+static constexpr wchar_t CONFIG_FILE_REL_PATH[] = L"\\TypeDuckLauncher.json";
 static constexpr wchar_t TYPEDUCK_SETTINGS_EXE[] = L"\\TypeDuckSettings.exe";
 static constexpr wchar_t TYPEDUCK_ABOUT_EXE[] = L"\\TypeDuckAbout.exe";
 
@@ -137,23 +137,23 @@ PipeServer::~PipeServer() {
 }
 
 void PipeServer::initDataDir() {
-  dataDirPath_ = getAppLocalDir() + L"\\MoqiIM";
+  dataDirPath_ = getTypeDuckLocalDataDir();
   makeDirs(dataDirPath_);
 }
 
 void PipeServer::initLogger() {
   auto logDirPath = dataDirPath_ + L"\\Log";
   auto logFile = Ime::DebugLogFile::prepareDailyLogFilePath(
-      logDirPath, L"MoqiLauncher.log");
+      logDirPath, L"TypeDuckLauncher.log");
 
   try {
-    logger_ = spdlog::rotating_logger_mt("MoqiLauncher", logFile,
+    logger_ = spdlog::rotating_logger_mt("TypeDuckLauncher", logFile,
                                          MAX_LOG_FILE_SIZE, NUM_LOG_FILES);
     spdlog::flush_on(spdlog::level::debug); // flush to the file on any kind of
                                             // errors (always flush)
   } catch (const spdlog::spdlog_ex &exc) {
     // fail to create file logger, fallback to console logger
-    logger_ = spdlog::stderr_logger_mt("MoqiLauncher");
+    logger_ = spdlog::stderr_logger_mt("TypeDuckLauncher");
   }
 
   logger_->set_level(logLevel_);
@@ -459,7 +459,7 @@ std::wstring PipeServer::getPipeName(const wchar_t *baseName) {
     // pipes.
     pipeName = L"\\\\.\\pipe\\";
     pipeName += username;
-    pipeName += L"\\MoqiIM\\";
+    pipeName += L"\\TypeDuckIME\\";
     pipeName += baseName;
   }
   return pipeName;
@@ -814,7 +814,7 @@ void PipeServer::showPopupMenu() const {
 }
 
 bool PipeServer::isCloudClipboardEnabled() const {
-  const auto configPath = getMoqiAppDataDir() + L"\\cloud_clipboard.json";
+  const auto configPath = getTypeDuckRoamingDataDir() + L"\\cloud_clipboard.json";
   Json::Value config;
   if (!loadJsonFile(configPath, config)) {
     return false;

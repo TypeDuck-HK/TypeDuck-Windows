@@ -14,7 +14,7 @@ std::wstring logFilePath() {
     if (::ExpandEnvironmentStringsW(L"%LOCALAPPDATA%", localAppData, MAX_PATH) == 0) {
         return L"";
     }
-    std::wstring baseDir = std::wstring(localAppData) + L"\\MoqiIM";
+    std::wstring baseDir = std::wstring(localAppData) + L"\\TypeDuckIME";
     std::wstring logDir = baseDir + L"\\Log";
     ::CreateDirectoryW(baseDir.c_str(), nullptr);
     ::CreateDirectoryW(logDir.c_str(), nullptr);
