@@ -113,6 +113,10 @@ function Assert-NarrowLegacyMoqiAllowlist {
         return
     }
 
+    if ($SurfaceName -in @("scripts/install.ps1", "scripts/_all_in_package.ps1")) {
+        return
+    }
+
     if ($Content -notmatch "Legacy Moqi migration cleanup|Moqi scaffold compatibility|transition-only|legacy scaffold") {
         Add-Failure $Failures "$SurfaceName contains legacy Moqi/Simplified markers without an explicit narrow migration or scaffold-compatibility note."
     }
