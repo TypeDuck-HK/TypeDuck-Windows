@@ -213,12 +213,25 @@ function Assert-StagingPipeline {
 function Assert-StrictNoSimplifiedInstallerChrome {
     param(
         [System.Collections.Generic.List[string]] $Failures,
+        [string] $Root,
         [hashtable] $Files
     )
 
     foreach ($entry in $Files.GetEnumerator()) {
         Assert-NotMatch $Failures $entry.Value "chinesesimplified|ChineseSimplified\.isl|输入法|检测到|安装程序|请在|卸载清理|墨奇" `
             "$($entry.Key) must not contain Simplified-only installer/setup chrome."
+    }
+
+    $removedTranslationPath = Join-Path $Root "installer/Inno-Setup-Chinese-Simplified-Translation"
+    if (Test-Path -LiteralPath $removedTranslationPath) {
+        Add-Failure $Failures "Removed Simplified Chinese Inno translation directory must not exist: installer/Inno-Setup-Chinese-Simplified-Translation"
+    }
+
+    $gitmodulesPath = Join-Path $Root ".gitmodules"
+    if (Test-Path -LiteralPath $gitmodulesPath) {
+        $gitmodules = [System.IO.File]::ReadAllText($gitmodulesPath, [System.Text.Encoding]::UTF8)
+        Assert-NotMatch $Failures $gitmodules "installer/Inno-Setup-Chinese-Simplified-Translation|ChineseSimplified\.isl|chinesesimplified" `
+            ".gitmodules must not reference the removed Simplified Chinese Inno translation dependency."
     }
 }
 
@@ -244,7 +257,7 @@ foreach ($entry in $files.GetEnumerator()) {
 }
 
 if ($Strict) {
-    Assert-StrictNoSimplifiedInstallerChrome $failures $files
+    Assert-StrictNoSimplifiedInstallerChrome $failures $root $files
 }
 
 if ($failures.Count -gt 0) {
