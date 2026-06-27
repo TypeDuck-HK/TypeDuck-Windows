@@ -18,7 +18,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 3: zh-HK TSF Registration and Installer Skeleton** - TypeDuck installs, registers, unregisters, and appears under Chinese (Traditional, Hong Kong). (completed 2026-06-24)
 - [x] **Phase 4: TypeDuck Protocol and Typing MVP** - TSF, launcher, and engine communicate with a bounded TypeDuck protocol that supports real Cantonese typing behavior. (completed 2026-06-24)
 - [x] **Phase 5: Candidate, Dictionary, Settings, and About UI Parity** - Users see and configure the TypeDuck Web alpha experience in native Windows surfaces. (completed 2026-06-26 by human verification and explicit screenshot-evidence divergence)
-- [ ] **Phase 6: Privacy, Security, and Scaffold Cleanup** - Off-scope Moqi/fcitx/cloud/AI behavior is removed or gated, diagnostics are safe, and visible strings are audited.
+- [x] **Phase 6: Privacy, Security, and Scaffold Cleanup** - Off-scope Moqi/fcitx/cloud/AI behavior is removed or gated, diagnostics are safe, and visible strings are audited. (completed 2026-06-27)
 - [ ] **Phase 7: Compatibility and Release Verification** - The v1 installer and IME are verified across Windows install paths, host apps, DPI, bitness, protocol recovery, and release artifacts.
 
 ## Phase Details
@@ -212,7 +212,7 @@ Plans:
 
 **Verification Environment**: Mixed. Static/code tests are expected for audits, parser bounds, logging defaults, and removed handlers. Add targeted Windows VM smoke evidence for installed-path privacy, launcher/runtime behavior, config-tool removal, pipe behavior, and absence of legacy feature surfaces after installation.
 
-**Plans**: 6/7 plans executed
+**Plans**: 7/7 plans complete
 Plans:
 **Wave 1**
 
@@ -234,7 +234,7 @@ Plans:
 
 **Wave 5** *(blocked on all prior Phase 6 plans)*
 
-- [ ] 06-06-PLAN.md — Close aggregate guard coverage and TypeDuck CI/release artifact naming.
+- [x] 06-06-PLAN.md — Close aggregate guard coverage and TypeDuck CI/release artifact naming.
 
 **UI hint**: yes
 
@@ -270,5 +270,5 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7
 | 3. zh-HK TSF Registration and Installer Skeleton | 3/3 | Complete    | 2026-06-24 |
 | 4. TypeDuck Protocol and Typing MVP | 4/4 | Complete | 2026-06-24 |
 | 5. Candidate, Dictionary, Settings, and About UI Parity | 15/15 | Complete | 2026-06-26 |
-| 6. Privacy, Security, and Scaffold Cleanup | 6/7 | In Progress|  |
+| 6. Privacy, Security, and Scaffold Cleanup | 7/7 | Complete   | 2026-06-27 |
 | 7. Compatibility and Release Verification | 0/4 | Not started | - |

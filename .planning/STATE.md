@@ -3,18 +3,18 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 current_phase: 6
-current_phase_name: Privacy, Security, and Scaffold Cleanup
-status: phase_6_in_progress
-stopped_at: Completed 06-05-PLAN.md
-last_updated: "2026-06-27T11:25:15.387Z"
+status: completed
+stopped_at: Completed 06-06-PLAN.md
+last_updated: "2026-06-27T11:38:58.875Z"
 last_activity: 2026-06-27
-last_activity_desc: Completed Phase 6 Plan 05 IPC hardening
+last_activity_desc: Phase 6 marked complete
 progress:
   total_phases: 7
-  completed_phases: 5
+  completed_phases: 6
   total_plans: 38
-  completed_plans: 33
-  percent: 87
+  completed_plans: 34
+  percent: 86
+current_phase_name: Privacy, Security, and Scaffold Cleanup
 ---
 
 # Project State
@@ -28,12 +28,12 @@ See: .planning/PROJECT.md (updated 2026-06-26)
 
 ## Current Position
 
-Phase: 6 of 7 (Privacy, Security, and Scaffold Cleanup)
-Plan: 06-05 complete; 06-06 next
-Status: Phase 6 in progress; IPC hardening complete
-Last activity: 2026-06-27 — Completed Phase 6 Plan 05 IPC hardening
+Phase: 6 — COMPLETE
+Plan: 06-06 complete; Phase 6 complete
+Status: Phase 6 complete
+Last activity: 2026-06-27 — Phase 6 marked complete
 
-Progress: [█████████░] 87% of planned milestone plans
+Progress: [█████████░] 86% of planned milestone plans
 
 ## Performance Metrics
 
@@ -89,6 +89,7 @@ Progress: [█████████░] 87% of planned milestone plans
 | Phase 06-privacy-security-and-scaffold-cleanup P07 | ~2h | 3 tasks | 21 files |
 | Phase 06 P04 | 12min | 3 tasks | 16 files |
 | Phase 06-privacy-security-and-scaffold-cleanup P05 | 7 min | 3 tasks | 5 files |
+| Phase 06-privacy-security-and-scaffold-cleanup P06 | 10 min | 3 tasks | 5 files |
 
 ## Accumulated Context
 
@@ -179,10 +180,13 @@ Recent decisions affecting current work:
 - [Phase 06]: Routine quote-pair diagnostics record redacted lengths instead of raw committed text.
 - [Phase 06]: TypeDuck launcher IPC hardening rejects only inspectable obvious mismatches; denied process inspection remains compatibility-tolerant and logs technical detail only.
 - [Phase 06]: Named-pipe allow ACEs use explicit read/write/synchronize rights with the network deny ACE preserved.
+- [Phase 06]: Phase 6 Plan 06: Strict aggregate guard now invokes focused installer, runtime, backend diagnostics, launcher protocol, settings/About, and icon packaging guards. — This makes VER-02 executable through one strict command and keeps focused guard failures visible in aggregate evidence.
+- [Phase 06]: Phase 6 Plan 06: Release/nightly CI surfaces use TypeDuck-Windows, TypeDuck-Windows-backend, TypeDuck-HK/schema aap2-alpha, and typeduck-windows-ime artifact names. — Visible release surfaces must be TypeDuck-owned and schema packaging must use the TypeDuck-HK schema source instead of rime-frost.
+- [Phase 06]: Phase 6 Plan 06: Guard evidence is compact JSON metadata only, avoiding raw typed samples and secrets. — The phase threat model requires pass/fail evidence without information disclosure.
 
 ### Pending Todos
 
-Phase 6 Plan 06 aggregate guard coverage and TypeDuck CI/release artifact naming is next.
+Phase 6 is complete; Phase 7 compatibility and release verification is next.
 
 ### Blockers/Concerns
 
@@ -203,6 +207,6 @@ Phase 6 Plan 06 aggregate guard coverage and TypeDuck CI/release artifact naming
 
 ## Session Continuity
 
-Last session: 2026-06-27T11:25:15.380Z
-Stopped at: Completed 06-05-PLAN.md
+Last session: 2026-06-27T11:37:28.460Z
+Stopped at: Completed 06-06-PLAN.md
 Resume file: None
