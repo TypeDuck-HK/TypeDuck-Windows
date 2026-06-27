@@ -55,9 +55,9 @@ using namespace std;
 namespace Moqi {
 
 PipeServer *PipeServer::singleton_ = nullptr;
-wchar_t PipeServer::singleInstanceMutexName_[] = L"MoqiLauncherMutex";
+wchar_t PipeServer::singleInstanceMutexName_[] = L"TypeDuckLauncherMutex";
 
-wchar_t PipeServer::wndClassName_[] = L"MoqiLauncherWnd";
+wchar_t PipeServer::wndClassName_[] = L"TypeDuckLauncherWnd";
 
 static wstring_convert<codecvt_utf8<wchar_t>> utf8Codec;
 

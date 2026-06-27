@@ -4,13 +4,27 @@
 #include <sddl.h>
 #include <VersionHelpers.h>
 
+#include <iomanip>
+#include <memory>
+#include <sstream>
 #include <string>
 #include <stdexcept>
 
-#define PROCESS_ALL_ACCESS_HEX  TEXT("0x1fffff")  // hex string of PROCESS_ALL_ACCESS
-
 
 namespace Moqi {
+
+namespace {
+
+constexpr ACCESS_MASK kTypeDuckPipeAllowAccess =
+    FILE_GENERIC_READ | FILE_GENERIC_WRITE | SYNCHRONIZE;
+
+std::wstring accessMaskToSddlRights(ACCESS_MASK mask) {
+    std::wostringstream stream;
+    stream << L"0x" << std::uppercase << std::hex << mask;
+    return stream.str();
+}
+
+} // namespace
 
 static std::wstring sidToStr(PSID sid) {
     std::wstring sidStr;
@@ -118,26 +132,27 @@ PipeSecurityAttributes::PipeSecurityAttributes():
     // DACL
     securityDescriptorStr += SDDL_DACL L":";
 
+    const std::wstring pipeAllowRights =
+        accessMaskToSddlRights(kTypeDuckPipeAllowAccess);
+
     // ACE strings in this DACL.
     // Syntax: ace_type;ace_flags;rights;object_guid;inherit_object_guid;account_sid;(resource_attribute)
     if (::IsWindows8OrGreater()) {
-        // Deny Remote Acccess.
+        // Deny remote access.
         securityDescriptorStr += L"(" SDDL_ACCESS_DENIED L";;" SDDL_GENERIC_ALL L";;;" SDDL_NETWORK L")";
 
-        // Allow general access to LocalSystem.
-        securityDescriptorStr += L"(" SDDL_ACCESS_ALLOWED L";;" SDDL_GENERIC_ALL L";;;" SDDL_LOCAL_SYSTEM L")";
+        // Allow local system services to connect to the pipe.
+        securityDescriptorStr += L"(" SDDL_ACCESS_ALLOWED L";;" + pipeAllowRights + L";;;" SDDL_LOCAL_SYSTEM L")";
 
-        // Allow general access to Built-in Administorators.
-        securityDescriptorStr += L"(" SDDL_ACCESS_ALLOWED L";;" SDDL_GENERIC_ALL L";;;" SDDL_BUILTIN_ADMINISTRATORS L")";
+        // Allow administrators to connect without granting generic-all access.
+        securityDescriptorStr += L"(" SDDL_ACCESS_ALLOWED L";;" + pipeAllowRights + L";;;" SDDL_BUILTIN_ADMINISTRATORS L")";
 
-        // Allow general access to ALL APPLICATION PACKAGES.
-        securityDescriptorStr += L"(" SDDL_ACCESS_ALLOWED L";;" SDDL_GENERIC_ALL L";;;" SDDL_ALL_APP_PACKAGES L")";
+        // Preserve app-container compatibility for same-user Windows hosts.
+        securityDescriptorStr += L"(" SDDL_ACCESS_ALLOWED L";;" + pipeAllowRights + L";;;" SDDL_ALL_APP_PACKAGES L")";
     }
 
-    // Add generic & standand and all other possible object specific access right to logon user.
-
-    // Hex of PROCESS_ALL_ACCESS = 0x1ffff
-    securityDescriptorStr += L"(" SDDL_ACCESS_ALLOWED L";;" PROCESS_ALL_ACCESS_HEX L";;;" + logonSid + L")";
+    // Allow the interactive logon session to read/write the launcher pipe.
+    securityDescriptorStr += L"(" SDDL_ACCESS_ALLOWED L";;" + pipeAllowRights + L";;;" + logonSid + L")";
 
     // Add low integrity label to support application environment like IE
     // protective mode if system supports(vista or latter).
