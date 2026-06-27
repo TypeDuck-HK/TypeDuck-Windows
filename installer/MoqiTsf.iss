@@ -403,30 +403,32 @@ var
   DataCheckBox: TNewCheckBox;
   ContinueButton: TNewButton;
   CancelButton: TNewButton;
-  FormWidth: Integer;
+  ContentLeft: Integer;
+  ContentWidth: Integer;
   ButtonWidth: Integer;
   ButtonHeight: Integer;
   ButtonGap: Integer;
   ButtonTop: Integer;
   ButtonsLeft: Integer;
 begin
-  FormWidth := ScaleX(430);
-  ButtonWidth := ScaleX(116);
-  ButtonHeight := ScaleY(32);
-  ButtonGap := ScaleX(12);
-  ButtonTop := ScaleY(144);
-  ButtonsLeft := (FormWidth - ((ButtonWidth * 2) + ButtonGap)) div 2;
-
-  Form := CreateCustomForm(FormWidth, ScaleY(184), False, True);
+  Form := CreateCustomForm(ScaleX(360), ScaleY(132), False, True);
   try
     Form.Caption := 'TypeDuck 解除安裝選項 / TypeDuck Uninstall Options';
     Form.Color := clWhite;
     Form.Font.Size := 10;
 
+    ContentLeft := ScaleX(16);
+    ContentWidth := Form.ClientWidth - (ContentLeft * 2);
+    ButtonWidth := ScaleX(116);
+    ButtonHeight := ScaleY(28);
+    ButtonGap := ScaleX(12);
+    ButtonTop := Form.ClientHeight - ScaleY(48);
+    ButtonsLeft := (Form.ClientWidth - ((ButtonWidth * 2) + ButtonGap)) div 2;
+
     PromptLabel := TNewStaticText.Create(Form);
     PromptLabel.Parent := Form;
     PromptLabel.Color := clWhite;
-    PromptLabel.SetBounds(ScaleX(16), ScaleY(18), FormWidth - ScaleX(32), ScaleY(68));
+    PromptLabel.SetBounds(ContentLeft, ScaleY(18), ContentWidth, ScaleY(68));
     PromptLabel.AutoSize := False;
     PromptLabel.WordWrap := True;
     PromptLabel.Caption := Bilingual(
@@ -436,7 +438,7 @@ begin
     DataCheckBox := TNewCheckBox.Create(Form);
     DataCheckBox.Parent := Form;
     DataCheckBox.Color := clWhite;
-    DataCheckBox.SetBounds(ScaleX(16), ScaleY(100), FormWidth - ScaleX(32), ScaleY(32));
+    DataCheckBox.SetBounds(ContentLeft, ScaleY(72), ContentWidth, ScaleY(32));
     DataCheckBox.Caption := '同時刪除 TypeDuck 個人資料 / Also delete TypeDuck user data';
     DataCheckBox.Checked := False;
 
