@@ -26,6 +26,7 @@ All Phase 5 screenshot tests are explicitly replaced by human verification. The 
 ### Candidate and Dictionary Panel
 
 - Native candidate popup uses the TypeDuck visual direction: light surface, warm amber highlight, compact layout, readable HK Chinese/English fonts, measured text widths, and dynamic panel sizing.
+- The left candidate panel is an accepted native divergence from the exact TypeDuck Web panel layout. The user explicitly accepted the compact linear native design as cleaner and more space-efficient, so Phase 5 requires TypeDuck visual tone, data semantics, interaction behavior, and dictionary parity rather than pixel-perfect left-panel structure.
 - Candidate text, Jyutping/pronunciation, Chinese terms, comments/definitions, dictionary indicators, and compound/component rows render from structured candidate data.
 - Lookup-filter payloads are parsed at the native renderer boundary; candidate transport remains pass-through and no Go-side lookup rewrite remains.
 - TypeDuck-HK librime fork v1.1.4 x64 is the runtime basis for the current backend path; the earlier stale runtime mismatch was diagnosed and fixed.

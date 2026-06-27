@@ -36,7 +36,10 @@ All Phase 5 screenshot-based tests and screenshot fixture artifacts were explici
 expected: Native candidate panel uses TypeDuck visual tone, warm highlight, compact layout, correct fonts, measured text widths, and dynamic sizing without clipped long candidates or over-wide short candidate windows.
 result: pass
 closure: "Fixed through the candidate/dictionary iteration: panel colors landed, widths are content-measured without imposed max width, `measureWithFont` gained safety slack, long pronunciation/body strings stop clipping, Chinese/English fonts no longer fall back to monospace, input-buffer left edge aligns with selected candidate background, and zero-width active input-buffer segments hide their background."
+accepted_divergence: "The native left candidate panel is intentionally not an exact TypeDuck Web layout clone. The user explicitly accepted the newer compact linear native design because it is cleaner and more space-efficient, while still preserving TypeDuck visual tone, data semantics, interaction behavior, and dictionary parity."
 regression_notes:
+  - Do not treat pixel-perfect left-panel parity with TypeDuck Web as a Phase 5 regression.
+  - Preserve the accepted compact linear native design unless a future product decision explicitly changes it.
   - Do not return to fixed-width candidate panels or char-count text estimates.
   - Do not cap candidate rows to three rows.
   - Do not let the input buffer clip or render a one-pixel background for empty selected text.
