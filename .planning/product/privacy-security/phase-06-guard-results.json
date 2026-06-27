@@ -1,0 +1,48 @@
+{
+  "generatedAt": "2026-06-27T11:34:45Z",
+  "repoRoot": "D:\\VSProjects\\moqi-im-windows",
+  "backendRoot": "D:\\VSProjects\\moqi-ime",
+  "commands": [
+    {
+      "name": "installer",
+      "command": "pwsh -NoProfile -ExecutionPolicy Bypass -File \"D:\\VSProjects\\moqi-im-windows\\scripts\\Test-TypeDuckInstallerSkeleton.ps1\" -RepoRoot \"D:\\VSProjects\\moqi-im-windows\" -Strict"
+    },
+    {
+      "name": "runtime",
+      "command": "pwsh -NoProfile -ExecutionPolicy Bypass -File \"D:\\VSProjects\\moqi-im-windows\\scripts\\Test-TypeDuckRuntimePackagePruning.ps1\" -BackendRoot \"D:\\VSProjects\\moqi-ime\" -RepoRoot \"D:\\VSProjects\\moqi-im-windows\" -Strict"
+    },
+    {
+      "name": "backend-diagnostics",
+      "command": "pwsh -NoProfile -ExecutionPolicy Bypass -File \"D:\\VSProjects\\moqi-im-windows\\scripts\\Test-TypeDuckBackendDiagnostics.ps1\" -BackendRoot \"D:\\VSProjects\\moqi-ime\" -RepoRoot \"D:\\VSProjects\\moqi-im-windows\" -Strict"
+    },
+    {
+      "name": "launcher-protocol",
+      "command": "pwsh -NoProfile -ExecutionPolicy Bypass -File \"D:\\VSProjects\\moqi-im-windows\\scripts\\Test-TypeDuckLauncherProtocol.ps1\" -RepoRoot \"D:\\VSProjects\\moqi-im-windows\" -Strict"
+    },
+    {
+      "name": "settings-about",
+      "command": "pwsh -NoProfile -ExecutionPolicy Bypass -File \"D:\\VSProjects\\moqi-im-windows\\scripts\\Test-TypeDuckSettingsAboutUi.ps1\" -BackendRoot \"D:\\VSProjects\\moqi-ime\" -RepoRoot \"D:\\VSProjects\\moqi-im-windows\" -Strict"
+    },
+    {
+      "name": "icon-packaging",
+      "command": "pwsh -NoProfile -ExecutionPolicy Bypass -File \"D:\\VSProjects\\moqi-im-windows\\scripts\\Test-TypeDuckIconPackaging.ps1\" -BackendRoot \"D:\\VSProjects\\moqi-ime\" -RepoRoot \"D:\\VSProjects\\moqi-im-windows\" -Strict"
+    }
+  ],
+  "status": "pass",
+  "categories": [
+    "identity",
+    "language",
+    "diagnostics",
+    "backend-diagnostics",
+    "backend-package",
+    "runtime",
+    "installer",
+    "installer-cleanup",
+    "legacy-moqi-coexistence",
+    "publisher",
+    "restart-guidance",
+    "ipc",
+    "settings-about",
+    "icon-packaging"
+  ]
+}
