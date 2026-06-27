@@ -85,7 +85,7 @@ Phase 5 closeout note: SET-01 through SET-10 are accepted by user human verifica
 - [x] **SEC-01**: Runtime logs and diagnostics use TypeDuck-owned paths and avoid raw typed content by default.
 - [x] **SEC-02**: Cloud clipboard/WebDAV behavior from the scaffold is removed or compile-gated out of v1.
 - [x] **SEC-03**: Arbitrary backend-provided config tool launching is removed or replaced by a fixed first-party TypeDuck settings entry point.
-- [ ] **SEC-04**: Named pipe access and client/server identity checks are hardened enough to prevent obvious same-user spoofing and oversized-frame abuse.
+- [x] **SEC-04**: Named pipe access and client/server identity checks are hardened enough to prevent obvious same-user spoofing and oversized-frame abuse.
 - [x] **SEC-05**: Installer avoids broad legacy process kills and uses TypeDuck-specific process names and cleanup operations.
 
 ### Verification and Release Readiness
@@ -194,7 +194,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | SEC-01 | Phase 6 | Complete |
 | SEC-02 | Phase 6 | Complete |
 | SEC-03 | Phase 6 | Complete |
-| SEC-04 | Phase 6 | Pending |
+| SEC-04 | Phase 6 | Complete |
 | SEC-05 | Phase 6 | Complete |
 | VER-01 | Phase 1 | Complete |
 | VER-02 | Phase 6 | Complete |

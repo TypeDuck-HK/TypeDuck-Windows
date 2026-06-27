@@ -5,16 +5,16 @@ milestone_name: milestone
 current_phase: 6
 current_phase_name: Privacy, Security, and Scaffold Cleanup
 status: phase_6_in_progress
-stopped_at: Completed 06-04-PLAN.md
-last_updated: "2026-06-27T11:13:51.870Z"
+stopped_at: Completed 06-05-PLAN.md
+last_updated: "2026-06-27T11:25:15.387Z"
 last_activity: 2026-06-27
-last_activity_desc: Completed Phase 6 Plan 04 diagnostics privacy cleanup
+last_activity_desc: Completed Phase 6 Plan 05 IPC hardening
 progress:
   total_phases: 7
   completed_phases: 5
   total_plans: 38
-  completed_plans: 32
-  percent: 84
+  completed_plans: 33
+  percent: 87
 ---
 
 # Project State
@@ -29,11 +29,11 @@ See: .planning/PROJECT.md (updated 2026-06-26)
 ## Current Position
 
 Phase: 6 of 7 (Privacy, Security, and Scaffold Cleanup)
-Plan: 06-04 complete; 06-05 next
-Status: Phase 6 in progress; diagnostics privacy cleanup complete
-Last activity: 2026-06-27 — Completed Phase 6 Plan 04 diagnostics privacy cleanup
+Plan: 06-05 complete; 06-06 next
+Status: Phase 6 in progress; IPC hardening complete
+Last activity: 2026-06-27 — Completed Phase 6 Plan 05 IPC hardening
 
-Progress: [████████░░] 84% of planned milestone plans
+Progress: [█████████░] 87% of planned milestone plans
 
 ## Performance Metrics
 
@@ -88,6 +88,7 @@ Progress: [████████░░] 84% of planned milestone plans
 | Phase 06-privacy-security-and-scaffold-cleanup P03 | 13 min | 3 tasks | 11 files |
 | Phase 06-privacy-security-and-scaffold-cleanup P07 | ~2h | 3 tasks | 21 files |
 | Phase 06 P04 | 12min | 3 tasks | 16 files |
+| Phase 06-privacy-security-and-scaffold-cleanup P05 | 7 min | 3 tasks | 5 files |
 
 ## Accumulated Context
 
@@ -176,10 +177,12 @@ Recent decisions affecting current work:
 - [Phase 06]: TypeDuck diagnostics use %LOCALAPPDATA%\TypeDuckIME and TypeDuckLauncher.json; Legacy Moqi paths remain separate and untouched.
 - [Phase 06]: Cloud clipboard protocol method 19 and request field 26 are removed from v1 and reserved in proto/moqi.proto.
 - [Phase 06]: Routine quote-pair diagnostics record redacted lengths instead of raw committed text.
+- [Phase 06]: TypeDuck launcher IPC hardening rejects only inspectable obvious mismatches; denied process inspection remains compatibility-tolerant and logs technical detail only.
+- [Phase 06]: Named-pipe allow ACEs use explicit read/write/synchronize rights with the network deny ACE preserved.
 
 ### Pending Todos
 
-Phase 6 Plan 05 IPC ACL and server identity hardening is next.
+Phase 6 Plan 06 aggregate guard coverage and TypeDuck CI/release artifact naming is next.
 
 ### Blockers/Concerns
 
@@ -200,6 +203,6 @@ Phase 6 Plan 05 IPC ACL and server identity hardening is next.
 
 ## Session Continuity
 
-Last session: 2026-06-27T11:13:51.861Z
-Stopped at: Completed 06-04-PLAN.md
+Last session: 2026-06-27T11:25:15.380Z
+Stopped at: Completed 06-05-PLAN.md
 Resume file: None
