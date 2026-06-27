@@ -71,6 +71,9 @@ static constexpr UINT TRAY_NOTIFICATION_TIMEOUT_MS = 5000;
 static constexpr char kTypeDuckProfileGuid[] =
     "{c6e8f5df-6504-44f9-b7cf-17a195373a83}";
 static constexpr char kTypeDuckBackendBridgeName[] = "typeduck-runtime-bridge";
+static constexpr char kTypeDuckBackendDisplayName[] = "TypeDuck Runtime Bridge";
+static constexpr char kTypeDuckBackendCommand[] = "TypeDuckRuntime\\server.exe";
+static constexpr char kTypeDuckBackendWorkingDir[] = "TypeDuckRuntime";
 
 static constexpr UINT ID_ENABLE_DEBUG_LOG = 1000;
 static constexpr UINT ID_SHOW_DEBUG_LOGS = 1001;
@@ -176,15 +179,16 @@ void PipeServer::saveConfig() {
 }
 
 void PipeServer::initBackendServers(const std::wstring &topDirPath) {
-  // load known backend implementations
-  Json::Value backends;
-  if (loadJsonFile(topDirPath + L"\\backends.json", backends) &&
-      backends.isArray()) {
-    for (auto &backendInfo : backends) {
-      backends_.emplace_back(
-          std::make_unique<BackendServer>(this, backendInfo));
-    }
-  }
+  (void)topDirPath;
+  Json::Value backendInfo;
+  backendInfo["name"] = kTypeDuckBackendBridgeName;
+  backendInfo["displayName"] = kTypeDuckBackendDisplayName;
+  backendInfo["description"] =
+      "Internal fixed TypeDuck runtime bridge; not product profile authority.";
+  backendInfo["command"] = kTypeDuckBackendCommand;
+  backendInfo["workingDir"] = kTypeDuckBackendWorkingDir;
+  backendInfo["params"] = "";
+  backends_.emplace_back(std::make_unique<BackendServer>(this, backendInfo));
 
   seedTypeDuckProfileBackendMapping();
 
@@ -204,7 +208,7 @@ void PipeServer::initInputMethods(const std::wstring &topDirPath) {
   // maps language profiles to backend names
   for (auto &backend : backends_) {
     std::wstring dirPath = topDirPath + L"\\" +
-                           utf8Codec.from_bytes(backend->name_) +
+                           utf8Codec.from_bytes(backend->workingDir_) +
                            L"\\input_methods";
     // scan the dir for lang profile definition files (ime.json)
     WIN32_FIND_DATA findData = {0};
