@@ -404,12 +404,9 @@ var
   ContinueButton: TNewButton;
   CancelButton: TNewButton;
 begin
-  Form := TSetupForm.Create(nil);
+  Form := CreateCustomForm(ScaleX(470), ScaleY(170), False, True);
   try
     Form.Caption := Bilingual('TypeDuck 解除安裝選項', 'TypeDuck Uninstall Options');
-    Form.ClientWidth := ScaleX(470);
-    Form.ClientHeight := ScaleY(170);
-    Form.Position := poScreenCenter;
 
     PromptLabel := TNewStaticText.Create(Form);
     PromptLabel.Parent := Form;

@@ -189,8 +189,11 @@ function Assert-InstallerScript {
         "Type:\s*filesandordirs;\s*Name:\s*`"\{localappdata\}\\TypeDuckIME`"",
         "Type:\s*filesandordirs;\s*Name:\s*`"\{userappdata\}\\TypeDuckIME`";\s*Check:\s*ShouldDeleteUserDataOnUninstall",
         "PromptDeleteUserDataOnUninstall",
+        "CreateCustomForm\(ScaleX\(470\),\s*ScaleY\(170\),\s*False,\s*True\)",
         "DeleteUserDataOnUninstall := False"
     ) "Uninstall cleanup must cover TypeDuck registration, startup, task, install files, and make roaming user-data deletion opt-in."
+    Assert-NotMatch $Failures $Iss "TSetupForm\.Create" `
+        "Uninstaller prompt must use Inno's CreateCustomForm helper instead of constructing TSetupForm directly."
     Assert-AllMatch $Failures $Iss @(
         "Type:\s*filesandordirs;\s*Name:\s*`"\{app\}\\x64`"",
         "Type:\s*filesandordirs;\s*Name:\s*`"\{app\}\\TypeDuckRuntime`"",
