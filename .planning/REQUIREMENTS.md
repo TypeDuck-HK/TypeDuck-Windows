@@ -7,9 +7,9 @@
 
 ### Product Identity
 
-- [ ] **IDEN-01**: User sees TypeDuck, not Moqi, in installer title text, installed app names, tray/menu surfaces, binary/resource metadata, logs, data paths, and release artifact names.
+- [x] **IDEN-01**: User sees TypeDuck, not Moqi, in installer title text, installed app names, tray/menu surfaces, binary/resource metadata, logs, data paths, and release artifact names.
 - [x] **IDEN-02**: Developer has a single TypeDuck identity contract covering executable names, DLL names, AppId/CLSID/profile GUIDs, install directories, log/data directories, pipe/mutex names, registry keys, resource strings, and release artifact names.
-- [ ] **IDEN-03**: User-facing surfaces contain no visible Moqi product strings after the TypeDuck identity phase.
+- [x] **IDEN-03**: User-facing surfaces contain no visible Moqi product strings after the TypeDuck identity phase.
 - [ ] **IDEN-04**: User-facing surfaces contain no visible fcitx, WebDAV/cloud clipboard, or AI feature references in the v1 product.
 
 ### Installation and TSF Registration
@@ -76,8 +76,8 @@ Phase 5 closeout note: SET-01 through SET-10 are accepted by user human verifica
 
 ### Language and Copy
 
-- [ ] **LANG-01**: Every user-facing installer, settings, About, tray/menu, candidate UI, error, and status string is bilingual in Traditional Hong Kong Chinese and English.
-- [ ] **LANG-02**: User-facing Chinese text uses Traditional Hong Kong wording, not Simplified Chinese wording or Simplified-only installer chrome.
+- [x] **LANG-01**: Every user-facing installer, settings, About, tray/menu, candidate UI, error, and status string is bilingual in Traditional Hong Kong Chinese and English.
+- [x] **LANG-02**: User-facing Chinese text uses Traditional Hong Kong wording, not Simplified Chinese wording or Simplified-only installer chrome.
 - [x] **LANG-03**: TypeDuck display-language labels and dictionary language names match TypeDuck Web alpha unless the Web alpha changes and the project context is updated.
 
 ### Privacy, Security, and Diagnostics
@@ -86,14 +86,14 @@ Phase 5 closeout note: SET-01 through SET-10 are accepted by user human verifica
 - [ ] **SEC-02**: Cloud clipboard/WebDAV behavior from the scaffold is removed or compile-gated out of v1.
 - [ ] **SEC-03**: Arbitrary backend-provided config tool launching is removed or replaced by a fixed first-party TypeDuck settings entry point.
 - [ ] **SEC-04**: Named pipe access and client/server identity checks are hardened enough to prevent obvious same-user spoofing and oversized-frame abuse.
-- [ ] **SEC-05**: Installer avoids broad legacy process kills and uses TypeDuck-specific process names and cleanup operations.
+- [x] **SEC-05**: Installer avoids broad legacy process kills and uses TypeDuck-specific process names and cleanup operations.
 
 ### Verification and Release Readiness
 
 Phase 5 evidence note: screenshot tests and `.planning/product/ui-fixtures` were explicitly replaced by human verification. This does not complete the release-readiness requirements below; Phase 7 still owns final compatibility, install/upgrade/uninstall, host-app, DPI, protocol recovery, screenshot, and release artifact evidence.
 
 - [x] **VER-01**: Developer has a dated TypeDuck Web alpha parity fixture set covering settings defaults, labels, candidate list, dictionary panel, and visual references.
-- [ ] **VER-02**: Developer can run automated or scripted checks that fail when visible Moqi, fcitx, WebDAV/cloud clipboard, AI, or Simplified-only strings remain in user-facing resources.
+- [x] **VER-02**: Developer can run automated or scripted checks that fail when visible Moqi, fcitx, WebDAV/cloud clipboard, AI, or Simplified-only strings remain in user-facing resources.
 - [ ] **VER-03**: Developer can verify clean install, upgrade/reinstall, uninstall, and reboot-required registration behavior on Windows 10/11 or equivalent test VMs.
 - [ ] **VER-04**: Developer can verify TypeDuck typing and candidate UI in representative host apps including Notepad, browsers, Office or Office-like apps, terminal/console contexts, elevated apps, and high-DPI/multi-monitor setups.
 - [ ] **VER-05**: Developer can verify protocol and engine behavior with golden tests for normal input, dictionary lookup, reverse lookup, malformed frames, timeouts, and backend restart.
@@ -144,9 +144,9 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| IDEN-01 | Phase 6 | Pending |
+| IDEN-01 | Phase 6 | Complete |
 | IDEN-02 | Phase 1 | Complete |
-| IDEN-03 | Phase 6 | Pending |
+| IDEN-03 | Phase 6 | Complete |
 | IDEN-04 | Phase 6 | Pending |
 | INST-01 | Phase 3 | Complete |
 | INST-02 | Phase 3 | Complete |
@@ -188,16 +188,16 @@ Which phases cover which requirements. Updated during roadmap creation.
 | SET-08 | Phase 5 | Complete |
 | SET-09 | Phase 5 | Complete |
 | SET-10 | Phase 5 | Complete |
-| LANG-01 | Phase 6 | Pending |
-| LANG-02 | Phase 6 | Pending |
+| LANG-01 | Phase 6 | Complete |
+| LANG-02 | Phase 6 | Complete |
 | LANG-03 | Phase 5 | Complete |
 | SEC-01 | Phase 6 | Pending |
 | SEC-02 | Phase 6 | Pending |
 | SEC-03 | Phase 6 | Pending |
 | SEC-04 | Phase 6 | Pending |
-| SEC-05 | Phase 6 | Pending |
+| SEC-05 | Phase 6 | Complete |
 | VER-01 | Phase 1 | Complete |
-| VER-02 | Phase 6 | Pending |
+| VER-02 | Phase 6 | Complete |
 | VER-03 | Phase 7 | Pending |
 | VER-04 | Phase 7 | Pending |
 | VER-05 | Phase 7 | Pending |

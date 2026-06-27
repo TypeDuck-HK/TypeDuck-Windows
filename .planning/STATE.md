@@ -4,17 +4,17 @@ milestone: v1.0
 milestone_name: milestone
 current_phase: 6
 current_phase_name: Privacy, Security, and Scaffold Cleanup
-status: ready_for_phase_6_planning
-stopped_at: Phase 6 and Phase 7 context gathered
-last_updated: "2026-06-27T06:57:29.940Z"
+status: phase_6_in_progress
+stopped_at: Completed 06-01-PLAN.md
+last_updated: "2026-06-27T10:11:49.462Z"
 last_activity: 2026-06-26
 last_activity_desc: Closed Phase 5 with user human verification, retired screenshot fixtures, and updated UAT/verification records
 progress:
   total_phases: 7
   completed_phases: 5
-  total_plans: 27
-  completed_plans: 27
-  percent: 71
+  total_plans: 38
+  completed_plans: 28
+  percent: 74
 ---
 
 # Project State
@@ -29,11 +29,11 @@ See: .planning/PROJECT.md (updated 2026-06-26)
 ## Current Position
 
 Phase: 6 of 7 (Privacy, Security, and Scaffold Cleanup)
-Plan: not planned yet
-Status: Phase 5 closed; Phase 6 ready for planning
-Last activity: 2026-06-26 — Closed Phase 5 with user human verification, retired screenshot fixtures, and updated UAT/verification records
+Plan: 06-01 complete; 06-02 next
+Status: Phase 6 in progress; installer cleanup complete
+Last activity: 2026-06-27 — Completed Phase 6 Plan 01 installer localization, cleanup, and guard work
 
-Progress: [██████████] 100% of planned Phase 1-5 plans
+Progress: [███████░░░] 74% of planned milestone plans
 
 ## Performance Metrics
 
@@ -83,6 +83,7 @@ Progress: [██████████] 100% of planned Phase 1-5 plans
 | Phase 05-candidate-dictionary-settings-and-about-ui-parity P13 | 10min | 2 tasks | 12 files |
 | Phase 05-candidate-dictionary-settings-and-about-ui-parity P14 | user-approved skip | 1 retired evidence path | docs |
 | Phase 05-candidate-dictionary-settings-and-about-ui-parity P15 | closeout | UAT/verification/roadmap | docs |
+| Phase 06 P01 | 7 min | 3 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -157,10 +158,13 @@ Recent decisions affecting current work:
 - [Phase 05-candidate-dictionary-settings-and-about-ui-parity]: 05-13: Keep installer/dist and installer/stage as ignored generated outputs; commit package SHA-256 and staged artifact hashes in provenance instead.
 - [Phase 05-candidate-dictionary-settings-and-about-ui-parity]: 05-14: The VM/manual screenshot manifest path was skipped by explicit user direction; `.planning/product/ui-fixtures` was removed and Phase 5 acceptance is human verification plus guards.
 - [Phase 05-candidate-dictionary-settings-and-about-ui-parity]: 05-15: Final Phase 5 closeout lives in `05-UAT.md`, `05-VERIFICATION.md`, `05-06-SUMMARY.md`, `05-14-SUMMARY.md`, and `05-15-SUMMARY.md`.
+- [Phase 06]: 06-01 removed Legacy Moqi registry/startup cleanup from the TypeDuck installer so TypeDuck uninstall does not touch separately installed Moqi state.
+- [Phase 06]: 06-01 keeps TypeDuck runtime `server.exe` cleanup path-scoped to the TypeDuck app directory because `server.exe` is a generic process name.
+- [Phase 06]: 06-01 renders restart guidance on final installer/uninstaller surfaces with reopen-apps-first wording instead of separate technical popups.
 
 ### Pending Todos
 
-Phase 6 planning is next.
+Phase 6 Plan 02 runtime package pruning is next.
 
 ### Blockers/Concerns
 
@@ -180,6 +184,6 @@ Phase 6 planning is next.
 
 ## Session Continuity
 
-Last session: 2026-06-27T06:57:29.932Z
-Stopped at: Phase 6 and Phase 7 context gathered
-Resume file: .planning/phases/06-privacy-security-and-scaffold-cleanup/06-CONTEXT.md
+Last session: 2026-06-27T10:11:49.452Z
+Stopped at: Completed 06-01-PLAN.md
+Resume file: None

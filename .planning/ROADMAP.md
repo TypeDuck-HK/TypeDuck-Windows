@@ -212,11 +212,11 @@ Plans:
 
 **Verification Environment**: Mixed. Static/code tests are expected for audits, parser bounds, logging defaults, and removed handlers. Add targeted Windows VM smoke evidence for installed-path privacy, launcher/runtime behavior, config-tool removal, pipe behavior, and absence of legacy feature surfaces after installation.
 
-**Plans**: 7 plans
+**Plans**: 1/7 plans executed
 Plans:
 **Wave 1**
 
-- [ ] 06-01-PLAN.md — Clean installer localization, first-page copy, Start Menu entries, process cleanup, and Simplified Inno dependency.
+- [x] 06-01-PLAN.md — Clean installer localization, first-page copy, Start Menu entries, process cleanup, and Simplified Inno dependency.
 - [ ] 06-02-PLAN.md — Prune and rename the shipped TypeDuck runtime package under `TypeDuckRuntime`.
 
 **Wave 2** *(blocked on Wave 1 runtime package cleanup)*
@@ -235,6 +235,7 @@ Plans:
 **Wave 5** *(blocked on all prior Phase 6 plans)*
 
 - [ ] 06-06-PLAN.md — Close aggregate guard coverage and TypeDuck CI/release artifact naming.
+
 **UI hint**: yes
 
 ### Phase 7: Compatibility and Release Verification
@@ -251,6 +252,7 @@ Plans:
 
 **Plans**: 4 plans
 Plans:
+
 - [ ] 07-01-PLAN.md — Build repeatable non-screenshot install/reinstall/uninstall/reboot and artifact-hash evidence.
 - [ ] 07-02-PLAN.md — Add protocol recovery matrix, guard, and focused C++ tests for release verification.
 - [ ] 07-03-PLAN.md — Create interactive host-app and DPI human-verification notes without screenshot automation.
@@ -268,5 +270,5 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7
 | 3. zh-HK TSF Registration and Installer Skeleton | 3/3 | Complete    | 2026-06-24 |
 | 4. TypeDuck Protocol and Typing MVP | 4/4 | Complete | 2026-06-24 |
 | 5. Candidate, Dictionary, Settings, and About UI Parity | 15/15 | Complete | 2026-06-26 |
-| 6. Privacy, Security, and Scaffold Cleanup | 0/6 | Not started | - |
+| 6. Privacy, Security, and Scaffold Cleanup | 1/7 | In Progress|  |
 | 7. Compatibility and Release Verification | 0/4 | Not started | - |
