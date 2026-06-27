@@ -34,7 +34,7 @@
 - libIME2 - static TSF abstraction layer built from `libIME2/src/CMakeLists.txt` and linked by `MoqiTextService/CMakeLists.txt`.
 - libuv - launcher event loop, named pipe server, subprocess management, timers, async handoff, and stdio pipes built by `libuv/CMakeLists.txt` and linked by `MoqLauncher/CMakeLists.txt`.
 - Protocol Buffers - framed binary frontend/backend IPC generated from `proto/moqi.proto`; framing helpers live in `proto/ProtoFraming.h`.
-- JsonCpp - JSON config/metadata parsing for `backends.json`, `input_methods/*/ime.json`, launcher config, and UI metadata in `MoqiTextService/DllEntry.cpp`, `MoqiTextService/MoqiImeModule.cpp`, `MoqLauncher/PipeServer.cpp`, and `MoqLauncher/Utils.cpp`.
+- JsonCpp - JSON config/metadata parsing for optional `input_methods/*/ime.json`, launcher config, and UI metadata in `MoqiTextService/DllEntry.cpp`, `MoqiTextService/MoqiImeModule.cpp`, `MoqLauncher/PipeServer.cpp`, and `MoqLauncher/Utils.cpp`; launcher backend registration is now fixed in code for `TypeDuckRuntime`.
 
 **Testing:**
 - GoogleTest 1.10.0 - vendored under `libIME2/lib/googletest-release-1.10.0` and enabled by `libIME2/CMakeLists.txt`.
@@ -52,7 +52,7 @@
 - `libIME2` submodule - TSF/IME base classes, COM helpers, candidate windows, message windows, and language bar support (`libIME2/src/`, `.gitmodules`).
 - `libuv` submodule, version macros `1.11.1-dev` - launcher event loop, named pipes, async callbacks, timers, process spawning, and stdio streams (`libuv/include/uv-version.h`, `libuv/CMakeLists.txt`).
 - `protobuf` 33.5 - schema compiler/runtime for `proto/moqi.proto`; downloaded from GitHub by `CMakeLists.txt` or provided through local CMake cache vars.
-- `jsoncpp` 1.8.4 - static JSON parser/writer used for backend manifests, IME metadata, config, and UI bridge objects (`jsoncpp/include/json/version.h`).
+- `jsoncpp` 1.8.4 - static JSON parser/writer used for optional IME metadata, config, and UI bridge objects (`jsoncpp/include/json/version.h`).
 - `spdlog` v1.2.1 - launcher rotating file logging (`CMakeLists.txt`, `MoqLauncher/PipeServer.cpp`).
 - Windows SDK libraries - TSF/COM/Win32 dependencies including `Rpcrt4`, `Advapi32`, `Shell32`, `shlwapi.lib`, `gdi32`, `user32`, `ws2_32`, `psapi`, `iphlpapi`, and `userenv` across component `CMakeLists.txt` files.
 
@@ -74,8 +74,8 @@
 - Top-level build orchestration: `CMakeLists.txt`.
 - MSVC runtime override: `CMAKE_MSVC_RUNTIME_LIBRARY` in `CMakeLists.txt`, plus `cmake/c_flag_overrides.cmake` and `cmake/cxx_flag_overrides.cmake`.
 - Version source: `version.txt`, parsed by `CMakeLists.txt` and applied to resource templates such as `MoqiTextService/MoqiTextService.rc.in` and `MoqLauncher/version.rc.in`.
-- Backend manifest: `backends.json` currently points to legacy `moqi-ime\server.exe`.
-- IME language profile metadata: installed backend folders under `input_methods/*/ime.json`, scanned by `MoqiTextService/DllEntry.cpp`, `MoqiTextService/MoqiImeModule.cpp`, and `MoqLauncher/PipeServer.cpp`.
+- Backend runtime bridge: `MoqLauncher/PipeServer.cpp` constructs one in-code `typeduck-runtime-bridge` for `TypeDuckRuntime\server.exe` with working directory `TypeDuckRuntime`.
+- IME language profile metadata: optional compatibility metadata under fixed TypeDuck runtime folders such as `TypeDuckRuntime\input_methods\*\ime.json`, scanned after first-party TypeDuck profile mapping by `MoqiTextService/DllEntry.cpp`, `MoqiTextService/MoqiImeModule.cpp`, and `MoqLauncher/PipeServer.cpp`.
 - Installer script: `installer/MoqiTsf.iss`; staging script: `scripts/install.ps1`; full packaging script: `scripts/_all_in_package.ps1`.
 
 ## Platform Requirements

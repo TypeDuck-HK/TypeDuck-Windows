@@ -30,8 +30,8 @@
          │
          ▼
 ┌─────────────────────────────────────────────────────────────┐
-│       Legacy backend payload configured by `backends.json`  │
-│       default: `moqi-ime/server.exe`                        │
+│       Fixed TypeDuck runtime bridge                         │
+│       `TypeDuckRuntime/server.exe`                          │
 └─────────────────────────────────────────────────────────────┘
 ```
 
@@ -58,7 +58,7 @@
 - Keep TSF/COM mechanics in `libIME2/src`; put TypeDuck product behavior in the product text service layer represented by `MoqiTextService/*`.
 - Communicate between the in-process TSF DLL and the launcher through a per-user Windows named pipe created by `MoqLauncher/PipeServer.cpp`.
 - Communicate between launcher and backend through backend process stdin/stdout using protobuf frames defined by `proto/moqi.proto` and `proto/ProtoFraming.h`.
-- Treat Moqi-specific branding, launcher names, install directory names, cloud clipboard, AI, and fcitx-facing concepts in `README.md`, `installer/MoqiTsf.iss`, `backends.json`, `MoqLauncher/*`, and `MoqiTextService/*` as legacy scaffold.
+- Treat Moqi-specific branding, launcher names, install directory names, cloud clipboard, AI, fcitx-facing concepts, and deleted manifest-driven backend discovery as legacy scaffold.
 - Preserve the architectural boundary for the TypeDuck rewrite: Windows TSF frontend in this repo, TypeDuck librime fork and dictionary lookup filter plugin in the backend/runtime payload, and installation metadata under Chinese (Traditional, Hong Kong).
 
 ## Layers
@@ -121,7 +121,7 @@
 ### Registration and Install Path
 
 1. `scripts/build.ps1` builds Win32 full solution and x64 `MoqiTextService.dll` (`scripts/build.ps1`).
-2. `scripts/install.ps1` stages `MoqiLauncher.exe`, `SetupHelper.exe`, Win32/x64 `MoqiTextService.dll`, `backends.json`, and the backend runtime under `installer/stage` (`scripts/install.ps1`).
+2. `scripts/install.ps1` stages `MoqiLauncher.exe`, `SetupHelper.exe`, Win32/x64 `MoqiTextService.dll`, and the `TypeDuckRuntime` backend runtime under `installer/stage` (`scripts/install.ps1`).
 3. `installer/build-installer.ps1` validates staged files and compiles `installer/MoqiTsf.iss` with Inno Setup (`installer/build-installer.ps1`).
 4. `installer/MoqiTsf.iss` installs to `{autopf32}\MoqiIM`, writes the `MoqiLauncher` startup registry value, and invokes `SetupHelper.exe /i` (`installer/MoqiTsf.iss`).
 5. `SetupHelper.exe` copies TSF DLLs into SysWOW64/System32 and registers them; locked DLLs trigger a scheduled post-reboot registration task (`SetupHelper/SetupHelper.cpp:649`, `SetupHelper/SetupHelper.cpp:714`).
@@ -129,10 +129,10 @@
 
 ### Backend and Language Profile Discovery
 
-1. `Moqi::ImeModule` reads `MOQI_PROGRAM_DIR` or falls back to `%ProgramFiles(x86)%\MoqiIM` (`MoqiTextService/MoqiImeModule.cpp:42`).
-2. `loadBackendDirs` reads backend names from installed `backends.json` (`MoqiTextService/MoqiImeModule.cpp:61`, `backends.json`).
-3. `DllRegisterServer` scans each backend directory for `input_methods/<name>/ime.json` and maps `name`, `guid`, `locale`, `fallbackLocale`, and `icon` to `Ime::LangProfileInfo` (`MoqiTextService/DllEntry.cpp:174`).
-4. `MoqLauncher/PipeServer.cpp` also scans backend input methods and maps profile GUIDs to backend instances (`MoqLauncher/PipeServer.cpp:172`, `MoqLauncher/PipeServer.cpp:335`).
+1. `Moqi::ImeModule` reads `TYPEDUCK_PROGRAM_DIR`, falls back through the legacy registration alias, or resolves `%ProgramFiles(x86)%\TypeDuckIME` (`MoqiTextService/MoqiImeModule.cpp`).
+2. `Moqi::ImeModule` uses a fixed runtime directory list containing `TypeDuckRuntime`; it does not parse `backends.json`.
+3. `DllRegisterServer` seeds the first-party TypeDuck zh-HK profile, then optionally scans fixed runtime metadata under `TypeDuckRuntime\input_methods\<name>\ime.json` for compatibility (`MoqiTextService/DllEntry.cpp`, `MoqiTextService/MoqiImeModule.cpp`).
+4. `MoqLauncher/PipeServer.cpp` constructs one in-code `typeduck-runtime-bridge` for `TypeDuckRuntime\server.exe`, seeds the TypeDuck profile GUID mapping, then optionally scans fixed runtime metadata without overriding the seeded mapping.
 
 **State Management:**
 - TSF composition state lives in `Ime::TextService` and is manipulated via `startComposition`, `setCompositionString`, `setCompositionCursor`, and `endComposition` (`libIME2/src/TextService.cpp:385`, `libIME2/src/TextService.cpp:521`, `libIME2/src/TextService.cpp:638`, `libIME2/src/TextService.cpp:452`).

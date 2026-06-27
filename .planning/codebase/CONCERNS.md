@@ -6,19 +6,19 @@
 
 **Legacy Moqi product identity is embedded across code, installer, protocol, CI, and runtime paths:**
 - Issue: Current binaries, namespaces, directories, registry cleanup, log paths, tray text, installer labels, release artifacts, and documentation are Moqi-specific. Treat these as scaffold-only for the TypeDuck Cantonese IME target.
-- Files: `CMakeLists.txt`, `backends.json`, `README.md`, `TODO.md`, `MoqiTextService/MoqiImeModule.cpp`, `MoqiTextService/DllEntry.cpp`, `MoqiTextService/MoqiTextService.rc.in`, `MoqiTextService/MoqiTextService.def`, `MoqiTextService/TsfLog.cpp`, `MoqLauncher/PipeServer.cpp`, `SetupHelper/SetupHelper.cpp`, `installer/MoqiTsf.iss`, `installer/README.txt`, `scripts/build.ps1`, `scripts/install.ps1`, `scripts/_all_in_package.ps1`, `.github/workflows/release.yml`, `.github/workflows/nightly.yml`
+- Files: `CMakeLists.txt`, `README.md`, `TODO.md`, `MoqiTextService/MoqiImeModule.cpp`, `MoqiTextService/DllEntry.cpp`, `MoqiTextService/MoqiTextService.rc.in`, `MoqiTextService/MoqiTextService.def`, `MoqiTextService/TsfLog.cpp`, `MoqLauncher/PipeServer.cpp`, `SetupHelper/SetupHelper.cpp`, `installer/MoqiTsf.iss`, `installer/README.txt`, `scripts/build.ps1`, `scripts/install.ps1`, `scripts/_all_in_package.ps1`, `.github/workflows/release.yml`, `.github/workflows/nightly.yml`
 - Impact: TypeDuck deliverables inherit wrong product names, wrong install directories, wrong AppId/CLSID coordination, wrong log locations, wrong tray/menu strings, wrong release asset names, and user-facing Simplified Chinese/Moqi references.
 - Fix approach: Create a single TypeDuck product identity contract with executable names, DLL names, AppId, TSF CLSID, profile GUIDs, install directories, log directories, release artifact names, installer text, tray strings, and protocol package names. Apply it through CMake configure definitions and installer/script constants instead of editing one-off string literals.
 
-**Backend architecture still assumes the Go `moqi-ime` process instead of TypeDuck librime in-process/runtime assets:**
-- Issue: The Windows frontend launches a configured backend from `backends.json` and speaks protobuf over stdio through `MoqLauncher`; the default backend is `moqi-ime\server.exe`.
-- Files: `backends.json`, `MoqLauncher/BackendServer.cpp`, `MoqLauncher/PipeServer.cpp`, `MoqiTextService/MoqiClient.cpp`, `proto/moqi.proto`, `proto/ProtoFraming.h`, `scripts/install.ps1`, `scripts/_all_in_package.ps1`, `.github/workflows/release.yml`, `.github/workflows/nightly.yml`
-- Impact: TypeDuck requirements for the TypeDuck librime fork plus dictionary lookup filter plugin do not fit the current Go-backend packaging and protocol assumptions without either a compatibility backend or a new native engine boundary.
-- Fix approach: Decide the engine boundary first. If librime stays out-of-process, define a TypeDuck backend package and protocol. If librime moves in-process, remove the launcher/backend JSON path from key handling and isolate engine calls behind a native IME engine interface.
+**Backend architecture still depends on an out-of-process TypeDuck runtime bridge:**
+- Issue: The Windows frontend now launches one fixed `TypeDuckRuntime\server.exe` bridge and speaks protobuf over stdio through `MoqLauncher`; the sibling backend source still carries legacy Moqi implementation history.
+- Files: `MoqLauncher/BackendServer.cpp`, `MoqLauncher/PipeServer.cpp`, `MoqiTextService/MoqiClient.cpp`, `proto/moqi.proto`, `proto/ProtoFraming.h`, `scripts/install.ps1`, `scripts/_all_in_package.ps1`, `.github/workflows/release.yml`, `.github/workflows/nightly.yml`
+- Impact: The process boundary is now TypeDuck-owned, but later cleanup still needs diagnostics/path/IPC hardening and release verification around the packaged runtime.
+- Fix approach: Keep the fixed `TypeDuckRuntime` bridge for v1, harden IPC and diagnostics in Phase 6, and verify runtime behavior in Phase 7.
 
 **Runtime language profile metadata is discovered from backend `ime.json` files:**
 - Issue: Registration scans `{programDir}\{backend}\input_methods\*\ime.json` at `DllRegisterServer` time and trusts those files for profile name, GUID, locale, fallback locale, and icon.
-- Files: `MoqiTextService/DllEntry.cpp`, `MoqiTextService/MoqiImeModule.cpp`, `libIME2/src/ImeModule.cpp`, `backends.json`
+- Files: `MoqiTextService/DllEntry.cpp`, `MoqiTextService/MoqiImeModule.cpp`, `libIME2/src/ImeModule.cpp`, `MoqLauncher/PipeServer.cpp`
 - Impact: A missing or malformed backend payload can register no language profiles. TypeDuck's required installation under Chinese (Traditional, Hong Kong) is not guaranteed by first-party TSF code.
 - Fix approach: Make the TypeDuck Hong Kong Traditional profile a first-party build-time resource with deterministic GUID, locale `zh-HK`, display names in Traditional Chinese Hong Kong and English, and icon metadata. Use backend metadata only for optional engine configuration.
 

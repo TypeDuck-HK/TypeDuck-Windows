@@ -5,16 +5,16 @@ milestone_name: milestone
 current_phase: 6
 current_phase_name: Privacy, Security, and Scaffold Cleanup
 status: phase_6_in_progress
-stopped_at: Completed 06-02-PLAN.md with installer compile blocker in out-of-scope Plan 01 file
-last_updated: "2026-06-27T10:18:00.000Z"
+stopped_at: Completed 06-03-PLAN.md
+last_updated: "2026-06-27T10:33:40.436Z"
 last_activity: 2026-06-27
-last_activity_desc: Completed Phase 6 Plan 02 runtime package pruning and TypeDuckRuntime staging
+last_activity_desc: Completed Phase 6 Plan 03 fixed TypeDuck runtime bridge
 progress:
   total_phases: 7
   completed_phases: 5
   total_plans: 38
-  completed_plans: 29
-  percent: 71
+  completed_plans: 30
+  percent: 79
 ---
 
 # Project State
@@ -29,11 +29,11 @@ See: .planning/PROJECT.md (updated 2026-06-26)
 ## Current Position
 
 Phase: 6 of 7 (Privacy, Security, and Scaffold Cleanup)
-Plan: 06-02 complete; 06-03 next
-Status: Phase 6 in progress; runtime package pruning complete with installer compile blocker tracked
-Last activity: 2026-06-27 — Completed Phase 6 Plan 02 runtime package pruning and TypeDuckRuntime staging
+Plan: 06-03 complete; 06-04 next
+Status: Phase 6 in progress; fixed TypeDuck runtime bridge complete
+Last activity: 2026-06-27 — Completed Phase 6 Plan 03 fixed TypeDuck runtime bridge
 
-Progress: [███████░░░] 74% of planned milestone plans
+Progress: [████████░░] 79% of planned milestone plans
 
 ## Performance Metrics
 
@@ -85,6 +85,7 @@ Progress: [███████░░░] 74% of planned milestone plans
 | Phase 05-candidate-dictionary-settings-and-about-ui-parity P15 | closeout | UAT/verification/roadmap | docs |
 | Phase 06 P01 | 7 min | 3 tasks | 4 files |
 | Phase 06-privacy-security-and-scaffold-cleanup P02 | 70 min | 3 tasks | 7 files |
+| Phase 06-privacy-security-and-scaffold-cleanup P03 | 13 min | 3 tasks | 11 files |
 
 ## Accumulated Context
 
@@ -165,10 +166,13 @@ Recent decisions affecting current work:
 - [Phase 06]: 06-02 TypeDuckRuntime is the shipped runtime folder; legacy PowerShell parameter names remain only for caller compatibility. — TypeDuck-owned install paths are required while preserving script compatibility for existing callers.
 - [Phase 06]: 06-02 package output keeps only canonical input_methods/rime/appearance_themes.json. — The former data-path theme copy is duplicate runtime payload and is now rejected by guards.
 - [Phase 06]: 06-02 staged backends.json is removed. — Plan 06-03 owns the fixed in-code TypeDuck runtime bridge, so Plan 06-02 must not ship the legacy manifest.
+- [Phase 06]: Launcher backend discovery is no longer file-driven; it always constructs one typeduck-runtime-bridge for TypeDuckRuntime/server.exe.
+- [Phase 06]: Optional backend ime.json scanning remains compatibility-only and runs after first-party TypeDuck profile mapping.
+- [Phase 06]: TSF Configure and launcher Settings stay fixed to TypeDuckSettings.exe and guards continue to reject backend configTool metadata.
 
 ### Pending Todos
 
-Phase 6 Plan 03 fixed TypeDuck runtime bridge is next.
+Phase 6 Plan 04 diagnostics path cleanup is next.
 
 ### Blockers/Concerns
 
@@ -189,6 +193,6 @@ Phase 6 Plan 03 fixed TypeDuck runtime bridge is next.
 
 ## Session Continuity
 
-Last session: 2026-06-27T10:18:00.000Z
-Stopped at: Completed 06-02-PLAN.md with installer compile blocker in out-of-scope Plan 01 file
+Last session: 2026-06-27T10:33:40.427Z
+Stopped at: Completed 06-03-PLAN.md
 Resume file: None

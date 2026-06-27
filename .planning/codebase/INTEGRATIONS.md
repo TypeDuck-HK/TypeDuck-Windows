@@ -13,12 +13,12 @@
   - Auth: User token/admin elevation; `SetupHelper.exe` relaunches with `runas` when needed.
 
 **Local Backend Process:**
-- Legacy `moqi-ime` backend - current runtime for candidate generation, Rime/fcitx features, menus, UI customization, AI actions, and cloud clipboard upload handling.
-  - SDK/Client: `backends.json` command `moqi-ime\server.exe`; launcher process management in `MoqLauncher/BackendServer.cpp`.
+- TypeDuck runtime bridge - current fixed runtime process for TypeDuck candidate generation and settings/deploy requests.
+  - SDK/Client: `MoqLauncher/PipeServer.cpp` constructs `typeduck-runtime-bridge` with command `TypeDuckRuntime\server.exe`; launcher process management remains in `MoqLauncher/BackendServer.cpp`.
   - Auth: Local process boundary only; no frontend secret.
-- TypeDuck target backend - not present in this repo. Future work should replace `backends.json`, package staging, runtime directory names, icons, and metadata while preserving the protobuf/named-pipe contract where appropriate.
-  - SDK/Client: Not detected.
-  - Auth: Not detected.
+- Legacy `moqi-ime` backend source - sibling backend repository still provides the packaged runtime build, but the Windows frontend no longer trusts source or staged `backends.json` for product runtime discovery.
+  - SDK/Client: Sibling runtime is consumed through the packaged `TypeDuckRuntime` folder.
+  - Auth: Local process boundary only; no frontend secret.
 
 **GitHub / Build Downloads:**
 - GitHub repositories and release assets - build fetches `spdlog`, `protobuf`, submodules, sibling backend, and CI artifacts/releases.
