@@ -1,20 +1,20 @@
----
+﻿---
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 current_phase: 07
 current_phase_name: Compatibility and Release Verification
-status: completed
-stopped_at: Completed 06-06-PLAN.md
-last_updated: "2026-06-27T11:40:51.058Z"
+status: in_progress
+stopped_at: Completed 07-01-PLAN.md
+last_updated: "2026-06-27T12:15:09.124Z"
 last_activity: 2026-06-27
-last_activity_desc: Phase 06 complete, transitioned to Phase 07
+last_activity_desc: Completed 07-01-PLAN.md
 progress:
   total_phases: 7
   completed_phases: 6
   total_plans: 38
-  completed_plans: 34
-  percent: 86
+  completed_plans: 36
+  percent: 95
 ---
 
 # Project State
@@ -24,22 +24,22 @@ progress:
 See: .planning/PROJECT.md (updated 2026-06-26)
 
 **Core value:** Hong Kong users can install TypeDuck under Chinese (Traditional, Hong Kong) and type Cantonese with the same trusted behavior, bilingual settings, candidate details, and dictionary-like lookup experience as TypeDuck Web alpha.
-**Current focus:** Phase 6: Privacy, Security, and Scaffold Cleanup
+**Current focus:** Phase 7: Compatibility and Release Verification
 
 ## Current Position
 
 Phase: 07 — Compatibility and Release Verification
-Plan: Not started
-Status: Phase 6 complete
-Last activity: 2026-06-27 — Phase 06 complete, transitioned to Phase 07
+Plan: 02 of 4 (next incomplete plan)
+Status: Phase 7 in progress
+Last activity: 2026-06-27 — Completed 07-01-PLAN.md
 
-Progress: [█████████░] 86% of planned milestone plans
+Progress: [██████████] 95% of planned milestone plans
 
 ## Performance Metrics
 
 **Velocity:**
 
-- Total plans completed: 34
+- Total plans completed: 36
 - Average duration: 20 min
 - Total execution time: 1.7 hours
 
@@ -55,7 +55,7 @@ Progress: [█████████░] 86% of planned milestone plans
 **Recent Trend:**
 
 - Last 5 plans: P01 5 min, P02 17 min, P03 10 min, P04 55 min, P05 13 min
-- Trend: Phase 5 native candidate, dictionary, settings, About, tray, icon, and resource parity is accepted by iterative human verification and static/build/package guards; Phase 6 scaffold/privacy cleanup is next.
+- Trend: Phase 7 release verification is in progress with install evidence and host-app/DPI notes complete; protocol recovery and aggregate release verification remain.
 
 *Updated after each plan completion*
 | Phase 01 P01 | 5 min | 2 tasks | 2 files |
@@ -91,6 +91,7 @@ Progress: [█████████░] 86% of planned milestone plans
 | Phase 06 P04 | 12min | 3 tasks | 16 files |
 | Phase 06-privacy-security-and-scaffold-cleanup P05 | 7 min | 3 tasks | 5 files |
 | Phase 06-privacy-security-and-scaffold-cleanup P06 | 10 min | 3 tasks | 5 files |
+| Phase 07 P01 | 11 min | 2 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -184,10 +185,12 @@ Recent decisions affecting current work:
 - [Phase 06]: Phase 6 Plan 06: Strict aggregate guard now invokes focused installer, runtime, backend diagnostics, launcher protocol, settings/About, and icon packaging guards. — This makes VER-02 executable through one strict command and keeps focused guard failures visible in aggregate evidence.
 - [Phase 06]: Phase 6 Plan 06: Release/nightly CI surfaces use TypeDuck-Windows, TypeDuck-Windows-backend, TypeDuck-HK/schema aap2-alpha, and typeduck-windows-ime artifact names. — Visible release surfaces must be TypeDuck-owned and schema packaging must use the TypeDuck-HK schema source instead of rime-frost.
 - [Phase 06]: Phase 6 Plan 06: Guard evidence is compact JSON metadata only, avoiding raw typed samples and secrets. — The phase threat model requires pass/fail evidence without information disclosure.
-
+- [Phase 07]: Phase 7 installer evidence defaults to ManualChecklistOnly and records deterministic commands, logs, hashes, registry/file/task state, Windows version, checkpoint identity, and notes without running the installer on the host.
+- [Phase 07]: Release install visual judgement is recorded as direct observation notes only; no screenshot files, screenshot manifests, capture scripts, or automated visual comparison are required by this evidence path.
+- [Phase 07]: The release install evidence guard scopes harness visual-artifact checks to the Phase 7 release evidence section so older non-release text does not create false positives.
 ### Pending Todos
 
-Phase 6 is complete; Phase 7 compatibility and release verification is next.
+Phase 7 is in progress; 07-02 protocol recovery and 07-04 aggregate release verification remain.
 
 ### Blockers/Concerns
 
@@ -208,6 +211,6 @@ Phase 6 is complete; Phase 7 compatibility and release verification is next.
 
 ## Session Continuity
 
-Last session: 2026-06-27T11:37:28.460Z
-Stopped at: Completed 06-06-PLAN.md
+Last session: 2026-06-27T12:15:09.110Z
+Stopped at: Completed 07-01-PLAN.md
 Resume file: None
