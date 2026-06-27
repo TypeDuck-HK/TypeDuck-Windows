@@ -5,16 +5,16 @@ milestone_name: milestone
 current_phase: 6
 current_phase_name: Privacy, Security, and Scaffold Cleanup
 status: phase_6_in_progress
-stopped_at: Completed 06-03-PLAN.md
-last_updated: "2026-06-27T10:56:54.684Z"
+stopped_at: Completed 06-04-PLAN.md
+last_updated: "2026-06-27T11:13:51.870Z"
 last_activity: 2026-06-27
-last_activity_desc: Completed Phase 6 Plan 03 fixed TypeDuck runtime bridge
+last_activity_desc: Completed Phase 6 Plan 04 diagnostics privacy cleanup
 progress:
   total_phases: 7
   completed_phases: 5
   total_plans: 38
-  completed_plans: 31
-  percent: 71
+  completed_plans: 32
+  percent: 84
 ---
 
 # Project State
@@ -29,11 +29,11 @@ See: .planning/PROJECT.md (updated 2026-06-26)
 ## Current Position
 
 Phase: 6 of 7 (Privacy, Security, and Scaffold Cleanup)
-Plan: 06-03 complete; 06-04 next
-Status: Phase 6 in progress; fixed TypeDuck runtime bridge complete
-Last activity: 2026-06-27 — Completed Phase 6 Plan 03 fixed TypeDuck runtime bridge
+Plan: 06-04 complete; 06-05 next
+Status: Phase 6 in progress; diagnostics privacy cleanup complete
+Last activity: 2026-06-27 — Completed Phase 6 Plan 04 diagnostics privacy cleanup
 
-Progress: [████████░░] 79% of planned milestone plans
+Progress: [████████░░] 84% of planned milestone plans
 
 ## Performance Metrics
 
@@ -87,6 +87,7 @@ Progress: [████████░░] 79% of planned milestone plans
 | Phase 06-privacy-security-and-scaffold-cleanup P02 | 70 min | 3 tasks | 7 files |
 | Phase 06-privacy-security-and-scaffold-cleanup P03 | 13 min | 3 tasks | 11 files |
 | Phase 06-privacy-security-and-scaffold-cleanup P07 | ~2h | 3 tasks | 21 files |
+| Phase 06 P04 | 12min | 3 tasks | 16 files |
 
 ## Accumulated Context
 
@@ -172,10 +173,13 @@ Recent decisions affecting current work:
 - [Phase 06]: TSF Configure and launcher Settings stay fixed to TypeDuckSettings.exe and guards continue to reject backend configTool metadata.
 - [Phase ?]: 06-07 removed active v1 backend entry points for AI, WebDAV/cloud clipboard, scheme-set download/update, auto-pair, and custom phrase surfaces.
 - [Phase ?]: 06-07 uses targeted Rime tests for the privacy/security contract because the full legacy Rime package suite still has unrelated stale failures.
+- [Phase 06]: TypeDuck diagnostics use %LOCALAPPDATA%\TypeDuckIME and TypeDuckLauncher.json; Legacy Moqi paths remain separate and untouched.
+- [Phase 06]: Cloud clipboard protocol method 19 and request field 26 are removed from v1 and reserved in proto/moqi.proto.
+- [Phase 06]: Routine quote-pair diagnostics record redacted lengths instead of raw committed text.
 
 ### Pending Todos
 
-Phase 6 Plan 04 diagnostics path cleanup is next.
+Phase 6 Plan 05 IPC ACL and server identity hardening is next.
 
 ### Blockers/Concerns
 
@@ -196,6 +200,6 @@ Phase 6 Plan 04 diagnostics path cleanup is next.
 
 ## Session Continuity
 
-Last session: 2026-06-27T10:56:23.777Z
-Stopped at: Completed 06-03-PLAN.md
+Last session: 2026-06-27T11:13:51.861Z
+Stopped at: Completed 06-04-PLAN.md
 Resume file: None
