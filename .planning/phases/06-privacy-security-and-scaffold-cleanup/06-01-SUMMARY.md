@@ -69,8 +69,9 @@ status: complete
 1. **Task 1: Remove the legacy installer language dependency** - `5cd96f7` (chore)
 2. **Task 2: Replace installer page text and Start Menu entries** - `baf9d6d` (feat)
 3. **Task 3: Automate TypeDuck process cleanup without a user-running-process page** - `cc1dada` (feat)
+4. **Guard fix: Preserve D-24 source-identifier allowance for packaging scripts** - `0dacbbb` (fix)
 
-**Plan metadata:** pending final docs commit
+**Plan metadata:** `0ecf80a` (docs), final metadata refresh pending
 
 ## Files Created/Modified
 
@@ -98,16 +99,24 @@ status: complete
 - **Verification:** `pwsh -NoProfile -ExecutionPolicy Bypass -File scripts\Test-TypeDuckInstallerSkeleton.ps1 -RepoRoot . -Strict`
 - **Committed in:** `cc1dada`
 
+**2. [Rule 1 - Bug] Fixed over-strict legacy identifier guard for packaging scripts**
+- **Found during:** Final verification after concurrent Phase 06 package-script commits landed
+- **Issue:** `Assert-NarrowLegacyMoqiAllowlist` treated non-visible source/build identifiers in `scripts/install.ps1` and `scripts/_all_in_package.ps1` as user-facing leakage, contrary to D-24.
+- **Fix:** Added a guard allowance for those packaging scripts while preserving strict installer/setup surface assertions.
+- **Files modified:** `scripts/Test-TypeDuckInstallerSkeleton.ps1`
+- **Verification:** `pwsh -NoProfile -ExecutionPolicy Bypass -File scripts\Test-TypeDuckInstallerSkeleton.ps1 -RepoRoot . -Strict`
+- **Committed in:** `0dacbbb`
+
 ---
 
-**Total deviations:** 1 auto-fixed (1 missing critical)
-**Impact on plan:** The fix preserved guard coverage without changing installer behavior or broadening scope.
+**Total deviations:** 2 auto-fixed (1 missing critical, 1 bug)
+**Impact on plan:** The fixes preserved guard coverage without changing installer behavior or broadening scope.
 
 ## Issues Encountered
 
 - `git rm` required the `.gitmodules` edit to be staged before removing the submodule gitlink. Staged only `.gitmodules`, removed only `installer/Inno-Setup-Chinese-Simplified-Translation`, and continued.
 - A regex typo in the stub scan command was corrected and re-run. The only match was `$RepoRoot = ""` in a script parameter default, which is not a UI/data stub.
-- An unrelated worktree change remained in `scripts/Test-TypeDuckRuntimePackagePruning.ps1`; it was outside 06-01 scope and was not staged or modified by this plan.
+- Concurrent Phase 06 package-script commits caused the strict guard to fail after the first metadata commit. Fixed the 06-01 guard to honor D-24 source-identifier allowances without editing out-of-scope package scripts.
 
 ## Verification
 
@@ -138,7 +147,7 @@ Ready for `06-02-PLAN.md` runtime package pruning. No blockers from 06-01.
 ## Self-Check: PASSED
 
 - Found `.planning/phases/06-privacy-security-and-scaffold-cleanup/06-01-SUMMARY.md` on disk.
-- Found task commits `5cd96f7`, `baf9d6d`, and `cc1dada` in git history.
+- Found task commits `5cd96f7`, `baf9d6d`, `cc1dada`, and `0dacbbb` in git history.
 - Re-ran the strict installer skeleton guard successfully.
 
 ---
