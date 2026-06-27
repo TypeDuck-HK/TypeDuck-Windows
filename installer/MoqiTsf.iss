@@ -106,7 +106,7 @@ Name: "{autoprograms}\TypeDuckIME\解除安裝 Uninstall"; Filename: "{uninstall
 
 [Run]
 Filename: "{app}\TypeDuckLauncher.exe"; Flags: nowait; Check: ShouldLaunchLauncher
-Filename: "{app}\TypeDuckSettings.exe"; Parameters: "/apply-defaults"; Flags: runhidden waituntilterminated; Check: ShouldSeedDefaultSettings
+Filename: "{app}\TypeDuckSettings.exe"; Parameters: "/apply-settings"; Flags: runhidden waituntilterminated; Check: ShouldSeedDefaultSettings
 Filename: "{app}\TypeDuckSettings.exe"; Description: "開啟 TypeDuck 設定 / Open TypeDuck Settings"; Flags: postinstall nowait skipifsilent; Check: ShouldLaunchSettings
 Filename: "{app}\TypeDuckAbout.exe"; Description: "開啟 TypeDuck 關於 / Open TypeDuck About"; Flags: postinstall nowait skipifsilent; Check: ShouldLaunchAbout
 

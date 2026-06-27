@@ -147,7 +147,7 @@ Assert-Text $installer 'TypeDuckIME\\關於 About TypeDuck…";\s+Filename:\s+"\
 Assert-Text $installer 'TypeDuckIME\\解除安裝 Uninstall";\s+Filename:\s+"\{uninstallexe\}"' "Installer must create the Phase 6 TypeDuck Uninstall Start Menu shortcut."
 Assert-Ordered $installer @(
   "Filename:\s+`"\{app\}\\TypeDuckLauncher\.exe`"",
-  "Parameters:\s+`"/apply-defaults`"",
+  "Parameters:\s+`"/apply-settings`"",
   "Filename:\s+`"\{app\}\\TypeDuckSettings\.exe`"",
   "Filename:\s+`"\{app\}\\TypeDuckAbout\.exe`""
 ) "Installer run order"
@@ -210,9 +210,11 @@ Assert-Text $window "index == 0 \? kRadioGroupStartStyle : kRadioStyle" "Main-la
 Assert-True ($window -notmatch "addButton\([^;]+BS_AUTORADIOBUTTON") "Settings radio controls must use grouped radio style constants, not raw shared radio styles."
 Assert-Text $window "kPageSizeTrackInset" "Page-size tick labels must leave side padding instead of spanning the full fieldset width."
 Assert-Text $window "kSettingsButtonWidth" "Confirm and Cancel buttons must use an explicit widened button width."
-Assert-Text $window "kApplyDefaultsSwitch" "Settings executable must expose a quiet default-preference seed mode for installation."
+Assert-Text $window "kApplySettingsSwitch" "Settings executable must expose a quiet install settings apply mode."
+Assert-Text $window "kApplyDefaultsSwitch" "Settings executable must keep the previous quiet default-preference seed switch as an alias."
 Assert-Text $window "applyViaLauncher" "Settings confirmation must apply through the launcher so Rime redeploy runs."
 Assert-Text $window "METHOD_TYPEDUCK_SETTINGS_UPDATE" "Settings confirmation must send the TypeDuck settings update IPC request."
+Assert-Text $window "METHOD_TYPEDUCK_DEPLOY" "Installation seed mode must explicitly request the same TypeDuck deploy used by launcher Refresh."
 Assert-Text $window 'TypeDuckIME\\\\|TypeDuckIME' "Settings confirmation must connect to the TypeDuck launcher pipe namespace."
 Assert-True ($window -notmatch '\\MoqiIM\\|\\\\MoqiIM\\\\') "Settings confirmation must not connect to the Legacy Moqi launcher pipe namespace."
 Assert-Ordered $window @(
@@ -229,8 +231,9 @@ Assert-Text $window "TBM_SETRANGE.+MAKELPARAM\(4,\s*10\)" "Candidate count contr
 Assert-Text $window "applyViaLauncher" "Apply must use the launcher-mediated TypeDuckPreferences path."
 Assert-Text $window "fillSettingsUpdate" "Settings must serialize the shared TypeDuckPreferences state into IPC updates."
 Assert-Text $window "METHOD_TYPEDUCK_SETTINGS_UPDATE" "Settings confirmation must send the TypeDuck settings update IPC request."
+Assert-Text $window "deployViaLauncher" "Installation seed mode must refresh Rime through the launcher after applying settings."
 Assert-Text $window "kApplyDefaultsSwitch" "Settings executable must expose a quiet default-preference seed mode for installation."
-Assert-Text $window "applyDefaultPreferencesIfMissing" "Installation seed mode must apply defaults when preferences are missing."
+Assert-Text $window "applyInstallSettings" "Installation seed mode must apply current or default settings before explicit Rime refresh."
 Assert-Text $textServiceCmake "MoqLauncher/TypeDuckPreferences\.cpp" "Text service must link the shared preferences loader for UI-only settings."
 Assert-Text $textService "reloadTypeDuckDisplayPreferences" "Text service must reload saved UI preferences during candidate refresh."
 Assert-Text $textService "displayPreferencesFromSavedPreferences" "Text service must map saved preferences to candidate display preferences."

@@ -189,7 +189,7 @@ function Assert-InstallerScript {
         "Type:\s*filesandordirs;\s*Name:\s*`"\{localappdata\}\\TypeDuckIME`"",
         "Type:\s*filesandordirs;\s*Name:\s*`"\{userappdata\}\\TypeDuckIME`";\s*Check:\s*ShouldDeleteUserDataOnUninstall",
         "PromptDeleteUserDataOnUninstall",
-        "Form := CreateCustomForm\(ScaleX\(400\),\s*ScaleY\(176\),\s*False,\s*True\)",
+        "Form := CreateCustomForm\(ScaleX\(360\),\s*ScaleY\(132\),\s*False,\s*True\)",
         "Form\.Color := clWhite",
         "ContentWidth := Form\.ClientWidth - \(ContentLeft \* 2\)",
         "ButtonTop := Form\.ClientHeight - ScaleY\(48\)",

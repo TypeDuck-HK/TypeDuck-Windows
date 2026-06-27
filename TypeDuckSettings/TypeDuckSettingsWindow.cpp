@@ -19,6 +19,7 @@ namespace {
 constexpr const wchar_t* kWindowClassName = L"TypeDuckSettingsWindow";
 constexpr const wchar_t* kSettingsInstanceMutexName =
     L"Local\\TypeDuckSettingsWindowInstance";
+constexpr const wchar_t* kApplySettingsSwitch = L"/apply-settings";
 constexpr const wchar_t* kApplyDefaultsSwitch = L"/apply-defaults";
 constexpr const wchar_t* kLauncherExecutableName = L"TypeDuckLauncher.exe";
 constexpr const wchar_t* kLauncherPipeBaseName = L"Launcher";
@@ -297,13 +298,64 @@ Moqi::TypeDuck::ApplyResult applyViaLauncher(
                     : snapshot.status_message()};
 }
 
-int applyDefaultPreferencesIfMissing() {
-  const auto path = Moqi::TypeDuck::defaultPreferencesPath();
-  if (std::filesystem::exists(path)) {
-    return 0;
+Moqi::TypeDuck::ApplyResult deployViaLauncher() {
+  HANDLE pipe = connectLauncherPipe(0);
+  if (pipe == INVALID_HANDLE_VALUE) {
+    ensureLauncherRunning();
+    pipe = connectLauncherPipe(kPipeConnectTimeoutMs);
   }
-  const auto result = applyViaLauncher(Moqi::TypeDuck::defaultPreferences());
-  return result.ok ? 0 : 1;
+  if (pipe == INVALID_HANDLE_VALUE) {
+    return {false, "TypeDuck Launcher 未能連線 / TypeDuck Launcher was unavailable"};
+  }
+
+  moqi::protocol::ClientRequest initRequest;
+  initRequest.set_seq_num(1);
+  initRequest.set_method(moqi::protocol::METHOD_INIT);
+  initRequest.set_guid(kTypeDuckProfileGuid);
+  moqi::protocol::ServerResponse initResponse;
+  if (!transactLauncher(pipe, initRequest, initResponse) ||
+      !initResponse.success()) {
+    CloseHandle(pipe);
+    const std::string message =
+        !initResponse.error().empty()
+            ? initResponse.error()
+            : "TypeDuck 後端未能初始化 / TypeDuck backend could not initialize";
+    return {false, message};
+  }
+
+  moqi::protocol::ClientRequest deployRequest;
+  deployRequest.set_seq_num(2);
+  deployRequest.set_method(moqi::protocol::METHOD_TYPEDUCK_DEPLOY);
+  deployRequest.mutable_typeduck_deploy_request()->set_force(true);
+  moqi::protocol::ServerResponse deployResponse;
+  if (!transactLauncher(pipe, deployRequest, deployResponse)) {
+    CloseHandle(pipe);
+    return {false, "TypeDuck Launcher 沒有回應 / TypeDuck Launcher did not respond"};
+  }
+  CloseHandle(pipe);
+  if (!deployResponse.success()) {
+    return {false, !deployResponse.error().empty()
+                       ? deployResponse.error()
+                       : "重新整理未能完成 / Refresh could not be completed"};
+  }
+  return {true, "重新整理已完成 / Refresh completed"};
+}
+
+int applyInstallSettings() {
+  const auto path = Moqi::TypeDuck::defaultPreferencesPath();
+  Moqi::TypeDuck::Preferences preferences = Moqi::TypeDuck::defaultPreferences();
+  if (std::filesystem::exists(path)) {
+    const auto loaded = Moqi::TypeDuck::loadPreferences(path);
+    if (loaded.ok) {
+      preferences = loaded.preferences;
+    }
+  }
+  const auto applyResult = applyViaLauncher(preferences);
+  if (!applyResult.ok) {
+    return 1;
+  }
+  const auto deployResult = deployViaLauncher();
+  return deployResult.ok ? 0 : 1;
 }
 
 class SettingsWindow {
@@ -705,9 +757,10 @@ int RunSettingsWindow(HINSTANCE instance, int showCommand) {
   int argc = 0;
   wchar_t** argv = CommandLineToArgvW(GetCommandLineW(), &argc);
   for (int index = 1; index < argc; ++index) {
-    if (_wcsicmp(argv[index], kApplyDefaultsSwitch) == 0) {
+    if (_wcsicmp(argv[index], kApplySettingsSwitch) == 0 ||
+        _wcsicmp(argv[index], kApplyDefaultsSwitch) == 0) {
       LocalFree(argv);
-      return applyDefaultPreferencesIfMissing();
+      return applyInstallSettings();
     }
   }
   if (argv != nullptr) {
