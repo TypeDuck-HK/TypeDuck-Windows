@@ -6,15 +6,15 @@ current_phase: 6
 current_phase_name: Privacy, Security, and Scaffold Cleanup
 status: phase_6_in_progress
 stopped_at: Completed 06-03-PLAN.md
-last_updated: "2026-06-27T10:33:40.436Z"
+last_updated: "2026-06-27T10:56:54.684Z"
 last_activity: 2026-06-27
 last_activity_desc: Completed Phase 6 Plan 03 fixed TypeDuck runtime bridge
 progress:
   total_phases: 7
   completed_phases: 5
   total_plans: 38
-  completed_plans: 30
-  percent: 79
+  completed_plans: 31
+  percent: 71
 ---
 
 # Project State
@@ -86,6 +86,7 @@ Progress: [████████░░] 79% of planned milestone plans
 | Phase 06 P01 | 7 min | 3 tasks | 4 files |
 | Phase 06-privacy-security-and-scaffold-cleanup P02 | 70 min | 3 tasks | 7 files |
 | Phase 06-privacy-security-and-scaffold-cleanup P03 | 13 min | 3 tasks | 11 files |
+| Phase 06-privacy-security-and-scaffold-cleanup P07 | ~2h | 3 tasks | 21 files |
 
 ## Accumulated Context
 
@@ -169,6 +170,8 @@ Recent decisions affecting current work:
 - [Phase 06]: Launcher backend discovery is no longer file-driven; it always constructs one typeduck-runtime-bridge for TypeDuckRuntime/server.exe.
 - [Phase 06]: Optional backend ime.json scanning remains compatibility-only and runs after first-party TypeDuck profile mapping.
 - [Phase 06]: TSF Configure and launcher Settings stay fixed to TypeDuckSettings.exe and guards continue to reject backend configTool metadata.
+- [Phase ?]: 06-07 removed active v1 backend entry points for AI, WebDAV/cloud clipboard, scheme-set download/update, auto-pair, and custom phrase surfaces.
+- [Phase ?]: 06-07 uses targeted Rime tests for the privacy/security contract because the full legacy Rime package suite still has unrelated stale failures.
 
 ### Pending Todos
 
@@ -193,6 +196,6 @@ Phase 6 Plan 04 diagnostics path cleanup is next.
 
 ## Session Continuity
 
-Last session: 2026-06-27T10:33:40.427Z
+Last session: 2026-06-27T10:56:23.777Z
 Stopped at: Completed 06-03-PLAN.md
 Resume file: None
