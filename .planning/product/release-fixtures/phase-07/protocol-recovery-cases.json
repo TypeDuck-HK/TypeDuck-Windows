@@ -1,0 +1,173 @@
+{
+  "schema": "typeduck-protocol-recovery-cases-v1",
+  "phase": "07-compatibility-and-release-verification",
+  "plan": "07-02",
+  "requirements_covered": [
+    "VER-05"
+  ],
+  "decisions_cited": [
+    "D-01",
+    "D-02",
+    "D-10",
+    "D-11",
+    "D-12",
+    "D-13"
+  ],
+  "matrix_role": "index-only",
+  "non_visual_only": true,
+  "failure_policy": {
+    "routine_user_facing_technical_detail": false,
+    "technical_detail_location": "redacted logs/evidence",
+    "user_detail_exceptions": [
+      "typing-unrecoverable",
+      "tampering-suspected"
+    ]
+  },
+  "cases": [
+    {
+      "case_id": "normal-cantonese-frames",
+      "category": "unit-protocol",
+      "evidence": "ProtocolRecovery_test.ValidCantoneseFrameRoundTripsWithCandidates",
+      "command": "build-vs32\\Tests\\TypeDuckProtocol\\Debug\\ProtocolRecovery_test.exe",
+      "coverage_refs": [
+        "ProtocolRecovery_test",
+        "ClientRequest",
+        "ServerResponse",
+        "CandidateEntry",
+        "Proto::FrameBuffer",
+        "parsePayload"
+      ],
+      "expected": "Valid Cantonese key request and candidate response frames round-trip with matching sequence and candidate fields."
+    },
+    {
+      "case_id": "raw-lookup-payload",
+      "category": "unit-protocol",
+      "evidence": "ProtocolRecovery_test.RawLookupSeparatorsSurviveServerResponseCandidatePage",
+      "command": "build-vs32\\Tests\\TypeDuckProtocol\\Debug\\ProtocolRecovery_test.exe",
+      "coverage_refs": [
+        "ProtocolRecovery_test",
+        "ServerResponse",
+        "TypeDuckCandidatePage",
+        "CandidateEntry.raw_lookup_comment",
+        "parsePayload"
+      ],
+      "expected": "Lookup-filter separators survive a full ServerResponse candidate-page round trip."
+    },
+    {
+      "case_id": "reverse-lookup-if-supported",
+      "category": "conditional-runtime-capability",
+      "evidence": "conditional matrix entry only until backend support returns a live reverse-lookup response",
+      "command": "scripts\\Test-TypeDuckProtocolRecovery.ps1 -Strict",
+      "coverage_refs": [
+        "VER-05",
+        "TypeDuck runtime capability evidence required when supported"
+      ],
+      "conditional_state": "skipped-with-reason",
+      "reason": "No executed reverse-lookup backend response is available in this non-visual recovery probe; this matrix keeps the case explicit without fabricating unsupported output."
+    },
+    {
+      "case_id": "malformed-frame",
+      "category": "unit-protocol",
+      "evidence": "ProtocolRecovery_test.MalformedAndOversizedFramesClearBufferedBytes",
+      "command": "build-vs32\\Tests\\TypeDuckProtocol\\Debug\\ProtocolRecovery_test.exe",
+      "coverage_refs": [
+        "ProtocolRecovery_test",
+        "Proto::FrameBuffer",
+        "launcher degraded response",
+        "TYPEDUCK_ERROR_MALFORMED_FRAME"
+      ],
+      "expected": "Malformed frame state stays bounded and launcher mapping remains degraded/recoverable."
+    },
+    {
+      "case_id": "oversized-frame",
+      "category": "unit-protocol",
+      "evidence": "ProtocolRecovery_test.MalformedAndOversizedFramesClearBufferedBytes",
+      "command": "build-vs32\\Tests\\TypeDuckProtocol\\Debug\\ProtocolRecovery_test.exe",
+      "coverage_refs": [
+        "ProtocolRecovery_test",
+        "Proto::FrameBuffer",
+        "launcher degraded response",
+        "TYPEDUCK_ERROR_PAYLOAD_TOO_LARGE"
+      ],
+      "expected": "Oversized frames reject with cleared buffered bytes."
+    },
+    {
+      "case_id": "invalid-protobuf",
+      "category": "unit-protocol",
+      "evidence": "ProtocolRecovery_test.InvalidProtobufPayloadClearsMessages",
+      "command": "build-vs32\\Tests\\TypeDuckProtocol\\Debug\\ProtocolRecovery_test.exe",
+      "coverage_refs": [
+        "ProtocolRecovery_test",
+        "parsePayload",
+        "ClientRequest",
+        "ServerResponse"
+      ],
+      "expected": "Invalid protobuf payloads parse false and leave messages cleared."
+    },
+    {
+      "case_id": "backend-timeout",
+      "category": "executed-probe",
+      "evidence": ".planning\\product\\release-fixtures\\phase-07\\protocol-recovery-results.json",
+      "command": "pwsh -NoProfile -ExecutionPolicy Bypass -File scripts\\Invoke-TypeDuckProtocolRecoveryProbe.ps1 -RepoRoot . -BuildDir build-vs32 -EvidencePath .planning\\product\\release-fixtures\\phase-07\\protocol-recovery-results.json -Strict",
+      "coverage_refs": [
+        "protocol-recovery-results.json",
+        "TypeduckBackendProbe --mode protocol-recovery",
+        "TYPEDUCK_ERROR_BACKEND_TIMEOUT",
+        "TYPEDUCK_HEALTH_RESTARTING"
+      ],
+      "expected": "Executed timeout result records timeout duration, restarting health, and recoverable bounded failure."
+    },
+    {
+      "case_id": "backend-restart-crash",
+      "category": "executed-probe",
+      "evidence": ".planning\\product\\release-fixtures\\phase-07\\protocol-recovery-results.json",
+      "command": "pwsh -NoProfile -ExecutionPolicy Bypass -File scripts\\Invoke-TypeDuckProtocolRecoveryProbe.ps1 -RepoRoot . -BuildDir build-vs32 -EvidencePath .planning\\product\\release-fixtures\\phase-07\\protocol-recovery-results.json -Strict",
+      "coverage_refs": [
+        "protocol-recovery-results.json",
+        "TypeduckBackendProbe --mode protocol-recovery",
+        "TYPEDUCK_ERROR_BACKEND_RESTART",
+        "restart_count"
+      ],
+      "expected": "Executed restart/crash result proves the next request reaches a restarted backend instance."
+    },
+    {
+      "case_id": "stale-mismatched-sequence",
+      "category": "unit-protocol",
+      "evidence": "ProtocolRecovery_test.StaleAndMismatchedSequencesAreIdentifiable",
+      "command": "build-vs32\\Tests\\TypeDuckProtocol\\Debug\\ProtocolRecovery_test.exe",
+      "coverage_refs": [
+        "ProtocolRecovery_test",
+        "pendingSeqNum",
+        "ServerResponse.seq_num",
+        "launcher degraded response"
+      ],
+      "expected": "Stale, missing, and mismatched response sequence numbers are identifiable before launcher routing accepts them."
+    },
+    {
+      "case_id": "settings-update-redeploy-failure",
+      "category": "executed-probe",
+      "evidence": ".planning\\product\\release-fixtures\\phase-07\\protocol-recovery-results.json",
+      "command": "pwsh -NoProfile -ExecutionPolicy Bypass -File scripts\\Invoke-TypeDuckProtocolRecoveryProbe.ps1 -RepoRoot . -BuildDir build-vs32 -EvidencePath .planning\\product\\release-fixtures\\phase-07\\protocol-recovery-results.json -Strict",
+      "coverage_refs": [
+        "protocol-recovery-results.json",
+        "METHOD_TYPEDUCK_DEPLOY",
+        "TYPEDUCK_ERROR_SETTINGS_APPLY_FAILED",
+        "TYPEDUCK_HEALTH_DEGRADED"
+      ],
+      "expected": "Executed redeploy failure records bounded settings failure and preserves prior state."
+    },
+    {
+      "case_id": "bounded-degraded-state",
+      "category": "executed-probe",
+      "evidence": ".planning\\product\\release-fixtures\\phase-07\\protocol-recovery-results.json",
+      "command": "pwsh -NoProfile -ExecutionPolicy Bypass -File scripts\\Invoke-TypeDuckProtocolRecoveryProbe.ps1 -RepoRoot . -BuildDir build-vs32 -EvidencePath .planning\\product\\release-fixtures\\phase-07\\protocol-recovery-results.json -Strict",
+      "coverage_refs": [
+        "protocol-recovery-results.json",
+        "Proto::FrameBuffer",
+        "TYPEDUCK_ERROR_PAYLOAD_TOO_LARGE",
+        "TYPEDUCK_HEALTH_DEGRADED"
+      ],
+      "expected": "Executed degraded-state result is typed, recoverable, redacted, and bounded."
+    }
+  ]
+}
