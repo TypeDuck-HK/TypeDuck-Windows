@@ -195,11 +195,13 @@ $backend = Resolve-FullPath -Path $BackendRoot
 $violations = [System.Collections.Generic.List[string]]::new()
 
 $backendBuildScriptPath = Join-Path $backend "scripts\build.ps1"
+$backendServerPath = Join-Path $backend "server.go"
 $installScriptPath = Join-Path $repo "scripts\install.ps1"
 $packageScriptPath = Join-Path $repo "scripts\_all_in_package.ps1"
 $installerBuildScriptPath = Join-Path $repo "installer\build-installer.ps1"
 
 $backendBuildScript = Read-TextIfPresent $backendBuildScriptPath
+$backendServer = Read-TextIfPresent $backendServerPath
 $installScript = Read-TextIfPresent $installScriptPath
 $packageScript = Read-TextIfPresent $packageScriptPath
 $installerBuildScript = Read-TextIfPresent $installerBuildScriptPath
@@ -213,6 +215,8 @@ Assert-SourceText $violations $backendBuildScript '\$PackageDir\s*=\s*Join-Path\
 Assert-SourceNotText $violations $backendBuildScript 'backends\.moqi-ime\.json|Generate backends\.json snippet|workingDir\s*=\s*"moqi-ime"|command\s*=\s*"moqi-ime\\server\.exe"' "Backend build must not emit legacy backend snippets."
 Assert-SourceNotText $violations $backendBuildScript '\$packageAppearanceThemesData\s*=|Packaged appearance theme compatibility copy|compatibility data path' "Backend build must not package input_methods/rime/data/appearance_themes.json."
 Assert-SourceText $violations $backendBuildScript 'input_methods\\rime\\appearance_themes\.json' "Backend build must preserve canonical input_methods/rime/appearance_themes.json."
+Assert-SourceText $violations $backendServer 'typeDuckProfileGUID\s*=\s*"\{c6e8f5df-6504-44f9-b7cf-17a195373a83\}"' "Backend must register the fixed TypeDuck profile GUID after ime.json is pruned."
+Assert-SourceText $violations $backendServer 'registerTypeDuckRimeService\(server\)' "Backend startup must register TypeDuck Rime without relying on packaged ime.json metadata."
 
 if ($Strict -and ($installScript -match 'TypeDuckRuntime' -or (Test-Path -LiteralPath (Join-Path $repo "installer\stage\win32\TypeDuckIME\TypeDuckRuntime")))) {
     Assert-SourceText $violations $installScript 'TypeDuckRuntime' "Windows staging must use TypeDuckRuntime as the installed runtime folder."
