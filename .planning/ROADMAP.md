@@ -212,12 +212,12 @@ Plans:
 
 **Verification Environment**: Mixed. Static/code tests are expected for audits, parser bounds, logging defaults, and removed handlers. Add targeted Windows VM smoke evidence for installed-path privacy, launcher/runtime behavior, config-tool removal, pipe behavior, and absence of legacy feature surfaces after installation.
 
-**Plans**: 1/7 plans executed
+**Plans**: 2/7 plans executed
 Plans:
 **Wave 1**
 
 - [x] 06-01-PLAN.md — Clean installer localization, first-page copy, Start Menu entries, process cleanup, and Simplified Inno dependency.
-- [ ] 06-02-PLAN.md — Prune and rename the shipped TypeDuck runtime package under `TypeDuckRuntime`.
+- [x] 06-02-PLAN.md — Prune and rename the shipped TypeDuck runtime package under `TypeDuckRuntime`.
 
 **Wave 2** *(blocked on Wave 1 runtime package cleanup)*
 
@@ -270,5 +270,5 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7
 | 3. zh-HK TSF Registration and Installer Skeleton | 3/3 | Complete    | 2026-06-24 |
 | 4. TypeDuck Protocol and Typing MVP | 4/4 | Complete | 2026-06-24 |
 | 5. Candidate, Dictionary, Settings, and About UI Parity | 15/15 | Complete | 2026-06-26 |
-| 6. Privacy, Security, and Scaffold Cleanup | 1/7 | In Progress|  |
+| 6. Privacy, Security, and Scaffold Cleanup | 2/7 | In Progress|  |
 | 7. Compatibility and Release Verification | 0/4 | Not started | - |

@@ -5,16 +5,16 @@ milestone_name: milestone
 current_phase: 6
 current_phase_name: Privacy, Security, and Scaffold Cleanup
 status: phase_6_in_progress
-stopped_at: Completed 06-01-PLAN.md
-last_updated: "2026-06-27T10:11:49.462Z"
-last_activity: 2026-06-26
-last_activity_desc: Closed Phase 5 with user human verification, retired screenshot fixtures, and updated UAT/verification records
+stopped_at: Completed 06-02-PLAN.md with installer compile blocker in out-of-scope Plan 01 file
+last_updated: "2026-06-27T10:18:00.000Z"
+last_activity: 2026-06-27
+last_activity_desc: Completed Phase 6 Plan 02 runtime package pruning and TypeDuckRuntime staging
 progress:
   total_phases: 7
   completed_phases: 5
   total_plans: 38
-  completed_plans: 28
-  percent: 74
+  completed_plans: 29
+  percent: 71
 ---
 
 # Project State
@@ -29,9 +29,9 @@ See: .planning/PROJECT.md (updated 2026-06-26)
 ## Current Position
 
 Phase: 6 of 7 (Privacy, Security, and Scaffold Cleanup)
-Plan: 06-01 complete; 06-02 next
-Status: Phase 6 in progress; installer cleanup complete
-Last activity: 2026-06-27 — Completed Phase 6 Plan 01 installer localization, cleanup, and guard work
+Plan: 06-02 complete; 06-03 next
+Status: Phase 6 in progress; runtime package pruning complete with installer compile blocker tracked
+Last activity: 2026-06-27 — Completed Phase 6 Plan 02 runtime package pruning and TypeDuckRuntime staging
 
 Progress: [███████░░░] 74% of planned milestone plans
 
@@ -84,6 +84,7 @@ Progress: [███████░░░] 74% of planned milestone plans
 | Phase 05-candidate-dictionary-settings-and-about-ui-parity P14 | user-approved skip | 1 retired evidence path | docs |
 | Phase 05-candidate-dictionary-settings-and-about-ui-parity P15 | closeout | UAT/verification/roadmap | docs |
 | Phase 06 P01 | 7 min | 3 tasks | 4 files |
+| Phase 06-privacy-security-and-scaffold-cleanup P02 | 70 min | 3 tasks | 7 files |
 
 ## Accumulated Context
 
@@ -161,14 +162,18 @@ Recent decisions affecting current work:
 - [Phase 06]: 06-01 removed Legacy Moqi registry/startup cleanup from the TypeDuck installer so TypeDuck uninstall does not touch separately installed Moqi state.
 - [Phase 06]: 06-01 keeps TypeDuck runtime `server.exe` cleanup path-scoped to the TypeDuck app directory because `server.exe` is a generic process name.
 - [Phase 06]: 06-01 renders restart guidance on final installer/uninstaller surfaces with reopen-apps-first wording instead of separate technical popups.
+- [Phase 06]: 06-02 TypeDuckRuntime is the shipped runtime folder; legacy PowerShell parameter names remain only for caller compatibility. — TypeDuck-owned install paths are required while preserving script compatibility for existing callers.
+- [Phase 06]: 06-02 package output keeps only canonical input_methods/rime/appearance_themes.json. — The former data-path theme copy is duplicate runtime payload and is now rejected by guards.
+- [Phase 06]: 06-02 staged backends.json is removed. — Plan 06-03 owns the fixed in-code TypeDuck runtime bridge, so Plan 06-02 must not ship the legacy manifest.
 
 ### Pending Todos
 
-Phase 6 Plan 02 runtime package pruning is next.
+Phase 6 Plan 03 fixed TypeDuck runtime bridge is next.
 
 ### Blockers/Concerns
 
 - [Phase 6]: Visible scaffold leakage, bilingual copy audit, data/log path cleanup, diagnostics safety, pipe hardening, and legacy feature removal remain the next risk area.
+- [Phase 06 Plan 02]: Installer compile is blocked outside this plan by installer/MoqiTsf.iss unknown preprocessor directive around line 104.
 
 ## Deferred Items
 
@@ -184,6 +189,6 @@ Phase 6 Plan 02 runtime package pruning is next.
 
 ## Session Continuity
 
-Last session: 2026-06-27T10:11:49.452Z
-Stopped at: Completed 06-01-PLAN.md
+Last session: 2026-06-27T10:18:00.000Z
+Stopped at: Completed 06-02-PLAN.md with installer compile blocker in out-of-scope Plan 01 file
 Resume file: None

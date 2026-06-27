@@ -10,7 +10,7 @@
 - [x] **IDEN-01**: User sees TypeDuck, not Moqi, in installer title text, installed app names, tray/menu surfaces, binary/resource metadata, logs, data paths, and release artifact names.
 - [x] **IDEN-02**: Developer has a single TypeDuck identity contract covering executable names, DLL names, AppId/CLSID/profile GUIDs, install directories, log/data directories, pipe/mutex names, registry keys, resource strings, and release artifact names.
 - [x] **IDEN-03**: User-facing surfaces contain no visible Moqi product strings after the TypeDuck identity phase.
-- [ ] **IDEN-04**: User-facing surfaces contain no visible fcitx, WebDAV/cloud clipboard, or AI feature references in the v1 product.
+- [x] **IDEN-04**: User-facing surfaces contain no visible fcitx, WebDAV/cloud clipboard, or AI feature references in the v1 product.
 
 ### Installation and TSF Registration
 
@@ -83,7 +83,7 @@ Phase 5 closeout note: SET-01 through SET-10 are accepted by user human verifica
 ### Privacy, Security, and Diagnostics
 
 - [ ] **SEC-01**: Runtime logs and diagnostics use TypeDuck-owned paths and avoid raw typed content by default.
-- [ ] **SEC-02**: Cloud clipboard/WebDAV behavior from the scaffold is removed or compile-gated out of v1.
+- [x] **SEC-02**: Cloud clipboard/WebDAV behavior from the scaffold is removed or compile-gated out of v1.
 - [ ] **SEC-03**: Arbitrary backend-provided config tool launching is removed or replaced by a fixed first-party TypeDuck settings entry point.
 - [ ] **SEC-04**: Named pipe access and client/server identity checks are hardened enough to prevent obvious same-user spoofing and oversized-frame abuse.
 - [x] **SEC-05**: Installer avoids broad legacy process kills and uses TypeDuck-specific process names and cleanup operations.
@@ -147,7 +147,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | IDEN-01 | Phase 6 | Complete |
 | IDEN-02 | Phase 1 | Complete |
 | IDEN-03 | Phase 6 | Complete |
-| IDEN-04 | Phase 6 | Pending |
+| IDEN-04 | Phase 6 | Complete |
 | INST-01 | Phase 3 | Complete |
 | INST-02 | Phase 3 | Complete |
 | INST-03 | Phase 3 | Complete |
@@ -192,7 +192,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | LANG-02 | Phase 6 | Complete |
 | LANG-03 | Phase 5 | Complete |
 | SEC-01 | Phase 6 | Pending |
-| SEC-02 | Phase 6 | Pending |
+| SEC-02 | Phase 6 | Complete |
 | SEC-03 | Phase 6 | Pending |
 | SEC-04 | Phase 6 | Pending |
 | SEC-05 | Phase 6 | Complete |
