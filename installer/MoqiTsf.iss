@@ -88,7 +88,9 @@ const
 
 var
   HelperInstallSucceeded: Boolean;
+  HelperInstallFailed: Boolean;
   HelperInstallNeedsRestart: Boolean;
+  HelperUninstallFailed: Boolean;
   HelperUninstallNeedsRestart: Boolean;
   HadExistingInstall: Boolean;
 
@@ -118,7 +120,11 @@ end;
 
 function InstallFinishedText: String;
 begin
-  if HadExistingInstall then
+  if HelperInstallFailed then
+    Result := Bilingual(
+      'TypeDuck 未能完成安裝。請重新啟動電腦，然後再次執行安裝程式。',
+      'TypeDuck could not finish installation. Please restart your computer, then run the installer again.')
+  else if HadExistingInstall then
     Result := Bilingual(
       'TypeDuck 已安裝完成。請關閉並重新開啟欲使用 TypeDuck 新版本的應用程式。如未能輸入，請重新啟動電腦。',
       'TypeDuck is installed. Close and reopen the apps where you want to use the new version of TypeDuck. If you are unable to type, restart your computer.')
@@ -130,9 +136,14 @@ end;
 
 function UninstallFinishedText: String;
 begin
-  Result := Bilingual(
-    'TypeDuck 已解除安裝。如 TypeDuck 仍然出現，請重新啟動電腦。',
-    'TypeDuck is uninstalled. If TypeDuck still appears, restart your computer.');
+  if HelperUninstallFailed then
+    Result := Bilingual(
+      'TypeDuck 未能完成解除安裝。請重新啟動電腦，然後再次執行解除安裝。',
+      'TypeDuck could not finish uninstalling. Please restart your computer, then run uninstall again.')
+  else
+    Result := Bilingual(
+      'TypeDuck 已解除安裝。如 TypeDuck 仍然出現，請重新啟動電腦。',
+      'TypeDuck is uninstalled. If TypeDuck still appears, restart your computer.');
 end;
 
 procedure CurPageChanged(CurPageID: Integer);
@@ -240,25 +251,32 @@ end;
 
 function BuildInstallSetupHelperParameters(const Action: String): String;
 begin
-  Result := Action;
-  if WizardSilent() then
-    Result := Result + ' /s';
+  Result := Action + ' /s';
   Result := Result + ' --appdir "' + ExpandConstant('{app}') + '"';
 end;
 
 function BuildUninstallSetupHelperParameters(const Action: String): String;
 begin
-  Result := Action;
-  if UninstallSilent() then
-    Result := Result + ' /s';
+  Result := Action + ' /s';
   Result := Result + ' --appdir "' + ExpandConstant('{app}') + '"';
 end;
 
-procedure HandleSetupHelperResult(const OperationZh: String; const OperationEn: String; const ResultCode: Integer);
+procedure HandleInstallSetupHelperFailure;
 begin
-  RaiseException(Bilingual(
-    OperationZh + '失敗，結束碼：' + IntToStr(ResultCode),
-    OperationEn + ' failed (exit code ' + IntToStr(ResultCode) + ').'));
+  HelperInstallFailed := True;
+  MsgBox(Bilingual(
+    'TypeDuck 未能完成安裝。請重新啟動電腦，然後再次執行安裝程式。',
+    'TypeDuck could not finish installation. Please restart your computer, then run the installer again.'),
+    mbError, MB_OK);
+end;
+
+procedure HandleUninstallSetupHelperFailure;
+begin
+  HelperUninstallFailed := True;
+  MsgBox(Bilingual(
+    'TypeDuck 未能完成解除安裝。請重新啟動電腦，然後再次執行解除安裝。',
+    'TypeDuck could not finish uninstalling. Please restart your computer, then run uninstall again.'),
+    mbError, MB_OK);
 end;
 
 procedure CurStepChanged(CurStep: TSetupStep);
@@ -275,7 +293,10 @@ begin
   if CurStep = ssPostInstall then
   begin
     if not RunSetupHelper(BuildInstallSetupHelperParameters('/i'), ResultCode) then
-      HandleSetupHelperResult('TypeDuck 安裝工具安裝', 'TypeDuck setup-helper install', ResultCode);
+    begin
+      HandleInstallSetupHelperFailure;
+      Exit;
+    end;
 
     if ResultCode = SetupHelperExitSuccess then
     begin
@@ -288,7 +309,10 @@ begin
     end;
     if (ResultCode <> SetupHelperExitSuccess) and
        (ResultCode <> SetupHelperExitRestartRequired) then
-      HandleSetupHelperResult('TypeDuck 安裝工具安裝', 'TypeDuck setup-helper install', ResultCode);
+    begin
+      HandleInstallSetupHelperFailure;
+      Exit;
+    end;
   end;
 end;
 
@@ -326,11 +350,17 @@ begin
     StopTypeDuckProcesses;
     DeleteTypeDuckReregisterTask;
     if not RunSetupHelper(BuildUninstallSetupHelperParameters('/u'), ResultCode) then
-      HandleSetupHelperResult('TypeDuck 安裝工具解除安裝', 'TypeDuck setup-helper uninstall', ResultCode);
+    begin
+      HandleUninstallSetupHelperFailure;
+      Exit;
+    end;
     if ResultCode = SetupHelperExitRestartRequired then
       HelperUninstallNeedsRestart := True
     else if ResultCode <> SetupHelperExitSuccess then
-      HandleSetupHelperResult('TypeDuck 安裝工具解除安裝', 'TypeDuck setup-helper uninstall', ResultCode);
+    begin
+      HandleUninstallSetupHelperFailure;
+      Exit;
+    end;
   end;
   if CurUninstallStep = usPostUninstall then
   begin

@@ -657,6 +657,12 @@ int ShowFailureAndReturn(const std::wstring& message, const bool silent) {
   return kExitFailure;
 }
 
+std::wstring TypingSetupFailureMessage() {
+  return Bilingual(
+      L"TypeDuck 未能連接至 Windows 輸入功能。請重新啟動電腦，然後再次執行安裝程式。",
+      L"TypeDuck could not connect to Windows typing. Please restart your computer, then run the installer again.");
+}
+
 int RunReregister(const Options& options) {
   const fs::path app_dir(options.app_dir);
   const fs::path source32 = app_dir / kTextServiceDllName;
@@ -674,16 +680,10 @@ int RunReregister(const Options& options) {
   CleanupStaleRebootCopies(source64);
 
   if (!RunRegsvr(regsvr32, dest32, app_dir, false)) {
-    return ShowFailureAndReturn(
-        Bilingual(L"未能註冊 Win32 TypeDuck TSF DLL。",
-                  L"Failed to register Win32 TypeDuck TSF DLL."),
-        options.silent);
+    return ShowFailureAndReturn(TypingSetupFailureMessage(), options.silent);
   }
   if (!RunRegsvr(regsvr64, dest64_for_regsvr, app_dir, false)) {
-    return ShowFailureAndReturn(
-        Bilingual(L"未能註冊 x64 TypeDuck TSF DLL。",
-                  L"Failed to register x64 TypeDuck TSF DLL."),
-        options.silent);
+    return ShowFailureAndReturn(TypingSetupFailureMessage(), options.silent);
   }
   DeleteReregisterTask();
   return kExitSuccess;
@@ -769,16 +769,10 @@ int RunInstall(const Options& options) {
   }
 
   if (!RunRegsvr(regsvr32, dest32, app_dir, false)) {
-    return ShowFailureAndReturn(
-        Bilingual(L"未能註冊 Win32 TypeDuck TSF DLL。",
-                  L"Failed to register Win32 TypeDuck TSF DLL."),
-        options.silent);
+    return ShowFailureAndReturn(TypingSetupFailureMessage(), options.silent);
   }
   if (!RunRegsvr(regsvr64, dest64_for_regsvr, app_dir, false)) {
-    return ShowFailureAndReturn(
-        Bilingual(L"未能註冊 x64 TypeDuck TSF DLL。",
-                  L"Failed to register x64 TypeDuck TSF DLL."),
-        options.silent);
+    return ShowFailureAndReturn(TypingSetupFailureMessage(), options.silent);
   }
   return kExitSuccess;
 }

@@ -386,54 +386,54 @@ Copy-IfExists -Source $installerBitmap -Destination (Join-Path $stageResourceRoo
 
 $launcher = Resolve-ArtifactPath -Label "TypeDuckLauncher.exe" -Candidates @(
     (Join-Path $Win32BuildDir "TypeDuckLauncher.exe"),
-    (Join-Path $Win32BuildDir "Debug\TypeDuckLauncher.exe"),
     (Join-Path $Win32BuildDir "Release\TypeDuckLauncher.exe"),
-    (Join-Path $Win32BuildDir "MoqLauncher\Debug\TypeDuckLauncher.exe"),
-    (Join-Path $Win32BuildDir "MoqLauncher\Release\TypeDuckLauncher.exe")
+    (Join-Path $Win32BuildDir "MoqLauncher\Release\TypeDuckLauncher.exe"),
+    (Join-Path $Win32BuildDir "Debug\TypeDuckLauncher.exe"),
+    (Join-Path $Win32BuildDir "MoqLauncher\Debug\TypeDuckLauncher.exe")
 )
 Copy-IfExists -Source $launcher -Destination (Join-Path $stageWin32Root "TypeDuckLauncher.exe")
 Set-WindowsExecutableIcon -ExecutablePath (Join-Path $stageWin32Root "TypeDuckLauncher.exe") -IconPath $transparentIcon
 
 $setupHelper = Resolve-ArtifactPath -Label "TypeDuckSetupHelper.exe" -Candidates @(
     (Join-Path $Win32BuildDir "TypeDuckSetupHelper.exe"),
-    (Join-Path $Win32BuildDir "Debug\TypeDuckSetupHelper.exe"),
     (Join-Path $Win32BuildDir "Release\TypeDuckSetupHelper.exe"),
-    (Join-Path $Win32BuildDir "SetupHelper\Debug\TypeDuckSetupHelper.exe"),
-    (Join-Path $Win32BuildDir "SetupHelper\Release\TypeDuckSetupHelper.exe")
+    (Join-Path $Win32BuildDir "SetupHelper\Release\TypeDuckSetupHelper.exe"),
+    (Join-Path $Win32BuildDir "Debug\TypeDuckSetupHelper.exe"),
+    (Join-Path $Win32BuildDir "SetupHelper\Debug\TypeDuckSetupHelper.exe")
 )
 Copy-IfExists -Source $setupHelper -Destination (Join-Path $stageWin32Root "TypeDuckSetupHelper.exe")
 Set-WindowsExecutableIcon -ExecutablePath (Join-Path $stageWin32Root "TypeDuckSetupHelper.exe") -IconPath $transparentIcon
 
 $settingsExe = Resolve-ArtifactPath -Label "TypeDuckSettings.exe" -Candidates @(
     (Join-Path $Win32BuildDir "TypeDuckSettings.exe"),
-    (Join-Path $Win32BuildDir "Debug\TypeDuckSettings.exe"),
     (Join-Path $Win32BuildDir "Release\TypeDuckSettings.exe"),
-    (Join-Path $Win32BuildDir "TypeDuckSettings\Debug\TypeDuckSettings.exe"),
     (Join-Path $Win32BuildDir "TypeDuckSettings\Release\TypeDuckSettings.exe"),
-    (Join-Path $RepoRoot "build-vs32-settings-ui\TypeDuckSettings\Debug\TypeDuckSettings.exe"),
-    (Join-Path $RepoRoot "build-vs32-settings-ui\TypeDuckSettings\Release\TypeDuckSettings.exe")
+    (Join-Path $RepoRoot "build-vs32-settings-ui\TypeDuckSettings\Release\TypeDuckSettings.exe"),
+    (Join-Path $Win32BuildDir "Debug\TypeDuckSettings.exe"),
+    (Join-Path $Win32BuildDir "TypeDuckSettings\Debug\TypeDuckSettings.exe"),
+    (Join-Path $RepoRoot "build-vs32-settings-ui\TypeDuckSettings\Debug\TypeDuckSettings.exe")
 )
 Copy-IfExists -Source $settingsExe -Destination (Join-Path $stageWin32Root "TypeDuckSettings.exe")
 Set-WindowsExecutableIcon -ExecutablePath (Join-Path $stageWin32Root "TypeDuckSettings.exe") -IconPath $transparentIcon
 
 $aboutExe = Resolve-ArtifactPath -Label "TypeDuckAbout.exe" -Candidates @(
     (Join-Path $Win32BuildDir "TypeDuckAbout.exe"),
-    (Join-Path $Win32BuildDir "Debug\TypeDuckAbout.exe"),
     (Join-Path $Win32BuildDir "Release\TypeDuckAbout.exe"),
-    (Join-Path $Win32BuildDir "TypeDuckSettings\Debug\TypeDuckAbout.exe"),
     (Join-Path $Win32BuildDir "TypeDuckSettings\Release\TypeDuckAbout.exe"),
-    (Join-Path $RepoRoot "build-vs32-settings-ui\TypeDuckSettings\Debug\TypeDuckAbout.exe"),
-    (Join-Path $RepoRoot "build-vs32-settings-ui\TypeDuckSettings\Release\TypeDuckAbout.exe")
+    (Join-Path $RepoRoot "build-vs32-settings-ui\TypeDuckSettings\Release\TypeDuckAbout.exe"),
+    (Join-Path $Win32BuildDir "Debug\TypeDuckAbout.exe"),
+    (Join-Path $Win32BuildDir "TypeDuckSettings\Debug\TypeDuckAbout.exe"),
+    (Join-Path $RepoRoot "build-vs32-settings-ui\TypeDuckSettings\Debug\TypeDuckAbout.exe")
 )
 Copy-IfExists -Source $aboutExe -Destination (Join-Path $stageWin32Root "TypeDuckAbout.exe")
 Set-WindowsExecutableIcon -ExecutablePath (Join-Path $stageWin32Root "TypeDuckAbout.exe") -IconPath $transparentIcon
 
 $dll32 = Resolve-ArtifactPath -Label "Win32 TypeDuckTextService.dll" -Candidates @(
     (Join-Path $Win32BuildDir "TypeDuckTextService.dll"),
-    (Join-Path $Win32BuildDir "Debug\TypeDuckTextService.dll"),
     (Join-Path $Win32BuildDir "Release\TypeDuckTextService.dll"),
-    (Join-Path $Win32BuildDir "MoqiTextService\Debug\TypeDuckTextService.dll"),
-    (Join-Path $Win32BuildDir "MoqiTextService\Release\TypeDuckTextService.dll")
+    (Join-Path $Win32BuildDir "MoqiTextService\Release\TypeDuckTextService.dll"),
+    (Join-Path $Win32BuildDir "Debug\TypeDuckTextService.dll"),
+    (Join-Path $Win32BuildDir "MoqiTextService\Debug\TypeDuckTextService.dll")
 )
 Copy-IfExists -Source $dll32 -Destination (Join-Path $stageWin32Root "TypeDuckTextService.dll")
 

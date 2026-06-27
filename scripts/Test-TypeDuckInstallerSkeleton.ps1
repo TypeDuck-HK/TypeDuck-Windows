@@ -184,6 +184,8 @@ function Assert-InstallerScript {
     Assert-AllMatch $Failures $Iss @(
         "CurPageChanged\(CurPageID: Integer\)",
         "WizardForm\.FinishedLabel\.Caption := InstallFinishedText",
+        "HelperInstallFailed",
+        "could not finish installation",
         "UninstallProgressForm\.StatusLabel\.Caption := UninstallFinishedText",
         "HadExistingInstall := ExistingImeInstallationPresent",
         "歡迎使用 TypeDuck",
@@ -201,6 +203,20 @@ function Assert-InstallerScript {
             Add-Failure $Failures "Final-page restart guidance must not expose TSF, DLL, COM, registration, or comparable technical terms."
         }
     }
+}
+
+function Assert-InstallerStagingScript {
+    param(
+        [System.Collections.Generic.List[string]] $Failures,
+        [string] $InstallScript
+    )
+
+    Assert-Match $Failures $InstallScript '(?s)MoqLauncher\\Release\\TypeDuckLauncher\.exe.*MoqLauncher\\Debug\\TypeDuckLauncher\.exe' `
+        "Installer staging must prefer the Win32 Release launcher before any Debug launcher."
+    Assert-Match $Failures $InstallScript '(?s)MoqiTextService\\Release\\TypeDuckTextService\.dll.*MoqiTextService\\Debug\\TypeDuckTextService\.dll' `
+        "Installer staging must prefer the Win32 Release text service before any Debug text service."
+    Assert-Match $Failures $InstallScript '(?s)SetupHelper\\Release\\TypeDuckSetupHelper\.exe.*SetupHelper\\Debug\\TypeDuckSetupHelper\.exe' `
+        "Installer staging must prefer the Win32 Release setup helper before any Debug setup helper."
 }
 
 function Assert-SetupHelper {
@@ -305,6 +321,7 @@ $files = @{
 }
 
 Assert-InstallerScript $failures $files["installer/MoqiTsf.iss"]
+Assert-InstallerStagingScript $failures $files["scripts/install.ps1"]
 Assert-SetupHelper $failures $files["SetupHelper/SetupHelper.cpp"] $files["SetupHelper/CMakeLists.txt"]
 Assert-StagingPipeline $failures $files["installer/build-installer.ps1"] $files["scripts/install.ps1"] $files["scripts/_all_in_package.ps1"] $files["MoqLauncher/CMakeLists.txt"]
 
