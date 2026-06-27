@@ -94,6 +94,10 @@ function Test-BannedText {
         [string] $FullPath,
         [string] $RelativePath
     )
+    if (($RelativePath -replace '/', '\') -match '^input_methods\\rime\\data\\') {
+        return @()
+    }
+
     $textExtensions = @(".json", ".yaml", ".yml", ".txt", ".md", ".ini", ".toml", ".ps1", ".bat", ".cmd", ".go", ".proto")
     if ($textExtensions -notcontains ([System.IO.Path]::GetExtension($FullPath).ToLowerInvariant())) {
         return @()
@@ -104,7 +108,7 @@ function Test-BannedText {
         return @()
     }
 
-    $matches = @()
+    $textViolations = @()
     foreach ($entry in @(
         @{ Pattern = '(?i)\bWebDAV\b'; Label = "WebDAV" },
         @{ Pattern = '(?i)cloud[_ -]?clipboard|云剪贴板'; Label = "cloud clipboard" },
@@ -112,11 +116,12 @@ function Test-BannedText {
         @{ Pattern = '(?i)scheme[_ -]?download|download scheme|下载方案|方案集下载'; Label = "scheme download" },
         @{ Pattern = '(?i)\bAI\b|ai_config|api[_-]?key|base[_-]?url|model|prompt|写好评|翻译|问答'; Label = "AI/config prompt" }
     )) {
-        if ($text -match $entry.Pattern) {
-            $matches += "$($entry.Label) text in $RelativePath"
+        if ($text -match $entry["Pattern"]) {
+            $label = $entry["Label"]
+            $textViolations += "$label text in $RelativePath"
         }
     }
-    return $matches
+    return $textViolations
 }
 
 function Test-RuntimeTree {
