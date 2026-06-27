@@ -62,6 +62,12 @@ function Assert-PatternAbsent([System.Collections.Generic.List[string]] $Violati
   }
 }
 
+function Assert-PatternPresent([System.Collections.Generic.List[string]] $Violations, [string] $Category, [string] $Text, [string] $Pattern, [string] $Message) {
+  if ($Text -notmatch $Pattern) {
+    Add-Violation $Violations $Category $Message
+  }
+}
+
 function Invoke-FocusedGuard(
     [System.Collections.Generic.List[string]] $Violations,
     [System.Collections.Generic.List[object]] $Commands,
@@ -272,6 +278,48 @@ foreach ($source in $sources) {
     }
   }
 }
+
+$releaseWorkflow = Get-FileText (Join-Path $repo ".github/workflows/release.yml")
+$nightlyWorkflow = Get-FileText (Join-Path $repo ".github/workflows/nightly.yml")
+$workflowText = "$releaseWorkflow`n$nightlyWorkflow"
+$packageScriptText = Get-FileText (Join-Path $repo "scripts/_all_in_package.ps1")
+$installerReadme = Get-FileText (Join-Path $repo "installer/README.txt")
+
+foreach ($pattern in @(
+    'installer/dist/typeduck-windows-ime-setup\.exe',
+    'typeduck-windows-ime-release-',
+    'typeduck-windows-ime-nightly-',
+    'path:\s+TypeDuck-Windows',
+    'path:\s+TypeDuck-Windows-backend',
+    'repository:\s+TypeDuck-HK/schema',
+    'ref:\s+aap2-alpha',
+    'Rime deployer',
+    'rime_deployer\.exe',
+    'runtime build folder',
+    'pwsh -NoProfile -ExecutionPolicy Bypass -File \.\\scripts\\_all_in_package\.ps1')) {
+  Assert-PatternPresent $violations "ci-artifacts" $workflowText $pattern "Release/nightly workflow is missing required TypeDuck CI/runtime pattern: $pattern"
+}
+foreach ($pattern in @(
+    'rime-frost',
+    'moqi-im-windows',
+    'moqi-ime',
+    'moqi-im-windows-setup\.exe',
+    'powershell\.exe\s+-NoProfile\s+-ExecutionPolicy\s+Bypass\s+-File\s+.*\.ps1',
+    'Seed launcher icon',
+    'moqi\.ico',
+    'MoqiIM')) {
+  Assert-PatternAbsent $violations "ci-artifacts" $workflowText $pattern "Release/nightly workflow still exposes legacy CI/package surface."
+}
+foreach ($pattern in @(
+    'path:\s*\$\{\{\s*github\.workspace\s*\}\}\\TypeDuck-HK-schema',
+    'path:\s*\$\{\{\s*github\.workspace\s*\}\}\\.*\\build')) {
+  Assert-PatternAbsent $violations "ci-artifacts" $workflowText $pattern "Workflows must not upload schema checkout or schema build outputs as standalone artifacts."
+}
+Assert-PatternPresent $violations "ci-artifacts" $packageScriptText 'pwsh' "All-in package script must invoke project scripts through pwsh."
+Assert-PatternPresent $violations "ci-artifacts" $packageScriptText 'typeduck-windows-ime-setup\.exe' "All-in package script must verify the TypeDuck installer output name."
+Assert-PatternPresent $violations "ci-docs" $installerReadme 'TypeDuckIME' "Installer README must document TypeDuckIME staging/install paths."
+Assert-PatternPresent $violations "ci-docs" $installerReadme 'TypeDuckRuntime' "Installer README must document TypeDuckRuntime staging paths."
+Assert-PatternPresent $violations "ci-docs" $installerReadme 'typeduck-windows-ime-setup\.exe' "Installer README must document the TypeDuck installer output name."
 
 if ($Strict) {
   $scriptText = Get-FileText (Join-Path $repo "scripts/Test-TypeDuckPrivacySecurityCleanup.ps1")
