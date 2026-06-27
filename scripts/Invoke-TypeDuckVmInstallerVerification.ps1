@@ -20,6 +20,7 @@ param(
     [string] $CheckpointName = "",
     [string] $EvidenceRoot = "",
     [switch] $ManualChecklistOnly,
+    [switch] $ReleaseInstallEvidence,
     [switch] $SkipCheckpoint
 )
 
@@ -100,6 +101,20 @@ function Resolve-EvidenceRoot {
     return $fullPath
 }
 
+function Test-IsPhase07InstallEvidenceMode {
+    param([string] $EvidenceRootPath)
+
+    if ($ReleaseInstallEvidence.IsPresent) {
+        return $true
+    }
+    if ([string]::IsNullOrWhiteSpace($EvidenceRootPath)) {
+        return $false
+    }
+    $normalized = [System.IO.Path]::GetFullPath($EvidenceRootPath).TrimEnd('\', '/')
+    $expected = [System.IO.Path]::GetFullPath((Join-Path (Resolve-RepoRoot) $kPhase07EvidenceRootRelative)).TrimEnd('\', '/')
+    return [string]::Equals($normalized, $expected, [System.StringComparison]::OrdinalIgnoreCase)
+}
+
 function Write-JsonFile {
     param(
         [Parameter(Mandatory = $true)] [object] $Value,
@@ -156,9 +171,10 @@ function New-ManualChecklistText {
 ## Safety
 
 - Do not install on the host machine.
-- Use Hyper-V VM $vmDisplay.
-- Create a checkpoint before install unless using an already recorded clean checkpoint.
-- Capture screenshots only of installer/input settings surfaces; avoid personal typed content.
+    - Use Hyper-V VM $vmDisplay.
+    - Create a checkpoint before install unless using an already recorded clean checkpoint.
+    - No screenshots are required.
+    - Observe installer/input settings surfaces directly in the VM and record notes only; avoid personal typed content.
 
 ## Manual Checklist
 
@@ -170,12 +186,11 @@ function New-ManualChecklistText {
    - Launch $installerDisplay inside the VM.
    - Confirm TypeDuck branding is visible.
    - Confirm TypeDuck-controlled text is bilingual Traditional Hong Kong Chinese / English.
-   - Save screenshot as ``installer-ui.png`` if possible.
 
 3. Chinese (Traditional, Hong Kong) input settings appearance:
    - Open Windows Settings language/input pages in the VM.
    - Confirm ``TypeDuck 粵語輸入法 / TypeDuck Cantonese IME`` appears under Chinese (Traditional, Hong Kong) / ``zh-HK``.
-   - Save screenshot as ``zh-hk-input-settings.png`` if possible.
+   - Record direct observations in this notes file.
 
 4. Win32/x64 DLL registration:
    - Confirm ``C:\Windows\SysWOW64\TypeDuckTextService.dll`` exists and record SHA-256.
@@ -201,7 +216,7 @@ function New-ManualChecklistText {
 - ``registry-after-install.json``
 - ``registry-after-uninstall.json``
 - ``vm-install-registration-uninstall.json``
-- Optional screenshots/limitations: ``installer-ui.png``, ``zh-hk-input-settings.png``
+- Human observation notes and limitations in this Markdown file.
 
 ## Source Audit
 
@@ -219,6 +234,133 @@ D-17 through D-19: Covered only when this packet is completed against a disposab
 - Manual checklist mode does not prove VM installation by itself.
 - Mark Plan 03-03 complete only after the VM evidence files above contain actual guest snapshots.
 "@
+}
+
+function New-Phase07InstallVerificationNotesText {
+    param(
+        [string] $Reason,
+        [string] $Vm,
+        [string] $Installer,
+        [string] $InstallerHash,
+        [string] $InstallerLength,
+        [string] $StartedAt
+    )
+
+    $installerDisplay = if ($Installer) { $Installer } else { "<path to typeduck-windows-ime-setup.exe>" }
+    $vmDisplay = if ($Vm) { $Vm } else { "<disposable Windows 10/11 VM name>" }
+    $hashDisplay = if ($InstallerHash) { $InstallerHash } else { "<record SHA-256 before guest copy>" }
+    $lengthDisplay = if ($InstallerLength) { $InstallerLength } else { "<record byte size before guest copy>" }
+    return @"
+# TypeDuck Phase 7 Install Verification Notes
+
+**Mode:** manual checklist
+**Reason:** $Reason
+**Started:** $StartedAt
+**VM:** $vmDisplay
+**Installer:** $installerDisplay
+**Installer SHA-256:** $hashDisplay
+**Installer byte size:** $lengthDisplay
+**Template:** .planning/product/release-fixtures/phase-07/install-verification-template.json
+
+## Safety
+
+- Do not install on the host machine.
+- Use a disposable Windows 10/11 VM or equivalent checkpointed guest.
+- Runtime VM credentials are supplied only at execution time and must not be written into evidence.
+- Record command output, logs, hashes, registry/file/task state, Windows version, checkpoint identity, and human notes only.
+
+## Session Identity
+
+| Field | Value |
+|-------|-------|
+| Tester | |
+| UTC completed | |
+| VM name | $vmDisplay |
+| VM id | |
+| Checkpoint name/id | |
+| Windows version/build | |
+| Host-safe statement | Installer was not run on the host |
+
+## Artifact Evidence
+
+| Field | Value |
+|-------|-------|
+| Expected installer name | typeduck-windows-ime-setup.exe |
+| Actual installer path | $installerDisplay |
+| SHA-256 command | Get-FileHash -Algorithm SHA256 -LiteralPath <installer> |
+| SHA-256 | $hashDisplay |
+| Byte size | $lengthDisplay |
+| Generated-at UTC | |
+
+## Lifecycle Cases
+
+| Case ID | Required evidence | Pass/Fail/Skipped | Notes |
+|---------|-------------------|-------------------|-------|
+| clean-install | install command, install.log, after-install registry/file/task snapshot | pending | |
+| reinstall-upgrade | second install command, reinstall.log, after-reinstall registry/file/task snapshot | pending | |
+| uninstall-cleanup | uninstall command, uninstall.log, after-uninstall cleanup snapshot | pending | |
+| reboot-required-registration | setup-helper exit 2 or locked-DLL condition, TypeDuckIME-ReRegisterTSF state, reboot/reregister result if exercised | pending | |
+| bitness-win32-x64 | SysWOW64 and System32 TypeDuckTextService.dll existence plus SHA-256 | pending | |
+| artifact-name-and-sha256 | typeduck-windows-ime-setup.exe name, byte size, SHA-256, command record | pending | |
+
+## Command Evidence
+
+| Step | Command or guest action | Exit code | Log path | Notes |
+|------|-------------------------|-----------|----------|-------|
+| Copy installer to guest | | | | |
+| Clean install | | | | |
+| Reinstall/upgrade | | | | |
+| Scheduled task query | schtasks /Query /TN TypeDuckIME-ReRegisterTSF | | | |
+| Uninstall | | | | |
+| Post-uninstall cleanup query | | | | |
+
+## Expected TypeDuck State
+
+| Item | Expected path/value | Evidence |
+|------|---------------------|----------|
+| CLSID | {7D92985A-BC53-47B5-A5CC-6E47F86B9D18} | |
+| Profile GUID | {C6E8F5DF-6504-44F9-B7CF-17A195373A83} | |
+| Locale | zh-HK | |
+| Display text | TypeDuck 粵語輸入法 / TypeDuck Cantonese IME | |
+| Win32 DLL | C:\Windows\SysWOW64\TypeDuckTextService.dll | |
+| x64 DLL | C:\Windows\System32\TypeDuckTextService.dll | |
+| Startup entry | HKCU\Software\Microsoft\Windows\CurrentVersion\Run\TypeDuckLauncher | |
+| Re-registration task | TypeDuckIME-ReRegisterTSF | |
+
+## Human Observation Notes
+
+Record direct VM observations here. Visual/DPI and host-app judgement belongs to the Phase 7 interactive checklist and notes files; this installer packet records only install lifecycle facts and notes.
+
+## Limitations
+
+- Manual checklist mode does not prove VM installation by itself.
+- Mark the case complete only after the rows above contain actual guest command and state evidence.
+- If a case is not applicable, record why and keep the skipped state explicit.
+"@
+}
+
+function Write-Phase07ManualPacket {
+    param(
+        [string] $EvidenceRootPath,
+        [string] $Reason,
+        [string] $StartedAt,
+        [string] $InstallerFullPath = ""
+    )
+
+    $installerHash = if ($InstallerFullPath) { Get-Sha256 -Path $InstallerFullPath } else { $null }
+    $installerLength = ""
+    if ($InstallerFullPath -and (Test-Path -LiteralPath $InstallerFullPath)) {
+        $installerLength = [string] (Get-Item -LiteralPath $InstallerFullPath).Length
+    }
+    Set-Content -LiteralPath (Join-Path $EvidenceRootPath $kPhase07InstallNotesName) `
+        -Value (New-Phase07InstallVerificationNotesText `
+            -Reason $Reason `
+            -Vm $VmName `
+            -Installer $InstallerFullPath `
+            -InstallerHash $installerHash `
+            -InstallerLength $installerLength `
+            -StartedAt $StartedAt) `
+        -Encoding UTF8
 }
 
 function Write-ManualPacket {
@@ -641,11 +783,11 @@ $installFailureText
 
 $uninstallFailureText
 
-## Screenshots / Settings Evidence
+## Human Visual Notes
 
 - Automation collected registry, file, task, language-list, and uninstall-entry snapshots.
-- If a screenshot is needed for product review, capture Windows Settings showing `TypeDuck 粵語輸入法 / TypeDuck Cantonese IME` under Chinese (Traditional, Hong Kong) and save it as `zh-hk-input-settings.png`.
-- Screenshot capture must avoid personal typed content.
+- If product review needs visual judgement, observe Windows Settings directly in the VM and record notes only.
+- Observation notes must avoid personal typed content.
 
 ## Limitations
 
@@ -654,8 +796,8 @@ $limitations
 ## Source Audit
 
 GOAL Phase 3: COVERED by Plans 03-01, 03-02, and this VM evidence packet.
-INST-01: Bilingual TypeDuck-branded installer, covered by Plan 03-02 source plus installer execution evidence and optional UI screenshot.
-INST-02: Select TypeDuck under Chinese (Traditional, Hong Kong), covered by TypeDuck zh-HK profile registry/language evidence and optional Settings screenshot.
+INST-01: Bilingual TypeDuck-branded installer, covered by Plan 03-02 source plus installer execution evidence and direct UI observation notes.
+INST-02: Select TypeDuck under Chinese (Traditional, Hong Kong), covered by TypeDuck zh-HK profile registry/language evidence and direct Settings observation notes.
 INST-03: Deterministic CLSID/profile GUID/zh-HK/display text, covered by Plan 03-01 constants and VM registry snapshots.
 INST-04: Win32 and x64 TSF DLL registration, covered by SysWOW64/System32 file hashes and regsvr-created registry snapshots.
 INST-05: TypeDuck-owned uninstall cleanup, covered by after-uninstall snapshots.
@@ -674,7 +816,11 @@ if ($ManualChecklistOnly) {
     if (-not [string]::IsNullOrWhiteSpace($InstallerPath)) {
         $resolvedInstaller = [System.IO.Path]::GetFullPath($InstallerPath)
     }
-    Write-ManualPacket -EvidenceRootPath $resolvedEvidenceRoot -Reason "ManualChecklistOnly was specified." -StartedAt $startedAt -InstallerFullPath $resolvedInstaller
+    if (Test-IsPhase07InstallEvidenceMode -EvidenceRootPath $resolvedEvidenceRoot) {
+        Write-Phase07ManualPacket -EvidenceRootPath $resolvedEvidenceRoot -Reason "ManualChecklistOnly was specified for Phase 7 install evidence." -StartedAt $startedAt -InstallerFullPath $resolvedInstaller
+    } else {
+        Write-ManualPacket -EvidenceRootPath $resolvedEvidenceRoot -Reason "ManualChecklistOnly was specified." -StartedAt $startedAt -InstallerFullPath $resolvedInstaller
+    }
     Write-Host "Manual verification packet written to: $resolvedEvidenceRoot"
     exit 0
 }
@@ -734,7 +880,7 @@ try {
     }
     $zhHkLanguage = @($afterInstallSnapshot.languageList | Where-Object { $_.languageTag -eq "zh-HK" })
     if ($zhHkLanguage.Count -eq 0) {
-        $limitations += "Get-WinUserLanguageList did not report zh-HK for the guest user; rely on CTF/TIP registry evidence and capture Settings screenshot if needed."
+        $limitations += "Get-WinUserLanguageList did not report zh-HK for the guest user; rely on CTF/TIP registry evidence and direct Settings observation notes if needed."
     }
 
     $endedAt = Format-UtcTimestamp
