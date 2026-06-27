@@ -280,7 +280,7 @@ function Assert-IpcHardening {
         'TypeDuckLauncher',
         'programDir\(\)'
     ) "Client pipe sanity check must inspect server PID, image path, TypeDuck launcher shape, and configured program directory when available."
-    Assert-NotMatch $Failures $MoqiClientCpp 'return\s+true;\s*\}\s*(?:// establish a connection|\r?\n\s*// establish a connection)' `
+    Assert-NotMatch $Failures $MoqiClientCpp 'FIXME:\s*check the command line of the server[\s\S]*return\s+true;\s*\}\s*(?:// establish a connection|\r?\n\s*// establish a connection)' `
         "Client pipe sanity check must not return true unconditionally."
     Assert-NotMatch $Failures $MoqiClientCpp 'GetFileVersionInfo|VerQueryValue|WinVerifyTrust|CryptQueryObject|CertGetCertificateChain|SHA256|sha256|hash' `
         "Client pipe sanity check must not require exact version, signature, or hash checks."

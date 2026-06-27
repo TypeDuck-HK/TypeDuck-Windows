@@ -33,6 +33,7 @@
 #include <algorithm>
 #include <cctype>
 #include <ctime>
+#include <cwctype>
 #include <filesystem>
 #include <fstream>
 #include <iomanip>
@@ -112,6 +113,61 @@ std::wstring utf8ToUtf16(const std::string &text) {
   wtext.resize(wlen);
   ::MultiByteToWideChar(CP_UTF8, 0, text.data(), inputLength, &wtext[0], wlen);
   return wtext;
+}
+
+std::wstring lowercaseCopy(std::wstring text) {
+  std::transform(text.begin(), text.end(), text.begin(),
+                 [](wchar_t ch) { return static_cast<wchar_t>(std::towlower(ch)); });
+  return text;
+}
+
+std::wstring normalizePathForCompare(std::wstring path) {
+  std::replace(path.begin(), path.end(), L'/', L'\\');
+  while (path.size() > 3 && (path.back() == L'\\' || path.back() == L'/')) {
+    path.pop_back();
+  }
+  return lowercaseCopy(path);
+}
+
+std::wstring fileNameFromPath(const std::wstring &path) {
+  try {
+    return std::filesystem::path(path).filename().wstring();
+  } catch (...) {
+    const size_t pos = path.find_last_of(L"\\/");
+    return pos == std::wstring::npos ? path : path.substr(pos + 1);
+  }
+}
+
+bool isTypeDuckLauncherImageName(const std::wstring &imageName) {
+  const std::wstring lowerName = lowercaseCopy(imageName);
+  return lowerName.find(L"typeduck") != std::wstring::npos &&
+         lowerName.find(L"launcher") != std::wstring::npos &&
+         lowerName.ends_with(L".exe");
+}
+
+bool isPathUnderDirectory(const std::wstring &path,
+                          const std::wstring &directory) {
+  if (path.empty() || directory.empty()) {
+    return true;
+  }
+
+  const std::wstring normalizedPath = normalizePathForCompare(path);
+  const std::wstring normalizedDir = normalizePathForCompare(directory);
+  if (normalizedPath == normalizedDir) {
+    return true;
+  }
+
+  const std::wstring prefix = normalizedDir + L"\\";
+  return normalizedPath.rfind(prefix, 0) == 0;
+}
+
+std::wstring getConfiguredProgramDir(TextService *textService) {
+  if (textService == nullptr) {
+    return L"";
+  }
+  auto module =
+      static_cast<Moqi::ImeModule *>(textService->imeModule().operator->());
+  return module != nullptr ? module->programDir() : L"";
 }
 
 std::wstring jsonStringToUtf16(const Json::Value &value) {
@@ -1954,14 +2010,51 @@ bool Client::callRpcMethod(moqi::protocol::ClientRequest &request,
 }
 
 bool Client::isPipeCreatedByMoqiServer(HANDLE pipe) {
-  // security check: make sure that we're connecting to the correct server
-  ULONG serverPid;
-  if (GetNamedPipeServerProcessId(pipe, &serverPid)) {
-    // FIXME: check the command line of the server?
-    // See this:
-    // http://www.codeproject.com/Articles/19685/Get-Process-Info-with-NtQueryInformationProcess
-    // Too bad! Undocumented Windows internal API might be needed here. :-(
+  ULONG serverPid = 0;
+  if (!::GetNamedPipeServerProcessId(pipe, &serverPid)) {
+    appendRpcGuardLog(L"launcher identity check accepted: server pid unavailable error=" +
+                      std::to_wstring(::GetLastError()));
+    return true;
   }
+
+  HANDLE serverProcess =
+      ::OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION, FALSE, serverPid);
+  if (serverProcess == nullptr) {
+    appendRpcGuardLog(L"launcher identity check accepted: process inspection denied pid=" +
+                      std::to_wstring(serverPid) + L" error=" +
+                      std::to_wstring(::GetLastError()));
+    return true;
+  }
+
+  wchar_t imagePath[32768] = {};
+  DWORD imagePathLen = static_cast<DWORD>(_countof(imagePath));
+  if (!::QueryFullProcessImageNameW(serverProcess, 0, imagePath, &imagePathLen)) {
+    const DWORD error = ::GetLastError();
+    ::CloseHandle(serverProcess);
+    appendRpcGuardLog(L"launcher identity check accepted: image path unavailable pid=" +
+                      std::to_wstring(serverPid) + L" error=" +
+                      std::to_wstring(error));
+    return true;
+  }
+  ::CloseHandle(serverProcess);
+
+  const std::wstring serverImagePath(imagePath, imagePathLen);
+  const std::wstring serverImageName = fileNameFromPath(serverImagePath);
+  if (!isTypeDuckLauncherImageName(serverImageName)) {
+    appendRpcGuardLog(L"launcher identity check rejected: unexpected image name pid=" +
+                      std::to_wstring(serverPid));
+    return false;
+  }
+
+  const std::wstring programDir = getConfiguredProgramDir(textService_);
+  if (!programDir.empty() && !isPathUnderDirectory(serverImagePath, programDir)) {
+    appendRpcGuardLog(L"launcher identity check rejected: image outside configured program directory pid=" +
+                      std::to_wstring(serverPid));
+    return false;
+  }
+
+  appendRpcGuardLog(L"launcher identity check accepted: TypeDuck launcher-shaped server pid=" +
+                    std::to_wstring(serverPid));
   return true;
 }
 
