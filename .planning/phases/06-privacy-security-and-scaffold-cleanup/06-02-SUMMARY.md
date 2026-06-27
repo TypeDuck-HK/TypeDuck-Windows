@@ -85,7 +85,7 @@ status: complete
 
 - Preserved legacy PowerShell parameter names only as caller compatibility; all produced runtime paths and user-facing script output now use TypeDuck wording.
 - Removed backend snippet generation because Plan 06-03 will replace manifest-driven runtime discovery.
-- Did not edit `installer/MoqiTsf.iss`; it is outside Plan 02 ownership and currently belongs to Plan 01 scope.
+- Did not edit `installer/MoqiTsf.iss` during Plan 02 execution; a follow-up integration fix in the Plan 01-owned installer script repaired the Inno compile issue found by Plan 02 staging verification.
 
 ## Deviations from Plan
 
@@ -112,7 +112,7 @@ status: complete
 
 ## Issues Encountered
 
-- `pwsh -NoProfile -ExecutionPolicy Bypass -File scripts\install.ps1 -RepoRoot . -MoqiImeSource D:\VSProjects\moqi-ime\scripts\build\TypeDuckRuntime` staged the payload successfully, then failed when invoking Inno Setup on `installer/MoqiTsf.iss`: `Unknown preprocessor directive` at the existing About text block around line 104. `installer/MoqiTsf.iss` is outside this plan's ownership and was not modified.
+- Initial staging exposed an Inno compile issue in the Plan 01-owned installer About text block, where a line beginning with `#13#10` was parsed as a preprocessor directive. Follow-up integration verification changed those blank lines to string literals and reran the full staging/installer build successfully.
 
 ## Verification
 
@@ -121,7 +121,7 @@ status: complete
 - PASS: `pwsh -NoProfile -ExecutionPolicy Bypass -File scripts\Test-TypeDuckRuntimePackagePruning.ps1 -RepoRoot . -BackendRoot D:\VSProjects\moqi-ime -Strict`
 - PASS: `pwsh -NoProfile -ExecutionPolicy Bypass -File scripts\Test-TypeDuckAppearanceTheme.ps1 -RepoRoot . -BackendRoot D:\VSProjects\moqi-ime -Strict`
 - PASS: `pwsh -NoProfile -ExecutionPolicy Bypass -File scripts\Test-TypeDuckIconPackaging.ps1 -RepoRoot . -BackendRoot D:\VSProjects\moqi-ime -Strict`
-- PARTIAL: `pwsh -NoProfile -ExecutionPolicy Bypass -File scripts\install.ps1 -RepoRoot . -MoqiImeSource D:\VSProjects\moqi-ime\scripts\build\TypeDuckRuntime` staged the package, but installer compilation failed in out-of-scope `installer/MoqiTsf.iss`.
+- PASS after integration fix: `pwsh -NoProfile -ExecutionPolicy Bypass -File scripts\install.ps1 -RepoRoot . -MoqiImeSource D:\VSProjects\moqi-ime\scripts\build\TypeDuckRuntime`
 
 ## Known Stubs
 
@@ -137,7 +137,7 @@ None - no external service configuration required.
 
 ## Next Phase Readiness
 
-Plan 06-03 can replace manifest-driven backend discovery with a fixed TypeDuck runtime bridge targeting `TypeDuckRuntime`. Release/installer compilation remains blocked until the out-of-scope `installer/MoqiTsf.iss` preprocessor issue is fixed by its owning plan.
+Plan 06-03 can replace manifest-driven backend discovery with a fixed TypeDuck runtime bridge targeting `TypeDuckRuntime`. Runtime staging and installer compilation are green after the follow-up installer syntax fix.
 
 ## Self-Check: PASSED
 
