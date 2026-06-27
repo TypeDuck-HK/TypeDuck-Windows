@@ -20,9 +20,7 @@ std::string frameWithDeclaredSize(std::uint32_t declaredSize,
 
 bool matchesExpectedSequence(const moqi::protocol::ServerResponse &response,
                              std::uint32_t expectedSeq) {
-  (void)response;
-  (void)expectedSeq;
-  return false;
+  return expectedSeq != 0 && response.seq_num() == expectedSeq;
 }
 
 } // namespace
