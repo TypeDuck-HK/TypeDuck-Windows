@@ -136,8 +136,8 @@ Assert-True ($canonicalProbeIndex -lt $compatProbeIndex) "Backend loader must pr
 $buildScriptSource = Get-Content -Raw -Encoding UTF8 -LiteralPath $buildScriptPath
 Assert-True ($buildScriptSource.Contains('$sourceAppearanceThemes = Join-Path $RimeDir "appearance_themes.json"')) "Build script must source themes from canonical input_methods/rime/appearance_themes.json."
 Assert-True ($buildScriptSource.Contains('$packageAppearanceThemes = Join-Path $PackageRimeDir "appearance_themes.json"')) "Build script must stage the canonical root theme path."
-Assert-True ($buildScriptSource.Contains('$packageAppearanceThemesData = Join-Path $PackageRimeDataDir "appearance_themes.json"')) "Build script must define the temporary data-path compatibility copy."
-Assert-True ($buildScriptSource.Contains("Packaged appearance theme compatibility copy is not byte-identical")) "Build script must fail if the compatibility copy drifts from the canonical file."
+Assert-True (-not $buildScriptSource.Contains('$packageAppearanceThemesData = Join-Path $PackageRimeDataDir "appearance_themes.json"')) "Build script must not stage a data-path appearance_themes.json compatibility copy."
+Assert-True (-not $buildScriptSource.Contains("Packaged appearance theme compatibility copy is not byte-identical")) "Build script must not retain compatibility-copy drift checks for the removed data-path theme file."
 
 $compatThemePath = Join-Path $backendRootPath "input_methods\rime\data\appearance_themes.json"
 if (Test-Path -LiteralPath $compatThemePath) {
@@ -146,16 +146,14 @@ if (Test-Path -LiteralPath $compatThemePath) {
     Assert-True ($canonicalHash -eq $compatHash) "Existing data-path compatibility theme file is not byte-identical to the canonical root file."
 }
 
-$packageThemePath = Join-Path $backendRootPath "scripts\build\moqi-ime\input_methods\rime\appearance_themes.json"
-$packageCompatThemePath = Join-Path $backendRootPath "scripts\build\moqi-ime\input_methods\rime\data\appearance_themes.json"
+$packageThemePath = Join-Path $backendRootPath "scripts\build\TypeDuckRuntime\input_methods\rime\appearance_themes.json"
+$packageCompatThemePath = Join-Path $backendRootPath "scripts\build\TypeDuckRuntime\input_methods\rime\data\appearance_themes.json"
 if ((Test-Path -LiteralPath $packageThemePath) -or (Test-Path -LiteralPath $packageCompatThemePath)) {
     Assert-True (Test-Path -LiteralPath $packageThemePath) "Packaged canonical appearance theme is missing from input_methods/rime."
-    Assert-True (Test-Path -LiteralPath $packageCompatThemePath) "Packaged compatibility appearance theme is missing from input_methods/rime/data."
+    Assert-True (-not (Test-Path -LiteralPath $packageCompatThemePath)) "Packaged data-path compatibility appearance theme must not exist."
     $packageCanonicalHash = (Get-FileHash -Algorithm SHA256 -LiteralPath $packageThemePath).Hash
-    $packageCompatHash = (Get-FileHash -Algorithm SHA256 -LiteralPath $packageCompatThemePath).Hash
-    Assert-True ($packageCanonicalHash -eq $packageCompatHash) "Packaged compatibility theme file is not byte-identical to the packaged canonical root file."
     Assert-True ($packageCanonicalHash -eq (Get-FileHash -Algorithm SHA256 -LiteralPath $themePath).Hash) "Packaged canonical theme file does not match the backend source theme file."
 }
 
 Write-Host "[PASS] TypeDuck appearance theme schema is role-based, light/dark only, and font data is top-level."
-Write-Host "[PASS] Backend loader and package checks prefer the canonical root theme file."
+Write-Host "[PASS] Backend loader prefers the canonical root theme file and package output keeps only that canonical copy."

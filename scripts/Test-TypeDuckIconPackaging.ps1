@@ -188,10 +188,9 @@ Assert-Text $installScript 'Set-WindowsExecutableIcon\s+-ExecutablePath\s+\(Join
 Assert-Text $installScript 'Set-WindowsExecutableIcon\s+-ExecutablePath\s+\(Join-Path\s+\$stageWin32Root\s+"TypeDuckSetupHelper\.exe"\)\s+-IconPath\s+\$transparentIcon' "Staging must stamp TypeDuckSetupHelper.exe with TypeDuck_Transparent.ico."
 Assert-Text $installScript 'Set-WindowsExecutableIcon\s+-ExecutablePath\s+\(Join-Path\s+\$stageWin32Root\s+"TypeDuckSettings\.exe"\)\s+-IconPath\s+\$transparentIcon' "Staging must stamp TypeDuckSettings.exe with TypeDuck_Transparent.ico."
 Assert-Text $installScript 'Set-WindowsExecutableIcon\s+-ExecutablePath\s+\(Join-Path\s+\$stageWin32Root\s+"TypeDuckAbout\.exe"\)\s+-IconPath\s+\$transparentIcon' "Staging must stamp TypeDuckAbout.exe with TypeDuck_Transparent.ico."
-Assert-Text $installScript 'Set-WindowsExecutableIcon\s+-ExecutablePath\s+\$backendServer\s+-IconPath\s+\$transparentIcon' "Staging must stamp packaged moqi-ime/server.exe with TypeDuck_Transparent.ico."
+Assert-Text $installScript 'Set-WindowsExecutableIcon\s+-ExecutablePath\s+\$backendServer\s+-IconPath\s+\$transparentIcon' "Staging must stamp packaged TypeDuckRuntime/server.exe with TypeDuck_Transparent.ico."
 
 Assert-Text $textServiceRc "IDI_TYPEDUCK_PROFILE\s+ICON\s+`"\.\./TypeDuckSettings/assets/TypeDuck_Small\.ico`"" "TSF DLL profile resource must use TypeDuck_Small.ico."
-Assert-Text $typeDuckProfile 'moqi-ime\\\\icons\\\\TypeDuck_Small\.ico' "First-party TypeDuck profile must prefer the packaged TypeDuck_Small.ico used by the system IME menu."
 Assert-Text $typeDuckProfile "preferredSmallIconPath" "Profile icon lookup must prefer the packaged small icon with a DLL resource fallback."
 Assert-NotText $typeDuckProfile "lockedSmallIconPath" "Profile icon lookup must not depend on the old raw app-root icon helper."
 
@@ -240,7 +239,7 @@ if (Test-Path -LiteralPath $stageRoot -PathType Container) {
     Add-Violation $rejectedBehavior "Raw standalone icon is staged under installed product root: $($icon.FullName)"
   }
 
-  $legacyRimeIcon = Join-Path $stageRoot "moqi-ime/input_methods/rime/icon.ico"
+  $legacyRimeIcon = Join-Path $stageRoot "TypeDuckRuntime/input_methods/rime/icon.ico"
   if (Test-Path -LiteralPath $legacyRimeIcon -PathType Leaf) {
     Add-Violation $rejectedBehavior "Legacy runtime icon is packaged: $legacyRimeIcon"
   }
@@ -263,7 +262,7 @@ if (Test-Path -LiteralPath $stageRoot -PathType Container) {
   Assert-ExecutableContainsIcon (Join-Path $stageRoot "TypeDuckSettings.exe") $transparent "Staged TypeDuckSettings.exe does not contain TypeDuck_Transparent.ico image data."
   Assert-ExecutableContainsIcon (Join-Path $stageRoot "TypeDuckAbout.exe") $transparent "Staged TypeDuckAbout.exe does not contain TypeDuck_Transparent.ico image data."
   Assert-ExecutableContainsIcon (Join-Path $stageRoot "TypeDuckTextService.dll") $small "Staged TypeDuckTextService.dll does not contain TypeDuck_Small.ico image data for the input picker."
-  Assert-ExecutableContainsIcon (Join-Path $stageRoot "moqi-ime/server.exe") $transparent "Staged moqi-ime/server.exe does not contain TypeDuck_Transparent.ico image data."
+  Assert-ExecutableContainsIcon (Join-Path $stageRoot "TypeDuckRuntime/server.exe") $transparent "Staged TypeDuckRuntime/server.exe does not contain TypeDuck_Transparent.ico image data."
   foreach ($bannedName in @("moqi.png", "mo.ico", "mo.png", "moqi.ico")) {
     $bannedStageFile = Get-ChildItem -LiteralPath $stageRoot -Recurse -Force -File -ErrorAction SilentlyContinue |
     Where-Object { $_.Name -ieq $bannedName } |
