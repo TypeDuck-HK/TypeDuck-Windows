@@ -91,7 +91,7 @@ FinishedLabel=TypeDuck 安裝已完成。%nTypeDuck setup has finished.
 WizardUninstalling=解除安裝狀態 / Uninstall Status
 UninstallStatusLabel=請稍候，TypeDuck 正在從此電腦移除。%nPlease wait while TypeDuck is removed from this computer.
 StatusUninstalling=正在解除安裝 TypeDuck / Uninstalling TypeDuck...
-ConfirmUninstall=是否要移除 %1 及其所有元件？%n%nDo you want to remove %1 and all of its components?
+ConfirmUninstall=是否要移除 TypeDuck 及其所有元件？%n%nDo you want to remove TypeDuck and all of its components?
 UninstalledAll=TypeDuck 已解除安裝。如 TypeDuck 仍然出現，請重新啟動電腦。%nTypeDuck is uninstalled. If TypeDuck still appears, restart your computer.
 UninstalledMost=TypeDuck 已解除安裝，但有部分檔案需重新啟動電腦方可自動移除。如 TypeDuck 仍然出現，請重新啟動電腦。%nTypeDuck uninstall is complete, but some files require a computer restart in order to be removed automatically. If TypeDuck still appears, restart your computer.
 UninstalledAndNeedsRestart=TypeDuck 已解除安裝。如 TypeDuck 仍然出現，請重新啟動電腦。%nTypeDuck is uninstalled. If TypeDuck still appears, restart your computer.
@@ -164,13 +164,13 @@ end;
 procedure InitializeWizard;
 begin
   WizardForm.WelcomeLabel1.Caption := Bilingual('歡迎使用 TypeDuck', 'Welcome to TypeDuck');
-  WizardForm.WelcomeLabel1.Top := ScaleY(12);
-  WizardForm.WelcomeLabel1.Height := ScaleY(62);
+  WizardForm.WelcomeLabel1.Top := ScaleY(4);
+  WizardForm.WelcomeLabel1.Height := ScaleY(52);
   WizardForm.WelcomeLabel1.Font.Size := 14;
   WizardForm.WelcomeLabel2.Caption := AboutTextBlock;
-  WizardForm.WelcomeLabel2.Top := ScaleY(70);
+  WizardForm.WelcomeLabel2.Top := ScaleY(58);
   WizardForm.WelcomeLabel2.Height := ScaleY(300);
-  WizardForm.WelcomeLabel2.Font.Size := 10;
+  WizardForm.WelcomeLabel2.Font.Size := 9;
 end;
 
 function InstallFinishedText: String;
@@ -403,14 +403,30 @@ var
   DataCheckBox: TNewCheckBox;
   ContinueButton: TNewButton;
   CancelButton: TNewButton;
+  FormWidth: Integer;
+  ButtonWidth: Integer;
+  ButtonHeight: Integer;
+  ButtonGap: Integer;
+  ButtonTop: Integer;
+  ButtonsLeft: Integer;
 begin
-  Form := CreateCustomForm(ScaleX(470), ScaleY(170), False, True);
+  FormWidth := ScaleX(430);
+  ButtonWidth := ScaleX(116);
+  ButtonHeight := ScaleY(32);
+  ButtonGap := ScaleX(12);
+  ButtonTop := ScaleY(144);
+  ButtonsLeft := (FormWidth - ((ButtonWidth * 2) + ButtonGap)) div 2;
+
+  Form := CreateCustomForm(FormWidth, ScaleY(184), False, True);
   try
-    Form.Caption := Bilingual('TypeDuck 解除安裝選項', 'TypeDuck Uninstall Options');
+    Form.Caption := 'TypeDuck 解除安裝選項 / TypeDuck Uninstall Options';
+    Form.Color := clWhite;
+    Form.Font.Size := 10;
 
     PromptLabel := TNewStaticText.Create(Form);
     PromptLabel.Parent := Form;
-    PromptLabel.SetBounds(ScaleX(16), ScaleY(16), ScaleX(438), ScaleY(58));
+    PromptLabel.Color := clWhite;
+    PromptLabel.SetBounds(ScaleX(16), ScaleY(18), FormWidth - ScaleX(32), ScaleY(68));
     PromptLabel.AutoSize := False;
     PromptLabel.WordWrap := True;
     PromptLabel.Caption := Bilingual(
@@ -419,23 +435,22 @@ begin
 
     DataCheckBox := TNewCheckBox.Create(Form);
     DataCheckBox.Parent := Form;
-    DataCheckBox.SetBounds(ScaleX(16), ScaleY(82), ScaleX(438), ScaleY(42));
-    DataCheckBox.Caption := Bilingual(
-      '同時刪除 TypeDuck 個人資料',
-      'Also delete TypeDuck user data');
+    DataCheckBox.Color := clWhite;
+    DataCheckBox.SetBounds(ScaleX(16), ScaleY(100), FormWidth - ScaleX(32), ScaleY(32));
+    DataCheckBox.Caption := '同時刪除 TypeDuck 個人資料 / Also delete TypeDuck user data';
     DataCheckBox.Checked := False;
 
     ContinueButton := TNewButton.Create(Form);
     ContinueButton.Parent := Form;
-    ContinueButton.SetBounds(ScaleX(254), ScaleY(132), ScaleX(96), ScaleY(30));
-    ContinueButton.Caption := Bilingual('繼續', 'Continue');
+    ContinueButton.SetBounds(ButtonsLeft, ButtonTop, ButtonWidth, ButtonHeight);
+    ContinueButton.Caption := '繼續 Continue';
     ContinueButton.Default := True;
     ContinueButton.ModalResult := mrOk;
 
     CancelButton := TNewButton.Create(Form);
     CancelButton.Parent := Form;
-    CancelButton.SetBounds(ScaleX(358), ScaleY(132), ScaleX(96), ScaleY(30));
-    CancelButton.Caption := Bilingual('取消', 'Cancel');
+    CancelButton.SetBounds(ButtonsLeft + ButtonWidth + ButtonGap, ButtonTop, ButtonWidth, ButtonHeight);
+    CancelButton.Caption := '取消 Cancel';
     CancelButton.Cancel := True;
     CancelButton.ModalResult := mrCancel;
 

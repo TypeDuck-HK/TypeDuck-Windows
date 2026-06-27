@@ -189,7 +189,10 @@ function Assert-InstallerScript {
         "Type:\s*filesandordirs;\s*Name:\s*`"\{localappdata\}\\TypeDuckIME`"",
         "Type:\s*filesandordirs;\s*Name:\s*`"\{userappdata\}\\TypeDuckIME`";\s*Check:\s*ShouldDeleteUserDataOnUninstall",
         "PromptDeleteUserDataOnUninstall",
-        "CreateCustomForm\(ScaleX\(470\),\s*ScaleY\(170\),\s*False,\s*True\)",
+        "FormWidth := ScaleX\(430\)",
+        "Form := CreateCustomForm\(FormWidth,\s*ScaleY\(184\),\s*False,\s*True\)",
+        "Form\.Color := clWhite",
+        "ButtonsLeft := \(FormWidth - \(\(ButtonWidth \* 2\) \+ ButtonGap\)\) div 2",
         "DeleteUserDataOnUninstall := False"
     ) "Uninstall cleanup must cover TypeDuck registration, startup, task, install files, and make roaming user-data deletion opt-in."
     Assert-NotMatch $Failures $Iss "TSetupForm\.Create" `
