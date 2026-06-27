@@ -17,13 +17,13 @@
   CMake x64 build directory (default: RepoRoot\build-vs64).
 
 .PARAMETER MoqiImeSource
-  Legacy Moqi scaffold compatibility: path to the transitional moqi-ime runtime tree to copy as backend.
+  Legacy parameter compatibility: path to the TypeDuckRuntime tree to copy as backend.
   Default detection order:
-    1. sibling ..\moqi-ime\scripts\build\moqi-ime
+    1. sibling ..\moqi-ime\scripts\build\TypeDuckRuntime
     2. sibling ..\moqi-ime
 
 .PARAMETER SkipMoqiImeCopy
-  If set, do not include the transitional backend tree in the staged installer payload.
+  If set, do not include the TypeDuck runtime tree in the staged installer payload.
 
 .PARAMETER StageDir
   Installer staging directory (default: RepoRoot\installer\stage).
@@ -262,7 +262,7 @@ function Resolve-MoqiImeSource {
     }
 
     $candidates = @(
-        (Join-Path $RepoRoot "..\moqi-ime\scripts\build\moqi-ime"),
+        (Join-Path $RepoRoot "..\moqi-ime\scripts\build\TypeDuckRuntime"),
         (Join-Path $RepoRoot "..\moqi-ime")
     )
 
@@ -273,10 +273,33 @@ function Resolve-MoqiImeSource {
         }
     }
 
-    return [System.IO.Path]::GetFullPath((Join-Path $RepoRoot "..\moqi-ime\scripts\build\moqi-ime"))
+    return [System.IO.Path]::GetFullPath((Join-Path $RepoRoot "..\moqi-ime\scripts\build\TypeDuckRuntime"))
 }
 
-function Copy-MoqiImeRuntime {
+function Test-BannedRuntimePath {
+    param(
+        [string] $RelativePath,
+        [bool] $IsDirectory
+    )
+
+    $normalized = ($RelativePath -replace '/', '\').TrimStart('\')
+    $lower = $normalized.ToLowerInvariant()
+
+    if ($lower -match '(^|\\)\.git(\\|$)') { return $true }
+    if ($lower -match '^input_methods\\(fcitx5|moqi)(\\|$)') { return $true }
+    if ($lower -match '^input_methods\\rime\\(android|cloudclipboard|templates|test|icons)(\\|$)') { return $true }
+    if ($lower -match '^icons(\\|$)') { return $true }
+    if (-not $IsDirectory) {
+        if ($lower.EndsWith('.go')) { return $true }
+        if ($lower -match '^input_methods\\rime\\(icon\.ico|ai_config\.json|ime\.json)$') { return $true }
+        if ($lower -match '^input_methods\\rime\\data\\appearance_themes\.json$') { return $true }
+        if ($lower -match '^backends(\.|$).*\.json$') { return $true }
+    }
+
+    return $false
+}
+
+function Copy-TypeDuckRuntime {
     param(
         [string] $SourceRoot,
         [string] $DestinationRoot
@@ -284,13 +307,16 @@ function Copy-MoqiImeRuntime {
 
     $serverExe = Join-Path $SourceRoot "server.exe"
     if (-not (Test-Path -LiteralPath $serverExe)) {
-        throw "moqi-ime server.exe not found: $serverExe"
+        throw "TypeDuckRuntime server.exe not found: $serverExe"
     }
 
     New-Item -ItemType Directory -Path $DestinationRoot -Force | Out-Null
 
     $directories = Get-ChildItem -Path $SourceRoot -Recurse -Force -Directory |
-    Where-Object { $_.FullName -notmatch '[\\/]\.git(?:[\\/]|$)' }
+    Where-Object {
+        $relativePath = $_.FullName.Substring($SourceRoot.Length).TrimStart('\', '/')
+        -not (Test-BannedRuntimePath -RelativePath $relativePath -IsDirectory $true)
+    }
     foreach ($directory in $directories) {
         $relativePath = $directory.FullName.Substring($SourceRoot.Length).TrimStart('\', '/')
         $targetDir = Join-Path $DestinationRoot $relativePath
@@ -308,9 +334,7 @@ function Copy-MoqiImeRuntime {
     )
     $files = Get-ChildItem -Path $SourceRoot -Recurse -Force -File | Where-Object {
         $relativePath = $_.FullName.Substring($SourceRoot.Length).TrimStart('\', '/')
-        $_.Extension -ne ".go" -and
-        $_.FullName -notmatch '[\\/]\.git(?:[\\/]|$)' -and
-        $relativePath -notmatch '^input_methods[\\/]rime[\\/]icon\.ico$' -and
+        (-not (Test-BannedRuntimePath -RelativePath $relativePath -IsDirectory $false)) -and
         ($bannedLegacyIconNames -notcontains $_.Name.ToLowerInvariant())
     }
     foreach ($file in $files) {
@@ -356,11 +380,6 @@ New-Item -ItemType Directory -Path $stageX64Root -Force | Out-Null
 New-Item -ItemType Directory -Path $stageWin32X64Root -Force | Out-Null
 New-Item -ItemType Directory -Path $stageResourceRoot -Force | Out-Null
 
-$backends = Join-Path $RepoRoot "backends.json"
-if (-not (Test-Path -LiteralPath $backends)) {
-    throw "Missing backends.json at $backends"
-}
-Copy-Item -LiteralPath $backends -Destination (Join-Path $stageWin32Root "backends.json") -Force
 Copy-IfExists -Source $aboutBanner -Destination (Join-Path $stageResourceRoot "About_Banner.bmp")
 Copy-IfExists -Source $creditLogos -Destination (Join-Path $stageResourceRoot "Credit_Logos.bmp")
 Copy-IfExists -Source $installerBitmap -Destination (Join-Path $stageResourceRoot "Installer.bmp")
@@ -428,15 +447,15 @@ Copy-IfExists -Source $dll64 -Destination (Join-Path $stageWin32X64Root "TypeDuc
 
 if (-not $SkipMoqiImeCopy) {
     if (-not (Test-Path -LiteralPath $MoqiImeSource)) {
-        throw "Moqi IME source not found: $MoqiImeSource (use -MoqiImeSource or -SkipMoqiImeCopy)."
+        throw "TypeDuck runtime source not found: $MoqiImeSource (use -MoqiImeSource or -SkipMoqiImeCopy)."
     }
-    $imeDest = Join-Path $stageWin32Root "moqi-ime"
-    Copy-MoqiImeRuntime -SourceRoot $MoqiImeSource -DestinationRoot $imeDest
-    $backendServer = Join-Path $imeDest "server.exe"
+    $runtimeDest = Join-Path $stageWin32Root "TypeDuckRuntime"
+    Copy-TypeDuckRuntime -SourceRoot $MoqiImeSource -DestinationRoot $runtimeDest
+    $backendServer = Join-Path $runtimeDest "server.exe"
     Set-WindowsExecutableIcon -ExecutablePath $backendServer -IconPath $transparentIcon
 }
 else {
-    Write-Warning "Skipped copying transitional moqi-ime backend; ensure the final TypeDuck installer payload is sufficient for registration testing."
+    Write-Warning "Skipped copying TypeDuckRuntime; ensure the final TypeDuck installer payload is sufficient for registration testing."
 }
 
 $installerScript = Join-Path $RepoRoot "installer\build-installer.ps1"

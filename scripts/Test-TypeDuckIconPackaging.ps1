@@ -198,7 +198,7 @@ Assert-Text $installer "SetupIconFile=\.\.\\TypeDuckSettings\\assets\\TypeDuck\.
 Assert-Text $installer "UninstallDisplayIcon=\{uninstallexe\}" "Uninstaller display icon must come from the compiled uninstaller icon, not a raw app-root TypeDuck.ico file."
 Assert-Text $packageScript "scripts\\install\.ps1" "All-in package must continue routing final packaging through scripts/install.ps1."
 Assert-Text $backendBuildScript '\$ServerIcon\s*=\s*Join-Path\s+\$IconsDir\s+"TypeDuck_Transparent\.ico"' "Backend server.exe must be stamped from TypeDuck_Transparent.ico."
-Assert-Text $backendBuildScript 'Remove-IfExists\s+-Path\s+\(Join-Path\s+\$PackageRimeDir\s+"icon\.ico"\)' "Backend package build must remove the legacy input_methods/rime/icon.ico runtime file."
+Assert-Text $backendBuildScript 'Remove-(IfExists|PackagePath)\s+-Path\s+\(Join-Path\s+\$PackageRimeDir\s+"icon\.ico"\)' "Backend package build must remove the legacy input_methods/rime/icon.ico runtime file."
 Assert-NotText $backendBuildScript '\$ServerIcon\s*=\s*Join-Path\s+\$IconsDir\s+"mo\.ico"' "Backend server.exe must not use the legacy Moqi executable icon."
 
 Assert-Ordered $about @(

@@ -1,16 +1,16 @@
 #Requires -Version 5.1
 <#
 .SYNOPSIS
-  One-click build for the transitional backend, TypeDuck Windows IME binaries, and installer package.
+  One-click build for the TypeDuck runtime, TypeDuck Windows IME binaries, and installer package.
 
-  Legacy Moqi scaffold compatibility: this script can still build/copy the
-  sibling moqi-ime adapter until the TypeDuck runtime package is finalized.
+  Legacy parameter names are preserved for callers that still pass the sibling
+  backend checkout path.
 
 .PARAMETER RepoRoot
   Root of this TypeDuck Windows IME scaffold checkout (defaults to the parent directory of this script).
 
 .PARAMETER MoqiImeRoot
-  Root of sibling transitional moqi-ime repository (defaults to RepoRoot\..\moqi-ime).
+  Root of sibling backend repository (defaults to RepoRoot\..\moqi-ime).
 
 .PARAMETER Configuration
   Build configuration for moqi-im-windows (default: Release).
@@ -69,7 +69,7 @@ $MoqiImeRoot = [System.IO.Path]::GetFullPath($MoqiImeRoot)
 $moqiImeBuildScript = Join-Path $MoqiImeRoot "scripts\build.ps1"
 $windowsBuildScript = Join-Path $RepoRoot "scripts\build.ps1"
 $windowsInstallScript = Join-Path $RepoRoot "scripts\install.ps1"
-$moqiImeRuntimeDir = Join-Path $MoqiImeRoot "scripts\build\moqi-ime"
+$moqiImeRuntimeDir = Join-Path $MoqiImeRoot "scripts\build\TypeDuckRuntime"
 
 if (-not $ProtobufRoot) {
     $candidatePaths = @()
@@ -121,7 +121,7 @@ foreach ($path in @($moqiImeBuildScript, $windowsBuildScript, $windowsInstallScr
     }
 }
 
-Write-Host "== Step 1/3: Build transitional moqi-ime runtime for TypeDuck packaging =="
+Write-Host "== Step 1/3: Build TypeDuck runtime package =="
 Invoke-Step -FilePath "pwsh" -ArgumentList @(
     "-NoProfile",
     "-ExecutionPolicy", "Bypass",
@@ -130,7 +130,7 @@ Invoke-Step -FilePath "pwsh" -ArgumentList @(
 ) -WorkingDirectory $MoqiImeRoot
 
 if (-not (Test-Path -LiteralPath (Join-Path $moqiImeRuntimeDir "server.exe"))) {
-    throw "moqi-ime runtime was not produced: $moqiImeRuntimeDir"
+    throw "TypeDuckRuntime was not produced: $moqiImeRuntimeDir"
 }
 
 Write-Host "== Step 2/3: Build TypeDuck Windows IME binaries =="
