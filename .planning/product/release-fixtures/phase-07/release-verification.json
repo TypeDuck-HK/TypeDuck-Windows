@@ -1,0 +1,252 @@
+{
+  "schema": "typeduck-release-verification-v1",
+  "phase": "07-compatibility-and-release-verification",
+  "generated_at_utc": "2026-06-27T12:25:09Z",
+  "status": "automated-ready-human-pending",
+  "requirements_covered": [
+    "VER-03",
+    "VER-04",
+    "VER-05",
+    "VER-06"
+  ],
+  "installer": {
+    "status": "manual-vm-pending",
+    "artifact_path": "installer\\dist\\typeduck-windows-ime-setup.exe",
+    "case_ids": [
+      "clean-install",
+      "reinstall-upgrade",
+      "uninstall-cleanup",
+      "reboot-required-registration",
+      "bitness-win32-x64",
+      "artifact-name-and-sha256"
+    ],
+    "template_path": ".planning\\product\\release-fixtures\\phase-07\\install-verification-template.json",
+    "notes_path": ".planning\\product\\release-fixtures\\phase-07\\install-verification-notes.md",
+    "no_host_install": true
+  },
+  "guard_commands": [
+    {
+      "id": "phase6-privacy-security-cleanup",
+      "command": "pwsh -NoProfile -ExecutionPolicy Bypass -File scripts\\Test-TypeDuckPrivacySecurityCleanup.ps1 -RepoRoot . -BackendRoot D:\\VSProjects\\moqi-ime -Strict",
+      "status": "passed",
+      "exit_code": 0,
+      "started_at_utc": "2026-06-27T12:25:00Z",
+      "completed_at_utc": "2026-06-27T12:25:02Z",
+      "artifact_path": ".planning\\product\\privacy-security\\phase-06-guard-results.json"
+    },
+    {
+      "id": "phase6-backend-diagnostics",
+      "command": "pwsh -NoProfile -ExecutionPolicy Bypass -File scripts\\Test-TypeDuckBackendDiagnostics.ps1 -RepoRoot . -BackendRoot D:\\VSProjects\\moqi-ime -Strict",
+      "status": "passed",
+      "exit_code": 0,
+      "started_at_utc": "2026-06-27T12:25:02Z",
+      "completed_at_utc": "2026-06-27T12:25:02Z",
+      "artifact_path": ".planning\\product\\privacy-security\\phase-06-guard-results.json"
+    },
+    {
+      "id": "release-install-evidence",
+      "command": "pwsh -NoProfile -ExecutionPolicy Bypass -File scripts\\Test-TypeDuckReleaseInstallEvidence.ps1 -RepoRoot . -Strict",
+      "status": "passed",
+      "exit_code": 0,
+      "started_at_utc": "2026-06-27T12:25:02Z",
+      "completed_at_utc": "2026-06-27T12:25:03Z",
+      "artifact_path": ".planning\\product\\release-fixtures\\phase-07\\install-verification-template.json"
+    },
+    {
+      "id": "protocol-recovery-probe",
+      "command": "pwsh -NoProfile -ExecutionPolicy Bypass -File scripts\\Invoke-TypeDuckProtocolRecoveryProbe.ps1 -RepoRoot . -BuildDir build-vs32 -EvidencePath .planning\\product\\release-fixtures\\phase-07\\protocol-recovery-results.json -Strict",
+      "status": "passed",
+      "exit_code": 0,
+      "started_at_utc": "2026-06-27T12:25:03Z",
+      "completed_at_utc": "2026-06-27T12:25:08Z",
+      "artifact_path": ".planning\\product\\release-fixtures\\phase-07\\protocol-recovery-results.json"
+    },
+    {
+      "id": "protocol-recovery-guard",
+      "command": "pwsh -NoProfile -ExecutionPolicy Bypass -File scripts\\Test-TypeDuckProtocolRecovery.ps1 -RepoRoot . -Strict",
+      "status": "passed",
+      "exit_code": 0,
+      "started_at_utc": "2026-06-27T12:25:08Z",
+      "completed_at_utc": "2026-06-27T12:25:08Z",
+      "artifact_path": ".planning\\product\\release-fixtures\\phase-07\\protocol-recovery-cases.json"
+    },
+    {
+      "id": "interactive-checklist-guard",
+      "command": "pwsh -NoProfile -ExecutionPolicy Bypass -File scripts\\Test-TypeDuckInteractiveReleaseChecklist.ps1 -RepoRoot . -Strict",
+      "status": "passed",
+      "exit_code": 0,
+      "started_at_utc": "2026-06-27T12:25:08Z",
+      "completed_at_utc": "2026-06-27T12:25:09Z",
+      "artifact_path": ".planning\\product\\release-fixtures\\phase-07\\host-app-dpi-notes.md"
+    },
+    {
+      "id": "release-artifact-guard",
+      "command": "pwsh -NoProfile -ExecutionPolicy Bypass -File scripts\\Test-TypeDuckReleaseArtifacts.ps1 -RepoRoot . -InstallerPath installer\\dist\\typeduck-windows-ime-setup.exe -Strict",
+      "status": "passed",
+      "exit_code": 0,
+      "started_at_utc": "2026-06-27T12:25:09Z",
+      "completed_at_utc": "2026-06-27T12:25:09Z",
+      "artifact_path": "installer\\dist\\typeduck-windows-ime-setup.exe"
+    }
+  ],
+  "automated_checks": [
+    {
+      "id": "phase6-privacy-security-cleanup",
+      "status": "passed",
+      "exit_code": 0,
+      "artifact_path": ".planning\\product\\privacy-security\\phase-06-guard-results.json"
+    },
+    {
+      "id": "phase6-backend-diagnostics",
+      "status": "passed",
+      "exit_code": 0,
+      "artifact_path": ".planning\\product\\privacy-security\\phase-06-guard-results.json"
+    },
+    {
+      "id": "release-install-evidence",
+      "status": "passed",
+      "exit_code": 0,
+      "artifact_path": ".planning\\product\\release-fixtures\\phase-07\\install-verification-template.json"
+    },
+    {
+      "id": "protocol-recovery-probe",
+      "status": "passed",
+      "exit_code": 0,
+      "artifact_path": ".planning\\product\\release-fixtures\\phase-07\\protocol-recovery-results.json"
+    },
+    {
+      "id": "protocol-recovery-guard",
+      "status": "passed",
+      "exit_code": 0,
+      "artifact_path": ".planning\\product\\release-fixtures\\phase-07\\protocol-recovery-cases.json"
+    },
+    {
+      "id": "interactive-checklist-guard",
+      "status": "passed",
+      "exit_code": 0,
+      "artifact_path": ".planning\\product\\release-fixtures\\phase-07\\host-app-dpi-notes.md"
+    },
+    {
+      "id": "release-artifact-guard",
+      "status": "passed",
+      "exit_code": 0,
+      "artifact_path": "installer\\dist\\typeduck-windows-ime-setup.exe"
+    }
+  ],
+  "vm_evidence": {
+    "status": "manual-vm-pending",
+    "install_lifecycle": "pending-human-guest-run",
+    "install_notes_path": ".planning\\product\\release-fixtures\\phase-07\\install-verification-notes.md",
+    "host_app_dpi_notes_path": ".planning\\product\\release-fixtures\\phase-07\\host-app-dpi-notes.md",
+    "screenshot_capture_required": false
+  },
+  "interactive_human_checks": {
+    "status": "pending-human",
+    "direct_human_judgement": true,
+    "no_screenshots_required": true,
+    "checklist_path": ".planning\\product\\release-fixtures\\phase-07\\interactive-vm-checklist.md",
+    "notes_path": ".planning\\product\\release-fixtures\\phase-07\\host-app-dpi-notes.md"
+  },
+  "protocol_recovery": {
+    "status": "executed",
+    "cases_path": ".planning\\product\\release-fixtures\\phase-07\\protocol-recovery-cases.json",
+    "results_path": ".planning\\product\\release-fixtures\\phase-07\\protocol-recovery-results.json",
+    "case_ids": [
+      "normal-cantonese-frames",
+      "raw-lookup-payload",
+      "reverse-lookup-if-supported",
+      "malformed-frame",
+      "oversized-frame",
+      "invalid-protobuf",
+      "backend-timeout",
+      "backend-restart-crash",
+      "stale-mismatched-sequence",
+      "settings-update-redeploy-failure",
+      "bounded-degraded-state"
+    ],
+    "executed_results": [
+      {
+        "case_id": "backend-timeout",
+        "executed": true,
+        "status": "passed",
+        "recoverable": true,
+        "observed_error_code": "TYPEDUCK_ERROR_BACKEND_TIMEOUT",
+        "observed_health": "TYPEDUCK_HEALTH_RESTARTING"
+      },
+      {
+        "case_id": "backend-restart-crash",
+        "executed": true,
+        "status": "passed",
+        "recoverable": true,
+        "observed_error_code": "TYPEDUCK_ERROR_BACKEND_RESTART",
+        "observed_health": "TYPEDUCK_HEALTH_OK"
+      },
+      {
+        "case_id": "settings-update-redeploy-failure",
+        "executed": true,
+        "status": "passed",
+        "recoverable": true,
+        "observed_error_code": "TYPEDUCK_ERROR_SETTINGS_APPLY_FAILED",
+        "observed_health": "TYPEDUCK_HEALTH_DEGRADED"
+      },
+      {
+        "case_id": "bounded-degraded-state",
+        "executed": true,
+        "status": "passed",
+        "recoverable": true,
+        "observed_error_code": "TYPEDUCK_ERROR_PAYLOAD_TOO_LARGE",
+        "observed_health": "TYPEDUCK_HEALTH_DEGRADED"
+      }
+    ]
+  },
+  "host_apps": {
+    "status": "pending-human",
+    "targets": [
+      "Notepad",
+      "Browser text field",
+      "Office or Office-like app",
+      "Terminal/console context",
+      "Elevated app",
+      "Awkward TSF host available in VM"
+    ],
+    "notes_path": ".planning\\product\\release-fixtures\\phase-07\\host-app-dpi-notes.md"
+  },
+  "dpi": {
+    "status": "pending-human",
+    "scales": [
+      "100%",
+      "140% if available",
+      "175%",
+      "200%"
+    ],
+    "notes_path": ".planning\\product\\release-fixtures\\phase-07\\host-app-dpi-notes.md",
+    "multi_monitor_disposition": "Phase 5 already human verified multi-monitor behavior; Phase 7 does not require new multi-monitor screenshot automation."
+  },
+  "release_artifacts": {
+    "status": "verified",
+    "installer_name": "typeduck-windows-ime-setup.exe",
+    "installer_path": "installer\\dist\\typeduck-windows-ime-setup.exe",
+    "sha256": "CDD1028B630A74AE21D095A76843581FA8D794A5250FF00CD69F78D3F447AF0E",
+    "byte_size": 21075640,
+    "generated_at_utc": "2026-06-27T10:19:58Z",
+    "hash_command": "Get-FileHash -Algorithm SHA256 -LiteralPath installer\\dist\\typeduck-windows-ime-setup.exe",
+    "case_ids": [
+      "artifact-name-and-sha256"
+    ],
+    "workflow_frontend_repo": "TypeDuck-Windows",
+    "workflow_backend_repo": "TypeDuck-Windows-backend",
+    "schema_repository": "https://github.com/TypeDuck-HK/schema",
+    "schema_branch": "aap2-alpha",
+    "rime_deployer_build_folder": "TypeDuck-Windows-backend\\input_methods\\rime\\build",
+    "standalone_schema_artifact": false
+  },
+  "limitations": {
+    "interactive_vm": "Host-app and DPI judgement remains the final human-controlled step.",
+    "screenshot_boundary": "No screenshot files, manifests, capture scripts, or automated image comparison are required.",
+    "research": "Excluded; phase planning used skip-research because existing GSD documentation was sufficient."
+  },
+  "rerun_after_repairs": {
+    "rule": "If a release-blocking product bug is found, route the smallest focused repair, rerun the affected verification, then rerun scripts\\Invoke-TypeDuckReleaseVerification.ps1 and scripts\\Test-TypeDuckReleaseVerification.ps1.",
+    "product_change_boundary": "Phase 7 adds tests, scripts, documentation, and evidence only unless a release-blocking failure is detected."
+  }
+}

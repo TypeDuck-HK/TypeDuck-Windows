@@ -19,7 +19,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 4: TypeDuck Protocol and Typing MVP** - TSF, launcher, and engine communicate with a bounded TypeDuck protocol that supports real Cantonese typing behavior. (completed 2026-06-24)
 - [x] **Phase 5: Candidate, Dictionary, Settings, and About UI Parity** - Users see and configure the TypeDuck Web alpha experience in native Windows surfaces. (completed 2026-06-26 by human verification and explicit screenshot-evidence divergence)
 - [x] **Phase 6: Privacy, Security, and Scaffold Cleanup** - Off-scope Moqi/fcitx/cloud/AI behavior is removed or gated, diagnostics are safe, and visible strings are audited. (completed 2026-06-27)
-- [ ] **Phase 7: Compatibility and Release Verification** - The v1 installer and IME are verified across Windows install paths, host apps, DPI, bitness, protocol recovery, and release artifacts.
+- [ ] **Phase 7: Compatibility and Release Verification** - The v1 installer and IME are verified across Windows install paths, host apps, DPI, bitness, protocol recovery, and release artifacts. (automated evidence complete; human VM host-app/DPI judgement pending)
 
 ## Phase Details
 
@@ -256,7 +256,7 @@ Plans:
 - [x] 07-01-PLAN.md — Build repeatable non-screenshot install/reinstall/uninstall/reboot and artifact-hash evidence.
 - [x] 07-02-PLAN.md — Add protocol recovery matrix, guard, and focused C++ tests for release verification.
 - [x] 07-03-PLAN.md — Create interactive host-app and DPI human-verification notes without screenshot automation.
-- [ ] 07-04-PLAN.md — Aggregate installer, protocol, host-app/DPI, cleanup, and artifact evidence into the final release manifest.
+- [x] 07-04-PLAN.md — Aggregate installer, protocol, host-app/DPI, cleanup, and artifact evidence into the final release manifest. (automated-ready-human-pending)
 
 ## Progress
 
@@ -271,4 +271,4 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7
 | 4. TypeDuck Protocol and Typing MVP | 4/4 | Complete | 2026-06-24 |
 | 5. Candidate, Dictionary, Settings, and About UI Parity | 15/15 | Complete | 2026-06-26 |
 | 6. Privacy, Security, and Scaffold Cleanup | 7/7 | Complete    | 2026-06-27 |
-| 7. Compatibility and Release Verification | 3/4 | In Progress|  |
+| 7. Compatibility and Release Verification | 4/4 | Human checkpoint pending|  |

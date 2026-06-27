@@ -4,17 +4,17 @@ milestone: v1.0
 milestone_name: milestone
 current_phase: 07
 current_phase_name: Compatibility and Release Verification
-status: executing
-stopped_at: Completed 07-02-PLAN.md
-last_updated: "2026-06-27T12:17:59.157Z"
+status: human_checkpoint_pending
+stopped_at: Completed 07-04 automated aggregate; waiting for interactive VM host-app/DPI judgement
+last_updated: "2026-06-27T12:25:09Z"
 last_activity: 2026-06-27
-last_activity_desc: Completed 07-02-PLAN.md
+last_activity_desc: Completed 07-04 automated aggregate release verification
 progress:
   total_phases: 7
   completed_phases: 6
   total_plans: 38
-  completed_plans: 37
-  percent: 86
+  completed_plans: 38
+  percent: 95
 ---
 
 # Project State
@@ -29,9 +29,9 @@ See: .planning/PROJECT.md (updated 2026-06-26)
 ## Current Position
 
 Phase: 07 — Compatibility and Release Verification
-Plan: 3 of 4 (next incomplete plan)
-Status: Phase 7 in progress
-Last activity: 2026-06-27 — Completed 07-02-PLAN.md
+Plan: 4 of 4 scripted plans complete; final human checkpoint pending
+Status: Phase 7 automated evidence complete, waiting for interactive VM host-app/DPI judgement
+Last activity: 2026-06-27 — Completed 07-04 aggregate release verification
 
 Progress: [██████████] 95% of planned milestone plans
 
@@ -54,8 +54,8 @@ Progress: [██████████] 95% of planned milestone plans
 
 **Recent Trend:**
 
-- Last 5 plans: P01 5 min, P02 17 min, P03 10 min, P04 55 min, P05 13 min
-- Trend: Phase 7 release verification is in progress with install evidence, protocol recovery, and host-app/DPI notes complete; aggregate release verification remains.
+- Last 5 plans: Phase 06 P06 10 min, Phase 07 P01 11 min, Phase 07 P02 13 min, Phase 07 P03 checklist scaffold, Phase 07 P04 aggregate evidence
+- Trend: Phase 7 scripted release verification is complete; final host-app/DPI judgement is interactive and screenshot-free.
 
 *Updated after each plan completion*
 | Phase 01 P01 | 5 min | 2 tasks | 2 files |
@@ -93,6 +93,8 @@ Progress: [██████████] 95% of planned milestone plans
 | Phase 06-privacy-security-and-scaffold-cleanup P06 | 10 min | 3 tasks | 5 files |
 | Phase 07 P01 | 11 min | 2 tasks | 4 files |
 | Phase 07 P02 | 13 min | 3 tasks | 7 files |
+| Phase 07 P03 | checklist scaffold | human checkpoint | 4 files |
+| Phase 07 P04 | aggregate | 3 tasks | release evidence |
 
 ## Accumulated Context
 
@@ -194,7 +196,7 @@ Recent decisions affecting current work:
 
 ### Pending Todos
 
-Phase 7 is in progress; 07-04 aggregate release verification remains.
+Phase 7 scripted work is complete. Remaining: the user performs direct VM host-app and DPI judgement using `.planning/product/release-fixtures/phase-07/interactive-vm-checklist.md` and records results in `.planning/product/release-fixtures/phase-07/host-app-dpi-notes.md`.
 
 ### Blockers/Concerns
 
@@ -215,6 +217,6 @@ Phase 7 is in progress; 07-04 aggregate release verification remains.
 
 ## Session Continuity
 
-Last session: 2026-06-27T12:17:59.148Z
-Stopped at: Completed 07-02-PLAN.md
+Last session: 2026-06-27T12:25:09Z
+Stopped at: Completed 07-04 automated aggregate; waiting for interactive VM host-app/DPI judgement
 Resume file: None
