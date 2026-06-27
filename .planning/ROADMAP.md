@@ -250,11 +250,11 @@ Plans:
   3. Developer can verify protocol and engine behavior with golden tests for normal input, dictionary lookup, reverse lookup, malformed frames, timeouts, and backend restart.
   4. Developer can produce a v1 installer artifact with TypeDuck naming and documented verification evidence.
 
-**Plans**: 2/4 plans executed
+**Plans**: 3/4 plans executed
 Plans:
 
 - [x] 07-01-PLAN.md — Build repeatable non-screenshot install/reinstall/uninstall/reboot and artifact-hash evidence.
-- [ ] 07-02-PLAN.md — Add protocol recovery matrix, guard, and focused C++ tests for release verification.
+- [x] 07-02-PLAN.md — Add protocol recovery matrix, guard, and focused C++ tests for release verification.
 - [x] 07-03-PLAN.md — Create interactive host-app and DPI human-verification notes without screenshot automation.
 - [ ] 07-04-PLAN.md — Aggregate installer, protocol, host-app/DPI, cleanup, and artifact evidence into the final release manifest.
 
@@ -271,4 +271,4 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7
 | 4. TypeDuck Protocol and Typing MVP | 4/4 | Complete | 2026-06-24 |
 | 5. Candidate, Dictionary, Settings, and About UI Parity | 15/15 | Complete | 2026-06-26 |
 | 6. Privacy, Security, and Scaffold Cleanup | 7/7 | Complete    | 2026-06-27 |
-| 7. Compatibility and Release Verification | 2/4 | In Progress|  |
+| 7. Compatibility and Release Verification | 3/4 | In Progress|  |
