@@ -212,7 +212,7 @@ Plans:
 
 **Verification Environment**: Mixed. Static/code tests are expected for audits, parser bounds, logging defaults, and removed handlers. Add targeted Windows VM smoke evidence for installed-path privacy, launcher/runtime behavior, config-tool removal, pipe behavior, and absence of legacy feature surfaces after installation.
 
-**Plans**: 6 plans
+**Plans**: 7 plans
 Plans:
 **Wave 1**
 
@@ -226,6 +226,7 @@ Plans:
 **Wave 3** *(blocked on Wave 2 runtime discovery)*
 
 - [ ] 06-04-PLAN.md — Move diagnostics to TypeDuck-owned paths and remove off-scope cloud/AI/fcitx frontend paths.
+- [ ] 06-07-PLAN.md — Translate/remove backend diagnostics and remove or gate stale backend feature surfaces.
 
 **Wave 4** *(blocked on Wave 3 diagnostics/off-scope cleanup)*
 

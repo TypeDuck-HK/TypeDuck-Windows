@@ -48,6 +48,7 @@ This phase removes or hardens remaining TypeDuck v1 product risks before release
 - **D-24:** Guard scripts should understand the v1 allowance for source identifiers. They should not fail merely because internal source paths, class names, variables, or target names still contain Moqi where those names are not user-visible.
 - **D-25:** Phase 6 may include static/code tests for logs, banned strings, frame bounds, config-tool removal, cloud/AI/fcitx handler removal, installer language resource removal, and safe process cleanup.
 - **D-26:** Do not treat the number of files modified as a warning or blocker. Bulk modification is expected in Phase 6, especially when changing log lines and product-owned paths.
+- **D-27:** Most Simplified Chinese log/debug/printf lines are expected to live in the sibling `D:\VSProjects\moqi-ime` backend. Backend diagnostics are first-class Phase 6 scope, and bulk backend edits are expected when translating diagnostics to English and removing stale runtime/package paths.
 
 ### the agent's Discretion
 The planner may choose the exact implementation split and guard script structure. It should keep user-visible cleanup, installer-owned localization, diagnostics/privacy, and IPC hardening in Phase 6; leave release-matrix execution to Phase 7; and avoid broad internal renames that do not change shipped behavior.
@@ -93,7 +94,7 @@ The planner may choose the exact implementation split and guard script structure
 - `MoqiTextService/TsfLog.cpp` and `libIME2/src/DebugLogConfig.cpp` - TSF/debug log path and opt-in behavior.
 - `proto/ProtoFraming.h` and `proto/moqi.proto` - Frame-size limits, malformed-frame behavior, and unused scaffold methods.
 - `scripts/install.ps1`, `scripts/_all_in_package.ps1`, `.github/workflows/release.yml`, `.github/workflows/nightly.yml` - Staging, artifact names, and package-time guard integration.
-- `D:\VSProjects\moqi-ime` - Sibling runtime repo whose packaged payload must stop exposing stale/off-scope paths and files listed in Specific Ideas.
+- `D:\VSProjects\moqi-ime` - Sibling runtime repo whose packaged payload must stop exposing stale/off-scope paths and files listed in Specific Ideas; also likely owns most Simplified Chinese backend log/debug/printf strings that must become English-only diagnostics.
 
 </canonical_refs>
 
@@ -131,6 +132,7 @@ The planner may choose the exact implementation split and guard script structure
 - Do not implement executable/service identity checks that reject past or future TypeDuck versions.
 - Default user-facing failures should be non-technical; technical details go to logs unless typing cannot recover or tampering is suspected.
 - Phase 6 owns non-test product code changes for cleanup/security. Phase 7 should mostly verify unless it uncovers a release-blocking failure.
+- Most Simplified Chinese log/debug/printf strings are likely in `D:\VSProjects\moqi-ime`; planning must include backend source scans and edits rather than treating diagnostics cleanup as only a Windows frontend task.
 - Rename the installed backend payload folder from `%PROGRAMFILES(x86)%\TypeDuckIME\moqi-ime` to a TypeDuck-owned name.
 - Move `%LOCALAPPDATA%\MoqiIM` to `%LOCALAPPDATA%\TypeDuckIME`, same location family as `TypeDuckPreferences.json`.
 - Rename `%APPDATA%\Moqi` to `%APPDATA%\TypeDuckIME`.

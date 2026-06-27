@@ -31,7 +31,7 @@
 | Minimal path rename only | Rename log paths but leave message text mostly untouched. | |
 
 **User's choice:** Logs must be entirely in English with no Simplified Chinese log/debug/printf lines. Be conservative when deciding whether diagnostics privacy requires removing/redacting a log line; this does not apply to translating non-English log lines to English.
-**Notes:** Runtime diagnostics should use TypeDuck-owned paths and avoid raw typed content by default.
+**Notes:** Runtime diagnostics should use TypeDuck-owned paths and avoid raw typed content by default. Most Simplified Chinese log/debug/printf lines are expected to live in the sibling `D:\VSProjects\moqi-ime` backend, so backend source edits are first-class Phase 6 scope and bulk backend edits are expected.
 
 ---
 
@@ -78,6 +78,7 @@
 
 - Choose the exact implementation split across product cleanup, log/path changes, IPC/frame hardening, installer localization, and guards.
 - Keep non-test product code changes in Phase 6.
+- Enrich planning patterns with backend-side diagnostics and stale runtime/package cleanup before revising the plans.
 
 ## Deferred Ideas
 
