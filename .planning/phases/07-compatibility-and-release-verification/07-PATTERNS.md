@@ -197,20 +197,22 @@ if (Test-Path -LiteralPath $installerPath) {
 **Planner notes:**
 - Add SHA-256 evidence for `installer/dist/typeduck-windows-ime-setup.exe`.
 - Check final artifact names in `.github/workflows/release.yml` and `.github/workflows/nightly.yml`; current workflow lines 90-102 and 89-99 still reference `moqi-im-windows-*` and `moqi-im-windows-setup.exe`.
+- Check workflow repository/path names: frontend should be `TypeDuck-Windows`; backend should be `TypeDuck-Windows-backend`.
+- Check schema source: workflows must not use `rime-frost`; they should use `https://github.com/TypeDuck-HK/schema` on temporary branch `aap2-alpha`, run those files through the Rime deployer to create the runtime `build` folder, and avoid uploading schema checkout/build output as a standalone artifact.
 
 ### `scripts/Test-TypeDuckPhase06Cleanup.ps1` (test/script, transform + batch)
 
 **Analog:** `scripts/Test-TypeDuckInstallerSkeleton.ps1` and `.planning/product/TYPEDUCK-BANNED-SURFACES.md`
 
-**Narrow legacy allowlist pattern** (`scripts/Test-TypeDuckInstallerSkeleton.ps1` lines 104-118):
+**Narrow scaffold allowlist pattern** (`scripts/Test-TypeDuckInstallerSkeleton.ps1` lines 104-118):
 ```powershell
 $legacyMatches = [regex]::Matches($Content, "Moqi|墨奇|MoqiIM|MoqiLauncher|MoqiTextService|moqi-im-windows|ChineseSimplified|chinesesimplified")
 if ($legacyMatches.Count -eq 0) {
     return
 }
 
-if ($Content -notmatch "Legacy Moqi migration cleanup|Moqi scaffold compatibility|transition-only|legacy scaffold") {
-    Add-Failure $Failures "$SurfaceName contains legacy Moqi/Simplified markers without an explicit narrow migration or scaffold-compatibility note."
+if ($Content -notmatch "Moqi scaffold compatibility|non-visible source identifier|legacy scaffold") {
+    Add-Failure $Failures "$SurfaceName contains legacy Moqi/Simplified markers without an explicit non-visible scaffold-compatibility note."
 }
 ```
 
@@ -548,19 +550,19 @@ Use a disposable Windows VM or equivalent checkpointed machine. Do not install t
 - name: Upload workflow artifact
   uses: actions/upload-artifact@v4
   with:
-    name: moqi-im-windows-release-${{ github.event.release.tag_name || github.sha }}
-    path: ${{ github.workspace }}/moqi-im-windows/installer/dist/moqi-im-windows-setup.exe
+    name: typeduck-windows-ime-release-${{ github.event.release.tag_name || github.sha }}
+    path: ${{ github.workspace }}/TypeDuck-Windows/installer/dist/typeduck-windows-ime-setup.exe
 
-$assetPath = Join-Path $PWD "installer\dist\moqi-im-windows-setup.exe"
+$assetPath = Join-Path $PWD "installer\dist\typeduck-windows-ime-setup.exe"
 gh release upload $tag $assetPath --clobber
 ```
 
 **Current stale nightly workflow anti-pattern** (`.github/workflows/nightly.yml` lines 86-99):
 ```yaml
-name: moqi-im-windows-nightly-${{ github.sha }}
-path: ${{ github.workspace }}/moqi-im-windows/installer/dist/moqi-im-windows-setup.exe
+name: typeduck-windows-ime-nightly-${{ github.sha }}
+path: ${{ github.workspace }}/TypeDuck-Windows/installer/dist/typeduck-windows-ime-setup.exe
 ...
-$assetPath = Join-Path $PWD "installer\dist\moqi-im-windows-setup.exe"
+$assetPath = Join-Path $PWD "installer\dist\typeduck-windows-ime-setup.exe"
 ```
 
 **Planner notes:**
@@ -736,11 +738,10 @@ end;
 if CurUninstallStep = usPostUninstall then
 begin
   RegPurgeTypeDuckResiduals;
-  RegPurgeLegacyMoqiResiduals;
 end;
 ```
 
-Apply to installer flow evidence and uninstall cleanup checks.
+Apply to installer flow evidence and uninstall cleanup checks. Phase 6/7 must not purge Legacy Moqi residuals; TypeDuck and Moqi should remain separately installed and usable.
 
 ## Anti-Patterns
 
@@ -786,7 +787,8 @@ Phase 6 explicitly prefers compatibility-tolerant checks. Do not add signature/v
 - Include repeatable non-screenshot verification for clean install, reinstall/upgrade, uninstall, reboot-required registration, typing smoke, host-app coverage, bitness, protocol recovery, final artifact naming, and SHA-256 hashes.
 - Protocol/recovery coverage must include normal Cantonese input frames, dictionary lookup payload preservation/parsing expectations, reverse lookup where supported, malformed/oversized frames, invalid protobuf, timeouts, backend restart/crash, stale/mismatched sequence, settings update/redeploy failure, and bounded degraded states.
 - Host-app and DPI judgements stay interactive. Required DPI list: 100%, 140% if available, 175%, 200%.
-- Release workflow paths currently still reference Moqi artifact names. Planner should include a release artifact name/hash check and likely workflow/script corrections unless Phase 6 has already fixed them before execution.
+- Release workflow paths currently still reference Moqi artifact and repo names. Planner should include a release artifact name/hash check and workflow/script corrections unless Phase 6 has already fixed them before execution.
+- Workflow schema packaging must use `TypeDuck-HK/schema` on `aap2-alpha`, run the checked-out schema through the Rime deployer to produce the runtime `build` folder, reject `rime-frost`, and avoid a separate schema artifact.
 
 ## Metadata
 

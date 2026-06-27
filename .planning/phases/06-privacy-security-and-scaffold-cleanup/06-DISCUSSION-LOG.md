@@ -80,6 +80,18 @@
 - Keep non-test product code changes in Phase 6.
 - Enrich planning patterns with backend-side diagnostics and stale runtime/package cleanup before revising the plans.
 
+---
+
+## Addendum: Installer Coexistence and Restart Text
+
+**Date:** 2026-06-27
+
+**User correction:** TypeDuck must not touch Legacy Moqi. TypeDuck and Moqi should be able to be installed and used as separate products.
+
+**Resulting decisions:** Installer cleanup is TypeDuck-owned only; no `%APPDATA%\Moqi` file deletion, migration, process killing, registry cleanup, scheduled-task cleanup, install-folder cleanup, or repair behavior. `MyAppPublisher` should be `香港教育大學 The Education University of Hong Kong`. Final installer/uninstaller restart guidance belongs on the last page, not a popup, and should be plain enough for first-time computer users: no TSF/DLL/COM/internal terms, suggest reopening apps first, and reboot only when necessary.
+
+**Plan impact:** Replace the previous exact Legacy Moqi cleanup target language in Phase 6 plans with coexistence guards. Check whether any non-installer plan still touches Legacy Moqi.
+
 ## Deferred Ideas
 
 - Screenshot-capture automation is excluded from release verification.

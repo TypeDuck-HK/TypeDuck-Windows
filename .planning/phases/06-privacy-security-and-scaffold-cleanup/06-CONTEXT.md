@@ -37,11 +37,13 @@ This phase removes or hardens remaining TypeDuck v1 product risks before release
 
 ### Installer and Process Cleanup
 - **D-17:** Process termination during install/uninstall is acceptable. The installer should automate known TypeDuck process cleanup rather than asking the user to manually close backend/launcher surfaces.
-- **D-18:** Process cleanup should be TypeDuck-specific and installer-owned. Avoid broad legacy process kills except for documented, allowlisted migration cleanup that is necessary to prevent duplicate/broken scaffold residues.
-- **D-19:** Installer cleanup should remove TypeDuck-owned system DLL registrations, startup entries, scheduled tasks, install files, and conflicting scaffold residue without purging unrelated user state.
+- **D-18:** Process cleanup should be TypeDuck-specific and installer-owned. Do not kill Legacy Moqi processes or use broad legacy process cleanup; TypeDuck and Moqi must be able to be installed and used as separate products.
+- **D-19:** Installer cleanup should remove only TypeDuck-owned registrations, startup entries, scheduled tasks, install files, and TypeDuck-owned state. Do not delete, migrate, unregister, repair, or otherwise touch Legacy Moqi files, folders, registry keys, scheduled tasks, or running processes.
 - **D-20:** The installer first page should show `Installer.bmp` and the exact same bilingual text used in the Phase 5 About dialog.
 - **D-21:** The Start Menu folder should be `TypeDuckIME`.
 - **D-22:** Start Menu entries should include TypeDuck Settings worded `輸入法設定 IME Settings`, About worded `關於 About TypeDuck…`, and Uninstall worded `解除安裝 Uninstall`.
+- **D-28:** `MyAppPublisher` should be `香港教育大學 The Education University of Hong Kong`.
+- **D-29:** Final installer/uninstaller restart guidance belongs on the last installer page, not in a separate popup. Word it for first-time computer users: do not mention TSF, DLL, COM, registration internals, or other technical terms. Suggest closing/reopening apps first and restarting Windows only if typing does not work or the installer says it is needed; do not urge rebooting as the default.
 
 ### Guard Coverage
 - **D-23:** Add automated or scripted checks that fail on visible Moqi, fcitx, WebDAV/cloud clipboard, AI, Simplified-only installer strings, Simplified Chinese log/debug/printf strings, and legacy installer language resources in user-facing/product surfaces.
@@ -134,14 +136,15 @@ The planner may choose the exact implementation split and guard script structure
 - Phase 6 owns non-test product code changes for cleanup/security. Phase 7 should mostly verify unless it uncovers a release-blocking failure.
 - Most Simplified Chinese log/debug/printf strings are likely in `D:\VSProjects\moqi-ime`; planning must include backend source scans and edits rather than treating diagnostics cleanup as only a Windows frontend task.
 - Rename the installed backend payload folder from `%PROGRAMFILES(x86)%\TypeDuckIME\moqi-ime` to a TypeDuck-owned name.
-- Move `%LOCALAPPDATA%\MoqiIM` to `%LOCALAPPDATA%\TypeDuckIME`, same location family as `TypeDuckPreferences.json`.
-- Rename `%APPDATA%\Moqi` to `%APPDATA%\TypeDuckIME`.
-- Rename `%LOCALAPPDATA%\MoqiIM\MoqiLauncher.json` to `TypeDuckLauncher.json`.
-- Rename log files under `%LOCALAPPDATA%\MoqiIM\Log`; changing the `APP` variable may be sufficient if the current logger derives names from it.
+- Use `%LOCALAPPDATA%\TypeDuckIME` for TypeDuck-owned local state, same location family as `TypeDuckPreferences.json`. Do not move or migrate an existing `%LOCALAPPDATA%\MoqiIM` folder.
+- Use `%APPDATA%\TypeDuckIME` for any TypeDuck-owned roaming path. Do not rename, migrate, delete, or otherwise touch an existing `%APPDATA%\Moqi` folder; Legacy Moqi must remain separately usable.
+- `%APPDATA%\TypeDuckIME` must not contain `ai_config.json`, `appearance_config.json`, `moqi_auto_pair_symbols.json`, or `moqi_custom_phrase.json`.
+- New TypeDuck launcher config should be `%LOCALAPPDATA%\TypeDuckIME\TypeDuckLauncher.json`; do not rename an existing `%LOCALAPPDATA%\MoqiIM\MoqiLauncher.json` in place.
+- New TypeDuck logs should live under `%LOCALAPPDATA%\TypeDuckIME\Log`; changing the `APP` variable may be sufficient if the current logger derives names from it. Do not move existing `%LOCALAPPDATA%\MoqiIM\Log` files.
 - Delete from the shipped TypeDuck runtime: `%PROGRAMFILES(x86)%\TypeDuckIME\moqi-ime\input_methods\rime\android`, `cloudclipboard`, `templates`, `test`, `ai_config.json`, and `ime.json`.
 - Delete `%PROGRAMFILES(x86)%\TypeDuckIME\moqi-ime\input_methods\rime\data\appearance_themes.json`; use `%PROGRAMFILES(x86)%\TypeDuckIME\moqi-ime\input_methods\rime\appearance_themes.json` instead.
 - Delete `%PROGRAMFILES(x86)%\TypeDuckIME\backends.json` and inline the needed backend content in code.
-- Delete legacy roaming files `%APPDATA%\Moqi\ai_config.json`, `appearance_config.json`, `moqi_auto_pair_symbols.json`, and `moqi_custom_phrase.json` from the TypeDuck v1 path/migration surface.
+- Do not delete Legacy Moqi roaming files such as `%APPDATA%\Moqi\ai_config.json`, `appearance_config.json`, `moqi_auto_pair_symbols.json`, or `moqi_custom_phrase.json`; they are Moqi-owned and outside TypeDuck cleanup.
 - Combine or remove installed icon folders `%PROGRAMFILES(x86)%\TypeDuckIME\moqi-ime\icons` and `%PROGRAMFILES(x86)%\TypeDuckIME\moqi-ime\input_methods\rime\icons`; if they are not exposed except through app icons, removal may be preferable.
 - Installer first page should use `Installer.bmp` and the exact About text from Phase 5 context.
 - Start Menu folder and entries should be: `TypeDuckIME`, `輸入法設定 IME Settings`, `關於 About TypeDuck…`, and `解除安裝 Uninstall`.

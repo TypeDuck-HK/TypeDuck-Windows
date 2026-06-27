@@ -64,7 +64,7 @@
 **Identity and language pattern** (lines 5-50):
 ```iss
 #define MyAppName "TypeDuck 粵語輸入法 / TypeDuck Cantonese IME"
-#define MyAppPublisher "TypeDuck"
+#define MyAppPublisher "香港教育大學 The Education University of Hong Kong"
 DefaultDirName={autopf32}\TypeDuckIME
 OutputBaseFilename=typeduck-windows-ime-setup
 SetupIconFile=..\TypeDuckSettings\assets\TypeDuck.ico
@@ -74,7 +74,7 @@ Name: "english"; MessagesFile: "compiler:Default.isl"
 Name: "chinesetraditional"; MessagesFile: "compiler:Default.isl"
 ```
 
-**Planner note:** Phase 6 must replace the current `compiler:Default.isl` fallback for `chinesetraditional` with product-owned bilingual installer messages, and remove the Simplified submodule instead of using official Simplified chrome.
+**Planner note:** Phase 6 must replace the current `compiler:Default.isl` fallback for `chinesetraditional` with product-owned bilingual installer messages, set the publisher to `香港教育大學 The Education University of Hong Kong`, and remove the Simplified submodule instead of using official Simplified chrome.
 
 **Start Menu and install launch pattern** (lines 55-64):
 ```iss
@@ -114,7 +114,9 @@ begin
 end;
 ```
 
-**Use this for:** automated TypeDuck-specific process cleanup. Extend only with allowlisted TypeDuck process names, not broad legacy kills.
+**Use this for:** automated TypeDuck-specific process cleanup. Extend only with allowlisted TypeDuck process names. Do not kill, inspect, or repair Legacy Moqi processes; TypeDuck and Moqi must coexist.
+
+**Final-page restart guidance note:** installer/uninstaller restart wording should be placed on the final wizard page rather than a popup. It must be plain bilingual user text with no `TSF`, `DLL`, `COM`, registration, or internal implementation terms. Suggest reopening apps first and restarting Windows only when necessary.
 
 ### `.gitmodules` and `installer/Inno-Setup-Chinese-Simplified-Translation/**` (config/vendor removal, batch)
 
@@ -850,7 +852,7 @@ if (Test-Path -LiteralPath $stageRoot -PathType Container) {
 }
 ```
 
-**Use this for:** fail if staged/packaged payload contains `input_methods\rime\android`, `cloudclipboard`, `templates`, `test`, `ai_config.json`, `ime.json`, duplicate icon folders, `input_methods\rime\data\appearance_themes.json`, `backends.json`, or legacy roaming filenames.
+**Use this for:** fail if staged/packaged TypeDuck payload contains `input_methods\rime\android`, `cloudclipboard`, `templates`, `test`, `ai_config.json`, `ime.json`, duplicate icon folders, `input_methods\rime\data\appearance_themes.json`, or `backends.json`. Do not treat Legacy Moqi roaming filenames as TypeDuck package cleanup targets.
 
 ### `D:\VSProjects\moqi-ime\scripts\build.ps1` (sibling packaging script, file-I/O + batch)
 
@@ -1227,7 +1229,7 @@ dataDirPath_ = getAppLocalDir() + L"\\MoqiIM";
 return std::wstring(localAppData) + L"\\MoqiIM\\MoqiLauncher.json";
 ```
 
-**Planner action:** replace with `TypeDuckIME` and `TypeDuckLauncher.json`, and add a migration/cleanup plan for old `%APPDATA%\Moqi` files without purging unrelated user state.
+**Planner action:** replace with `TypeDuckIME` and `TypeDuckLauncher.json`. Do not add migration or cleanup for old `%APPDATA%\Moqi` files; Legacy Moqi remains a separate product and TypeDuck must not touch its state.
 
 ### Frame Bounds and Malformed Payloads
 **Source:** `proto/ProtoFraming.h` lines 11-21, `MoqLauncher/PipeClient.cpp` lines 180-219, `MoqLauncher/BackendServer.cpp` lines 343-364  

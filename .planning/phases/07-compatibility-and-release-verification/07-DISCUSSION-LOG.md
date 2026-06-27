@@ -66,6 +66,16 @@
 - Choose exact release checklist and verification script split.
 - Decide which recovery cases are automated versus documented/manual, while respecting the no-screenshot-automation boundary.
 
+---
+
+## Addendum: Workflow Repository and Schema Source
+
+**Date:** 2026-06-27
+
+**User correction:** GitHub workflows should use frontend repo `TypeDuck-Windows` and backend repo `TypeDuck-Windows-backend`. Do not use `rime-frost`; use `https://github.com/TypeDuck-HK/schema` on the temporary `aap2-alpha` branch. Run the schema through the Rime deployer to generate the runtime build folder, and do not publish schema as a separate artifact.
+
+**Plan impact:** Phase 7 release artifact/workflow guards must check repository names, schema source/branch, Rime deployer build-folder generation, absence of `rime-frost`, and absence of standalone schema artifacts.
+
 ## Deferred Ideas
 
 - Automated screenshot capture/comparison.
