@@ -1,16 +1,14 @@
 ; TypeDuck Windows IME - Inno Setup 6 wizard (x64 only).
 ; Build: install Inno Setup 6, then run build-installer.ps1 -StageDir <stage root>.
-; Source filename is kept as MoqiTsf.iss during the scaffold transition.
+; Moqi scaffold compatibility: source filename is kept as MoqiTsf.iss during the transition.
 
 #define MyAppName "TypeDuck 粵語輸入法 / TypeDuck Cantonese IME"
 #define MyAppPublisher "香港教育大學 The Education University of Hong Kong"
 #define MyAppURL "https://www.typeduck.hk/"
 #define MyAppId "{{9B52CF20-1C5D-4C74-9F5D-9E66377C8F37}"
 #define ImeClsid "{{7D92985A-BC53-47B5-A5CC-6E47F86B9D18}}"
-#define LegacyMoqiImeClsid "{{8F204C91-2D7A-4B3E-9E1F-6A5C0D8B2E7F}}"
 #define ImeClsidCode "{7D92985A-BC53-47B5-A5CC-6E47F86B9D18}"
 #define ImeProfileGuidCode "{C6E8F5DF-6504-44F9-B7CF-17A195373A83}"
-#define LegacyMoqiImeClsidCode "{8F204C91-2D7A-4B3E-9E1F-6A5C0D8B2E7F}"
 
 #ifndef StageDir
   #define StageDir "..\stage"
@@ -29,7 +27,7 @@ DisableProgramGroupPage=yes
 PrivilegesRequired=admin
 ArchitecturesAllowed=x64
 ArchitecturesInstallIn64BitMode=x64
-CloseApplications=yes
+CloseApplications=no
 RestartApplications=no
 WizardStyle=modern
 OutputDir=dist
@@ -72,22 +70,26 @@ Root: HKCU; Subkey: "Software\Microsoft\Windows\CurrentVersion\Run"; \
 
 [InstallDelete]
 Type: filesandordirs; Name: "{app}\x64"
-; Legacy Moqi migration cleanup: remove only scaffold payload folders that conflict
-; with this TypeDuck install directory during the transition.
+; TypeDuck-owned runtime cleanup inside this app directory only.
 Type: filesandordirs; Name: "{app}\moqi-ime"
+
+[UninstallDelete]
+Type: filesandordirs; Name: "{app}"
+Type: filesandordirs; Name: "{localappdata}\TypeDuckIME"
+Type: filesandordirs; Name: "{userappdata}\TypeDuckIME"
 
 [Code]
 const
   SetupHelperExitSuccess = 0;
   SetupHelperExitRestartRequired = 2;
   TypeDuckReregisterTaskName = 'TypeDuckIME-ReRegisterTSF';
+  TypeDuckTextServiceDllName = 'TypeDuckTextService.dll';
   StartupSubkey = 'Software\Microsoft\Windows\CurrentVersion\Run';
 
 var
   HelperInstallSucceeded: Boolean;
   HelperInstallNeedsRestart: Boolean;
   HelperUninstallNeedsRestart: Boolean;
-  HadExistingInstall: Boolean;
 
 function Bilingual(const Zh: String; const En: String): String;
 begin
@@ -113,16 +115,24 @@ begin
   WizardForm.WelcomeLabel2.Caption := AboutTextBlock;
 end;
 
-function ExistingImeInstallationPresent: Boolean;
+function InstallFinishedText: String;
 begin
-  Result :=
-    FileExists(ExpandConstant('{app}\TypeDuckLauncher.exe')) or
-    FileExists(ExpandConstant('{syswow64}\TypeDuckTextService.dll')) or
-    FileExists(ExpandConstant('{sys}\TypeDuckTextService.dll')) or
-    RegKeyExists(HKEY_LOCAL_MACHINE, 'SOFTWARE\Microsoft\CTF\TIP\{#ImeClsidCode}') or
-    RegKeyExists(HKEY_CURRENT_USER, 'Software\Microsoft\CTF\TIP\{#ImeClsidCode}') or
-    RegKeyExists(HKEY_CLASSES_ROOT, 'CLSID\{#ImeClsidCode}') or
-    RegKeyExists(HKEY_CURRENT_USER, 'Software\Classes\CLSID\{#ImeClsidCode}');
+  Result := Bilingual(
+    'TypeDuck 已安裝完成。請先關閉並重新開啟想使用 TypeDuck 的應用程式；如仍未能輸入，或此安裝器提示需要重啟，才重新啟動 Windows。',
+    'TypeDuck is installed. First close and reopen the apps where you want to type with TypeDuck; restart Windows only if typing still does not work, or if this installer says a restart is needed.');
+end;
+
+function UninstallFinishedText: String;
+begin
+  Result := Bilingual(
+    'TypeDuck 已解除安裝。請先關閉並重新開啟仍顯示 TypeDuck 的應用程式；如仍見到 TypeDuck，或此解除安裝器提示需要重啟，才重新啟動 Windows。',
+    'TypeDuck is uninstalled. First close and reopen any apps that still show TypeDuck; restart Windows only if TypeDuck still appears, or if this uninstaller says a restart is needed.');
+end;
+
+procedure CurPageChanged(CurPageID: Integer);
+begin
+  if CurPageID = wpFinished then
+    WizardForm.FinishedLabel.Caption := InstallFinishedText;
 end;
 
 procedure DeleteRegistryTreeIfPresent(const RootKey: Integer; const Subkey: String);
@@ -148,16 +158,6 @@ begin
   RegDeleteValue(HKEY_CURRENT_USER, StartupSubkey, 'TypeDuckLauncher');
 end;
 
-procedure RegPurgeLegacyMoqiResiduals;
-begin
-  // Legacy Moqi migration cleanup: allowlist only this scaffold CLSID/TIP/startup residue.
-  DeleteRegistryTreeIfPresent(HKEY_CLASSES_ROOT, 'CLSID\{#LegacyMoqiImeClsidCode}');
-  DeleteRegistryTreeIfPresent(HKEY_LOCAL_MACHINE, 'SOFTWARE\Microsoft\CTF\TIP\{#LegacyMoqiImeClsidCode}');
-  DeleteRegistryTreeIfPresent(HKEY_CURRENT_USER, 'Software\Microsoft\CTF\TIP\{#LegacyMoqiImeClsidCode}');
-  DeleteRegistryTreeIfPresent(HKEY_CURRENT_USER, 'Software\Classes\CLSID\{#LegacyMoqiImeClsidCode}');
-  RegDeleteValue(HKEY_CURRENT_USER, StartupSubkey, 'MoqiLauncher');
-end;
-
 procedure TryKillProcessImage(const ImageName: String);
 var
   R: Integer;
@@ -166,9 +166,27 @@ begin
     '', SW_HIDE, ewWaitUntilTerminated, R);
 end;
 
+procedure TryKillProcessInAppDir(const ProcessName: String);
+var
+  R: Integer;
+  Command: String;
+begin
+  Command :=
+    '-NoProfile -ExecutionPolicy Bypass -Command "' +
+    '$app = ''' + ExpandConstant('{app}') + '''; ' +
+    'Get-Process -Name ''' + ProcessName + ''' -ErrorAction SilentlyContinue | ' +
+    'Where-Object { $_.Path -and $_.Path.StartsWith($app, [System.StringComparison]::OrdinalIgnoreCase) } | ' +
+    'Stop-Process -Force"';
+  Exec(ExpandConstant('{sys}\WindowsPowerShell\v1.0\powershell.exe'),
+    Command, '', SW_HIDE, ewWaitUntilTerminated, R);
+end;
+
 procedure StopTypeDuckProcesses;
 begin
   TryKillProcessImage('TypeDuckLauncher.exe');
+  TryKillProcessImage('TypeDuckSettings.exe');
+  TryKillProcessImage('TypeDuckAbout.exe');
+  TryKillProcessInAppDir('server');
 end;
 
 procedure DeleteTypeDuckReregisterTask;
@@ -231,7 +249,6 @@ var
 begin
   if CurStep = ssInstall then
   begin
-    HadExistingInstall := ExistingImeInstallationPresent;
     StopTypeDuckProcesses;
     DeleteTypeDuckReregisterTask;
   end;
@@ -244,22 +261,11 @@ begin
     if ResultCode = SetupHelperExitSuccess then
     begin
       HelperInstallSucceeded := True;
-      if HadExistingInstall then
-        SuppressibleMsgBox(
-          Bilingual(
-            '偵測到覆蓋安裝。如果目前 Windows 工作階段仍有舊 TSF 實例，TypeDuck 可能需要登出或重啟 Windows 後才會即時恢復正常輸入。',
-            'An existing install was detected. If the current Windows session still has an old TSF instance loaded, TypeDuck may need sign-out or Windows restart before input resumes immediately.'),
-          mbInformation, MB_OK, IDOK);
     end
     else if ResultCode = SetupHelperExitRestartRequired then
     begin
       HelperInstallSucceeded := True;
       HelperInstallNeedsRestart := True;
-      SuppressibleMsgBox(
-        Bilingual(
-          '安裝器已更新 TypeDuck 應用程式檔案，但 TSF DLL 仍被 Windows 使用。請在安裝完成後盡快重啟 Windows；系統重啟後會自動完成 TSF 註冊。',
-          'The installer updated TypeDuck application files, but the TSF DLL is still in use by Windows. Please restart Windows after setup; TSF registration will finish automatically after reboot.'),
-        mbInformation, MB_OK, IDOK);
     end;
     if (ResultCode <> SetupHelperExitSuccess) and
        (ResultCode <> SetupHelperExitRestartRequired) then
@@ -310,12 +316,6 @@ begin
   if CurUninstallStep = usPostUninstall then
   begin
     RegPurgeTypeDuckResiduals;
-    RegPurgeLegacyMoqiResiduals;
-    if HelperUninstallNeedsRestart then
-      SuppressibleMsgBox(
-        Bilingual(
-          '部分 TypeDuck TSF DLL 已安排在 Windows 重啟後刪除。請盡快重啟 Windows，以完成解除安裝清理。',
-          'Some TypeDuck TSF DLL files were scheduled for deletion after Windows restarts. Please restart Windows soon to finish uninstall cleanup.'),
-        mbInformation, MB_OK, IDOK);
+    UninstallProgressForm.StatusLabel.Caption := UninstallFinishedText;
   end;
 end;

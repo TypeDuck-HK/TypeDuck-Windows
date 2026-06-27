@@ -131,6 +131,7 @@ function Assert-InstallerScript {
         "MyAppPublisher\s+`"香港教育大學 The Education University of Hong Kong`"",
         "AppPublisher=\{#MyAppPublisher\}",
         "DefaultDirName=\{autopf32\}\\TypeDuckIME",
+        "CloseApplications=no",
         "OutputBaseFilename=typeduck-windows-ime-setup",
         "WizardImageFile=\.\.\\TypeDuckSettings\\resources\\Installer\.bmp",
         "TypeDuckLauncher\.exe",
@@ -158,7 +159,40 @@ function Assert-InstallerScript {
     Assert-NotMatch $Failures $Iss "MoqiLauncher\.exe|(?<!TypeDuck)SetupHelper\.exe|MoqiTextService\.dll|DefaultDirName=\{autopf32\}\\MoqiIM|OutputBaseFilename=moqi-im-windows-setup" `
         "Installer-controlled payload, install directory, and artifact names must not use Moqi deployed names."
     Assert-Match $Failures $Iss "RegPurgeTypeDuckResiduals|PurgeTypeDuck" "Uninstall must purge TypeDuck COM/TSF registry residue."
-    Assert-Match $Failures $Iss "RegPurgeLegacyMoqiResiduals|Legacy Moqi migration cleanup" "Any Moqi cleanup must be explicit and narrow."
+    Assert-NotMatch $Failures $Iss "RegPurgeLegacyMoqiResiduals|LegacyMoqi|MoqiLauncher|\\MoqiIM|\\Moqi\\|Software\\Classes\\CLSID\\\{8F204C91|SOFTWARE\\Microsoft\\CTF\\TIP\\\{8F204C91" `
+        "Installer cleanup must not delete, unregister, repair, or otherwise touch Legacy Moqi state."
+    Assert-NotMatch $Failures $Iss "CloseApplications=yes|AppMutex|CloseApplicationsFilter|RestartApplications=yes" `
+        "Installer must not rely on Inno running-application close/restart pages for TypeDuck process cleanup."
+    Assert-AllMatch $Failures $Iss @(
+        "TryKillProcessImage\('TypeDuckLauncher\.exe'\)",
+        "TryKillProcessImage\('TypeDuckSettings\.exe'\)",
+        "TryKillProcessImage\('TypeDuckAbout\.exe'\)",
+        "TryKillProcessInAppDir\('server'\)"
+    ) "StopTypeDuckProcesses must be allowlisted to TypeDuck executables and the app-dir-scoped runtime server."
+    Assert-AllMatch $Failures $Iss @(
+        "RunSetupHelper\(BuildUninstallSetupHelperParameters\('/u'\)",
+        "RegDeleteValue\(HKEY_CURRENT_USER, StartupSubkey, 'TypeDuckLauncher'\)",
+        "DeleteTypeDuckReregisterTask",
+        "Type:\s*filesandordirs;\s*Name:\s*`"\{app\}`"",
+        "Type:\s*filesandordirs;\s*Name:\s*`"\{localappdata\}\\TypeDuckIME`"",
+        "Type:\s*filesandordirs;\s*Name:\s*`"\{userappdata\}\\TypeDuckIME`""
+    ) "Uninstall cleanup must cover TypeDuck registration, startup, task, install files, and TypeDuck-owned state."
+    Assert-AllMatch $Failures $Iss @(
+        "CurPageChanged\(CurPageID: Integer\)",
+        "WizardForm\.FinishedLabel\.Caption := InstallFinishedText",
+        "UninstallProgressForm\.StatusLabel\.Caption := UninstallFinishedText",
+        "close and reopen the apps",
+        "restart Windows only if"
+    ) "Restart guidance must be rendered on final installer/uninstaller surfaces with reopen-apps-first wording."
+    Assert-NotMatch $Failures $Iss "SuppressibleMsgBox\(" `
+        "Restart guidance must not use a separate popup."
+
+    $finalGuidanceMatches = [regex]::Matches($Iss, "(?s)function (InstallFinishedText|UninstallFinishedText): String;.*?end;")
+    foreach ($match in $finalGuidanceMatches) {
+        if ($match.Value -match "\b(TSF|DLL|COM|registration)\b|註冊") {
+            Add-Failure $Failures "Final-page restart guidance must not expose TSF, DLL, COM, registration, or comparable technical terms."
+        }
+    }
 }
 
 function Assert-SetupHelper {
