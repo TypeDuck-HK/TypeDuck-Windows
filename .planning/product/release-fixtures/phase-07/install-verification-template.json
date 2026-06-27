@@ -1,0 +1,185 @@
+{
+  "phase": "07-compatibility-and-release-verification",
+  "plan": "07-01",
+  "schemaVersion": 1,
+  "evidenceRoot": ".planning/product/release-fixtures/phase-07",
+  "runner": "scripts/Invoke-TypeDuckVmInstallerVerification.ps1",
+  "defaultMode": "ManualChecklistOnly",
+  "hostSafety": {
+    "installerRunsOnHost": false,
+    "guestCredentialsPersisted": false,
+    "allowedAutomation": "Hyper-V or equivalent guest commands only"
+  },
+  "installer": {
+    "expectedFileName": "typeduck-windows-ime-setup.exe",
+    "requiredFields": [
+      "path",
+      "sha256",
+      "byteSize",
+      "generatedAtUtc",
+      "hashCommand"
+    ]
+  },
+  "requiredScenarioIds": [
+    "clean-install",
+    "reinstall-upgrade",
+    "uninstall-cleanup",
+    "reboot-required-registration",
+    "bitness-win32-x64",
+    "artifact-name-and-sha256"
+  ],
+  "requiredEvidence": [
+    "command-outcomes",
+    "install-log-path",
+    "uninstall-log-path",
+    "sha256",
+    "byte-size",
+    "registry-state",
+    "file-state",
+    "scheduled-task-state",
+    "human-notes-path",
+    "vm-checkpoint",
+    "windows-version"
+  ],
+  "expected": {
+    "clsid": "{7D92985A-BC53-47B5-A5CC-6E47F86B9D18}",
+    "profileGuid": "{C6E8F5DF-6504-44F9-B7CF-17A195373A83}",
+    "locale": "zh-HK",
+    "displayName": "TypeDuck 粵語輸入法 / TypeDuck Cantonese IME",
+    "win32Dll": "C:\\Windows\\SysWOW64\\TypeDuckTextService.dll",
+    "x64Dll": "C:\\Windows\\System32\\TypeDuckTextService.dll",
+    "scheduledTask": "TypeDuckIME-ReRegisterTSF",
+    "startupValue": "TypeDuckLauncher"
+  },
+  "evidenceCases": [
+    {
+      "id": "clean-install",
+      "commands": [
+        "install",
+        "after-install-snapshot"
+      ],
+      "logs": [
+        "install.log"
+      ],
+      "registry": [
+        "ctf-tip",
+        "clsid",
+        "startup"
+      ],
+      "files": [
+        "install-directory",
+        "win32-dll",
+        "x64-dll"
+      ],
+      "scheduledTask": "absent-or-restart-required-only",
+      "notesPath": ".planning/product/release-fixtures/phase-07/install-verification-notes.md"
+    },
+    {
+      "id": "reinstall-upgrade",
+      "commands": [
+        "install",
+        "second-install",
+        "after-reinstall-snapshot"
+      ],
+      "logs": [
+        "install.log",
+        "reinstall.log"
+      ],
+      "registry": [
+        "ctf-tip",
+        "clsid",
+        "startup"
+      ],
+      "files": [
+        "win32-dll",
+        "x64-dll"
+      ],
+      "scheduledTask": "absent-or-restart-required-only",
+      "notesPath": ".planning/product/release-fixtures/phase-07/install-verification-notes.md"
+    },
+    {
+      "id": "uninstall-cleanup",
+      "commands": [
+        "uninstall",
+        "after-uninstall-snapshot"
+      ],
+      "logs": [
+        "uninstall.log"
+      ],
+      "registry": [
+        "ctf-tip-removed",
+        "clsid-removed",
+        "startup-removed"
+      ],
+      "files": [
+        "install-directory-removed",
+        "win32-dll-removed",
+        "x64-dll-removed"
+      ],
+      "scheduledTask": "removed",
+      "notesPath": ".planning/product/release-fixtures/phase-07/install-verification-notes.md"
+    },
+    {
+      "id": "reboot-required-registration",
+      "commands": [
+        "install-or-reregister",
+        "scheduled-task-query"
+      ],
+      "logs": [
+        "install.log"
+      ],
+      "registry": [
+        "ctf-tip-or-pending-reregister"
+      ],
+      "files": [
+        "pending-reboot-copy-if-needed"
+      ],
+      "scheduledTask": "TypeDuckIME-ReRegisterTSF",
+      "notesPath": ".planning/product/release-fixtures/phase-07/install-verification-notes.md"
+    },
+    {
+      "id": "bitness-win32-x64",
+      "commands": [
+        "file-hash-win32",
+        "file-hash-x64",
+        "regsvr32-state"
+      ],
+      "logs": [
+        "install.log"
+      ],
+      "registry": [
+        "win32-registration",
+        "x64-registration"
+      ],
+      "files": [
+        "C:\\Windows\\SysWOW64\\TypeDuckTextService.dll",
+        "C:\\Windows\\System32\\TypeDuckTextService.dll"
+      ],
+      "scheduledTask": "not-primary",
+      "notesPath": ".planning/product/release-fixtures/phase-07/install-verification-notes.md"
+    },
+    {
+      "id": "artifact-name-and-sha256",
+      "commands": [
+        "Get-FileHash -Algorithm SHA256",
+        "Get-Item"
+      ],
+      "logs": [],
+      "registry": [],
+      "files": [
+        "typeduck-windows-ime-setup.exe"
+      ],
+      "scheduledTask": "not-applicable",
+      "notesPath": ".planning/product/release-fixtures/phase-07/install-verification-notes.md"
+    }
+  ],
+  "nonImageEvidence": {
+    "commands": "record command lines and exit codes",
+    "logs": "record guest log paths and tails",
+    "sha256": "record artifact and DLL hashes",
+    "registry": "record TypeDuck CTF TIP, CLSID, startup, and cleanup state",
+    "files": "record TypeDuck install directory and dual-bitness DLL state",
+    "scheduledTask": "record TypeDuckIME-ReRegisterTSF presence or removal",
+    "notesPath": ".planning/product/release-fixtures/phase-07/install-verification-notes.md"
+  }
+}

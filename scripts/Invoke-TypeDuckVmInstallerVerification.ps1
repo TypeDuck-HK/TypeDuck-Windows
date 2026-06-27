@@ -43,6 +43,40 @@ $kBeforeName = "registry-before.json"
 $kAfterInstallName = "registry-after-install.json"
 $kAfterUninstallName = "registry-after-uninstall.json"
 
+# TYPE_DUCK_PHASE07_INSTALL_EVIDENCE_BEGIN
+$kPhase07EvidenceRootRelative = ".planning\product\release-fixtures\phase-07"
+$kPhase07InstallTemplateRelative = ".planning\product\release-fixtures\phase-07\install-verification-template.json"
+$kPhase07InstallNotesName = "install-verification-notes.md"
+$kPhase07ScenarioIds = @(
+    "clean-install",
+    "reinstall-upgrade",
+    "uninstall-cleanup",
+    "reboot-required-registration",
+    "bitness-win32-x64",
+    "artifact-name-and-sha256"
+)
+$kPhase07RequiredEvidence = @(
+    "command-outcomes",
+    "install-log-path",
+    "uninstall-log-path",
+    "sha256",
+    "byte-size",
+    "registry-state",
+    "file-state",
+    "scheduled-task-state",
+    "human-notes-path",
+    "vm-checkpoint",
+    "windows-version"
+)
+$kPhase07HostSafety = [ordered]@{
+    installerRunsOnHost = $false
+    defaultMode = "ManualChecklistOnly"
+    installer = "typeduck-windows-ime-setup.exe"
+    dll = "TypeDuckTextService.dll"
+    scheduledTask = "TypeDuckIME-ReRegisterTSF"
+}
+# TYPE_DUCK_PHASE07_INSTALL_EVIDENCE_END
+
 function Format-UtcTimestamp {
     param([datetime] $Value = [datetime]::UtcNow)
 
