@@ -142,8 +142,9 @@ Assert-Text $installer "Description:\s+`"開啟 TypeDuck 關於 / Open TypeDuck 
 Assert-Text $installer "function\s+ShouldLaunchSettings\(\):\s+Boolean" "Installer settings launch must be gated by a dedicated function."
 Assert-Text $installer "function\s+ShouldSeedDefaultSettings\(\):\s+Boolean" "Installer must gate default settings seeding."
 Assert-Text $installer "function\s+ShouldLaunchAbout\(\):\s+Boolean" "Installer About launch must be gated by a dedicated function."
-Assert-Text $installer 'TypeDuck About";\s+Filename:\s+"\{app\}\\TypeDuckAbout\.exe"' "Installer must create a TypeDuck About Start Menu shortcut."
-Assert-Text $installer 'TypeDuck 關於";\s+Filename:\s+"\{app\}\\TypeDuckAbout\.exe"' "Installer must create a TypeDuck 關於 Start Menu shortcut."
+Assert-Text $installer 'TypeDuckIME\\輸入法設定 IME Settings";\s+Filename:\s+"\{app\}\\TypeDuckSettings\.exe"' "Installer must create the Phase 6 TypeDuck IME Settings Start Menu shortcut."
+Assert-Text $installer 'TypeDuckIME\\關於 About TypeDuck…";\s+Filename:\s+"\{app\}\\TypeDuckAbout\.exe"' "Installer must create the Phase 6 TypeDuck About Start Menu shortcut."
+Assert-Text $installer 'TypeDuckIME\\解除安裝 Uninstall";\s+Filename:\s+"\{uninstallexe\}"' "Installer must create the Phase 6 TypeDuck Uninstall Start Menu shortcut."
 Assert-Ordered $installer @(
   "Filename:\s+`"\{app\}\\TypeDuckLauncher\.exe`"",
   "Parameters:\s+`"/apply-defaults`"",

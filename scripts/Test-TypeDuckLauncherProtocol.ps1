@@ -197,32 +197,36 @@ function Assert-BackendRecovery {
 function Assert-TypeDuckMapping {
     param(
         [System.Collections.Generic.List[string]] $Failures,
-        [string] $PipeServerCpp,
-        [string] $BackendsJson
+        [string] $Root,
+        [string] $PipeServerCpp
     )
 
     Assert-AllMatch $Failures $PipeServerCpp @(
         "\{c6e8f5df-6504-44f9-b7cf-17a195373a83\}",
         "typeduck-runtime-bridge",
+        "TypeDuckRuntime\\\\server\.exe",
+        "TypeDuckRuntime",
         "normalizeGuidKey",
         "seedTypeDuckProfileBackendMapping",
         "backendMap_\\[kTypeDuckProfileGuid\\]|backendMap_\.insert"
-    ) "PipeServer must seed the Phase 3 TypeDuck zh-HK profile GUID to the TypeDuck runtime bridge."
+    ) "PipeServer must define the fixed TypeDuck runtime bridge and seed the Phase 3 TypeDuck zh-HK profile GUID to it."
     Assert-Ordered $Failures $PipeServerCpp "seedTypeDuckProfileBackendMapping\(\)" "initInputMethods\(topDirPath\)" `
         "First-party TypeDuck mapping must be seeded before optional backend ime.json scanning."
 
-    $backends = $BackendsJson | ConvertFrom-Json
-    $bridge = @($backends | Where-Object { $_.name -eq "typeduck-runtime-bridge" })
-    if ($bridge.Count -ne 1) {
-        Add-Failure $Failures "backends.json must define exactly one typeduck-runtime-bridge entry."
-    } else {
-        if ($bridge[0].description -notmatch "internal|compatibility|transitional") {
-            Add-Failure $Failures "typeduck-runtime-bridge manifest entry must document that it is an internal/transitional compatibility bridge."
-        }
+    Assert-NotMatch $Failures $PipeServerCpp 'loadJsonFile\([^)]*backends\.json|backends\.json' `
+        "PipeServer must not load or reference product backend discovery through backends.json."
+    Assert-NotMatch $Failures $PipeServerCpp 'moqi-ime\\server\.exe|workingDir"\]\s*=\s*"moqi-ime"|backendFromName\("moqi-ime"\)' `
+        "PipeServer fixed runtime bridge must not point at legacy moqi-ime backend paths."
+
+    $sourceBackends = Join-Path $Root "backends.json"
+    if (Test-Path -LiteralPath $sourceBackends -PathType Leaf) {
+        Add-Failure $Failures "Source backends.json must be deleted; product runtime discovery must be fixed in PipeServer.cpp."
     }
 
-    Assert-NotMatch $Failures $BackendsJson '"name"\s*:\s*"moqi-ime"' `
-        "backends.json must not present moqi-ime as the product backend identity."
+    $stagedBackends = Join-Path $Root "installer\stage\win32\TypeDuckIME\backends.json"
+    if (Test-Path -LiteralPath $stagedBackends -PathType Leaf) {
+        Add-Failure $Failures "Staged TypeDuckIME payload must not contain top-level backends.json."
+    }
 }
 
 function Assert-TransportPreserved {
@@ -253,14 +257,13 @@ $files = @{
     "MoqLauncher/BackendServer.h" = Read-RequiredFile $root "MoqLauncher/BackendServer.h"
     "MoqLauncher/PipeServer.cpp" = Read-RequiredFile $root "MoqLauncher/PipeServer.cpp"
     "MoqLauncher/PipeServer.h" = Read-RequiredFile $root "MoqLauncher/PipeServer.h"
-    "backends.json" = Read-RequiredFile $root "backends.json"
     ".planning/product/protocol-fixtures/phase-04/launcher-recovery.json" = Read-RequiredFile $root ".planning/product/protocol-fixtures/phase-04/launcher-recovery.json"
 }
 
 Assert-Fixture $failures $files[".planning/product/protocol-fixtures/phase-04/launcher-recovery.json"]
 Assert-ClientRecovery $failures $files["MoqLauncher/PipeClient.cpp"] $files["MoqLauncher/PipeClient.h"]
 Assert-BackendRecovery $failures $files["MoqLauncher/BackendServer.cpp"] $files["MoqLauncher/BackendServer.h"] $files["MoqLauncher/PipeServer.cpp"] $files["MoqLauncher/PipeServer.h"]
-Assert-TypeDuckMapping $failures $files["MoqLauncher/PipeServer.cpp"] $files["backends.json"]
+Assert-TypeDuckMapping $failures $root $files["MoqLauncher/PipeServer.cpp"]
 Assert-TransportPreserved $failures $files["MoqLauncher/PipeClient.cpp"] $files["MoqLauncher/BackendServer.cpp"] $files["MoqLauncher/PipeServer.cpp"]
 
 if ($Strict) {

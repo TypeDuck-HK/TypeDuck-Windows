@@ -204,6 +204,11 @@ $installScript = Read-TextIfPresent $installScriptPath
 $packageScript = Read-TextIfPresent $packageScriptPath
 $installerBuildScript = Read-TextIfPresent $installerBuildScriptPath
 
+$sourceBackends = Join-Path $repo "backends.json"
+if (Test-Path -LiteralPath $sourceBackends -PathType Leaf) {
+    Add-Violation $violations "Source backends.json must not remain as a product runtime authority: $sourceBackends"
+}
+
 Assert-SourceText $violations $backendBuildScript '\$PackageDir\s*=\s*Join-Path\s+\$BuildRoot\s+"TypeDuckRuntime"' "Backend build default package output must be scripts/build/TypeDuckRuntime."
 Assert-SourceNotText $violations $backendBuildScript 'backends\.moqi-ime\.json|Generate backends\.json snippet|workingDir\s*=\s*"moqi-ime"|command\s*=\s*"moqi-ime\\server\.exe"' "Backend build must not emit legacy backend snippets."
 Assert-SourceNotText $violations $backendBuildScript '\$packageAppearanceThemesData\s*=|Packaged appearance theme compatibility copy|compatibility data path' "Backend build must not package input_methods/rime/data/appearance_themes.json."
