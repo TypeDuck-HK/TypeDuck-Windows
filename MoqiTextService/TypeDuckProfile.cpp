@@ -16,7 +16,7 @@ std::wstring preferredSmallIconPath(const std::wstring& fallbackIconFile) {
   if (!iconPath.empty() && iconPath.back() != L'\\' && iconPath.back() != L'/') {
     iconPath += L'\\';
   }
-  iconPath += L"moqi-ime\\icons\\TypeDuck_Small.ico";
+  iconPath += L"TypeDuckRuntime\\icons\\TypeDuck_Small.ico";
   if (::GetFileAttributesW(iconPath.c_str()) == INVALID_FILE_ATTRIBUTES) {
     return fallbackIconFile;
   }

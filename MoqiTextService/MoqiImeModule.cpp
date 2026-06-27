@@ -36,6 +36,7 @@ const GUID g_textServiceClsid = TypeDuck::kTextServiceClsid;
 namespace {
 
 constexpr const wchar_t* kTypeDuckSettingsExecutable = L"TypeDuckSettings.exe";
+constexpr const wchar_t* kTypeDuckRuntimeDir = L"TypeDuckRuntime";
 
 std::wstring getConfiguredProgramDir() {
   wchar_t path[MAX_PATH] = {};
@@ -78,24 +79,9 @@ bool launchTypeDuckSettings(HWND hwndParent, const std::wstring& programDir) {
   return reinterpret_cast<INT_PTR>(result) > 32;
 }
 
-void loadBackendDirs(const std::wstring& programDir,
-                     std::vector<std::wstring>& backendDirs) {
+void loadFixedRuntimeDirs(std::vector<std::wstring>& backendDirs) {
   backendDirs.clear();
-  std::ifstream fp(programDir + L"\\backends.json", std::ifstream::binary);
-  if (!fp) {
-    return;
-  }
-
-  Json::Value backendsInfo;
-  fp >> backendsInfo;
-  if (!backendsInfo.isArray()) {
-    return;
-  }
-
-  for (const auto& backend : backendsInfo) {
-    std::wstring name = utf8ToUtf16(backend["name"].asCString());
-    backendDirs.push_back(name);
-  }
+  backendDirs.emplace_back(kTypeDuckRuntimeDir);
 }
 
 }  // namespace
@@ -104,7 +90,7 @@ ImeModule::ImeModule(HMODULE module)
     : Ime::ImeModule(module, g_textServiceClsid) {
   programDir_ = getConfiguredProgramDir();
   if (!programDir_.empty()) {
-    loadBackendDirs(programDir_, backendDirs_);
+    loadFixedRuntimeDirs(backendDirs_);
   }
 }
 
