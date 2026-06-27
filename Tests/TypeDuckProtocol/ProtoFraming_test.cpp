@@ -20,6 +20,11 @@ std::string frameWithDeclaredSize(std::uint32_t declaredSize,
 
 } // namespace
 
+TEST(TypeDuckProtoFraming, UsesOneMiBClientAndBackendFrameCaps) {
+  EXPECT_EQ(Moqi::Proto::kMaxClientFramePayloadBytes, 1024u * 1024u);
+  EXPECT_EQ(Moqi::Proto::kMaxBackendFramePayloadBytes, 1024u * 1024u);
+}
+
 TEST(TypeDuckProtoFraming, RejectsOversizedFrameAndDropsBody) {
   Moqi::Proto::FrameBuffer buffer(8);
   const std::string frame = frameWithDeclaredSize(9, "abcdefghi");

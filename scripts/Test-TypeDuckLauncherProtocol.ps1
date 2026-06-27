@@ -247,6 +247,45 @@ function Assert-TransportPreserved {
     ) "D-01 transport must remain named pipe plus backend stdin/stdout framed protobuf."
 }
 
+function Assert-IpcHardening {
+    param(
+        [System.Collections.Generic.List[string]] $Failures,
+        [string] $PipeServerCpp,
+        [string] $PipeSecurityCpp,
+        [string] $MoqiClientCpp
+    )
+
+    Assert-AllMatch $Failures "$PipeServerCpp`n$MoqiClientCpp" @(
+        'TypeDuckIME',
+        'pipe',
+        'Launcher'
+    ) "Client and server must construct the TypeDuck-owned launcher pipe namespace."
+
+    Assert-NotMatch $Failures "$PipeServerCpp`n$MoqiClientCpp" '\\MoqiIM\\Launcher|\\Moqi\\Launcher' `
+        "Launcher pipe namespace must not use legacy Moqi product paths."
+
+    Assert-NotMatch $Failures $PipeSecurityCpp 'PROCESS_ALL_ACCESS|PROCESS_ALL_ACCESS_HEX|0x1fffff|SDDL_GENERIC_ALL\s+L";;;"\s*\+' `
+        "Pipe allow ACEs must not grant process-style all-access rights."
+    Assert-AllMatch $Failures $PipeSecurityCpp @(
+        'FILE_GENERIC_READ',
+        'FILE_GENERIC_WRITE',
+        'SYNCHRONIZE',
+        'SDDL_NETWORK'
+    ) "Pipe DACL must use explicit pipe-compatible read/write/connect rights and keep the network deny ACE."
+
+    Assert-AllMatch $Failures $MoqiClientCpp @(
+        'GetNamedPipeServerProcessId',
+        'OpenProcess\s*\(\s*PROCESS_QUERY_LIMITED_INFORMATION',
+        'QueryFullProcessImageNameW',
+        'TypeDuckLauncher',
+        'programDir\(\)'
+    ) "Client pipe sanity check must inspect server PID, image path, TypeDuck launcher shape, and configured program directory when available."
+    Assert-NotMatch $Failures $MoqiClientCpp 'return\s+true;\s*\}\s*(?:// establish a connection|\r?\n\s*// establish a connection)' `
+        "Client pipe sanity check must not return true unconditionally."
+    Assert-NotMatch $Failures $MoqiClientCpp 'GetFileVersionInfo|VerQueryValue|WinVerifyTrust|CryptQueryObject|CertGetCertificateChain|SHA256|sha256|hash' `
+        "Client pipe sanity check must not require exact version, signature, or hash checks."
+}
+
 $root = Resolve-RepoRoot -RequestedRoot $RepoRoot
 $failures = [System.Collections.Generic.List[string]]::new()
 
@@ -255,8 +294,10 @@ $files = @{
     "MoqLauncher/PipeClient.h" = Read-RequiredFile $root "MoqLauncher/PipeClient.h"
     "MoqLauncher/BackendServer.cpp" = Read-RequiredFile $root "MoqLauncher/BackendServer.cpp"
     "MoqLauncher/BackendServer.h" = Read-RequiredFile $root "MoqLauncher/BackendServer.h"
+    "MoqLauncher/PipeSecurity.cpp" = Read-RequiredFile $root "MoqLauncher/PipeSecurity.cpp"
     "MoqLauncher/PipeServer.cpp" = Read-RequiredFile $root "MoqLauncher/PipeServer.cpp"
     "MoqLauncher/PipeServer.h" = Read-RequiredFile $root "MoqLauncher/PipeServer.h"
+    "MoqiTextService/MoqiClient.cpp" = Read-RequiredFile $root "MoqiTextService/MoqiClient.cpp"
     ".planning/product/protocol-fixtures/phase-04/launcher-recovery.json" = Read-RequiredFile $root ".planning/product/protocol-fixtures/phase-04/launcher-recovery.json"
 }
 
@@ -265,6 +306,7 @@ Assert-ClientRecovery $failures $files["MoqLauncher/PipeClient.cpp"] $files["Moq
 Assert-BackendRecovery $failures $files["MoqLauncher/BackendServer.cpp"] $files["MoqLauncher/BackendServer.h"] $files["MoqLauncher/PipeServer.cpp"] $files["MoqLauncher/PipeServer.h"]
 Assert-TypeDuckMapping $failures $root $files["MoqLauncher/PipeServer.cpp"]
 Assert-TransportPreserved $failures $files["MoqLauncher/PipeClient.cpp"] $files["MoqLauncher/BackendServer.cpp"] $files["MoqLauncher/PipeServer.cpp"]
+Assert-IpcHardening $failures $files["MoqLauncher/PipeServer.cpp"] $files["MoqLauncher/PipeSecurity.cpp"] $files["MoqiTextService/MoqiClient.cpp"]
 
 if ($Strict) {
     Assert-NotMatch $failures $files["MoqLauncher/PipeServer.cpp"] 'backendFromName\("moqi-ime"\)' `
