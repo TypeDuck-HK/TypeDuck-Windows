@@ -18,7 +18,7 @@
 | Agent discretion | Let planner decide case by case. | |
 
 **User's choice:** Source code folder/file/class/variable names are fine for v1. Logs, user-facing installation paths, log folders/files, and visible product surfaces must be cleaned up.
-**Notes:** The guard strategy should not fail on internal implementation names that are not user-facing.
+**Notes:** The guard strategy should not fail on internal implementation names that are not user-facing. For `moqi-ime`, stale/off-scope behavior should be removed from shipped runtime/package and callable paths; source deletion is preferred for risky/product-confusing features, while compile/package exclusion is acceptable for low-risk inaccessible leftovers.
 
 ---
 
@@ -30,7 +30,7 @@
 | Full diagnostic rewrite | Redesign logging broadly in Phase 6. | |
 | Minimal path rename only | Rename log paths but leave message text mostly untouched. | |
 
-**User's choice:** Logs must be entirely in English with no Simplified Chinese log/debug/printf lines. Be conservative while translating/auditing because current logs appear mostly fine.
+**User's choice:** Logs must be entirely in English with no Simplified Chinese log/debug/printf lines. Be conservative when deciding whether diagnostics privacy requires removing/redacting a log line; this does not apply to translating non-English log lines to English.
 **Notes:** Runtime diagnostics should use TypeDuck-owned paths and avoid raw typed content by default.
 
 ---
@@ -57,7 +57,7 @@
 | No process killing | Avoid process termination and require restart/reboot. | |
 
 **User's choice:** The page showing TypeDuck and backend engine currently running should be eliminated. Killing is fine; the installer already knows what to kill and should automate it.
-**Notes:** Cleanup should stay TypeDuck-specific and avoid broad unrelated process kills.
+**Notes:** Cleanup should stay TypeDuck-specific and avoid broad unrelated process kills. Installer first page should show `Installer.bmp` plus the exact About text from Phase 5, use Start Menu folder `TypeDuckIME`, and include entries `輸入法設定 IME Settings`, `關於 About TypeDuck…`, and `解除安裝 Uninstall`.
 
 ---
 

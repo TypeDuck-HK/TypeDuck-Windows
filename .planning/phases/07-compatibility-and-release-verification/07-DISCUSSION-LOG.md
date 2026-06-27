@@ -17,7 +17,7 @@
 | Full automated screenshot matrix | Automate VM screenshots and compare/capture visual evidence. | |
 | Minimal smoke only | Run only a final manual smoke and produce artifact hash. | |
 
-**User's choice:** No VM automation that requires capturing screenshots. Verification that would require screenshots should be interactive.
+**User's choice:** No VM automation that requires capturing screenshots. Visual verification is interactive, and the user will judge without capturing screenshots.
 **Notes:** DPI is user-controlled in the VM. Broader integration-test setup outside v1 scope should not be pulled in.
 
 ---

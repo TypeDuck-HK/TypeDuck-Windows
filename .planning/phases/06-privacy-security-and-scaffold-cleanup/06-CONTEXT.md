@@ -18,31 +18,36 @@ This phase removes or hardens remaining TypeDuck v1 product risks before release
 - **D-02:** User-facing installation folders, log folders, log filenames, app names, resource metadata, installer strings, tray/menu surfaces, candidate/settings/About/status/error text, and release artifact names must be TypeDuck-owned.
 - **D-03:** No v1-visible surface should expose Moqi, fcitx, WebDAV/cloud clipboard, AI, Simplified-only wording, backend-declared generic config tools, or other off-scope scaffold concepts.
 - **D-04:** The installed installer page or surface that says TypeDuck and the backend engine are currently running should be eliminated. The installer already knows which TypeDuck processes to stop; it should automate that cleanup instead of showing this page to the user.
+- **D-05:** For the sibling `moqi-ime` runtime, stale/off-scope behavior should be removed from shipped TypeDuck runtime/package and callable paths. Source-level deletion is preferred for risky or product-confusing features, but conservative compile/package exclusion is acceptable for low-risk implementation leftovers that are fully inaccessible and testably absent from v1.
 
 ### Logs, Diagnostics, and Strings
-- **D-05:** Log/debug/printf lines must be entirely English. There should be no Simplified Chinese log/debug/printf text.
-- **D-06:** While translating/auditing log lines, be conservative. The user has already reviewed the current log lines and believes they are mostly fine; do not over-engineer log rewriting beyond removing non-English or unsafe content.
-- **D-07:** Runtime logs and diagnostics should use TypeDuck-owned paths and avoid raw typed content by default. Technical details belong in logs, not routine user-facing dialogs.
-- **D-08:** User-facing v1 strings are expected to be mostly bilingual already except installer. Phase 6 should still inspect source/resources and add automated guards where practical.
-- **D-09:** Remove the Simplified Chinese Inno language submodule/translation dependency immediately. The TypeDuck installer should supply all installer strings itself instead of relying on official Inno translations.
-- **D-10:** Installer strings should be product-owned bilingual Traditional Hong Kong Chinese and English. Standard installer chrome should not be accepted merely because an official translation exists.
+- **D-06:** Log/debug/printf lines must be entirely English. There should be no Simplified Chinese log/debug/printf text.
+- **D-07:** The user's "be conservative" guidance applies when auditing diagnostics privacy and deciding whether a log line should be removed or redacted. It does not mean being conservative about translations; non-English/Simplified log lines should be translated to English.
+- **D-08:** Runtime logs and diagnostics should use TypeDuck-owned paths and avoid raw typed content by default. Technical details belong in logs, not routine user-facing dialogs.
+- **D-09:** User-facing v1 strings are expected to be mostly bilingual already except installer. Phase 6 should still inspect source/resources and add automated guards where practical.
+- **D-10:** Remove the Simplified Chinese Inno language submodule/translation dependency immediately. The TypeDuck installer should supply all installer strings itself instead of relying on official Inno translations.
+- **D-11:** Installer strings should be product-owned bilingual Traditional Hong Kong Chinese and English. Standard installer chrome should not be accepted merely because an official translation exists.
 
 ### IPC, Launch, and Failure Behavior
-- **D-11:** Harden named pipe access, frame-size limits, malformed-frame handling, and bounded diagnostics, but do not add checks that reject legitimate executables or services from past or future TypeDuck versions.
-- **D-12:** Any server/client identity check must be compatibility-tolerant. Prefer TypeDuck-owned namespace, ACL, owner/path sanity, and frame/protocol bounds over strict version/signature rules that would break upgrades, downgrades, or future release channels.
-- **D-13:** Remove arbitrary backend-provided config tool launching. Configuration should route to the fixed first-party `TypeDuckSettings.exe` entry point.
-- **D-14:** Cloud clipboard/WebDAV/AI/fcitx feature paths should be removed or compile-gated out of v1 if removal is temporarily risky. They must not be visible or callable as TypeDuck product behavior.
-- **D-15:** User-facing failure behavior should hide technical details by default. Show technical detail only in logs except when TypeDuck typing is no longer possible and restart cannot recover it, or when the implementation believes the user explicitly tampered with something and rejects it.
+- **D-12:** Harden named pipe access, frame-size limits, malformed-frame handling, and bounded diagnostics, but do not add checks that reject legitimate executables or services from past or future TypeDuck versions.
+- **D-13:** Any server/client identity check must be compatibility-tolerant. Prefer TypeDuck-owned namespace, ACL, owner/path sanity, and frame/protocol bounds over strict version/signature rules that would break upgrades, downgrades, or future release channels.
+- **D-14:** Remove arbitrary backend-provided config tool launching. Configuration should route to the fixed first-party `TypeDuckSettings.exe` entry point.
+- **D-15:** Cloud clipboard/WebDAV/AI/fcitx feature paths should be removed or compile-gated out of v1 if removal is temporarily risky. They must not be visible or callable as TypeDuck product behavior.
+- **D-16:** User-facing failure behavior should hide technical details by default. Show technical detail only in logs except when TypeDuck typing is no longer possible and restart cannot recover it, or when the implementation believes the user explicitly tampered with something and rejects it.
 
 ### Installer and Process Cleanup
-- **D-16:** Process termination during install/uninstall is acceptable. The installer should automate known TypeDuck process cleanup rather than asking the user to manually close backend/launcher surfaces.
-- **D-17:** Process cleanup should be TypeDuck-specific and installer-owned. Avoid broad legacy process kills except for documented, allowlisted migration cleanup that is necessary to prevent duplicate/broken scaffold residues.
-- **D-18:** Installer cleanup should remove TypeDuck-owned system DLL registrations, startup entries, scheduled tasks, install files, and conflicting scaffold residue without purging unrelated user state.
+- **D-17:** Process termination during install/uninstall is acceptable. The installer should automate known TypeDuck process cleanup rather than asking the user to manually close backend/launcher surfaces.
+- **D-18:** Process cleanup should be TypeDuck-specific and installer-owned. Avoid broad legacy process kills except for documented, allowlisted migration cleanup that is necessary to prevent duplicate/broken scaffold residues.
+- **D-19:** Installer cleanup should remove TypeDuck-owned system DLL registrations, startup entries, scheduled tasks, install files, and conflicting scaffold residue without purging unrelated user state.
+- **D-20:** The installer first page should show `Installer.bmp` and the exact same bilingual text used in the Phase 5 About dialog.
+- **D-21:** The Start Menu folder should be `TypeDuckIME`.
+- **D-22:** Start Menu entries should include TypeDuck Settings worded `輸入法設定 IME Settings`, About worded `關於 About TypeDuck…`, and Uninstall worded `解除安裝 Uninstall`.
 
 ### Guard Coverage
-- **D-19:** Add automated or scripted checks that fail on visible Moqi, fcitx, WebDAV/cloud clipboard, AI, Simplified-only installer strings, Simplified Chinese log/debug/printf strings, and legacy installer language resources in user-facing/product surfaces.
-- **D-20:** Guard scripts should understand the v1 allowance for source identifiers. They should not fail merely because internal source paths, class names, variables, or target names still contain Moqi where those names are not user-visible.
-- **D-21:** Phase 6 may include static/code tests for logs, banned strings, frame bounds, config-tool removal, cloud/AI/fcitx handler removal, installer language resource removal, and safe process cleanup.
+- **D-23:** Add automated or scripted checks that fail on visible Moqi, fcitx, WebDAV/cloud clipboard, AI, Simplified-only installer strings, Simplified Chinese log/debug/printf strings, and legacy installer language resources in user-facing/product surfaces.
+- **D-24:** Guard scripts should understand the v1 allowance for source identifiers. They should not fail merely because internal source paths, class names, variables, or target names still contain Moqi where those names are not user-visible.
+- **D-25:** Phase 6 may include static/code tests for logs, banned strings, frame bounds, config-tool removal, cloud/AI/fcitx handler removal, installer language resource removal, and safe process cleanup.
+- **D-26:** Do not treat the number of files modified as a warning or blocker. Bulk modification is expected in Phase 6, especially when changing log lines and product-owned paths.
 
 ### the agent's Discretion
 The planner may choose the exact implementation split and guard script structure. It should keep user-visible cleanup, installer-owned localization, diagnostics/privacy, and IPC hardening in Phase 6; leave release-matrix execution to Phase 7; and avoid broad internal renames that do not change shipped behavior.
@@ -88,6 +93,7 @@ The planner may choose the exact implementation split and guard script structure
 - `MoqiTextService/TsfLog.cpp` and `libIME2/src/DebugLogConfig.cpp` - TSF/debug log path and opt-in behavior.
 - `proto/ProtoFraming.h` and `proto/moqi.proto` - Frame-size limits, malformed-frame behavior, and unused scaffold methods.
 - `scripts/install.ps1`, `scripts/_all_in_package.ps1`, `.github/workflows/release.yml`, `.github/workflows/nightly.yml` - Staging, artifact names, and package-time guard integration.
+- `D:\VSProjects\moqi-ime` - Sibling runtime repo whose packaged payload must stop exposing stale/off-scope paths and files listed in Specific Ideas.
 
 </canonical_refs>
 
@@ -125,6 +131,18 @@ The planner may choose the exact implementation split and guard script structure
 - Do not implement executable/service identity checks that reject past or future TypeDuck versions.
 - Default user-facing failures should be non-technical; technical details go to logs unless typing cannot recover or tampering is suspected.
 - Phase 6 owns non-test product code changes for cleanup/security. Phase 7 should mostly verify unless it uncovers a release-blocking failure.
+- Rename the installed backend payload folder from `%PROGRAMFILES(x86)%\TypeDuckIME\moqi-ime` to a TypeDuck-owned name.
+- Move `%LOCALAPPDATA%\MoqiIM` to `%LOCALAPPDATA%\TypeDuckIME`, same location family as `TypeDuckPreferences.json`.
+- Rename `%APPDATA%\Moqi` to `%APPDATA%\TypeDuckIME`.
+- Rename `%LOCALAPPDATA%\MoqiIM\MoqiLauncher.json` to `TypeDuckLauncher.json`.
+- Rename log files under `%LOCALAPPDATA%\MoqiIM\Log`; changing the `APP` variable may be sufficient if the current logger derives names from it.
+- Delete from the shipped TypeDuck runtime: `%PROGRAMFILES(x86)%\TypeDuckIME\moqi-ime\input_methods\rime\android`, `cloudclipboard`, `templates`, `test`, `ai_config.json`, and `ime.json`.
+- Delete `%PROGRAMFILES(x86)%\TypeDuckIME\moqi-ime\input_methods\rime\data\appearance_themes.json`; use `%PROGRAMFILES(x86)%\TypeDuckIME\moqi-ime\input_methods\rime\appearance_themes.json` instead.
+- Delete `%PROGRAMFILES(x86)%\TypeDuckIME\backends.json` and inline the needed backend content in code.
+- Delete legacy roaming files `%APPDATA%\Moqi\ai_config.json`, `appearance_config.json`, `moqi_auto_pair_symbols.json`, and `moqi_custom_phrase.json` from the TypeDuck v1 path/migration surface.
+- Combine or remove installed icon folders `%PROGRAMFILES(x86)%\TypeDuckIME\moqi-ime\icons` and `%PROGRAMFILES(x86)%\TypeDuckIME\moqi-ime\input_methods\rime\icons`; if they are not exposed except through app icons, removal may be preferable.
+- Installer first page should use `Installer.bmp` and the exact About text from Phase 5 context.
+- Start Menu folder and entries should be: `TypeDuckIME`, `輸入法設定 IME Settings`, `關於 About TypeDuck…`, and `解除安裝 Uninstall`.
 
 </specifics>
 

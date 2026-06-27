@@ -15,26 +15,27 @@ This phase proves the TypeDuck v1 installer and IME are shippable after Phase 6 
 
 ### Interactive VM and Screenshot Boundary
 - **D-01:** Do not create VM automation that requires capturing screenshots. Screenshot-driven verification should be interactive, not automated.
-- **D-02:** DPI verification is user-controlled in the VM. The user will try 100%, 140% if the VM supports fractional scaling, 175%, and 200%.
-- **D-03:** The user will judge DPI/visual behavior directly. Do not require automated screenshot comparison, screenshot manifests, or screenshot capture scripts for v1 release verification.
-- **D-04:** Multi-monitor behavior was already human verified in Phase 5. Do not reintroduce multi-monitor screenshot automation as a Phase 7 acceptance gate.
+- **D-02:** "Interactive screenshot-driven verification" means the user will judge visually without capturing screenshots. Do not require screenshot files, screenshot manifests, screenshot capture scripts, or automated screenshot comparison for v1 release verification.
+- **D-03:** DPI verification is user-controlled in the VM. The user will try 100%, 140% if the VM supports fractional scaling, 175%, and 200%.
+- **D-04:** The user will judge DPI/visual behavior directly.
+- **D-05:** Multi-monitor behavior was already human verified in Phase 5. Do not reintroduce multi-monitor screenshot automation as a Phase 7 acceptance gate.
 
 ### Release Evidence Matrix
-- **D-05:** Phase 7 should include the important release verification bits that are repeatable without screenshots: clean install, reinstall/upgrade where applicable, uninstall, reboot-required registration behavior, typing smoke, host-app coverage, protocol recovery, and final artifact naming/hash evidence.
-- **D-06:** Host-app verification should remain interactive where Windows UI behavior is the subject of judgement. Useful targets include Notepad, browsers, Office or Office-like apps, terminal/console contexts, elevated apps, and any awkward TSF hosts available during release testing.
-- **D-07:** Windows 10/11 VM evidence is useful where available, but do not pull broader integration-test infrastructure outside v1 scope.
-- **D-08:** Bitness verification remains important because the installer deploys both 32-bit and 64-bit TSF DLLs.
-- **D-09:** Release evidence should be documented with commands, logs, hashes, registry/file checks, and human-verification notes instead of requiring captured screenshots.
+- **D-06:** Phase 7 should include the important release verification bits that are repeatable without screenshots: clean install, reinstall/upgrade where applicable, uninstall, reboot-required registration behavior, typing smoke, host-app coverage, protocol recovery, and final artifact naming/hash evidence.
+- **D-07:** Host-app verification should remain interactive where Windows UI behavior is the subject of judgement. Useful targets include Notepad, browsers, Office or Office-like apps, terminal/console contexts, elevated apps, and any awkward TSF hosts available during release testing.
+- **D-08:** Windows 10/11 VM evidence is useful where available, but do not pull broader integration-test infrastructure outside v1 scope.
+- **D-09:** Bitness verification remains important because the installer deploys both 32-bit and 64-bit TSF DLLs.
+- **D-10:** Release evidence should be documented with commands, logs, hashes, registry/file checks, and human-verification notes instead of requiring captured screenshots.
 
 ### Protocol and Recovery Verification
-- **D-10:** Include repeatable tests for the important protocol/recovery scenarios that do not require screenshots: normal Cantonese input frames, dictionary lookup payload preservation/parsing expectations, reverse lookup where supported, malformed frames, oversized frames, invalid protobuf payloads, timeout behavior, backend restart/crash behavior, stale/mismatched sequence responses, settings update/redeploy failure, and bounded degraded states.
-- **D-11:** The repeatedly testable parts should be automated or scripted where practical. Visual host-app judgement remains interactive.
-- **D-12:** Technical recovery failures should preserve the Phase 6 failure policy: user-facing technical detail stays out of routine UI, with detail in logs unless typing is unrecoverable or tampering is suspected.
+- **D-11:** Include repeatable tests for the important protocol/recovery scenarios that do not require screenshots: normal Cantonese input frames, dictionary lookup payload preservation/parsing expectations, reverse lookup where supported, malformed frames, oversized frames, invalid protobuf payloads, timeout behavior, backend restart/crash behavior, stale/mismatched sequence responses, settings update/redeploy failure, and bounded degraded states.
+- **D-12:** The repeatedly testable parts should be automated or scripted where practical. Visual host-app judgement remains interactive.
+- **D-13:** Technical recovery failures should preserve the Phase 6 failure policy: user-facing technical detail stays out of routine UI, with detail in logs unless typing is unrecoverable or tampering is suspected.
 
 ### Product Change Boundary
-- **D-13:** All non-test product code changes should be done in Phase 6 unless a failure is detected in Phase 7.
-- **D-14:** If Phase 7 finds a product bug, planning should route the smallest necessary fix through a focused failure repair path and then rerun the affected release verification. Do not use Phase 7 to add new capabilities.
-- **D-15:** Phase 7 may add or update tests, scripts, verification docs, release evidence manifests, and packaging checks as part of release readiness.
+- **D-14:** All non-test product code changes should be done in Phase 6 unless a failure is detected in Phase 7.
+- **D-15:** If Phase 7 finds a product bug, planning should route the smallest necessary fix through a focused failure repair path and then rerun the affected release verification. Do not use Phase 7 to add new capabilities.
+- **D-16:** Phase 7 may add or update tests, scripts, verification docs, release evidence manifests, and packaging checks as part of release readiness.
 
 ### the agent's Discretion
 The planner may choose the exact release checklist and test/script split, but must keep screenshot capture out of automation, treat DPI as user-judged interactive VM work, and include only repeatable non-screenshot protocol/recovery checks in automated release verification.
@@ -105,6 +106,7 @@ The planner may choose the exact release checklist and test/script split, but mu
 
 - DPI checks to be controlled by the user in the VM at 100%, 140% if available, 175%, and 200%.
 - No screenshot-capture automation for VM verification.
+- User judgement means no screenshots need to be captured.
 - Multi-monitor does not need new screenshot automation because it was already human verified in Phase 5.
 - Include important protocol recovery scenarios only when they are repeatedly testable without screenshots.
 - Other broad integration-test setup is outside v1 scope.
