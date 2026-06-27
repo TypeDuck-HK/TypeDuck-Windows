@@ -223,6 +223,82 @@ function Test-BackendDiagnostics {
     }
 }
 
+function Test-BackendUserFacingPayloads {
+    param(
+        [System.Collections.Generic.List[string]] $Violations,
+        [string] $Backend
+    )
+
+    $rimeGo = Join-Path $Backend "input_methods\rime\rime.go"
+    if (-not (Test-Path -LiteralPath $rimeGo -PathType Leaf)) {
+        Add-Violation $Violations "Missing active Rime backend source for user-facing payload scan: $rimeGo"
+        return
+    }
+
+    $text = Get-Content -Raw -Encoding UTF8 -LiteralPath $rimeGo
+    $bannedSimplifiedOnlyLabels = @(
+        '"切换方案集"',
+        '"输入方案\(&I\)"',
+        '"打开超级简拼"',
+        '"刷新配置\(&R\)"',
+        '"输入状态共享"',
+        '"外观\(&A\)"',
+        '"切换主题"',
+        '"行内预编辑"',
+        '"候选排列"',
+        '"竖排"',
+        '"横排"',
+        '"每行候选数"',
+        '"候选间距"',
+        '"总候选数量"',
+        '"字体大小"',
+        '"候选文字字体"',
+        '"微软雅黑 UI"',
+        '"等线"',
+        '"宋体"',
+        '"注释文字大小"',
+        '"注释文字字体"',
+        '"候选框背景"',
+        '"浅蓝"',
+        '"浅灰"',
+        '"浅绿"',
+        '"高亮颜色"',
+        '"字体颜色"',
+        '"深蓝"',
+        '"高亮文字颜色"',
+        '"导入皮肤"',
+        '"输入设置"',
+        '"分号键次选"',
+        '"打开文件夹\(&O\)"',
+        '"用户文件夹"',
+        '"共享文件夹"',
+        '"同步文件夹"',
+        '"日志文件夹"',
+        '"帮助文档\(&H\)"',
+        '"参加讨论\(&J\)"',
+        '"设置"'
+    )
+
+    foreach ($labelPattern in $bannedSimplifiedOnlyLabels) {
+        if ($text -match $labelPattern) {
+            Add-Violation $Violations "Active backend UI/menu payload still contains Simplified-only label pattern $labelPattern in input_methods/rime/rime.go"
+        }
+    }
+
+    foreach ($requiredPattern in @(
+        '"切換方案集 / Switch Scheme Set"',
+        '"輸入方案\(&I\) / Input Schema"',
+        '"外觀\(&A\) / Appearance"',
+        '"輸入設定 / Input Settings"',
+        '"說明文件\(&H\) / Help"',
+        '"中英文切換 / Chinese-English"'
+    )) {
+        if ($text -notmatch $requiredPattern) {
+            Add-Violation $Violations "Active backend UI/menu payload is missing required bilingual Traditional/English label pattern $requiredPattern"
+        }
+    }
+}
+
 $repo = Resolve-FullPath -Path $RepoRoot
 $backend = Resolve-FullPath -Path $BackendRoot
 $violations = [System.Collections.Generic.List[string]]::new()
@@ -232,6 +308,7 @@ if (-not (Test-Path -LiteralPath $backend -PathType Container)) {
 }
 
 Test-BackendDiagnostics -Violations $violations -Backend $backend
+Test-BackendUserFacingPayloads -Violations $violations -Backend $backend
 
 $backendPackageRoot = Join-Path $backend "scripts\build\TypeDuckRuntime"
 Test-RuntimeTree -Violations $violations -Root $backendPackageRoot -Label "Backend TypeDuckRuntime package"
