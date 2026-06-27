@@ -136,9 +136,28 @@ foreach ($source in $sources) {
   }
 }
 
-# Cloud clipboard/protocol removal is enforced in Task 3 of this plan. Task 2
-# keeps the strict guard focused on TypeDuck-owned paths and diagnostics privacy
-# so each task can be committed atomically.
+$cloudPatterns = @(
+  'AddClipboardFormatListener',
+  'RemoveClipboardFormatListener',
+  'WM_CLIPBOARDUPDATE',
+  'ID_CLIPBOARD_DEBOUNCE_TIMER',
+  'WM_FLUSH_CLIPBOARD_UPLOAD',
+  'cloud_clipboard',
+  'Cloud clipboard',
+  'METHOD_CLOUD_CLIPBOARD_UPLOAD',
+  'cloud_clipboard_text',
+  'uploadCloudClipboardText',
+  'processClipboardUploadOnUvThread',
+  'readClipboardUtf8',
+  'scheduleClipboardUpload',
+  'pendingClipboardText_',
+  'client_id\(\)\s*==\s*"clipboard"'
+)
+foreach ($source in $sources) {
+  foreach ($pattern in $cloudPatterns) {
+    Assert-PatternAbsent $violations "off-scope-cloud" $source.Text $pattern "$($source.RelativePath) still exposes cloud clipboard/frontend clipboard upload surface."
+  }
+}
 
 $offScopePatterns = @(
   'WebDAV|webdav',
@@ -156,9 +175,8 @@ foreach ($source in $sources) {
     if ($line.Text -match '[\p{IsCJKUnifiedIdeographs}]') {
       Add-Violation $violations "english-diagnostics" "$($source.RelativePath):$($line.Number) diagnostic output contains CJK text: $($line.Text.Trim())"
     }
-    $deferCloudDiagnostics = $line.Text -match '(?i)cloud clipboard'
     $isExplicitlyRedacted = $line.Text -match '(?i)redacted'
-    if (-not $deferCloudDiagnostics -and -not $isExplicitlyRedacted -and
+    if (-not $isExplicitlyRedacted -and
         $line.Text -match 'compositionString|candidate(List|Entries)?|rawLookupComment|clipboard|utf8Text|commitString|serialized(Request|Response|Reply)|payload') {
       Add-Violation $violations "raw-content-diagnostics" "$($source.RelativePath):$($line.Number) diagnostic output may include typed, candidate, clipboard, or raw protocol content: $($line.Text.Trim())"
     }

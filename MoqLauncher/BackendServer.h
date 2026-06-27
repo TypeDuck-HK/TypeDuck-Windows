@@ -72,8 +72,6 @@ public:
 
 	TypeDuck::ApplyResult requestTypeDuckDeploy();
 
-	void uploadCloudClipboardText(const std::string& utf8Text);
-
 private:
     uv::Pipe* createStdinPipe();
 

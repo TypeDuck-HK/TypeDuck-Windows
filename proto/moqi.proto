@@ -5,6 +5,7 @@ package moqi.protocol;
 option go_package = "github.com/gaboolic/moqi-ime/proto;moqipb";
 
 enum Method {
+  reserved 19;
   METHOD_UNSPECIFIED = 0;
   METHOD_INIT = 1;
   METHOD_CLOSE = 2;
@@ -24,7 +25,6 @@ enum Method {
   METHOD_HIGHLIGHT_CANDIDATE = 16;
   METHOD_SELECT_CANDIDATE = 17;
   METHOD_CHANGE_PAGE = 18;
-  METHOD_CLOUD_CLIPBOARD_UPLOAD = 19;
   METHOD_TYPEDUCK_SETTINGS_SNAPSHOT = 100;
   METHOD_TYPEDUCK_SETTINGS_UPDATE = 101;
   METHOD_TYPEDUCK_DEPLOY = 102;
@@ -243,7 +243,7 @@ message TrayNotification {
 }
 
 message ClientRequest {
-  reserved 100;
+  reserved 26, 100;
   uint32 seq_num = 1;
   Method method = 2;
   optional string guid = 3;
@@ -269,7 +269,6 @@ message ClientRequest {
   optional string client_id = 23;
   optional int32 candidate_index = 24;
   optional bool page_backward = 25;
-  optional string cloud_clipboard_text = 26;
   optional TypeDuckProtocolInfo typeduck_protocol = 27;
   optional TypeDuckSettingsSnapshot typeduck_settings_snapshot = 28;
   optional TypeDuckSettingsUpdate typeduck_settings_update = 29;

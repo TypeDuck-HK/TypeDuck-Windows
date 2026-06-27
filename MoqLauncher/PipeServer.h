@@ -102,13 +102,6 @@ private:
 	void showTrayNotification(const std::wstring& title, const std::wstring& message,
 	                         DWORD infoFlags);
 	void flushTrayNotifications();
-	void onClipboardUpdate();
-	void initClipboardAsync();
-	void scheduleClipboardUpload(std::string utf8Text);
-	void processClipboardUploadOnUvThread();
-	void flushDebouncedClipboardUpload();
-	bool isCloudClipboardEnabled() const;
-	std::string readClipboardUtf8() const;
 
 	// backend server
 	void initBackendServers(const std::wstring& topDirPath);
@@ -154,7 +147,6 @@ private:
 
 	HWND hwnd_; // handle of the window
 	static wchar_t wndClassName_[];
-	static constexpr UINT WM_CLIPBOARDUPDATE_MSG = WM_CLIPBOARDUPDATE;
 	NOTIFYICONDATA shellNotifyIconData_;
 	bool shutdownRequested_;
 	struct TrayNotificationRequest {
@@ -164,11 +156,6 @@ private:
 	};
 	std::deque<TrayNotificationRequest> trayNotifications_;
 	std::mutex trayNotificationsMutex_;
-
-	uv_async_t *clipboardAsync_;
-	std::mutex clipboardMutex_;
-	std::string pendingClipboardText_;
-	bool clipboardListenerRegistered_;
 
 	HANDLE singleInstanceMutex_;
 
