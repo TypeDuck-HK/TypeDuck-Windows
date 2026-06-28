@@ -183,6 +183,7 @@ Assert-Text $installScript '\$stageResourceRoot\s*=\s*Join-Path\s+\$stageWin32Ro
 Assert-Text $installScript 'Copy-IfExists\s+-Source\s+\$aboutBanner\s+-Destination\s+\(Join-Path\s+\$stageResourceRoot\s+"About_Banner\.bmp"\)' "Staging must copy About_Banner.bmp into the product resources folder."
 Assert-Text $installScript 'Copy-IfExists\s+-Source\s+\$creditLogos\s+-Destination\s+\(Join-Path\s+\$stageResourceRoot\s+"Credit_Logos\.bmp"\)' "Staging must copy Credit_Logos.bmp into the product resources folder."
 Assert-Text $installScript 'Copy-IfExists\s+-Source\s+\$installerBitmap\s+-Destination\s+\(Join-Path\s+\$stageResourceRoot\s+"Installer\.bmp"\)' "Staging must copy Installer.bmp into the product resources folder."
+Assert-Text $installScript 'Copy-IfExists\s+-Source\s+\$smallIcon\s+-Destination\s+\(Join-Path\s+\$stageResourceRoot\s+"TypeDuck_Small\.ico"\)' "Staging must copy only TypeDuck_Small.ico into resources for the system IME picker."
 Assert-NotText $installScript 'Copy-IfExists\s+-Source\s+\$(transparentIcon|smallIcon|productIcon)\s+-Destination\s+\(Join-Path\s+\$stageWin32Root\s+"TypeDuck[^"]*\.ico"\)' "Staging must not copy raw TypeDuck icon files into the installed app root."
 Assert-Text $installScript 'Set-WindowsExecutableIcon\s+-ExecutablePath\s+\(Join-Path\s+\$stageWin32Root\s+"TypeDuckLauncher\.exe"\)\s+-IconPath\s+\$transparentIcon' "Staging must stamp TypeDuckLauncher.exe with TypeDuck_Transparent.ico."
 Assert-Text $installScript 'Set-WindowsExecutableIcon\s+-ExecutablePath\s+\(Join-Path\s+\$stageWin32Root\s+"TypeDuckSetupHelper\.exe"\)\s+-IconPath\s+\$transparentIcon' "Staging must stamp TypeDuckSetupHelper.exe with TypeDuck_Transparent.ico."
@@ -192,6 +193,7 @@ Assert-Text $installScript 'Set-WindowsExecutableIcon\s+-ExecutablePath\s+\$back
 
 Assert-Text $textServiceRc "IDI_TYPEDUCK_PROFILE\s+ICON\s+`"\.\./TypeDuckSettings/assets/TypeDuck_Small\.ico`"" "TSF DLL profile resource must use TypeDuck_Small.ico."
 Assert-Text $typeDuckProfile "preferredSmallIconPath" "Profile icon lookup must prefer the packaged small icon with a DLL resource fallback."
+Assert-Text $typeDuckProfile 'resources\\\\TypeDuck_Small\.ico' "Profile icon lookup must use the installed resources/TypeDuck_Small.ico path."
 Assert-NotText $typeDuckProfile "lockedSmallIconPath" "Profile icon lookup must not depend on the old raw app-root icon helper."
 
 Assert-Text $installer "SetupIconFile=\.\.\\TypeDuckSettings\\assets\\TypeDuck\.ico" "Installer setup icon must use TypeDuck.ico."
@@ -256,6 +258,10 @@ Assert-True ($rejectedBehavior.Count -eq 0) "Rejected UAT icon packaging behavio
 if (Test-Path -LiteralPath $stageRoot -PathType Container) {
   foreach ($resourceName in @("About_Banner.bmp", "Credit_Logos.bmp", "Installer.bmp")) {
     Assert-True (Test-Path -LiteralPath (Join-Path $stageRoot "resources/$resourceName")) "Missing staged frontend resource: resources/$resourceName"
+  }
+  Assert-SameFileHash (Join-Path $stageRoot "resources/TypeDuck_Small.ico") $small "Missing or mismatched staged system IME icon: resources/TypeDuck_Small.ico."
+  foreach ($iconName in @("TypeDuck_Transparent.ico", "TypeDuck.ico")) {
+    Assert-True (-not (Test-Path -LiteralPath (Join-Path $stageRoot "resources/$iconName"))) "Only TypeDuck_Small.ico should be staged as a raw icon resource; unexpected resources/$iconName found."
   }
   Assert-ExecutableContainsIcon (Join-Path $stageRoot "TypeDuckLauncher.exe") $transparent "Staged TypeDuckLauncher.exe does not contain TypeDuck_Transparent.ico image data."
   Assert-ExecutableContainsIcon (Join-Path $stageRoot "TypeDuckSetupHelper.exe") $transparent "Staged TypeDuckSetupHelper.exe does not contain TypeDuck_Transparent.ico image data."

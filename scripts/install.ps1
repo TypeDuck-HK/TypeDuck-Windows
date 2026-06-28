@@ -383,6 +383,7 @@ New-Item -ItemType Directory -Path $stageResourceRoot -Force | Out-Null
 Copy-IfExists -Source $aboutBanner -Destination (Join-Path $stageResourceRoot "About_Banner.bmp")
 Copy-IfExists -Source $creditLogos -Destination (Join-Path $stageResourceRoot "Credit_Logos.bmp")
 Copy-IfExists -Source $installerBitmap -Destination (Join-Path $stageResourceRoot "Installer.bmp")
+Copy-IfExists -Source $smallIcon -Destination (Join-Path $stageResourceRoot "TypeDuck_Small.ico")
 
 $launcher = Resolve-ArtifactPath -Label "TypeDuckLauncher.exe" -Candidates @(
     (Join-Path $Win32BuildDir "TypeDuckLauncher.exe"),
