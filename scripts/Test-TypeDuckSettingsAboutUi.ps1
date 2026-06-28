@@ -232,6 +232,11 @@ Assert-Text $window "applyViaLauncher" "Apply must use the launcher-mediated Typ
 Assert-Text $window "fillSettingsUpdate" "Settings must serialize the shared TypeDuckPreferences state into IPC updates."
 Assert-Text $window "METHOD_TYPEDUCK_SETTINGS_UPDATE" "Settings confirmation must send the TypeDuck settings update IPC request."
 Assert-Text $window "deployViaLauncher" "Installation seed mode must refresh Rime through the launcher after applying settings."
+Assert-Text $window "kPipeConnectTimeoutMs = 5000" "Settings install/apply mode must use a bounded launcher-start wait."
+Assert-Text $window "kPipeConnectRetryMs" "Settings install/apply mode must retry until the launcher pipe exists."
+Assert-Text $window "GetTickCount64" "Settings install/apply mode must use a bounded launcher pipe retry loop."
+Assert-Text $window "install/update uses it to seed the packaged prebuilt RIME build" "Settings install deploy must document the existing wire-field meaning."
+Assert-Text $window "set_force\(true\)" "Installation seed deploy must request the packaged build-folder seed path."
 Assert-Text $window "kApplyDefaultsSwitch" "Settings executable must expose a quiet default-preference seed mode for installation."
 Assert-Text $window "applyInstallSettings" "Installation seed mode must apply current or default settings before explicit Rime refresh."
 Assert-Text $textServiceCmake "MoqLauncher/TypeDuckPreferences\.cpp" "Text service must link the shared preferences loader for UI-only settings."
@@ -244,6 +249,10 @@ Assert-Text $window "取消 Cancel" "Cancel button must be bilingual."
 Assert-True ($window -notmatch "套用後即時更新輸入法設定|Apply updates TypeDuck input settings|設定已儲存") "Settings window must not expose removed apply/status helper labels."
 Assert-True ($window -notmatch "TypeDuckPreferences\.json|Unsupported controls are disabled|不支援時會停用") "Settings copy must not expose internal persistence files or unsupported-state placeholders."
 Assert-Text $preferences "TypeDuckPreferences\.json" "Settings source of truth must remain TypeDuckPreferences.json."
+
+$backendServerPath = Join-Path $repo "MoqLauncher/BackendServer.cpp"
+$backendServer = Get-Content -Raw -Encoding UTF8 -LiteralPath $backendServerPath
+Assert-Text $backendServer "set_force\(false\)" "Tray Refresh deploy must not copy the packaged build folder into user data."
 
 $aboutPath = Join-Path $repo "TypeDuckSettings/TypeDuckAboutDialog.cpp"
 if (Test-Path -LiteralPath $aboutPath) {

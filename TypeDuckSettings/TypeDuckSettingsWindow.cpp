@@ -46,6 +46,7 @@ constexpr int kSettingsButtonBottomY = 526;
 constexpr DWORD kRadioStyle = BS_AUTORADIOBUTTON;
 constexpr DWORD kRadioGroupStartStyle = BS_AUTORADIOBUTTON | WS_GROUP;
 constexpr DWORD kPipeConnectTimeoutMs = 5000;
+constexpr DWORD kPipeConnectRetryMs = 50;
 
 enum ControlId : int {
   kDisplayLanguageBase = 1100,
@@ -180,20 +181,27 @@ HANDLE connectLauncherPipe(DWORD timeoutMs) {
   if (pipeName.empty()) {
     return INVALID_HANDLE_VALUE;
   }
-  if (!WaitNamedPipeW(pipeName.c_str(), timeoutMs)) {
-    return INVALID_HANDLE_VALUE;
-  }
-  HANDLE pipe = CreateFileW(pipeName.c_str(), GENERIC_READ | GENERIC_WRITE, 0,
-                            nullptr, OPEN_EXISTING, 0, nullptr);
-  if (pipe == INVALID_HANDLE_VALUE) {
-    return INVALID_HANDLE_VALUE;
-  }
-  DWORD mode = PIPE_READMODE_MESSAGE;
-  if (!SetNamedPipeHandleState(pipe, &mode, nullptr, nullptr)) {
-    CloseHandle(pipe);
-    return INVALID_HANDLE_VALUE;
-  }
-  return pipe;
+
+  const ULONGLONG deadline = GetTickCount64() + timeoutMs;
+  do {
+    HANDLE pipe = CreateFileW(pipeName.c_str(), GENERIC_READ | GENERIC_WRITE, 0,
+                              nullptr, OPEN_EXISTING, 0, nullptr);
+    if (pipe != INVALID_HANDLE_VALUE) {
+      DWORD mode = PIPE_READMODE_MESSAGE;
+      if (!SetNamedPipeHandleState(pipe, &mode, nullptr, nullptr)) {
+        CloseHandle(pipe);
+        return INVALID_HANDLE_VALUE;
+      }
+      return pipe;
+    }
+
+    if (timeoutMs == 0) {
+      return INVALID_HANDLE_VALUE;
+    }
+    Sleep(kPipeConnectRetryMs);
+  } while (GetTickCount64() < deadline);
+
+  return INVALID_HANDLE_VALUE;
 }
 
 bool transactLauncher(HANDLE pipe, const moqi::protocol::ClientRequest& request,
@@ -326,6 +334,7 @@ Moqi::TypeDuck::ApplyResult deployViaLauncher() {
   moqi::protocol::ClientRequest deployRequest;
   deployRequest.set_seq_num(2);
   deployRequest.set_method(moqi::protocol::METHOD_TYPEDUCK_DEPLOY);
+  // The wire field is named force; install/update uses it to seed the packaged prebuilt RIME build before deploy.
   deployRequest.mutable_typeduck_deploy_request()->set_force(true);
   moqi::protocol::ServerResponse deployResponse;
   if (!transactLauncher(pipe, deployRequest, deployResponse)) {
