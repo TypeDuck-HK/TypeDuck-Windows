@@ -201,14 +201,15 @@ function Assert-InstallerScript {
     Assert-NotMatch $Failures $Iss "Type:\s*filesandordirs;\s*Name:\s*`"\{userappdata\}\\TypeDuckIME`"" `
         "Roaming user data must be deleted by opt-in code, not by a user-context-sensitive [UninstallDelete] entry."
     Assert-AllMatch $Failures $Iss @(
+        'TypeDuckLauncher\.exe";\s*Flags:\s*nowait runasoriginaluser',
+        'TypeDuckSettings\.exe";\s*Parameters:\s*"/apply-settings";\s*Flags:\s*runhidden waituntilterminated runasoriginaluser',
         'TypeDuckSettings\.exe";\s*Description:.*Flags:\s*postinstall nowait skipifsilent runasoriginaluser',
-        'TypeDuckAbout\.exe";\s*Description:.*Flags:\s*postinstall nowait skipifsilent runasoriginaluser',
-        'ApplyInstallSettingsAsOriginalUser',
-        'ExecAsOriginalUser\(ExpandConstant\(''\{app\}\\TypeDuckLauncher\.exe''\)',
-        'ExecAsOriginalUser\(ExpandConstant\(''\{app\}\\TypeDuckSettings\.exe''\),\s*''/apply-settings''',
-        'ewWaitUntilTerminated',
-        'ResultCode <> 0'
-    ) "Installer user-facing and settings-seed processes must run as the original user after any successful helper result so APPDATA and launcher state are created for the right account."
+        'TypeDuckAbout\.exe";\s*Description:.*Flags:\s*postinstall nowait skipifsilent runasoriginaluser'
+    ) "Installer user-facing and settings-seed processes must run as the original user so APPDATA and launcher state are created for the right account."
+    Assert-NotMatch $Failures $Iss 'TypeDuckSettings\.exe";\s*Parameters:\s*"/apply-settings";[^\r\n]*postinstall' `
+        "Install-time settings seed must be mandatory, not a final-page postinstall checkbox."
+    Assert-NotMatch $Failures $Iss "ApplyInstallSettingsAsOriginalUser|HandleInstallUserStateFailure|ResultCode\s*<>\s*0\s*then\s*HandleInstallUserStateFailure" `
+        "Installer must not turn a completed hidden settings seed exit code into a visible install failure."
     Assert-NotMatch $Failures $Iss "TSetupForm\.Create" `
         "Uninstaller prompt must use Inno's CreateCustomForm helper instead of constructing TSetupForm directly."
     Assert-AllMatch $Failures $Iss @(
