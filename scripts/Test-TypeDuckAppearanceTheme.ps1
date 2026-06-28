@@ -65,6 +65,7 @@ $themeFile = $rawThemeJson | ConvertFrom-Json
 Assert-True ($themeFile.version -ge 2) "appearance_themes.json must use the TypeDuck schema version 2 or newer."
 Assert-True ($null -ne $themeFile.fonts) "appearance_themes.json must define top-level fonts."
 Assert-True ($null -ne $themeFile.themes) "appearance_themes.json must define themes."
+Assert-True (-not (@($themeFile.PSObject.Properties.Name) -contains "source")) "appearance_themes.json must not include development-source metadata."
 Assert-ArraySetEquals -Actual @($themeFile.themes | ForEach-Object { $_.id }) -Expected @("light", "dark") -Label "Bundled theme IDs"
 
 $requiredPaletteRoles = @(
@@ -91,6 +92,7 @@ foreach ($theme in $themeFile.themes) {
     $themeProperties = @($theme.PSObject.Properties.Name)
     Assert-True (-not ($themeProperties -contains "fonts")) "Theme '$($theme.id)' must not contain font data; fonts belong at the top level."
     Assert-True (-not ($themeProperties -contains "appearance")) "Theme '$($theme.id)' must not use the legacy appearance object."
+    Assert-True (-not ($themeProperties -contains "source")) "Theme '$($theme.id)' must not include development-source metadata."
     Assert-True ($null -ne $theme.palette) "Theme '$($theme.id)' must define a role-based palette."
 
     $paletteKeys = @($theme.palette.PSObject.Properties.Name)
@@ -122,6 +124,7 @@ Assert-True (Test-Path -LiteralPath $buildScriptPath) "Missing backend build scr
 $loaderSource = Get-Content -Raw -Encoding UTF8 -LiteralPath $loaderPath
 Assert-True ($loaderSource.Contains("ThemePalette")) "Backend loader must decode the TypeDuck palette contract."
 Assert-True ($loaderSource -match 'Palette\s+ThemePalette\s+`json:"palette,omitempty"`') "ThemeDefinition must expose TypeDuck palette data."
+Assert-True (-not ($loaderSource -match '`json:"source"`')) "ThemeDefinition must not decode or write development-source metadata."
 Assert-True ($loaderSource -match 'Fonts\s+map\[string\]interface\{\}\s+`json:"fonts,omitempty"`') "appearanceThemesFile must decode top-level fonts."
 Assert-True ($loaderSource.Contains("paletteAppearanceConfig")) "Backend loader must map TypeDuck palettes to runtime appearance fields."
 
