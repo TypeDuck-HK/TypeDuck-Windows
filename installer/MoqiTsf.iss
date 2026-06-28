@@ -377,22 +377,22 @@ end;
 
 function ShouldLaunchLauncher(): Boolean;
 begin
-  Result := HelperInstallSucceeded and (not HelperInstallNeedsRestart);
+  Result := HelperInstallSucceeded;
 end;
 
 function ShouldLaunchSettings(): Boolean;
 begin
-  Result := HelperInstallSucceeded and (not HelperInstallNeedsRestart);
+  Result := HelperInstallSucceeded;
 end;
 
 function ShouldSeedDefaultSettings(): Boolean;
 begin
-  Result := HelperInstallSucceeded and (not HelperInstallNeedsRestart);
+  Result := HelperInstallSucceeded;
 end;
 
 function ShouldLaunchAbout(): Boolean;
 begin
-  Result := HelperInstallSucceeded and (not HelperInstallNeedsRestart);
+  Result := HelperInstallSucceeded;
 end;
 
 function PromptDeleteUserDataOnUninstall(): Boolean;

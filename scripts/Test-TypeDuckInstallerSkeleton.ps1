@@ -204,8 +204,10 @@ function Assert-InstallerScript {
         'TypeDuckLauncher\.exe";\s*Flags:\s*nowait runasoriginaluser',
         'TypeDuckSettings\.exe";\s*Parameters:\s*"/apply-settings";\s*Flags:\s*runhidden waituntilterminated runasoriginaluser',
         'TypeDuckSettings\.exe";\s*Description:.*Flags:\s*postinstall nowait skipifsilent runasoriginaluser',
-        'TypeDuckAbout\.exe";\s*Description:.*Flags:\s*postinstall nowait skipifsilent runasoriginaluser'
-    ) "Installer user-facing and settings-seed processes must run as the original user so APPDATA and launcher state are created for the right account."
+        'TypeDuckAbout\.exe";\s*Description:.*Flags:\s*postinstall nowait skipifsilent runasoriginaluser',
+        'function\s+ShouldLaunchLauncher\(\):\s+Boolean;\s*begin\s*Result := HelperInstallSucceeded;\s*end;',
+        'function\s+ShouldSeedDefaultSettings\(\):\s+Boolean;\s*begin\s*Result := HelperInstallSucceeded;\s*end;'
+    ) "Installer user-facing and settings-seed processes must run as the original user after any successful helper result so APPDATA and launcher state are created for the right account."
     Assert-NotMatch $Failures $Iss "TSetupForm\.Create" `
         "Uninstaller prompt must use Inno's CreateCustomForm helper instead of constructing TSetupForm directly."
     Assert-AllMatch $Failures $Iss @(
