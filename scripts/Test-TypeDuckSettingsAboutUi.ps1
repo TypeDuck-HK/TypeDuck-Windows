@@ -237,6 +237,8 @@ Assert-Text $window "applyInstallSettings" "Installation seed mode must apply cu
 Assert-Text $textServiceCmake "MoqLauncher/TypeDuckPreferences\.cpp" "Text service must link the shared preferences loader for UI-only settings."
 Assert-Text $textService "reloadTypeDuckDisplayPreferences" "Text service must reload saved UI preferences during candidate refresh."
 Assert-Text $textService "displayPreferencesFromSavedPreferences" "Text service must map saved preferences to candidate display preferences."
+Assert-Text $preferences "std::getenv\(`"APPDATA`"\)" "Settings source of truth must be stored under roaming APPDATA."
+Assert-True ($preferences -notmatch "std::getenv\(`"LOCALAPPDATA`"\)") "Settings source of truth must not use local APPDATA."
 Assert-Text $window "確定 Confirm" "Confirm button must be bilingual."
 Assert-Text $window "取消 Cancel" "Cancel button must be bilingual."
 Assert-True ($window -notmatch "套用後即時更新輸入法設定|Apply updates TypeDuck input settings|設定已儲存") "Settings window must not expose removed apply/status helper labels."

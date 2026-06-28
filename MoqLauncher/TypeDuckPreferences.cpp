@@ -94,8 +94,8 @@ Preferences preferencesFromJson(const Json::Value& root) {
   return preferences;
 }
 
-std::string localAppDataPath() {
-  const char* value = std::getenv("LOCALAPPDATA");
+std::string roamingAppDataPath() {
+  const char* value = std::getenv("APPDATA");
   return value != nullptr ? value : "";
 }
 
@@ -240,11 +240,11 @@ RimeSideEffects rimeSideEffects(const Preferences& preferences) {
 }
 
 std::filesystem::path defaultPreferencesPath() {
-  const auto local = localAppDataPath();
-  if (local.empty()) {
+  const auto roaming = roamingAppDataPath();
+  if (roaming.empty()) {
     return std::filesystem::path(kPreferencesFileName);
   }
-  return std::filesystem::path(local) / "TypeDuckIME" / kPreferencesFileName;
+  return std::filesystem::path(roaming) / "TypeDuckIME" / kPreferencesFileName;
 }
 
 ValidationResult loadPreferences(const std::filesystem::path& path) {

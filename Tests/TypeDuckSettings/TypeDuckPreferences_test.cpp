@@ -5,6 +5,7 @@
 #include <filesystem>
 #include <fstream>
 #include <string>
+#include <cstdlib>
 
 namespace {
 
@@ -43,6 +44,16 @@ TEST(TypeDuckPreferences, DefaultsMatchWebAlphaDecisionContract) {
   ASSERT_FALSE(descriptors.empty());
   EXPECT_EQ(descriptors.front().id, "displayLanguages");
   EXPECT_EQ(descriptors.front().label, "顯示語言 Display Languages");
+}
+
+TEST(TypeDuckPreferences, DefaultPathUsesRoamingAppData) {
+  const auto roaming = makeTempDir("typeduck-roaming-appdata-test");
+  const auto local = makeTempDir("typeduck-local-appdata-test");
+  _putenv_s("APPDATA", roaming.string().c_str());
+  _putenv_s("LOCALAPPDATA", local.string().c_str());
+
+  EXPECT_EQ(Moqi::TypeDuck::defaultPreferencesPath(),
+            roaming / "TypeDuckIME" / "TypeDuckPreferences.json");
 }
 
 TEST(TypeDuckPreferences, PageSizeRangeAndDefaultCustomPatch) {

@@ -105,10 +105,10 @@ Name: "{autoprograms}\TypeDuckIME\關於 About TypeDuck…"; Filename: "{app}\Ty
 Name: "{autoprograms}\TypeDuckIME\解除安裝 Uninstall"; Filename: "{uninstallexe}"
 
 [Run]
-Filename: "{app}\TypeDuckLauncher.exe"; Flags: nowait; Check: ShouldLaunchLauncher
-Filename: "{app}\TypeDuckSettings.exe"; Parameters: "/apply-settings"; Flags: runhidden waituntilterminated; Check: ShouldSeedDefaultSettings
-Filename: "{app}\TypeDuckSettings.exe"; Description: "開啟 TypeDuck 設定 / Open TypeDuck Settings"; Flags: postinstall nowait skipifsilent; Check: ShouldLaunchSettings
-Filename: "{app}\TypeDuckAbout.exe"; Description: "開啟 TypeDuck 關於 / Open TypeDuck About"; Flags: postinstall nowait skipifsilent; Check: ShouldLaunchAbout
+Filename: "{app}\TypeDuckLauncher.exe"; Flags: nowait runasoriginaluser; Check: ShouldLaunchLauncher
+Filename: "{app}\TypeDuckSettings.exe"; Parameters: "/apply-settings"; Flags: runhidden waituntilterminated runasoriginaluser; Check: ShouldSeedDefaultSettings
+Filename: "{app}\TypeDuckSettings.exe"; Description: "開啟 TypeDuck 設定 / Open TypeDuck Settings"; Flags: postinstall nowait skipifsilent runasoriginaluser; Check: ShouldLaunchSettings
+Filename: "{app}\TypeDuckAbout.exe"; Description: "開啟 TypeDuck 關於 / Open TypeDuck About"; Flags: postinstall nowait skipifsilent runasoriginaluser; Check: ShouldLaunchAbout
 
 [Registry]
 Root: HKCU; Subkey: "Software\Microsoft\Windows\CurrentVersion\Run"; \
@@ -124,7 +124,6 @@ Type: filesandordirs; Name: "{app}\resources"
 [UninstallDelete]
 Type: filesandordirs; Name: "{app}"
 Type: filesandordirs; Name: "{localappdata}\TypeDuckIME"
-Type: filesandordirs; Name: "{userappdata}\TypeDuckIME"; Check: ShouldDeleteUserDataOnUninstall
 
 [Code]
 const
@@ -464,6 +463,41 @@ begin
   end;
 end;
 
+procedure DeleteTypeDuckUserDataDir(const Path: String);
+begin
+  if DirExists(Path) then
+    DelTree(Path, True, True, True);
+end;
+
+procedure DeleteTypeDuckRoamingUserData;
+var
+  FindRec: TFindRec;
+  ProfilesRoot: String;
+  ProfilePath: String;
+begin
+  DeleteTypeDuckUserDataDir(ExpandConstant('{userappdata}\TypeDuckIME'));
+
+  ProfilesRoot := ExpandConstant('{sd}\Users');
+  if not DirExists(ProfilesRoot) then
+    Exit;
+
+  if FindFirst(ProfilesRoot + '\*', FindRec) then
+  begin
+    try
+      repeat
+        if (FindRec.Name <> '.') and (FindRec.Name <> '..') then
+        begin
+          ProfilePath := ProfilesRoot + '\' + FindRec.Name;
+          if DirExists(ProfilePath) then
+            DeleteTypeDuckUserDataDir(ProfilePath + '\AppData\Roaming\TypeDuckIME');
+        end;
+      until not FindNext(FindRec);
+    finally
+      FindClose(FindRec);
+    end;
+  end;
+end;
+
 function InitializeUninstall(): Boolean;
 begin
   DeleteUserDataOnUninstall := False;
@@ -488,6 +522,8 @@ begin
   begin
     StopTypeDuckProcesses;
     DeleteTypeDuckReregisterTask;
+    if DeleteUserDataOnUninstall then
+      DeleteTypeDuckRoamingUserData;
     if not RunSetupHelper(BuildUninstallSetupHelperParameters('/u'), ResultCode) then
     begin
       HandleUninstallSetupHelperFailure;

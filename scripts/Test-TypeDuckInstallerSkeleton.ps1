@@ -187,7 +187,9 @@ function Assert-InstallerScript {
         "DeleteTypeDuckReregisterTask",
         "Type:\s*filesandordirs;\s*Name:\s*`"\{app\}`"",
         "Type:\s*filesandordirs;\s*Name:\s*`"\{localappdata\}\\TypeDuckIME`"",
-        "Type:\s*filesandordirs;\s*Name:\s*`"\{userappdata\}\\TypeDuckIME`";\s*Check:\s*ShouldDeleteUserDataOnUninstall",
+        "DeleteTypeDuckRoamingUserData",
+        "DeleteTypeDuckUserDataDir\(ExpandConstant\('\{userappdata\}\\TypeDuckIME'\)\)",
+        "ProfilePath \+ '\\AppData\\Roaming\\TypeDuckIME'",
         "PromptDeleteUserDataOnUninstall",
         "Form := CreateCustomForm\(ScaleX\(360\),\s*ScaleY\(132\),\s*False,\s*True\)",
         "Form\.Color := clWhite",
@@ -196,6 +198,14 @@ function Assert-InstallerScript {
         "ButtonsLeft := \(Form\.ClientWidth - \(\(ButtonWidth \* 2\) \+ ButtonGap\)\) div 2",
         "DeleteUserDataOnUninstall := False"
     ) "Uninstall cleanup must cover TypeDuck registration, startup, task, install files, and make roaming user-data deletion opt-in."
+    Assert-NotMatch $Failures $Iss "Type:\s*filesandordirs;\s*Name:\s*`"\{userappdata\}\\TypeDuckIME`"" `
+        "Roaming user data must be deleted by opt-in code, not by a user-context-sensitive [UninstallDelete] entry."
+    Assert-AllMatch $Failures $Iss @(
+        'TypeDuckLauncher\.exe";\s*Flags:\s*nowait runasoriginaluser',
+        'TypeDuckSettings\.exe";\s*Parameters:\s*"/apply-settings";\s*Flags:\s*runhidden waituntilterminated runasoriginaluser',
+        'TypeDuckSettings\.exe";\s*Description:.*Flags:\s*postinstall nowait skipifsilent runasoriginaluser',
+        'TypeDuckAbout\.exe";\s*Description:.*Flags:\s*postinstall nowait skipifsilent runasoriginaluser'
+    ) "Installer user-facing and settings-seed processes must run as the original user so APPDATA and launcher state are created for the right account."
     Assert-NotMatch $Failures $Iss "TSetupForm\.Create" `
         "Uninstaller prompt must use Inno's CreateCustomForm helper instead of constructing TSetupForm directly."
     Assert-AllMatch $Failures $Iss @(
