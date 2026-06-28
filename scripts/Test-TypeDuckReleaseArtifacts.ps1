@@ -119,8 +119,8 @@ foreach ($workflow in @(
   Assert-Text $failures $workflow.Text 'Remove-Item\s+-LiteralPath\s+\$target\s+-Recurse\s+-Force' "$($workflow.Name) must remove listed schema files before Rime deployment."
   Assert-Text $failures $workflow.Text '-RimeDataSource\s+"?\$env:GITHUB_WORKSPACE\\TypeDuck-HK-schema' "$($workflow.Name) must pass the pruned schema checkout to the backend build."
   Assert-Text $failures $workflow.Text 'rime_deployer\.exe' "$($workflow.Name) must invoke the Rime deployer."
-  Assert-Text $failures $workflow.Text '--build\s+\$backendRimeRoot|--build\s+"?\$backendRimeRoot"?' "$($workflow.Name) must run the schema through the Rime deployer build command."
-  Assert-Text $failures $workflow.Text 'runtimeBuild.*\bbuild\b|backendRimeRoot.*\bbuild\b' "$($workflow.Name) must validate the generated runtime build folder."
+  Assert-Text $failures $workflow.Text '--build\s+\$schemaDir|--build\s+"?\$schemaDir"?' "$($workflow.Name) must run the schema through the Rime deployer build command."
+  Assert-Text $failures $workflow.Text 'buildDir.*\bbuild\b|Join-Path\s+\$schemaDir\s+"build"' "$($workflow.Name) must validate the generated schema build folder."
   Assert-Text $failures $workflow.Text $workflow.ArtifactPattern "$($workflow.Name) must use TypeDuck-owned workflow artifact names."
   Assert-Text $failures $workflow.Text 'typeduck-windows-ime-setup-\$\{\{\s*github\.event\.release\.tag_name\s*\|\|\s*github\.sha\s*\}\}\.exe' "$($workflow.Name) must prepare the tag-or-sha installer asset name."
   Assert-Text $failures $workflow.Text 'installer/dist/\$\{\{\s*env\.TYPEDUCK_INSTALLER_ASSET\s*\}\}|installer\\dist\\.*TYPEDUCK_INSTALLER_ASSET' "$($workflow.Name) must upload the renamed installer asset."
@@ -148,6 +148,7 @@ foreach ($entry in @(
 
 Assert-Text $failures $packageText 'installer\\dist\\typeduck-windows-ime-setup\.exe|installer/dist/typeduck-windows-ime-setup\.exe' "Package scripts must point at installer/dist/typeduck-windows-ime-setup.exe."
 Assert-Text $failures $packageText 'RimeDataSource' "Package scripts must forward the TypeDuck schema source to the backend build."
+Assert-NoText $failures $package '`\\"\$[A-Za-z][A-Za-z0-9_]*`\\"' "Package script native argument arrays must not embed literal quote characters around variable values."
 
 $installerFullPath = Resolve-FullPath -BasePath $root -Path $InstallerPath
 if (Test-Path -LiteralPath $installerFullPath -PathType Leaf) {

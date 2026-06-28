@@ -129,11 +129,11 @@ Write-Host "== Step 1/3: Build TypeDuck runtime package =="
 $moqiImeBuildArgs = @(
     "-NoProfile",
     "-ExecutionPolicy", "Bypass",
-    "-File", "`"$moqiImeBuildScript`"",
-    "-RepoRoot", "`"$MoqiImeRoot`""
+    "-File", $moqiImeBuildScript,
+    "-RepoRoot", $MoqiImeRoot
 )
 if ($RimeDataSource) {
-    $moqiImeBuildArgs += @("-RimeDataSource", "`"$RimeDataSource`"")
+    $moqiImeBuildArgs += @("-RimeDataSource", $RimeDataSource)
 }
 Invoke-Step -FilePath "pwsh" -ArgumentList $moqiImeBuildArgs -WorkingDirectory $MoqiImeRoot
 
@@ -142,19 +142,19 @@ if (-not (Test-Path -LiteralPath (Join-Path $moqiImeRuntimeDir "server.exe"))) {
 }
 
 Write-Host "== Step 2/3: Build TypeDuck Windows IME binaries =="
- $windowsBuildArgs = @(
+$windowsBuildArgs = @(
     "-NoProfile",
     "-ExecutionPolicy", "Bypass",
-    "-File", "`"$windowsBuildScript`"",
-    "-RepoRoot", "`"$RepoRoot`"",
+    "-File", $windowsBuildScript,
+    "-RepoRoot", $RepoRoot,
     "-Configuration", $Configuration,
-    "-Generator", "`"$Generator`""
+    "-Generator", $Generator
 )
 if ($ProtobufSourceDir) {
-    $windowsBuildArgs += @("-ProtobufSourceDir", "`"$ProtobufSourceDir`"")
+    $windowsBuildArgs += @("-ProtobufSourceDir", $ProtobufSourceDir)
 }
 if ($ProtobufRoot) {
-    $windowsBuildArgs += @("-ProtobufRoot", "`"$ProtobufRoot`"")
+    $windowsBuildArgs += @("-ProtobufRoot", $ProtobufRoot)
 }
 Invoke-Step -FilePath "pwsh" -ArgumentList $windowsBuildArgs -WorkingDirectory $RepoRoot
 
@@ -162,9 +162,9 @@ Write-Host "== Step 3/3: Build TypeDuck installer package =="
 Invoke-Step -FilePath "pwsh" -ArgumentList @(
     "-NoProfile",
     "-ExecutionPolicy", "Bypass",
-    "-File", "`"$windowsInstallScript`"",
-    "-RepoRoot", "`"$RepoRoot`"",
-    "-MoqiImeSource", "`"$moqiImeRuntimeDir`""
+    "-File", $windowsInstallScript,
+    "-RepoRoot", $RepoRoot,
+    "-MoqiImeSource", $moqiImeRuntimeDir
 ) -WorkingDirectory $RepoRoot
 
 $installerPath = Join-Path $RepoRoot "installer\dist\typeduck-windows-ime-setup.exe"
