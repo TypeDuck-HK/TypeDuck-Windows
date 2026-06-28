@@ -111,6 +111,7 @@ static std::string normalizeGuidKey(std::string guid) {
 PipeServer::PipeServer()
     : quitExistingLauncher_(false), hwnd_(nullptr),
       singleInstanceMutex_(nullptr),
+      applySettingsOnStartup_(false),
       shutdownRequested_(false),
       logLevel_{spdlog::level::err} {
 
@@ -409,6 +410,29 @@ void PipeServer::openTypeDuckSettings() const {
   }
 }
 
+void PipeServer::launchTypeDuckSettingsApply() const {
+  std::wstring settingsPath = topDirPath_ + TYPEDUCK_SETTINGS_EXE;
+  HINSTANCE result = ::ShellExecuteW(nullptr, L"open", settingsPath.c_str(),
+                                     L"/apply-settings", topDirPath_.c_str(),
+                                     SW_HIDE);
+  if (reinterpret_cast<INT_PTR>(result) <= 32) {
+    logger_->warn("Unable to launch TypeDuckSettings.exe /apply-settings");
+  }
+}
+
+void PipeServer::runStartupSettingsApply() {
+  uv_timer_init(uv_default_loop(), &startupSettingsApplyTimer_);
+  startupSettingsApplyTimer_.data = this;
+  uv_timer_start(&startupSettingsApplyTimer_,
+                 [](uv_timer_t *handle) {
+                   auto server = reinterpret_cast<PipeServer *>(handle->data);
+                   server->launchTypeDuckSettingsApply();
+                   uv_timer_stop(handle);
+                   uv_close(reinterpret_cast<uv_handle_t *>(handle), nullptr);
+                 },
+                 100, 0);
+}
+
 void PipeServer::openTypeDuckAbout() const {
   std::wstring aboutPath = topDirPath_ + TYPEDUCK_ABOUT_EXE;
   HINSTANCE result = ::ShellExecuteW(hwnd_, L"open", aboutPath.c_str(),
@@ -468,6 +492,8 @@ void PipeServer::parseCommandLine(LPSTR cmd) {
     const wchar_t *arg = argv[i];
     if (wcscmp(arg, L"/quit") == 0)
       quitExistingLauncher_ = true;
+    else if (wcscmp(arg, L"/apply-settings") == 0)
+      applySettingsOnStartup_ = true;
   }
   LocalFree(argv);
 }
@@ -590,6 +616,10 @@ int PipeServer::exec(LPSTR cmd) {
               auto _this = reinterpret_cast<PipeServer *>(server->data);
               _this->onNewClientConnected(server, status);
             });
+
+  if (applySettingsOnStartup_) {
+    runStartupSettingsApply();
+  }
 
   // run GUI message loop in another worker thread
   uv_thread_t uiThread;

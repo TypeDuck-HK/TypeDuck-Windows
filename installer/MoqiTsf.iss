@@ -105,15 +105,14 @@ Name: "{autoprograms}\TypeDuckIME\關於 About TypeDuck…"; Filename: "{app}\Ty
 Name: "{autoprograms}\TypeDuckIME\解除安裝 Uninstall"; Filename: "{uninstallexe}"
 
 [Run]
-Filename: "{app}\TypeDuckLauncher.exe"; Flags: nowait runasoriginaluser
-Filename: "{app}\TypeDuckSettings.exe"; Parameters: "/apply-settings"; Flags: runhidden waituntilterminated runasoriginaluser
+Filename: "{app}\TypeDuckLauncher.exe"; Parameters: "/apply-settings"; Flags: nowait runasoriginaluser
 Filename: "{app}\TypeDuckSettings.exe"; Description: "開啟 TypeDuck 設定 / Open TypeDuck Settings"; Flags: postinstall nowait skipifsilent runasoriginaluser; Check: ShouldLaunchSettings
 Filename: "{app}\TypeDuckAbout.exe"; Description: "開啟 TypeDuck 關於 / Open TypeDuck About"; Flags: postinstall nowait skipifsilent runasoriginaluser; Check: ShouldLaunchAbout
 
 [Registry]
 Root: HKCU; Subkey: "Software\Microsoft\Windows\CurrentVersion\Run"; \
   ValueType: string; ValueName: "TypeDuckLauncher"; \
-  ValueData: """{app}\TypeDuckLauncher.exe"""; \
+  ValueData: """{app}\TypeDuckLauncher.exe"" /apply-settings"; \
   Flags: uninsdeletevalue
 
 [InstallDelete]

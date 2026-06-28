@@ -99,6 +99,8 @@ private:
 	void showPopupMenu() const;
 	void openTypeDuckSettings() const;
 	void openTypeDuckAbout() const;
+	void runStartupSettingsApply();
+	void launchTypeDuckSettingsApply() const;
 	void showTrayNotification(const std::wstring& title, const std::wstring& message,
 	                         DWORD infoFlags);
 	void flushTrayNotifications();
@@ -137,6 +139,7 @@ private:
 	
 	std::wstring topDirPath_;
 	bool quitExistingLauncher_;
+	bool applySettingsOnStartup_;
 	static PipeServer* singleton_;
 	static wchar_t singleInstanceMutexName_[];
 	std::vector<PipeClient*> clients_;
@@ -158,6 +161,7 @@ private:
 	std::mutex trayNotificationsMutex_;
 
 	HANDLE singleInstanceMutex_;
+	uv_timer_t startupSettingsApplyTimer_;
 
 	// error logging
 	spdlog::level::level_enum logLevel_;

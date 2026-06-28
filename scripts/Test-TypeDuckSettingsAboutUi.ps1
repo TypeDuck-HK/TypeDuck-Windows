@@ -140,7 +140,8 @@ Assert-Text $installer "Filename:\s+`"\{app\}\\TypeDuckAbout\.exe`"" "Installer 
 Assert-Text $installer "Description:\s+`"開啟 TypeDuck 設定 / Open TypeDuck Settings`"" "Installer settings launch description must be bilingual."
 Assert-Text $installer "Description:\s+`"開啟 TypeDuck 關於 / Open TypeDuck About`"" "Installer About launch description must be bilingual."
 Assert-Text $installer "function\s+ShouldLaunchSettings\(\):\s+Boolean" "Installer settings launch must be gated by a dedicated function."
-Assert-Text $installer 'TypeDuckSettings\.exe";\s+Parameters:\s+"/apply-settings";\s+Flags:\s+runhidden waituntilterminated runasoriginaluser' "Installer must run install settings seeding as a mandatory original-user [Run] entry."
+Assert-Text $installer 'TypeDuckLauncher\.exe";\s+Parameters:\s+"/apply-settings";\s+Flags:\s+nowait runasoriginaluser' "Installer must start the launcher in settings-apply mode with a single mandatory original-user [Run] entry."
+Assert-True ($installer -notmatch 'TypeDuckSettings\.exe";\s+Parameters:\s+"/apply-settings"') "Installer must let the launcher invoke TypeDuckSettings /apply-settings instead of running a second mandatory [Run] entry."
 Assert-Text $installer "function\s+ShouldLaunchAbout\(\):\s+Boolean" "Installer About launch must be gated by a dedicated function."
 Assert-Text $installer 'TypeDuckIME\\輸入法設定 IME Settings";\s+Filename:\s+"\{app\}\\TypeDuckSettings\.exe"' "Installer must create the Phase 6 TypeDuck IME Settings Start Menu shortcut."
 Assert-Text $installer 'TypeDuckIME\\關於 About TypeDuck…";\s+Filename:\s+"\{app\}\\TypeDuckAbout\.exe"' "Installer must create the Phase 6 TypeDuck About Start Menu shortcut."
@@ -148,9 +149,10 @@ Assert-Text $installer 'TypeDuckIME\\解除安裝 Uninstall";\s+Filename:\s+"\{u
 Assert-Ordered $installer @(
   "Filename:\s+`"\{app\}\\TypeDuckLauncher\.exe`"",
   "Parameters:\s+`"/apply-settings`"",
-  "Filename:\s+`"\{app\}\\TypeDuckSettings\.exe`"",
+  "Description:\s+`"開啟 TypeDuck 設定 / Open TypeDuck Settings`"",
   "Filename:\s+`"\{app\}\\TypeDuckAbout\.exe`""
 ) "Installer run order"
+Assert-Text $installer 'ValueData:\s+"""\{app\}\\TypeDuckLauncher\.exe"" /apply-settings"' "Startup entry must opt the Launcher into first-login settings apply mode."
 Assert-Text $packageScript "scripts\\install\.ps1" "All-in package script must continue to route packaging through scripts/install.ps1."
 Assert-Text $imeModule "TypeDuckSettings\.exe" "TSF Configure entry point must launch TypeDuckSettings.exe."
 Assert-Text $imeModule "launchTypeDuckSettings" "TSF Configure entry point must route through a fixed TypeDuck settings launch helper."
@@ -160,6 +162,11 @@ Assert-Text $pipeServer "TypeDuckSettings\.exe" "Launcher post-install entry poi
 Assert-Text $pipeServer "openTypeDuckSettings" "Launcher must expose a fixed TypeDuck settings launch helper."
 Assert-Text $pipeServer "TypeDuckAbout\.exe" "Launcher tray entry must launch TypeDuckAbout.exe."
 Assert-Text $pipeServer "openTypeDuckAbout" "Launcher must expose a fixed TypeDuck About launch helper."
+Assert-Text $pipeServer "applySettingsOnStartup_" "Launcher must keep settings apply opt-in behind an explicit startup flag."
+Assert-Text $pipeServer "launchTypeDuckSettingsApply" "Launcher must launch TypeDuckSettings /apply-settings after startup when requested."
+Assert-Text $pipeServer "wcscmp\(arg,\s*L`"/apply-settings`"\)" "Launcher must parse the installer/startup settings apply flag."
+Assert-Text $pipeServer "uv_timer_start" "Launcher must delay startup settings apply until the pipe listener has been created."
+Assert-Text $pipeServer "ShellExecuteW\(nullptr,\s*L`"open`",\s*settingsPath\.c_str\(\),\s*L`"/apply-settings`"" "Launcher settings apply flag must call TypeDuckSettings.exe /apply-settings."
 Assert-Text $pipeServer "輸入法設定 / IME Settings" "Launcher settings menu label must be bilingual."
 Assert-Text $pipeServer "關於 / About TypeDuck" "Launcher About menu label must be bilingual."
 Assert-Ordered $pipeServer @(

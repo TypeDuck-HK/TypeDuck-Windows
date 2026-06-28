@@ -142,6 +142,7 @@ function Assert-InstallerScript {
         "TypeDuckSetupHelper\.exe",
         "TypeDuckTextService\.dll",
         "ValueName:\s*`"TypeDuckLauncher`"",
+        'ValueData:\s*"""\{app\}\\TypeDuckLauncher\.exe"" /apply-settings',
         "TypeDuckIME-ReRegisterTSF",
         "\{autoprograms\}\\TypeDuckIME\\輸入法設定 IME Settings",
         "\{autoprograms\}\\TypeDuckIME\\關於 About TypeDuck…",
@@ -201,11 +202,12 @@ function Assert-InstallerScript {
     Assert-NotMatch $Failures $Iss "Type:\s*filesandordirs;\s*Name:\s*`"\{userappdata\}\\TypeDuckIME`"" `
         "Roaming user data must be deleted by opt-in code, not by a user-context-sensitive [UninstallDelete] entry."
     Assert-AllMatch $Failures $Iss @(
-        'TypeDuckLauncher\.exe";\s*Flags:\s*nowait runasoriginaluser',
-        'TypeDuckSettings\.exe";\s*Parameters:\s*"/apply-settings";\s*Flags:\s*runhidden waituntilterminated runasoriginaluser',
+        'TypeDuckLauncher\.exe";\s*Parameters:\s*"/apply-settings";\s*Flags:\s*nowait runasoriginaluser',
         'TypeDuckSettings\.exe";\s*Description:.*Flags:\s*postinstall nowait skipifsilent runasoriginaluser',
         'TypeDuckAbout\.exe";\s*Description:.*Flags:\s*postinstall nowait skipifsilent runasoriginaluser'
-    ) "Installer user-facing and settings-seed processes must run as the original user so APPDATA and launcher state are created for the right account."
+    ) "Installer user-facing and settings-apply launcher process must run as the original user so APPDATA and launcher state are created for the right account."
+    Assert-NotMatch $Failures $Iss 'TypeDuckSettings\.exe";\s*Parameters:\s*"/apply-settings"' `
+        "Install-time settings apply must be routed through the Launcher flag, not a second mandatory [Run] entry."
     Assert-NotMatch $Failures $Iss 'TypeDuckSettings\.exe";\s*Parameters:\s*"/apply-settings";[^\r\n]*postinstall' `
         "Install-time settings seed must be mandatory, not a final-page postinstall checkbox."
     Assert-NotMatch $Failures $Iss "ApplyInstallSettingsAsOriginalUser|HandleInstallUserStateFailure|ResultCode\s*<>\s*0\s*then\s*HandleInstallUserStateFailure" `
