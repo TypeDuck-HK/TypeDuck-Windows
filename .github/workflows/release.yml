@@ -77,20 +77,16 @@ jobs:
 
           "PROTOBUF_ROOT=$protocRoot" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
 
-      - name: Prepare TypeDuck schema runtime build
+      - name: Build TypeDuck schema
         run: |
-          $schemaSource = Join-Path $env:GITHUB_WORKSPACE "TypeDuck-HK-schema"
+          $schemaDir = Join-Path $env:GITHUB_WORKSPACE "TypeDuck-HK-schema"
+          $buildDir = Join-Path $schemaDir "build"
           $schemaPruneList = Join-Path $env:GITHUB_WORKSPACE "TypeDuck-Windows\scripts\typeduck-schema-prune-list.txt"
           $backendRimeRoot = Join-Path $env:GITHUB_WORKSPACE "TypeDuck-Windows-backend\input_methods\rime"
-          $schemaDest = Join-Path $backendRimeRoot "data\schema"
-          $runtimeBuild = Join-Path $backendRimeRoot "build"
           $rimeDeployer = Join-Path $backendRimeRoot "rime_deployer.exe"
 
-          if (Test-Path -LiteralPath $schemaDest) {
-            Remove-Item -LiteralPath $schemaDest -Recurse -Force
-          }
-          if (Test-Path -LiteralPath $runtimeBuild) {
-            Remove-Item -LiteralPath $runtimeBuild -Recurse -Force
+          if (Test-Path -LiteralPath $buildDir) {
+            Remove-Item -LiteralPath $buildDir -Recurse -Force
           }
 
           if (-not (Test-Path -LiteralPath $schemaPruneList -PathType Leaf)) {
@@ -99,32 +95,28 @@ jobs:
           Get-Content -LiteralPath $schemaPruneList | ForEach-Object {
             $entry = $_.Trim()
             if (-not [string]::IsNullOrWhiteSpace($entry) -and -not $entry.StartsWith("#")) {
-              $target = Join-Path $schemaSource $entry
+              $target = Join-Path $schemaDir $entry
               if (Test-Path -LiteralPath $target) {
                 Remove-Item -LiteralPath $target -Recurse -Force
               }
             }
           }
 
-          New-Item -ItemType Directory -Path $schemaDest -Force | Out-Null
-          if (-not (Test-Path -LiteralPath $schemaSource -PathType Container)) {
-            throw "Missing TypeDuck schema checkout: $schemaSource"
-          }
-          $schemaItems = Get-ChildItem -LiteralPath $schemaSource -Force
-          if (-not $schemaItems) {
-            throw "TypeDuck schema checkout is empty: $schemaSource"
-          }
-          Copy-Item -LiteralPath $schemaItems.FullName -Destination $schemaDest -Recurse -Force
-
           if (-not (Test-Path -LiteralPath $rimeDeployer -PathType Leaf)) {
             throw "Missing Rime deployer: $rimeDeployer"
           }
-          & $rimeDeployer --build $backendRimeRoot
+          & $rimeDeployer --build $schemaDir
           if ($LASTEXITCODE -ne 0) {
             throw "Rime deployer failed with exit code $LASTEXITCODE."
           }
-          if (-not (Test-Path -LiteralPath $runtimeBuild -PathType Container)) {
-            throw "Rime deployer did not produce runtime build folder: $runtimeBuild"
+          foreach ($entry in "user.yaml", "installation.yaml") {
+            $target = Join-Path $schemaDir $entry
+            if (Test-Path -LiteralPath $target) {
+              Remove-Item -LiteralPath $target -Recurse -Force
+            }
+          }
+          if (-not (Test-Path -LiteralPath $buildDir -PathType Container)) {
+            throw "Rime deployer did not produce build folder: $buildDir"
           }
 
       - name: Build release installer
