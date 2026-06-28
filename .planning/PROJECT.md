@@ -35,13 +35,12 @@ Hong Kong users can install TypeDuck under Chinese (Traditional, Hong Kong) and 
 - ✓ Phase 5 delivered a separate native About executable with current accepted attribution text, product/credit resources, links, version/engine/schema attribution, Start Menu/tray access, and duplicate-instance prevention.
 - ✓ Phase 5 cleaned icon/resource packaging for the visible TypeDuck surfaces, including TypeDuck executable/input-picker/installer icon usage and frontend-owned About bitmap resources.
 - ✓ Phase 5 visual acceptance is recorded by user human verification. All Phase 5 screenshot tests and `.planning/product/ui-fixtures` artifacts were explicitly retired by user direction on 2026-06-26.
+- ✓ Phase 6 completed TypeDuck privacy/security/scaffold cleanup: installer localization, TypeDuckRuntime packaging, fixed runtime bridge, TypeDuck log/data paths, removed cloud/WebDAV/AI/fcitx surfaces, IPC hardening, backend diagnostics cleanup, CI/release naming, and aggregate guards.
+- ✓ Phase 7 completed release verification with current installer artifact hash, install/reinstall/uninstall VM iterations, protocol recovery evidence, host-app/DPI human verification, and post-aggregate regression repairs.
 
 ### Active
 
-- [ ] Remove transitional product reliance on backend `ime.json`; TypeDuck-owned code/config must ultimately own profile identity, settings entry points, and runtime capability contracts.
-- [ ] Replace Moqi product identity with TypeDuck identity across binaries, resources, installer, registry/profile metadata, data/log paths, and release artifacts.
-- [ ] Display all user-facing text bilingually in Traditional Hong Kong Chinese and English.
-- [ ] Remove or hide unused scaffold features such as fcitx references, WebDAV/cloud clipboard, AI controls, and excessive customization not present in TypeDuck Web alpha.
+- [ ] Prepare v1 distribution packaging and release-note handoff using the completed Phase 7 evidence packet.
 
 ### Out of Scope
 
@@ -81,8 +80,8 @@ Hong Kong users can install TypeDuck under Chinese (Traditional, Hong Kong) and 
 - **Phase 3 requires Windows VM evidence.** Installer, TSF registration, dual-bitness DLL deployment, language profile placement, uninstall/reinstall, and reboot-required registration behavior must be verified in a clean Windows 10/11 VM or equivalent disposable Windows test environment. Prefer Hyper-V checkpoints before install tests.
 - **Phase 4 is mostly code-testable, with a VM smoke once TSF typing is wired.** Protocol, frame bounds, payload parsing, engine adapter behavior, and timeout handling should have automated code tests; real TSF typing and host-process responsiveness still need a targeted Windows VM smoke test before the phase is accepted.
 - **Phase 5 is closed by human verification.** Earlier VM screenshot-manifest tests were explicitly replaced by user human verification on 2026-06-26. Do not recreate `.planning/product/ui-fixtures` as a Phase 5 acceptance gate; future screenshots belong to Phase 7 release evidence if desired.
-- **Phase 6 is mixed.** Static audits and code tests can cover banned strings, removed handlers, parser bounds, and logging defaults, but installed-path privacy, launcher/runtime behavior, config-tool removal, pipe behavior, and absence of legacy feature surfaces should receive targeted Windows VM smoke evidence.
-- **Phase 7 formalizes the full matrix.** It should gather the final clean install, upgrade/reinstall, uninstall, reboot, host app, DPI, bitness, protocol recovery, and release artifact evidence.
+- **Phase 6 is complete.** Static audits, code tests, backend guards, and Phase 7 live follow-up cover banned strings, removed handlers, parser bounds, logging defaults, installed-path privacy, launcher/runtime behavior, config-tool removal, pipe behavior, and absence of legacy feature surfaces.
+- **Phase 7 is complete.** The final evidence packet covers clean install/reinstall/uninstall iterations, reboot-required registration path guards, host app and DPI human verification, bitness, protocol recovery, current installer hash, workflow/schema-source guards, and no-screenshot verification boundaries.
 
 ## Key Decisions
 
@@ -102,6 +101,9 @@ Hong Kong users can install TypeDuck under Chinese (Traditional, Hong Kong) and 
 | Close Phase 4 on live VM UAT plus static guards | The user installed the rebuilt installer in the VM and confirmed TypeDuck typing and schema replacement worked; deeper launcher fault-injection probes are valuable but not blocking for this MVP phase. | Accepted in Phase 4 |
 | Keep TypeDuck schemas in the sibling runtime build | Schema filtering, prebuild with `rime_deployer.exe --build`, and packaged `build` artifacts belong to `moqi-ime`; this repo should not add a schema submodule. | Accepted in Phase 4 |
 | Close Phase 5 on human verification plus static guards | The user iteratively verified candidate/dictionary/settings/About behavior in the VM and explicitly retired screenshot tests and `.planning/product/ui-fixtures`; release-grade screenshot matrices move to Phase 7. | Accepted in Phase 5 |
+| Close Phase 6 on focused guards plus Phase 7 live follow-up | Static guards prove privacy/security cleanup, while Phase 7 VM iterations closed the remaining live installer/launcher/path behavior. | Accepted in Phase 6/7 |
+| Keep screenshot-driven release verification interactive | User explicitly completed host-app/DPI judgement without screenshot capture; future regressions should preserve direct human judgement unless requirements change. | Accepted in Phase 7 |
+| Keep only `resources\TypeDuck_Small.ico` as a raw installed icon | The Windows system IME picker needs a file path, but old `icons` folders and other raw icon files remain pruned. | Accepted in Phase 7 |
 
 ## Evolution
 
@@ -119,4 +121,4 @@ After each milestone:
 4. Confirm candidate/dictionary display against TypeDuck Web alpha.
 
 ---
-*Last updated: 2026-06-26 after Phase 5 closeout*
+*Last updated: 2026-06-28 after Phase 7 closeout*

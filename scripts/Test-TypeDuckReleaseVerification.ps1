@@ -237,8 +237,8 @@ Assert-ContainsAll $failures @($manifest.host_apps.targets) @(
 Assert-ContainsAll $failures @($manifest.dpi.scales) @("100%", "140% if available", "175%", "200%") "dpi.scales"
 
 if ($Strict) {
-  if ($manifest.interactive_human_checks.status -notin @("pending-human", "passed", "failed")) {
-    Add-Failure $failures "Strict mode requires interactive_human_checks.status to be pending-human, passed, or failed."
+  if ($manifest.interactive_human_checks.status -notin @("pending-human", "passed", "failed", "complete")) {
+    Add-Failure $failures "Strict mode requires interactive_human_checks.status to be pending-human, passed, failed, or complete."
   }
   if ([string]::IsNullOrWhiteSpace([string] $manifest.rerun_after_repairs.rule)) {
     Add-Failure $failures "Strict mode requires rerun_after_repairs.rule."

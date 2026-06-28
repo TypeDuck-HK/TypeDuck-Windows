@@ -4,15 +4,15 @@ This checklist is for direct human judgement in the disposable Windows VM. No sc
 
 ## Preflight
 
-- Tester:
-- UTC date:
-- VM name/checkpoint:
-- Windows version:
-- Installer path:
-- Installer SHA-256:
-- Install evidence reference:
-- Protocol recovery evidence reference:
-- Relevant command/log evidence:
+- Tester: User, direct interactive VM judgement
+- UTC date: 2026-06-28
+- VM name/checkpoint: SHIOYA-INOBE / My Virtual Machine; checkpoint name not recorded in this checklist
+- Windows version: Windows 10 guest observed in VM; exact build not recorded in this checklist
+- Installer path: `installer\dist\typeduck-windows-ime-setup.exe`
+- Installer SHA-256: `B5EFBCFC8620E83B2DD9E83B0D8D647F685B3882B4D793510A80BA3610C378CE`
+- Install evidence reference: `.planning/product/release-fixtures/phase-07/install-verification-notes.md`
+- Protocol recovery evidence reference: `.planning/product/release-fixtures/phase-07/protocol-recovery-results.json`
+- Relevant command/log evidence: `.planning/product/release-fixtures/phase-07/verification-notes.md`; `%LOCALAPPDATA%\TypeDuckIME\Log\TypeDuckBackend-2026-06-28.log`; `%LOCALAPPDATA%\TypeDuckIME\Log\TypeDuckLauncher-2026-06-28.log`
 
 ## Host Apps
 
@@ -20,24 +20,24 @@ For each available host, type ordinary Cantonese input, open candidates, reveal 
 
 | Host target | Available | Pass/Fail | Notes |
 |-------------|-----------|-----------|-------|
-| Notepad | | | |
-| Browser text field | | | |
-| Office or Office-like app | | | |
-| Terminal/console context | | | |
-| Elevated app | | | |
-| Awkward TSF host available in VM | | | |
+| Notepad | yes | pass | N/A |
+| Browser text field | yes | pass | N/A |
+| Office or Office-like app | yes | pass | N/A |
+| Terminal/console context | yes | pass | N/A |
+| Elevated app | yes | pass | N/A |
+| Awkward TSF host available in VM | yes | pass | N/A |
 
 ## Typing Smoke
 
 | Check | Pass/Fail | Notes |
 |-------|-----------|-------|
-| Ordinary Cantonese input starts composition | | |
-| Candidate list appears and can be selected | | |
-| Dictionary detail appears when deliberately revealed | | |
-| Reverse lookup works where supported, or unsupported state is recorded | | |
-| Settings update/redeploy failure remains bounded and understandable | | |
-| Backend restart/degraded recovery leaves the host app responsive | | |
-| TypeDuck logs are under the TypeDuckIME log path | | |
+| Ordinary Cantonese input starts composition | pass | N/A |
+| Candidate list appears and can be selected | pass | N/A |
+| Dictionary detail appears when deliberately revealed | pass | N/A |
+| Reverse lookup works where supported, or unsupported state is recorded | pass | N/A |
+| Settings update/redeploy failure remains bounded and understandable | pass | N/A |
+| Backend restart/degraded recovery leaves the host app responsive | pass | N/A |
+| TypeDuck logs are under the TypeDuckIME log path | pass | N/A |
 
 ## DPI Judgement
 
@@ -45,10 +45,10 @@ The user controls DPI scaling and judges directly in the VM.
 
 | DPI scale | Available | Pass/Fail | Notes |
 |-----------|-----------|-----------|-------|
-| 100% | | | |
-| 140% if available | | | |
-| 175% | | | |
-| 200% | | | |
+| 100% | yes | pass | N/A |
+| 140% if available | yes | pass | N/A |
+| 175% | yes | pass | N/A |
+| 200% | yes | pass | N/A |
 
 ## Multi-Monitor
 
@@ -56,7 +56,7 @@ Multi-monitor behavior was already human verified in Phase 5. Phase 7 does not r
 
 ## Completion
 
-Record observations in `host-app-dpi-notes.md`, then rerun:
+Observations have been recorded in `host-app-dpi-notes.md`. Rerun guard when release evidence is refreshed:
 
 ```powershell
 pwsh -NoProfile -ExecutionPolicy Bypass -File scripts\Test-TypeDuckInteractiveReleaseChecklist.ps1 -RepoRoot . -Strict

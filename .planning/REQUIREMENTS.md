@@ -95,7 +95,7 @@ Phase 5 evidence note: screenshot tests and `.planning/product/ui-fixtures` were
 - [x] **VER-01**: Developer has a dated TypeDuck Web alpha parity fixture set covering settings defaults, labels, candidate list, dictionary panel, and visual references.
 - [x] **VER-02**: Developer can run automated or scripted checks that fail when visible Moqi, fcitx, WebDAV/cloud clipboard, AI, or Simplified-only strings remain in user-facing resources.
 - [x] **VER-03**: Developer can verify clean install, upgrade/reinstall, uninstall, and reboot-required registration behavior on Windows 10/11 or equivalent test VMs.
-- [ ] **VER-04**: Developer can verify TypeDuck typing and candidate UI in representative host apps including Notepad, browsers, Office or Office-like apps, terminal/console contexts, elevated apps, and high-DPI/multi-monitor setups.
+- [x] **VER-04**: Developer can verify TypeDuck typing and candidate UI in representative host apps including Notepad, browsers, Office or Office-like apps, terminal/console contexts, elevated apps, and high-DPI/multi-monitor setups.
 - [x] **VER-05**: Developer can verify protocol and engine behavior with golden tests for normal input, dictionary lookup, reverse lookup, malformed frames, timeouts, and backend restart.
 - [x] **VER-06**: Developer can produce a v1 installer artifact with TypeDuck naming and documented verification evidence.
 
@@ -199,7 +199,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | VER-01 | Phase 1 | Complete |
 | VER-02 | Phase 6 | Complete |
 | VER-03 | Phase 7 | Complete |
-| VER-04 | Phase 7 | Pending |
+| VER-04 | Phase 7 | Complete |
 | VER-05 | Phase 7 | Complete |
 | VER-06 | Phase 7 | Complete |
 
@@ -211,4 +211,4 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 ---
 *Requirements defined: 2026-06-23*
-*Last updated: 2026-06-26 after Phase 5 closeout*
+*Last updated: 2026-06-28 after Phase 7 closeout*

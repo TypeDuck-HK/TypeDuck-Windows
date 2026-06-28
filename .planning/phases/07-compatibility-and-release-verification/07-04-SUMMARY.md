@@ -30,10 +30,10 @@ key-files:
     - .planning/product/privacy-security/phase-06-guard-results.json
 
 requirements-completed: ["VER-03", "VER-05", "VER-06"]
-requirements-human-pending: ["VER-04"]
+requirements-human-pending: []
 
 completed: 2026-06-27
-status: human_checkpoint_pending
+status: complete
 ---
 
 # Phase 07 Plan 04: Aggregate Release Verification Summary
@@ -50,9 +50,9 @@ Created the final non-interactive release evidence packet. The aggregate now val
 ## Evidence
 
 - Installer artifact: `installer\dist\typeduck-windows-ime-setup.exe`
-- SHA-256: `CDD1028B630A74AE21D095A76843581FA8D794A5250FF00CD69F78D3F447AF0E`
-- Byte size: `21075640`
-- Aggregate status: `automated-ready-human-pending`
+- SHA-256: `B5EFBCFC8620E83B2DD9E83B0D8D647F685B3882B4D793510A80BA3610C378CE`
+- Byte size: `20942974`
+- Aggregate status: `complete`
 
 ## Verification
 
@@ -60,9 +60,21 @@ Created the final non-interactive release evidence packet. The aggregate now val
 - `pwsh -NoProfile -ExecutionPolicy Bypass -File scripts\Invoke-TypeDuckReleaseVerification.ps1 -RepoRoot . -EvidenceRoot .planning\product\release-fixtures\phase-07 -BackendRoot D:\VSProjects\moqi-ime` - passed.
 - `pwsh -NoProfile -ExecutionPolicy Bypass -File scripts\Test-TypeDuckReleaseVerification.ps1 -RepoRoot . -Strict` - passed.
 
-## Remaining Human Checkpoint
+## Human Checkpoint
 
-VER-04 remains intentionally pending. The final step is direct human VM judgement using `.planning/product/release-fixtures/phase-07/interactive-vm-checklist.md` and recording results in `.planning/product/release-fixtures/phase-07/host-app-dpi-notes.md`. No screenshots are required or requested.
+VER-04 is complete. The user performed direct VM judgement using `.planning/product/release-fixtures/phase-07/interactive-vm-checklist.md` and the results are recorded in `.planning/product/release-fixtures/phase-07/host-app-dpi-notes.md`. No screenshots were required or requested.
+
+## Post-Aggregate Regression Repairs
+
+After the first aggregate evidence pass, release-blocking regressions were fixed and included in the final closeout:
+
+- Fixed TypeDuck runtime profile registration after `ime.json` pruning.
+- Fixed install-time launcher/settings startup order through a launcher flag.
+- Restored accepted Rime first-run/full-check deployment behavior.
+- Fixed candidate click commit handling, Explorer DPI sizing, and candidate Chinese font fallback.
+- Polished installer/uninstaller bilingual text, user-data deletion prompt, and failure wording.
+- Removed appearance-theme `source` metadata.
+- Fixed the Windows system IME menu icon by staging only `resources\TypeDuck_Small.ico` as a raw icon.
 
 ---
 *Phase: 07-compatibility-and-release-verification*

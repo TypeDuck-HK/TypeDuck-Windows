@@ -1,8 +1,8 @@
 {
   "schema": "typeduck-release-verification-v1",
   "phase": "07-compatibility-and-release-verification",
-  "generated_at_utc": "2026-06-27T12:25:09Z",
-  "status": "automated-ready-human-pending",
+  "generated_at_utc": "2026-06-28T08:33:34Z",
+  "status": "complete",
   "requirements_covered": [
     "VER-03",
     "VER-04",
@@ -10,7 +10,7 @@
     "VER-06"
   ],
   "installer": {
-    "status": "manual-vm-pending",
+    "status": "verified",
     "artifact_path": "installer\\dist\\typeduck-windows-ime-setup.exe",
     "case_ids": [
       "clean-install",
@@ -134,14 +134,14 @@
     }
   ],
   "vm_evidence": {
-    "status": "manual-vm-pending",
-    "install_lifecycle": "pending-human-guest-run",
+    "status": "verified",
+    "install_lifecycle": "verified-by-interactive-vm-iterations",
     "install_notes_path": ".planning\\product\\release-fixtures\\phase-07\\install-verification-notes.md",
     "host_app_dpi_notes_path": ".planning\\product\\release-fixtures\\phase-07\\host-app-dpi-notes.md",
     "screenshot_capture_required": false
   },
   "interactive_human_checks": {
-    "status": "pending-human",
+    "status": "complete",
     "direct_human_judgement": true,
     "no_screenshots_required": true,
     "checklist_path": ".planning\\product\\release-fixtures\\phase-07\\interactive-vm-checklist.md",
@@ -200,7 +200,7 @@
     ]
   },
   "host_apps": {
-    "status": "pending-human",
+    "status": "complete",
     "targets": [
       "Notepad",
       "Browser text field",
@@ -212,7 +212,7 @@
     "notes_path": ".planning\\product\\release-fixtures\\phase-07\\host-app-dpi-notes.md"
   },
   "dpi": {
-    "status": "pending-human",
+    "status": "complete",
     "scales": [
       "100%",
       "140% if available",
@@ -226,9 +226,9 @@
     "status": "verified",
     "installer_name": "typeduck-windows-ime-setup.exe",
     "installer_path": "installer\\dist\\typeduck-windows-ime-setup.exe",
-    "sha256": "CDD1028B630A74AE21D095A76843581FA8D794A5250FF00CD69F78D3F447AF0E",
-    "byte_size": 21075640,
-    "generated_at_utc": "2026-06-27T10:19:58Z",
+    "sha256": "B5EFBCFC8620E83B2DD9E83B0D8D647F685B3882B4D793510A80BA3610C378CE",
+    "byte_size": 20942974,
+    "generated_at_utc": "2026-06-28T08:33:34Z",
     "hash_command": "Get-FileHash -Algorithm SHA256 -LiteralPath installer\\dist\\typeduck-windows-ime-setup.exe",
     "case_ids": [
       "artifact-name-and-sha256"
@@ -243,7 +243,7 @@
     "standalone_schema_artifact": false
   },
   "limitations": {
-    "interactive_vm": "Host-app and DPI judgement remains the final human-controlled step.",
+    "interactive_vm": "Host-app and DPI judgement completed by direct user-controlled VM verification.",
     "screenshot_boundary": "No screenshot files, manifests, capture scripts, or automated image comparison are required.",
     "research": "Excluded; phase planning used skip-research because existing GSD documentation was sufficient."
   },

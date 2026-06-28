@@ -4,17 +4,17 @@ milestone: v1.0
 milestone_name: milestone
 current_phase: 07
 current_phase_name: Compatibility and Release Verification
-status: human_checkpoint_pending
-stopped_at: Completed 07-04 automated aggregate; waiting for interactive VM host-app/DPI judgement
-last_updated: "2026-06-27T12:25:09Z"
-last_activity: 2026-06-27
-last_activity_desc: Completed 07-04 automated aggregate release verification
+status: complete
+stopped_at: Phase 7 closed after interactive VM host-app/DPI judgement and documentation closeout
+last_updated: "2026-06-28T08:33:34Z"
+last_activity: 2026-06-28
+last_activity_desc: Closed Phase 7 release verification after user-completed interactive VM checklist
 progress:
   total_phases: 7
-  completed_phases: 6
+  completed_phases: 7
   total_plans: 38
   completed_plans: 38
-  percent: 95
+  percent: 100
 ---
 
 # Project State
@@ -24,16 +24,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-06-26)
 
 **Core value:** Hong Kong users can install TypeDuck under Chinese (Traditional, Hong Kong) and type Cantonese with the same trusted behavior, bilingual settings, candidate details, and dictionary-like lookup experience as TypeDuck Web alpha.
-**Current focus:** Phase 7: Compatibility and Release Verification
+**Current focus:** v1 closeout complete; prepare release handoff if needed.
 
 ## Current Position
 
 Phase: 07 — Compatibility and Release Verification
-Plan: 4 of 4 scripted plans complete; final human checkpoint pending
-Status: Phase 7 automated evidence complete, waiting for interactive VM host-app/DPI judgement
-Last activity: 2026-06-27 — Completed 07-04 aggregate release verification
+Plan: 4 of 4 plans complete
+Status: Phase 7 complete after user interactive VM host-app/DPI judgement
+Last activity: 2026-06-28 — Closed Phase 7 release verification
 
-Progress: [██████████] 95% of planned milestone plans
+Progress: [██████████] 100% of planned milestone plans
 
 ## Performance Metrics
 
@@ -54,8 +54,8 @@ Progress: [██████████] 95% of planned milestone plans
 
 **Recent Trend:**
 
-- Last 5 plans: Phase 06 P06 10 min, Phase 07 P01 11 min, Phase 07 P02 13 min, Phase 07 P03 checklist scaffold, Phase 07 P04 aggregate evidence
-- Trend: Phase 7 scripted release verification is complete; final host-app/DPI judgement is interactive and screenshot-free.
+- Last 5 plans: Phase 07 P01 11 min, Phase 07 P02 13 min, Phase 07 P03 checklist scaffold and human pass, Phase 07 P04 aggregate evidence, Phase 7 documentation closeout
+- Trend: v1 milestone phases are complete; release verification remains screenshot-free and human-judged for host-app/DPI visuals.
 
 *Updated after each plan completion*
 | Phase 01 P01 | 5 min | 2 tasks | 2 files |
@@ -197,27 +197,26 @@ Recent decisions affecting current work:
 
 ### Pending Todos
 
-Phase 7 scripted work is complete. Remaining: the user performs direct VM host-app and DPI judgement using `.planning/product/release-fixtures/phase-07/interactive-vm-checklist.md` and records results in `.planning/product/release-fixtures/phase-07/host-app-dpi-notes.md`.
+No open v1 phase todos remain. Next work, if requested, is release handoff or a new milestone.
 
 ### Blockers/Concerns
 
-- [Phase 6]: Visible scaffold leakage, bilingual copy audit, data/log path cleanup, diagnostics safety, pipe hardening, and legacy feature removal remain the next risk area.
-- [Phase 06 Plan 02]: Installer compile is blocked outside this plan by installer/MoqiTsf.iss unknown preprocessor directive around line 104.
+- None currently recorded for the completed v1 milestone.
 
 ## Deferred Items
 
 | Category | Item | Status | Deferred At |
 |----------|------|--------|-------------|
-| Installer localization | Installer language picker showed duplicate English entries; decide whether to bundle/vet Traditional Chinese Inno language resources or keep product-controlled bilingual strings only. | Deferred to installer/UI polish | Phase 3 UAT |
-| Installer shortcuts | Start Menu folder creation still warns on the bilingual path with a slash; correct shortcut folder naming in a later installer phase. | Deferred to installer/UI polish | Phase 3 UAT |
-| Installed payload cleanup | Installed `backends.json` still references `moqi-ime` and `moqi-ime\\server.exe` inside `C:\Program Files (x86)\TypeDuckIME`; Phase 4/6 should remove or replace this scaffold manifest with a TypeDuck-owned runtime contract. | Deferred to protocol/scaffold cleanup | Phase 3 UAT |
-| Typing MVP proof harness | `scripts\Test-TypeDuckTypingMvpProof.ps1 -Strict` still expects executable launcher fault-injection probes; Phase 4 is accepted on static guards plus live VM UAT, and deeper probes should move to release verification. | Deferred to compatibility/release verification | Phase 4 closeout |
-| Settings-backed schema customization | `common.custom.yaml` should be generated and updated by frontend settings instead of treated as static packaged data. | Deferred to settings UI | Phase 4 closeout |
-| Residual Moqi paths | Logs/config still use legacy paths such as `%LOCALAPPDATA%\MoqiIM`; product-owned path cleanup belongs with broader scaffold cleanup. | Deferred to scaffold cleanup | Phase 4 closeout |
-| Release-grade screenshot matrix | Phase 5 screenshot fixtures and screenshot tests were explicitly retired and replaced by human verification; fresh screenshots, if desired, belong to final compatibility/release evidence. | Deferred to release verification | Phase 5 closeout |
+| Installer localization | Product-controlled bilingual strings are supplied in the installer; no Simplified Inno dependency remains. | Closed in Phase 6 | Phase 6 closeout |
+| Installer shortcuts | Start Menu entries use TypeDuckIME folder and bilingual Settings/About/Uninstall wording. | Closed in Phase 6 | Phase 6 closeout |
+| Installed payload cleanup | `backends.json` is no longer staged and `TypeDuckRuntime` is the fixed runtime bridge. | Closed in Phase 6 | Phase 6 closeout |
+| Typing MVP proof harness | Protocol recovery and release probes now cover timeout/restart/degraded behavior. | Closed in Phase 7 | Phase 7 closeout |
+| Settings-backed schema customization | Settings writes preferences/custom YAML and applies through launcher-mediated install/update paths. | Closed in Phase 5/7 | Phase 7 closeout |
+| Residual Moqi paths | TypeDuck logs/data paths now use TypeDuckIME; remaining Moqi strings are internal scaffold identifiers only. | Closed in Phase 6 | Phase 6 closeout |
+| Release visual matrix | Host-app and DPI release judgement completed by direct human VM verification without screenshot automation. | Closed in Phase 7 | Phase 7 closeout |
 
 ## Session Continuity
 
-Last session: 2026-06-27T12:25:09Z
-Stopped at: Completed 07-04 automated aggregate; waiting for interactive VM host-app/DPI judgement
+Last session: 2026-06-28T08:33:34Z
+Stopped at: Phase 7 release verification closed
 Resume file: None

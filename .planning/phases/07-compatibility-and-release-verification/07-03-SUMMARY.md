@@ -8,7 +8,7 @@ provides:
   - No-screenshot host-app and DPI checklist
   - Human notes template for direct VM judgement
   - Guard that blocks screenshot-driven checklist regressions
-status: human_checkpoint_pending
+status: complete
 completed: 2026-06-27
 ---
 
@@ -28,4 +28,4 @@ Created the Phase 7 interactive verification packet and guard without running sc
 
 ## Human Checkpoint
 
-The remaining task is direct user judgement in the VM for host apps and DPI scales: 100%, 140% if available, 175%, and 200%. No screenshots are required or requested.
+Completed on 2026-06-28 by direct user judgement in the VM for host apps and DPI scales: 100%, 140% if available, 175%, and 200%. No screenshots were required or requested.
