@@ -1,241 +1,285 @@
 # Codebase Structure
 
-**Analysis Date:** 2026-06-23
+**Analysis Date:** 2026-06-28
 
 ## Directory Layout
 
 ```text
-moqi-im-windows/
-├── .github/               # GitHub Actions release/nightly packaging workflows
-├── .planning/codebase/    # GSD-generated codebase maps
-├── .vscode/               # Local editor settings
-├── cmake/                 # MSVC runtime flag override files
-├── installer/             # Inno Setup script, installer compiler wrapper, translation assets
-├── jsoncpp/               # Vendored jsoncpp dependency
-├── libIME2/               # Generic TSF/COM support library plus small unit tests
-├── libuv/                 # Vendored libuv dependency used by launcher
-├── MoqiTextService/       # In-process TSF DLL and product-specific Windows IME UI/client logic
-├── MoqLauncher/           # Win32 launcher, named pipe server, backend process bridge, tray UI
-├── others/imgs/           # README/demo images for legacy Moqi scaffold
-├── Preview/               # Standalone candidate window preview executable
-├── proto/                 # Protobuf schema, generated C++ protobuf files, framing helper
-├── scripts/               # Build, package, install-stage, and icon generation PowerShell scripts
-├── SetupHelper/           # Admin helper for copying/registering TSF DLLs
-├── backends.json          # Installed backend process manifest
-├── CMakeLists.txt         # Top-level native build graph
-├── README.md              # Legacy Moqi product documentation
-├── TODO.md                # Small project note file
-└── version.txt            # Semantic version input for resources/build
+TypeDuck-Windows/
+├── CMakeLists.txt                 # C++ build graph, dependencies, generated protobuf, target inclusion
+├── MoqiTextService/               # TSF COM DLL, TypeDuck profile, frontend RPC, candidate UI
+├── MoqLauncher/                   # Launcher process, named pipe server, backend bridge, preferences
+├── SetupHelper/                   # Elevated TSF DLL copy/register/unregister helper
+├── TypeDuckSettings/              # Settings and About Win32 applications and resources
+├── Preview/                       # Standalone candidate window preview target
+├── Tools/TypeduckBackendProbe/    # Local backend/protocol probe tool
+├── Tests/                         # First-party C++ and PowerShell verification targets
+├── proto/                         # Shared protobuf schema, generated C++ bindings, C++ framing helper
+├── scripts/                       # Build, staging, installer, runtime, and verification scripts
+├── installer/                     # Inno Setup script and installer build support
+├── runtime/                       # Staged TypeDuck runtime assets for local proof/package work
+├── third_party/                   # External source checkouts/submodules used by product scripts
+├── libIME2/                       # Reusable TSF/COM framework and vendored GoogleTest
+├── libuv/                         # Vendored libuv dependency for launcher process/pipe IO
+├── jsoncpp/                       # Vendored JsonCpp dependency
+└── .planning/codebase/            # Shared codebase map documents
+
+TypeDuck-Windows-backend/
+├── server.go                      # Backend process entry point and request dispatcher
+├── protocol_io.go                 # Length-prefixed protobuf stdin/stdout frame IO
+├── go.mod                         # Go module/dependency manifest
+├── proto/                         # Shared protobuf schema and generated Go bindings
+├── imecore/                       # Backend request/response model and text service interface
+├── input_methods/rime/            # TypeDuck Rime service, librime binding, settings, data metadata
+├── input_methods/fcitx5/          # Additional registered service implementation
+├── input_methods/moqi/            # Additional registered service implementation
+├── mobilebridge/                  # Mobile bridge package and tests
+├── icons/                         # Runtime and input mode icons
+├── scripts/                       # Backend build/deploy/test scripts
+├── tools/                         # Go tooling package
+└── docs/                          # Backend design/training notes
 ```
 
 ## Directory Purposes
 
-**`MoqiTextService`:**
-- Purpose: Product-specific Windows TSF text service DLL; this is the main frontend surface for the TypeDuck rewrite.
-- Contains: COM DLL exports, TSF subclass, backend RPC client, candidate window, lang-bar button, resources, logging helpers.
-- Key files: `MoqiTextService/DllEntry.cpp`, `MoqiTextService/MoqiTextService.cpp`, `MoqiTextService/MoqiClient.cpp`, `MoqiTextService/MoqiCandidateWindow.cpp`, `MoqiTextService/MoqiImeModule.cpp`, `MoqiTextService/MoqiTextService.rc.in`.
+**`TypeDuck-Windows/MoqiTextService`:**
+- Purpose: Windows TSF product DLL and in-host UI/RPC layer.
+- Contains: COM exports, TypeDuck profile constants, text service subclass, RPC client, candidate window, language bar button, candidate lookup formatter, resources.
+- Key files: `TypeDuck-Windows/MoqiTextService/DllEntry.cpp`, `TypeDuck-Windows/MoqiTextService/TypeDuckProfile.cpp`, `TypeDuck-Windows/MoqiTextService/MoqiImeModule.cpp`, `TypeDuck-Windows/MoqiTextService/MoqiTextService.cpp`, `TypeDuck-Windows/MoqiTextService/MoqiClient.cpp`, `TypeDuck-Windows/MoqiTextService/MoqiCandidateWindow.cpp`, `TypeDuck-Windows/MoqiTextService/TypeDuckCandidateInfo.cpp`.
 
-**`MoqLauncher`:**
-- Purpose: Per-user background process that isolates backend lifetime from TSF host processes and forwards messages between named pipe clients and backend stdio.
-- Contains: Pipe server/client, backend process manager, libuv pipe wrapper, pipe security, JSON helpers, tray menu and notifications.
-- Key files: `MoqLauncher/PipeServer.cpp`, `MoqLauncher/PipeClient.cpp`, `MoqLauncher/BackendServer.cpp`, `MoqLauncher/UvPipe.h`, `MoqLauncher/PipeSecurity.cpp`, `MoqLauncher/MoqiLauncher.cpp`.
+**`TypeDuck-Windows/MoqLauncher`:**
+- Purpose: User-session process that mediates between all TSF DLL instances and one backend runtime process.
+- Contains: Named pipe server/client, backend subprocess bridge, TypeDuck preference validation/storage, tray window, pipe security, JSON helpers.
+- Key files: `TypeDuck-Windows/MoqLauncher/MoqiLauncher.cpp`, `TypeDuck-Windows/MoqLauncher/PipeServer.cpp`, `TypeDuck-Windows/MoqLauncher/PipeClient.cpp`, `TypeDuck-Windows/MoqLauncher/BackendServer.cpp`, `TypeDuck-Windows/MoqLauncher/TypeDuckPreferences.cpp`.
 
-**`libIME2`:**
-- Purpose: Generic TSF/COM foundation reused by the product text service.
-- Contains: Static library source under `libIME2/src`, GoogleTest under `libIME2/lib/googletest-release-1.10.0`, and unit tests under `libIME2/test`.
-- Key files: `libIME2/src/TextService.cpp`, `libIME2/src/ImeModule.cpp`, `libIME2/src/EditSession.cpp`, `libIME2/src/ComObject.h`, `libIME2/src/ComPtr.h`, `libIME2/test/ComObject_test.cpp`, `libIME2/test/ComPtr_test.cpp`.
+**`TypeDuck-Windows/libIME2/src`:**
+- Purpose: Reusable TSF/COM base layer.
+- Contains: `Ime::TextService`, `Ime::ImeModule`, COM helpers, edit sessions, windows, display attributes, language bar, debug logging.
+- Key files: `TypeDuck-Windows/libIME2/src/TextService.cpp`, `TypeDuck-Windows/libIME2/src/ImeModule.cpp`, `TypeDuck-Windows/libIME2/src/ComObject.h`, `TypeDuck-Windows/libIME2/src/ComPtr.h`, `TypeDuck-Windows/libIME2/src/EditSession.cpp`.
 
-**`proto`:**
-- Purpose: Shared protocol between TSF DLL, launcher, and backend.
-- Contains: Authoritative schema, checked-in generated C++ protobuf files, and frame assembly/parsing helper.
-- Key files: `proto/moqi.proto`, `proto/ProtoFraming.h`, `proto/moqi.pb.cc`, `proto/moqi.pb.h`.
+**`TypeDuck-Windows/SetupHelper`:**
+- Purpose: Elevated install-time and uninstall-time TSF registration helper.
+- Contains: Wide-character Win32 helper code for admin relaunch, DLL copy fallback, reboot scheduling, `regsvr32.exe`, and bilingual result messages.
+- Key files: `TypeDuck-Windows/SetupHelper/SetupHelper.cpp`, `TypeDuck-Windows/SetupHelper/CMakeLists.txt`, `TypeDuck-Windows/SetupHelper/SetupHelper.rc`.
 
-**`SetupHelper`:**
-- Purpose: Elevated install-time helper for TSF DLL file operations and COM/TSF registration.
-- Contains: Single Win32 executable target and source file.
-- Key files: `SetupHelper/SetupHelper.cpp`, `SetupHelper/CMakeLists.txt`.
+**`TypeDuck-Windows/TypeDuckSettings`:**
+- Purpose: Win32 settings and about UI shipped with the installer.
+- Contains: Settings window, about dialog, resources, version resources, TypeDuck icons and bitmaps.
+- Key files: `TypeDuck-Windows/TypeDuckSettings/main.cpp`, `TypeDuck-Windows/TypeDuckSettings/TypeDuckSettingsWindow.cpp`, `TypeDuck-Windows/TypeDuckSettings/TypeDuckAboutMain.cpp`, `TypeDuck-Windows/TypeDuckSettings/TypeDuckAboutDialog.cpp`, `TypeDuck-Windows/TypeDuckSettings/resources/Installer.bmp`.
 
-**`installer`:**
-- Purpose: Inno Setup package definition and package compilation helper.
-- Contains: `.iss` installer script, Chinese Simplified translation asset, README, build script, generated `dist` output, and ignored `stage` tree.
-- Key files: `installer/MoqiTsf.iss`, `installer/build-installer.ps1`, `installer/README.txt`, `installer/Inno-Setup-Chinese-Simplified-Translation/ChineseSimplified.isl`.
+**`TypeDuck-Windows/proto`:**
+- Purpose: C++ side of the cross-process protocol.
+- Contains: `moqi.proto`, checked-in generated C++ bindings, and `ProtoFraming.h` for bounded little-endian length-prefix framing.
+- Key files: `TypeDuck-Windows/proto/moqi.proto`, `TypeDuck-Windows/proto/moqi.pb.h`, `TypeDuck-Windows/proto/moqi.pb.cc`, `TypeDuck-Windows/proto/ProtoFraming.h`.
 
-**`scripts`:**
-- Purpose: Local packaging workflow orchestration.
-- Contains: Build script for Win32/x64, installer staging script, one-click backend+frontend+installer script, and icon generation script.
-- Key files: `scripts/build.ps1`, `scripts/install.ps1`, `scripts/_all_in_package.ps1`, `scripts/generate-glyph-icon.ps1`.
+**`TypeDuck-Windows/scripts`:**
+- Purpose: Build, installer staging, runtime staging, VM/install proof, protocol proof, and release verification automation.
+- Contains: PowerShell scripts; run with `pwsh` for Unicode-safe execution.
+- Key files: `TypeDuck-Windows/scripts/build.ps1`, `TypeDuck-Windows/scripts/install.ps1`, `TypeDuck-Windows/scripts/Stage-TypeDuckRuntime.ps1`, `TypeDuck-Windows/scripts/Invoke-TypeDuckReleaseVerification.ps1`, `TypeDuck-Windows/scripts/Test-TypeDuckProtocolContract.ps1`.
 
-**`Preview`:**
-- Purpose: Standalone Win32 TypeDuck candidate/dictionary UI preview.
-- Contains: `MoqiCandidatePreview` executable source, CMake target, and CandidateInfo-backed preview/capture scenarios.
-- Key files: `Preview/main.cpp`, `Preview/CMakeLists.txt`.
+**`TypeDuck-Windows/installer`:**
+- Purpose: Inno Setup packaging and install/uninstall orchestration.
+- Contains: Graphical installer script, app metadata, messages, file copy, registry startup, helper invocation, process cleanup.
+- Key files: `TypeDuck-Windows/installer/MoqiTsf.iss`, `TypeDuck-Windows/installer/build-installer.ps1`, `TypeDuck-Windows/installer/README.txt`.
 
-**`jsoncpp`:**
-- Purpose: Vendored JSON parser used by product service and launcher.
-- Contains: Upstream jsoncpp source, tests, docs, and CMake files.
-- Key files: `jsoncpp/CMakeLists.txt`, `jsoncpp/include/json/json.h`, `jsoncpp/src/lib_json/json_reader.cpp`, `jsoncpp/src/lib_json/json_value.cpp`, `jsoncpp/src/lib_json/json_writer.cpp`.
+**`TypeDuck-Windows/Tests`:**
+- Purpose: First-party validation targets for candidate data, settings, and protocol behavior.
+- Contains: C++ GoogleTest targets and PowerShell test scripts referenced by release verification.
+- Key files: `TypeDuck-Windows/Tests/TypeDuckCandidateData/TypeDuckCandidateInfo_test.cpp`, `TypeDuck-Windows/Tests/TypeDuckSettings/TypeDuckPreferences_test.cpp`, `TypeDuck-Windows/Tests/TypeDuckProtocol/ProtoFraming_test.cpp`, `TypeDuck-Windows/Tests/TypeDuckProtocol/ProtocolRecovery_test.cpp`.
 
-**`libuv`:**
-- Purpose: Vendored async/process/pipe library used by `MoqLauncher`.
-- Contains: Upstream libuv source, include files, docs, samples, and tests.
-- Key files: `libuv/CMakeLists.txt`, `libuv/include/uv.h`, `libuv/src/win/pipe.c`, `libuv/src/win/process.c`.
+**`TypeDuck-Windows-backend`:**
+- Purpose: Go backend executable root.
+- Contains: Main server loop, frame IO, integration tests, Go module manifest.
+- Key files: `TypeDuck-Windows-backend/server.go`, `TypeDuck-Windows-backend/protocol_io.go`, `TypeDuck-Windows-backend/server_test.go`, `TypeDuck-Windows-backend/server_integration_test.go`, `TypeDuck-Windows-backend/go.mod`.
 
-**`cmake`:**
-- Purpose: MSVC runtime and release flag overrides used before top-level `project()`.
-- Contains: C and C++ override files.
-- Key files: `cmake/c_flag_overrides.cmake`, `cmake/cxx_flag_overrides.cmake`.
+**`TypeDuck-Windows-backend/imecore`:**
+- Purpose: Backend-neutral request/response and service interface layer.
+- Contains: `TextService` interface, base service, protobuf conversion, tray helpers.
+- Key files: `TypeDuck-Windows-backend/imecore/client.go`, `TypeDuck-Windows-backend/imecore/service.go`, `TypeDuck-Windows-backend/imecore/protocol.go`, `TypeDuck-Windows-backend/imecore/tray.go`.
 
-**`.github`:**
-- Purpose: CI packaging pipelines for nightly and release installers.
-- Contains: GitHub Actions workflows that checkout this repo and sibling backend repo, install tools, build package, and upload artifacts.
-- Key files: `.github/workflows/release.yml`, `.github/workflows/nightly.yml`.
+**`TypeDuck-Windows-backend/input_methods/rime`:**
+- Purpose: TypeDuck Rime backend implementation.
+- Contains: Rime service object, native librime binding, key mapping, settings/config update, appearance themes, candidate overlays, cloud clipboard code, Android support, runtime metadata, icons, templates, tests.
+- Key files: `TypeDuck-Windows-backend/input_methods/rime/rime.go`, `TypeDuck-Windows-backend/input_methods/rime/librime.go`, `TypeDuck-Windows-backend/input_methods/rime/native_cgo.go`, `TypeDuck-Windows-backend/input_methods/rime/rime_keyevent.go`, `TypeDuck-Windows-backend/input_methods/rime/appearance_config.go`, `TypeDuck-Windows-backend/input_methods/rime/ime.json`.
+
+**`TypeDuck-Windows-backend/proto`:**
+- Purpose: Go side of the cross-process protocol.
+- Contains: `moqi.proto` and generated Go bindings.
+- Key files: `TypeDuck-Windows-backend/proto/moqi.proto`, `TypeDuck-Windows-backend/proto/moqi.pb.go`.
+
+**`TypeDuck-Windows-backend/scripts`:**
+- Purpose: Build and deploy the backend runtime package.
+- Contains: Go build packaging, Rime data copy, test scripts, deploy scripts, build output under `scripts/build`.
+- Key files: `TypeDuck-Windows-backend/scripts/build.ps1`, `TypeDuck-Windows-backend/scripts/deploy-server.ps1`, `TypeDuck-Windows-backend/scripts/Test-TypeDuckCandidateParity.ps1`.
 
 ## Key File Locations
 
 **Entry Points:**
-- `MoqiTextService/DllEntry.cpp`: TSF DLL load, class factory, register/unregister exports, backend `ime.json` scan.
-- `MoqiTextService/MoqiImeModule.cpp`: Text service CLSID, program directory discovery, backend input-method metadata loading.
-- `MoqiTextService/MoqiTextService.cpp`: Product text service lifecycle and TSF callback overrides.
-- `MoqLauncher/MoqiLauncher.cpp`: Launcher executable entry point.
-- `MoqLauncher/PipeServer.cpp`: Launcher single-instance setup, named pipe listening, backend initialization, tray GUI thread.
-- `SetupHelper/SetupHelper.cpp`: Installer helper action dispatch.
-- `Preview/main.cpp`: CandidateInfo-backed TypeDuck candidate/dictionary preview app entry point and BMP capture helper.
+- `TypeDuck-Windows/MoqiTextService/DllEntry.cpp`: TSF DLL exports and TSF registration.
+- `TypeDuck-Windows/MoqLauncher/MoqiLauncher.cpp`: Launcher `WinMain`.
+- `TypeDuck-Windows/SetupHelper/SetupHelper.cpp`: Setup helper `wWinMain`.
+- `TypeDuck-Windows/TypeDuckSettings/main.cpp`: Settings app `wWinMain`.
+- `TypeDuck-Windows/TypeDuckSettings/TypeDuckAboutMain.cpp`: About app entry point.
+- `TypeDuck-Windows-backend/server.go`: Backend `main`.
 
 **Configuration:**
-- `CMakeLists.txt`: Top-level project, dependency fetch, protobuf generation, target inclusion rules.
-- `MoqiTextService/CMakeLists.txt`: TSF DLL source list and link dependencies.
-- `MoqLauncher/CMakeLists.txt`: Launcher source list, libuv/spdlog definitions, link dependencies.
-- `libIME2/src/CMakeLists.txt`: `libIME2_static` source list.
-- `backends.json`: Backend process name, command, working directory, and params.
-- `version.txt`: Version read by CMake and resource templates.
-- `.vscode/settings.json`: Workspace editor settings.
+- `TypeDuck-Windows/CMakeLists.txt`: C++ build targets, dependencies, generated C++ proto.
+- `TypeDuck-Windows/version.txt`: Product version source for resource generation.
+- `TypeDuck-Windows/installer/MoqiTsf.iss`: Installer metadata, messages, file copy, registry, run/uninstall logic.
+- `TypeDuck-Windows/MoqiTextService/TypeDuckProfile.cpp`: CLSID, profile GUID, zh-HK locale, installed names.
+- `TypeDuck-Windows/MoqLauncher/TypeDuckPreferences.cpp`: User preference schema and validation.
+- `TypeDuck-Windows-backend/go.mod`: Go module and dependencies.
+- `TypeDuck-Windows-backend/input_methods/rime/ime.json`: TypeDuck Rime profile metadata.
+- `TypeDuck-Windows-backend/input_methods/rime/appearance_themes.json`: Backend appearance theme data.
 
 **Core Logic:**
-- `libIME2/src/TextService.cpp`: Generic TSF activation, key handling, composition, compartments, and display attributes.
-- `libIME2/src/ImeModule.cpp`: COM class factory and TSF registration implementation.
-- `MoqiTextService/MoqiClient.cpp`: Backend RPC request/response handling and UI/composition application.
-- `MoqiTextService/MoqiCandidateWindow.cpp`: Product candidate window rendering and `ITfCandidateListUIElement` methods.
-- `MoqLauncher/BackendServer.cpp`: Backend process start/restart, stdin/stdout/stderr forwarding, backend response dispatch.
-- `MoqLauncher/PipeClient.cpp`: Per-client pipe parsing, backend selection, timeout handling.
-- `proto/moqi.proto`: Method and message contract.
-- `proto/ProtoFraming.h`: Length-prefixed protobuf framing helper.
+- `TypeDuck-Windows/libIME2/src/TextService.cpp`: Generic TSF text service state and edit sessions.
+- `TypeDuck-Windows/MoqiTextService/MoqiTextService.cpp`: Product TSF event bridge.
+- `TypeDuck-Windows/MoqiTextService/MoqiClient.cpp`: Frontend RPC client and response application.
+- `TypeDuck-Windows/MoqiTextService/MoqiCandidateWindow.cpp`: Candidate/dictionary panel rendering.
+- `TypeDuck-Windows/MoqLauncher/PipeServer.cpp`: Launcher singleton, pipe server, tray, backend mapping.
+- `TypeDuck-Windows/MoqLauncher/PipeClient.cpp`: Named pipe client request routing.
+- `TypeDuck-Windows/MoqLauncher/BackendServer.cpp`: Backend process stdin/stdout bridge.
+- `TypeDuck-Windows-backend/server.go`: Backend dispatcher and client session registry.
+- `TypeDuck-Windows-backend/imecore/protocol.go`: Protobuf conversion contract.
+- `TypeDuck-Windows-backend/input_methods/rime/rime.go`: Rime request handling and response assembly.
+- `TypeDuck-Windows-backend/input_methods/rime/librime.go`: Native Rime DLL binding.
+
+**Protocol:**
+- `TypeDuck-Windows/proto/moqi.proto`: Frontend C++ schema source.
+- `TypeDuck-Windows-backend/proto/moqi.proto`: Backend Go schema source.
+- `TypeDuck-Windows/proto/ProtoFraming.h`: C++ bounded frame helper.
+- `TypeDuck-Windows-backend/protocol_io.go`: Go frame helper.
+
+**Installer and Runtime Packaging:**
+- `TypeDuck-Windows/scripts/build.ps1`: Frontend build orchestration.
+- `TypeDuck-Windows/scripts/install.ps1`: Installer stage tree creation and runtime copy.
+- `TypeDuck-Windows/scripts/Stage-TypeDuckRuntime.ps1`: Runtime asset staging for librime/schema proof.
+- `TypeDuck-Windows/installer/MoqiTsf.iss`: Inno installer.
+- `TypeDuck-Windows-backend/scripts/build.ps1`: Backend runtime package creation.
 
 **Testing:**
-- `libIME2/test/ComObject_test.cpp`: COM object helper unit tests.
-- `libIME2/test/ComPtr_test.cpp`: COM smart pointer unit tests.
-- `libIME2/test/CMakeLists.txt`: Test target definitions.
-
-**Packaging:**
-- `scripts/build.ps1`: CMake configure/build for Win32 and x64.
-- `scripts/install.ps1`: Installer staging, artifact resolution, backend runtime copy.
-- `scripts/_all_in_package.ps1`: One-click backend, Windows binaries, and installer build.
-- `installer/build-installer.ps1`: Inno Setup compiler wrapper and stage validation.
-- `installer/MoqiTsf.iss`: Install/uninstall script, startup registry, SetupHelper invocation, Moqi registry cleanup.
+- `TypeDuck-Windows/Tests/TypeDuckProtocol/ProtoFraming_test.cpp`: C++ frame tests.
+- `TypeDuck-Windows/Tests/TypeDuckProtocol/ProtocolRecovery_test.cpp`: Protocol recovery tests.
+- `TypeDuck-Windows/Tests/TypeDuckCandidateData/TypeDuckCandidateInfo_test.cpp`: Candidate lookup parser tests.
+- `TypeDuck-Windows/Tests/TypeDuckSettings/TypeDuckPreferences_test.cpp`: Preference validation tests.
+- `TypeDuck-Windows-backend/server_test.go`: Backend server unit tests.
+- `TypeDuck-Windows-backend/server_integration_test.go`: Backend integration tests.
+- `TypeDuck-Windows-backend/imecore/protocol_test.go`: Backend protobuf conversion tests.
+- `TypeDuck-Windows-backend/input_methods/rime/rime_test.go`: Rime service tests.
 
 ## Naming Conventions
 
 **Files:**
-- Product TSF files use `Moqi*` PascalCase prefixes: `MoqiTextService/MoqiClient.cpp`, `MoqiTextService/MoqiCandidateWindow.h`, `MoqiTextService/MoqiLangBarButton.cpp`.
-- Launcher files use role nouns in PascalCase: `MoqLauncher/PipeServer.cpp`, `MoqLauncher/PipeClient.h`, `MoqLauncher/BackendServer.cpp`.
-- Generic library files use PascalCase class names under `libIME2/src`: `libIME2/src/TextService.cpp`, `libIME2/src/ComPtr.h`, `libIME2/src/DisplayAttributeProvider.cpp`.
-- Build scripts use lowercase verbs or descriptive names: `scripts/build.ps1`, `scripts/install.ps1`, `scripts/_all_in_package.ps1`, `installer/build-installer.ps1`.
-- Generated protobuf files live beside the schema: `proto/moqi.pb.cc`, `proto/moqi.pb.h`.
+- First-party C++ modules use PascalCase file stems in current code identifiers: `TypeDuck-Windows/MoqiTextService/MoqiClient.cpp`, `TypeDuck-Windows/MoqLauncher/PipeServer.cpp`, `TypeDuck-Windows/SetupHelper/SetupHelper.cpp`.
+- TypeDuck-specific C++ additions use `TypeDuck*` file stems: `TypeDuck-Windows/MoqiTextService/TypeDuckProfile.cpp`, `TypeDuck-Windows/MoqLauncher/TypeDuckPreferences.cpp`, `TypeDuck-Windows/TypeDuckSettings/TypeDuckSettingsWindow.cpp`.
+- Backend Go files use lowercase snake_case where descriptive: `TypeDuck-Windows-backend/protocol_io.go`, `TypeDuck-Windows-backend/input_methods/rime/rime_keyevent.go`, `TypeDuck-Windows-backend/input_methods/rime/appearance_config.go`.
+- Test files use `_test.cpp` in frontend test targets and `_test.go` in backend packages.
+- Generated protobuf files are `moqi.pb.*`; do not hand-edit `TypeDuck-Windows/proto/moqi.pb.h`, `TypeDuck-Windows/proto/moqi.pb.cc`, or `TypeDuck-Windows-backend/proto/moqi.pb.go`.
 
 **Directories:**
-- Product executable/library directories are PascalCase: `MoqiTextService`, `MoqLauncher`, `SetupHelper`, `Preview`.
-- Vendored dependencies keep upstream names: `jsoncpp`, `libuv`, `libIME2`.
-- Support directories are lowercase: `cmake`, `installer`, `proto`, `scripts`, `others`.
+- Frontend executable/library targets are top-level PascalCase directories: `TypeDuck-Windows/MoqiTextService`, `TypeDuck-Windows/MoqLauncher`, `TypeDuck-Windows/SetupHelper`, `TypeDuck-Windows/TypeDuckSettings`.
+- Backend input methods live under `TypeDuck-Windows-backend/input_methods/<method>`.
+- Backend package directories use lowercase package names: `TypeDuck-Windows-backend/imecore`, `TypeDuck-Windows-backend/mobilebridge`, `TypeDuck-Windows-backend/tools`.
+- Runtime package layout must keep `server.exe` and `input_methods/` in the same `TypeDuckRuntime` directory.
+
+**Code Identifiers:**
+- C++ class and namespace identifiers currently include `Moqi::` for product frontend/launcher code and `Ime::` for reusable TSF code.
+- C++ TypeDuck product constants live under `Moqi::TypeDuck` in `TypeDuck-Windows/MoqiTextService/TypeDuckProfile.cpp`.
+- Protobuf package is `moqi.protocol` in both repositories.
+- Go module imports currently use an older external module identity; treat those import paths as current code identifiers until the module is renamed.
 
 ## Where to Add New Code
 
-**New TypeDuck TSF Behavior:**
-- Primary code: `MoqiTextService/MoqiTextService.cpp`, `MoqiTextService/MoqiTextService.h`.
-- Backend request/response behavior: `MoqiTextService/MoqiClient.cpp`, `MoqiTextService/MoqiClient.h`.
-- Candidate visual feel, dictionary detail, movement reveal, and focus-safe placement matching TypeDuck Web alpha: `MoqiTextService/MoqiCandidateWindow.cpp`, `MoqiTextService/MoqiCandidateWindow.h`, `MoqiTextService/MoqiTextService.cpp`.
-- Lang-bar and preserved-key controls: `MoqiTextService/MoqiLangBarButton.cpp`, `MoqiTextService/MoqiLangBarButton.h`, `MoqiTextService/MoqiClient.cpp`.
+**New TSF behavior:**
+- Primary code: `TypeDuck-Windows/MoqiTextService/MoqiTextService.cpp` and `TypeDuck-Windows/MoqiTextService/MoqiClient.cpp`
+- Shared TSF framework changes: `TypeDuck-Windows/libIME2/src`
+- Tests: `TypeDuck-Windows/Tests/TypeDuckProtocol` or targeted PowerShell scripts under `TypeDuck-Windows/scripts`
 
-**New Backend Protocol Capability:**
-- Schema: `proto/moqi.proto`.
-- Framing: reuse `proto/ProtoFraming.h`.
-- TSF client handling: `MoqiTextService/MoqiClient.cpp`.
-- Launcher pipe handling: `MoqLauncher/PipeClient.cpp`.
-- Backend process handling: `MoqLauncher/BackendServer.cpp`.
-- Regenerate generated sources through the top-level protobuf custom command in `CMakeLists.txt`.
+**New candidate or dictionary UI behavior:**
+- Parser/formatting: `TypeDuck-Windows/MoqiTextService/TypeDuckCandidateInfo.cpp`
+- Rendering and interaction: `TypeDuck-Windows/MoqiTextService/MoqiCandidateWindow.cpp`
+- Tests: `TypeDuck-Windows/Tests/TypeDuckCandidateData/TypeDuckCandidateInfo_test.cpp`
 
-**New Backend Runtime Integration:**
-- Backend manifest: `backends.json`.
-- Launcher backend discovery and GUID routing: `MoqLauncher/PipeServer.cpp`.
-- Backend process launch details: `MoqLauncher/BackendServer.cpp`.
-- Installer staging of runtime payload: `scripts/install.ps1`, `scripts/_all_in_package.ps1`.
-- TypeDuck librime fork and dictionary lookup filter plugin belong in the staged backend runtime tree copied by `scripts/install.ps1`, not in `libIME2/src`.
+**New launcher IPC or backend process behavior:**
+- Named pipe routing: `TypeDuck-Windows/MoqLauncher/PipeClient.cpp`
+- Backend process lifecycle: `TypeDuck-Windows/MoqLauncher/BackendServer.cpp`
+- Launcher singleton/tray: `TypeDuck-Windows/MoqLauncher/PipeServer.cpp`
+- Protocol tests: `TypeDuck-Windows/Tests/TypeDuckProtocol`
 
-**New Registration/Installer Behavior:**
-- TSF CLSID and product module identity: `MoqiTextService/MoqiImeModule.cpp`.
-- Language profile scanning and `locale`/`fallbackLocale` mapping: `MoqiTextService/DllEntry.cpp`.
-- Registration mechanics: `libIME2/src/ImeModule.cpp`.
-- Installer UI, install directory, startup registry, and cleanup: `installer/MoqiTsf.iss`.
-- TSF DLL copy/register/unregister actions: `SetupHelper/SetupHelper.cpp`.
-- Chinese (Traditional, Hong Kong) installation target requires coordinated changes in `installer/MoqiTsf.iss`, backend `ime.json`, `MoqiTextService/DllEntry.cpp`, and `libIME2/src/ImeModule.cpp`.
+**New settings preference:**
+- Frontend preference model: `TypeDuck-Windows/MoqLauncher/TypeDuckPreferences.cpp`
+- Settings UI: `TypeDuck-Windows/TypeDuckSettings/TypeDuckSettingsWindow.cpp`
+- Protocol fields if needed: `TypeDuck-Windows/proto/moqi.proto` and `TypeDuck-Windows-backend/proto/moqi.proto`
+- Backend application to Rime: `TypeDuck-Windows-backend/input_methods/rime/appearance_config.go` and `TypeDuck-Windows-backend/input_methods/rime/rime.go`
+- Tests: `TypeDuck-Windows/Tests/TypeDuckSettings/TypeDuckPreferences_test.cpp` and backend `_test.go` files near the changed package.
 
-**New Build or Packaging Step:**
-- Local build orchestration: `scripts/build.ps1`.
-- Installer staging: `scripts/install.ps1`.
-- Full package flow: `scripts/_all_in_package.ps1`.
-- Inno compiler invocation: `installer/build-installer.ps1`.
-- CI packaging: `.github/workflows/release.yml`, `.github/workflows/nightly.yml`.
+**New protocol capability:**
+- Schema: `TypeDuck-Windows/proto/moqi.proto` and `TypeDuck-Windows-backend/proto/moqi.proto`
+- C++ framing/application: `TypeDuck-Windows/proto/ProtoFraming.h`, `TypeDuck-Windows/MoqiTextService/MoqiClient.cpp`, `TypeDuck-Windows/MoqLauncher/PipeClient.cpp`, `TypeDuck-Windows/MoqLauncher/BackendServer.cpp`
+- Go conversion: `TypeDuck-Windows-backend/imecore/protocol.go`
+- Tests: `TypeDuck-Windows/Tests/TypeDuckProtocol` and `TypeDuck-Windows-backend/imecore/protocol_test.go`
 
-**New Generic TSF Utility:**
-- Shared TSF/COM implementation: `libIME2/src`.
-- Tests: `libIME2/test`.
-- Use `libIME2/src` only for generic TSF behavior that is not TypeDuck-specific.
+**New backend engine behavior:**
+- Backend service dispatch: `TypeDuck-Windows-backend/server.go`
+- Request/response model: `TypeDuck-Windows-backend/imecore/protocol.go`
+- Rime session behavior: `TypeDuck-Windows-backend/input_methods/rime/rime.go`
+- Rime native API usage: `TypeDuck-Windows-backend/input_methods/rime/librime.go` and `TypeDuck-Windows-backend/input_methods/rime/native_cgo.go`
+- Tests: colocated `*_test.go` files under `TypeDuck-Windows-backend/input_methods/rime` or `TypeDuck-Windows-backend/imecore`
+
+**New installer behavior:**
+- Inno wizard/install/uninstall logic: `TypeDuck-Windows/installer/MoqiTsf.iss`
+- Elevated copy/register behavior: `TypeDuck-Windows/SetupHelper/SetupHelper.cpp`
+- Stage tree changes: `TypeDuck-Windows/scripts/install.ps1`
+- Verification scripts: `TypeDuck-Windows/scripts/Test-TypeDuckInstallerSkeleton.ps1`, `TypeDuck-Windows/scripts/Invoke-TypeDuckReleaseVerification.ps1`
+
+**New runtime package content:**
+- Backend package builder: `TypeDuck-Windows-backend/scripts/build.ps1`
+- Frontend installer staging copy/filtering: `TypeDuck-Windows/scripts/install.ps1`
+- Librime/schema staging proof: `TypeDuck-Windows/scripts/Stage-TypeDuckRuntime.ps1`
 
 **Utilities:**
-- Launcher filesystem/JSON helpers: `MoqLauncher/Utils.cpp`, `MoqLauncher/Utils.h`.
-- TSF logging helpers: `MoqiTextService/TsfLog.cpp`, `MoqiTextService/TsfLog.h`, `libIME2/src/DebugLogFile.h`.
-- Shared protobuf framing: `proto/ProtoFraming.h`.
+- Frontend shared Win32 helpers: keep near the owning target unless reused by multiple targets.
+- Launcher shared helpers: `TypeDuck-Windows/MoqLauncher/Utils.cpp` and `TypeDuck-Windows/MoqLauncher/Utils.h`.
+- Backend shared request/response helpers: `TypeDuck-Windows-backend/imecore`.
 
 ## Special Directories
 
-**`jsoncpp`:**
-- Purpose: Vendored third-party JSON library.
+**`TypeDuck-Windows/build-vs32`, `TypeDuck-Windows/build-vs64`, `TypeDuck-Windows/build-vs32-settings`, `TypeDuck-Windows/build-vs32-settings-ui`:**
+- Purpose: Local CMake/MSBuild output directories.
+- Generated: Yes.
+- Committed: No.
+
+**`TypeDuck-Windows/runtime`:**
+- Purpose: Staged runtime evidence/assets used by runtime proof and packaging workflows.
+- Generated: Yes.
+- Committed: Repository-specific; inspect git status before editing.
+
+**`TypeDuck-Windows/.planning`:**
+- Purpose: Product planning, product fixtures, codebase maps, and implementation artifacts.
+- Generated: Yes.
+- Committed: Project reference artifacts.
+
+**`TypeDuck-Windows/libIME2`, `TypeDuck-Windows/libuv`, `TypeDuck-Windows/jsoncpp`:**
+- Purpose: Vendored or submodule dependencies used by the frontend build.
 - Generated: No.
 - Committed: Yes.
 
-**`libuv`:**
-- Purpose: Vendored third-party async/process/pipe library.
-- Generated: No.
-- Committed: Yes.
-
-**`libIME2/lib/googletest-release-1.10.0`:**
-- Purpose: Vendored GoogleTest dependency for `libIME2/test`.
-- Generated: No.
-- Committed: Yes.
-
-**`proto/moqi.pb.cc` and `proto/moqi.pb.h`:**
-- Purpose: Checked-in protobuf-generated C++ sources.
+**`TypeDuck-Windows-backend/scripts/build`:**
+- Purpose: Backend build output and `TypeDuckRuntime` package directory.
 - Generated: Yes.
-- Committed: Yes.
+- Committed: No for normal build outputs.
 
-**`build-vs32`, `build-vs64`, `build-*`, `cmake-build-ninja`:**
-- Purpose: Local CMake build outputs.
-- Generated: Yes.
-- Committed: No; ignored by `.gitignore`.
+**`TypeDuck-Windows-backend/input_methods/rime/android`:**
+- Purpose: Android native runtime assets for backend package variants.
+- Generated: No for checked-in assets.
+- Committed: Yes when present.
 
-**`installer/stage`:**
-- Purpose: Staged installer payload built by `scripts/install.ps1`.
-- Generated: Yes.
-- Committed: No; ignored by `.gitignore`.
-
-**`installer/dist`:**
-- Purpose: Inno Setup output directory for setup executables.
-- Generated: Yes.
-- Committed: No for normal development; output name is controlled by `installer/MoqiTsf.iss`.
-
-**`others/imgs`:**
-- Purpose: Legacy Moqi README/demo images.
+**`TypeDuck-Windows-backend/input_methods/rime/test`:**
+- Purpose: Standalone Rime experiment/probe code.
 - Generated: No.
 - Committed: Yes.
 
 ---
 
-*Structure analysis: 2026-06-23*
+*Structure analysis: 2026-06-28*

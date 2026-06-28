@@ -1,282 +1,242 @@
 # Codebase Concerns
 
-**Analysis Date:** 2026-06-23
+**Analysis Date:** 2026-06-28
+
+**Scope:** This audit treats `https://github.com/TypeDuck-HK/TypeDuck-Windows` and `https://github.com/TypeDuck-HK/TypeDuck-Windows-backend` as equivalent parts of the TypeDuck Windows v1 product codebase. Paths below are repo-relative and prefixed with `TypeDuck-Windows:` or `TypeDuck-Windows-backend:`.
 
 ## Tech Debt
 
-**Legacy Moqi product identity is embedded across code, installer, protocol, CI, and runtime paths:**
-- Issue: Current binaries, namespaces, directories, registry cleanup, log paths, tray text, installer labels, release artifacts, and documentation are Moqi-specific. Treat these as scaffold-only for the TypeDuck Cantonese IME target.
-- Files: `CMakeLists.txt`, `README.md`, `TODO.md`, `MoqiTextService/MoqiImeModule.cpp`, `MoqiTextService/DllEntry.cpp`, `MoqiTextService/MoqiTextService.rc.in`, `MoqiTextService/MoqiTextService.def`, `MoqiTextService/TsfLog.cpp`, `MoqLauncher/PipeServer.cpp`, `SetupHelper/SetupHelper.cpp`, `installer/MoqiTsf.iss`, `installer/README.txt`, `scripts/build.ps1`, `scripts/install.ps1`, `scripts/_all_in_package.ps1`, `.github/workflows/release.yml`, `.github/workflows/nightly.yml`
-- Impact: TypeDuck deliverables inherit wrong product names, wrong install directories, wrong AppId/CLSID coordination, wrong log locations, wrong tray/menu strings, wrong release asset names, and user-facing Simplified Chinese/Moqi references.
-- Fix approach: Create a single TypeDuck product identity contract with executable names, DLL names, AppId, TSF CLSID, profile GUIDs, install directories, log directories, release artifact names, installer text, tray strings, and protocol package names. Apply it through CMake configure definitions and installer/script constants instead of editing one-off string literals.
+**Moqi-named product identifiers remain in compiled code and build contracts:**
+- Issue: Current namespaces, CMake targets, protocol package names, generated protobuf names, header guards, script parameters, installer filename, and some command IDs still use `Moqi`/`moqi` identifiers while the public product and binaries are TypeDuck.
+- Files: `TypeDuck-Windows:CMakeLists.txt`, `TypeDuck-Windows:MoqiTextService/CMakeLists.txt`, `TypeDuck-Windows:MoqiTextService/MoqiClient.h`, `TypeDuck-Windows:MoqiTextService/MoqiClient.cpp`, `TypeDuck-Windows:MoqiTextService/MoqiImeModule.cpp`, `TypeDuck-Windows:MoqLauncher/PipeServer.cpp`, `TypeDuck-Windows:installer/MoqiTsf.iss`, `TypeDuck-Windows:scripts/_all_in_package.ps1`, `TypeDuck-Windows:proto/moqi.proto`, `TypeDuck-Windows-backend:go.mod`, `TypeDuck-Windows-backend:proto/moqi.proto`, `TypeDuck-Windows-backend:imecore/protocol.go`
+- Impact: Future changes can update visible TypeDuck behavior while leaving internal release, diagnostics, protocol, or installer assumptions attached to the wrong product vocabulary. This also makes cross-repo search and ownership ambiguous.
+- Fix approach: Define a TypeDuck identity matrix for module names, executable names, DLL names, protocol package names, CMake cache variables, script parameters, and installer filenames. Rename in thin compatibility layers first, then remove stale aliases after release tooling and tests use TypeDuck names only.
 
-**Backend architecture still depends on an out-of-process TypeDuck runtime bridge:**
-- Issue: The Windows frontend now launches one fixed `TypeDuckRuntime\server.exe` bridge and speaks protobuf over stdio through `MoqLauncher`; the sibling backend source still carries legacy Moqi implementation history.
-- Files: `MoqLauncher/BackendServer.cpp`, `MoqLauncher/PipeServer.cpp`, `MoqiTextService/MoqiClient.cpp`, `proto/moqi.proto`, `proto/ProtoFraming.h`, `scripts/install.ps1`, `scripts/_all_in_package.ps1`, `.github/workflows/release.yml`, `.github/workflows/nightly.yml`
-- Impact: The process boundary is now TypeDuck-owned, but later cleanup still needs diagnostics/path/IPC hardening and release verification around the packaged runtime.
-- Fix approach: Keep the fixed `TypeDuckRuntime` bridge for v1, harden IPC and diagnostics in Phase 6, and verify runtime behavior in Phase 7.
+**Backend still registers non-TypeDuck services from source input method folders:**
+- Issue: The backend always registers the fixed TypeDuck Rime profile, then scans `input_methods` and can register `moqi`, `fcitx5`, and default Moqi-backed services if their `ime.json` files are present.
+- Files: `TypeDuck-Windows-backend:server.go`, `TypeDuck-Windows-backend:input_methods/moqi/ime.json`, `TypeDuck-Windows-backend:input_methods/fcitx5/ime.json`, `TypeDuck-Windows-backend:input_methods/moqi/moqi.go`, `TypeDuck-Windows-backend:input_methods/fcitx5/fcitx5.go`
+- Impact: Source builds and ad hoc runtime packages can expose Simplified Chinese or incomplete input methods outside the TypeDuck v1 scope. This increases accidental registration and support surface.
+- Fix approach: Gate service registration behind a TypeDuck runtime mode, or remove non-TypeDuck input method folders from v1 source builds. Keep test-only implementations behind explicit build tags or test helpers.
 
-**Runtime language profile metadata is discovered from backend `ime.json` files:**
-- Issue: Registration scans `{programDir}\{backend}\input_methods\*\ime.json` at `DllRegisterServer` time and trusts those files for profile name, GUID, locale, fallback locale, and icon.
-- Files: `MoqiTextService/DllEntry.cpp`, `MoqiTextService/MoqiImeModule.cpp`, `libIME2/src/ImeModule.cpp`, `MoqLauncher/PipeServer.cpp`
-- Impact: A missing or malformed backend payload can register no language profiles. TypeDuck's required installation under Chinese (Traditional, Hong Kong) is not guaranteed by first-party TSF code.
-- Fix approach: Make the TypeDuck Hong Kong Traditional profile a first-party build-time resource with deterministic GUID, locale `zh-HK`, display names in Traditional Chinese Hong Kong and English, and icon metadata. Use backend metadata only for optional engine configuration.
+**Cross-repo protobuf schemas are not identical:**
+- Issue: The frontend schema includes TypeDuck protocol info, settings snapshots, engine capabilities, health, error details, richer `CandidateEntry` fields, and reserved cloud clipboard fields. The backend schema still includes `METHOD_CLOUD_CLIPBOARD_UPLOAD` and only emits `CandidateEntry.text` and `CandidateEntry.comment`.
+- Files: `TypeDuck-Windows:proto/moqi.proto`, `TypeDuck-Windows-backend:proto/moqi.proto`, `TypeDuck-Windows:MoqLauncher/PipeClient.cpp`, `TypeDuck-Windows:MoqiTextService/MoqiClient.cpp`, `TypeDuck-Windows-backend:imecore/protocol.go`
+- Impact: Product behavior depends on a shared wire contract that is maintained in two repos without a single source of truth. Dictionary metadata, health diagnostics, and error recovery can drift silently.
+- Fix approach: Make one protobuf schema canonical, generate C++ and Go bindings from it in CI, and add a cross-repo schema compatibility check that fails on unreviewed field, enum, or package drift.
 
-**Generated protobuf sources are committed while CMake also regenerates them:**
-- Issue: `proto/moqi.pb.cc` and `proto/moqi.pb.h` are checked in, but `CMakeLists.txt` generates protobuf output into `${CMAKE_BINARY_DIR}/generated/proto` and the targets compile `${MOQI_PROTO_CPP}` from the build directory.
-- Files: `proto/moqi.pb.cc`, `proto/moqi.pb.h`, `proto/moqi.proto`, `CMakeLists.txt`, `MoqiTextService/CMakeLists.txt`, `MoqLauncher/CMakeLists.txt`
-- Impact: Developers can read or edit stale generated sources that are not compiled. Protocol changes can appear committed while local builds use different generated files.
-- Fix approach: Either remove checked-in generated protobuf files or make them the canonical source with a regeneration check in CI. Prefer removing generated files and adding an explicit `protoc` verification step.
+**Backend source contains AI and cloud clipboard surfaces outside the TypeDuck v1 runtime package:**
+- Issue: The backend build prunes `ai_config.json`, `cloudclipboard`, and related runtime directories from packaged output, but source code still includes AI hotkeys, AI HTTP calls, cloud clipboard menus, WebDAV dialogs, and preserved keys.
+- Files: `TypeDuck-Windows-backend:input_methods/rime/rime.go`, `TypeDuck-Windows-backend:input_methods/rime/ai_config.go`, `TypeDuck-Windows-backend:input_methods/rime/ai_client.go`, `TypeDuck-Windows-backend:input_methods/rime/cloud_clipboard.go`, `TypeDuck-Windows-backend:input_methods/rime/cloudclipboard/client.go`, `TypeDuck-Windows-backend:scripts/build.ps1`, `TypeDuck-Windows-backend:scripts/Test-TypeDuckCandidateParity.ps1`
+- Impact: Source-built runtimes, tests, and future changes can re-enable network or clipboard features that are not part of the v1 product surface.
+- Fix approach: Move non-v1 surfaces behind build tags or remove them from the product runtime package. Keep packaging-pruning tests, but do not rely on packaging alone to define product behavior.
 
-**Large first-party source files mix TSF, UI, RPC, state management, and product behavior:**
-- Issue: Several core files are oversized and multi-responsibility: `MoqiTextService/MoqiClient.cpp` (1584 lines), `MoqiTextService/MoqiTextService.cpp` (1155 lines), `MoqiTextService/MoqiCandidateWindow.cpp` (914 lines), `SetupHelper/SetupHelper.cpp` (767 lines), and `MoqLauncher/PipeServer.cpp` (713 lines).
-- Files: `MoqiTextService/MoqiClient.cpp`, `MoqiTextService/MoqiTextService.cpp`, `MoqiTextService/MoqiCandidateWindow.cpp`, `SetupHelper/SetupHelper.cpp`, `MoqLauncher/PipeServer.cpp`
-- Impact: TypeDuck behavior changes are high-risk because input processing, candidate UI, async response handling, logging, and compatibility workarounds are interleaved.
-- Fix approach: Split along stable boundaries: `TypeduckEngineClient`, `CandidateViewModel`, `CandidateWindowRenderer`, `ProfileRegistration`, `InstallerSystemDllOps`, and `LauncherIpcServer`. Keep TSF callback glue thin.
-
-**User-facing fcitx, AI, WebDAV, and Moqi feature clutter exists in docs and launcher behavior:**
-- Issue: README and launcher code describe or implement features outside the TypeDuck target, including fcitx-in-progress text, WebDAV cloud clipboard, AI config, multiple Moqi schemes, and Moqi tray controls.
-- Files: `README.md`, `TODO.md`, `MoqLauncher/PipeServer.cpp`, `MoqLauncher/BackendServer.cpp`, `proto/moqi.proto`, `MoqiTextService/MoqiClient.cpp`
-- Impact: Shipping these paths creates unused user-facing clutter and product confusion for a TypeDuck Cantonese IME.
-- Fix approach: Remove or compile-gate non-TypeDuck feature surfaces. Keep only controls that match TypeDuck Web alpha behavior and expose text in bilingual Traditional Hong Kong Chinese and English.
+**Large core files concentrate unrelated responsibilities:**
+- Issue: Key path files combine TSF handling, IPC, UI, rendering, settings, Rime calls, product menus, and async state machines.
+- Files: `TypeDuck-Windows:MoqiTextService/MoqiClient.cpp`, `TypeDuck-Windows:MoqiTextService/MoqiTextService.cpp`, `TypeDuck-Windows:MoqiTextService/MoqiCandidateWindow.cpp`, `TypeDuck-Windows:MoqLauncher/PipeServer.cpp`, `TypeDuck-Windows-backend:input_methods/rime/rime.go`, `TypeDuck-Windows-backend:input_methods/rime/librime.go`, `TypeDuck-Windows-backend:imecore/protocol.go`
+- Impact: Behavior changes for candidate display, key handling, settings, or runtime health are high-risk because unrelated flows share mutable state and helper functions.
+- Fix approach: Split by stable responsibility: protocol adapter, settings bridge, candidate view model, dictionary payload parser, Rime native bridge, menu model, and installer/registration operations. Keep TSF and Rime boundary code thin.
 
 ## Known Bugs
 
-**Backspace while editing is noted as sluggish:**
-- Symptoms: Holding Backspace while deleting composing text is reported as laggy.
-- Files: `TODO.md`, `MoqiTextService/MoqiTextService.cpp`, `MoqiTextService/MoqiClient.cpp`, `MoqLauncher/BackendServer.cpp`
-- Trigger: Hold Backspace during active composition with backend round-trips enabled.
-- Workaround: Not detected.
+**Backend frame reads can allocate unbounded payloads:**
+- Symptoms: `readFrame` reads a 32-bit length and allocates `make([]byte, size)` without a maximum, while the frontend enforces 1 MiB frame caps.
+- Files: `TypeDuck-Windows-backend:protocol_io.go`, `TypeDuck-Windows:proto/ProtoFraming.h`, `TypeDuck-Windows:MoqLauncher/BackendServer.cpp`, `TypeDuck-Windows:MoqLauncher/PipeClient.cpp`
+- Trigger: A malformed or hostile stdin frame declares a very large payload length.
+- Workaround: The frontend launcher limits frames it sends, but the backend process has no equivalent guard if invoked directly or fed malformed input.
 
-**Mixed Chinese/English input and Shift case switching are noted as unreliable:**
-- Symptoms: Mixed Chinese/English input has bugs and Shift case switching sometimes fails even when keyboard events are observed.
-- Files: `TODO.md`, `MoqiTextService/MoqiTextService.cpp`, `MoqiTextService/MoqiClient.cpp`, `proto/moqi.proto`
-- Trigger: Switch between Chinese and English input with Shift while composing or entering printable keys.
-- Workaround: Not detected.
+**Frontend can accept a same-user named-pipe endpoint without strong server identity validation:**
+- Symptoms: The TSF client checks pipe metadata in `isPipeCreatedByMoqiServer`, but the pipe name and same-user ACL are the main trust boundary.
+- Files: `TypeDuck-Windows:MoqiTextService/MoqiClient.cpp`, `TypeDuck-Windows:MoqLauncher/PipeServer.cpp`, `TypeDuck-Windows:MoqLauncher/PipeSecurity.cpp`
+- Trigger: Another same-user process creates or proxies the expected TypeDuck named pipe before the launcher.
+- Workaround: Pipe ACLs deny network access and restrict to local app/container/logon principals; no signer or executable-path validation is enforced.
 
-**Client-side server identity check always succeeds:**
-- Symptoms: `Client::isPipeCreatedByMoqiServer` obtains the named-pipe server PID but returns `true` without validating executable path, signer, owner, or command line.
-- Files: `MoqiTextService/MoqiClient.cpp`
-- Trigger: A same-user process creates the expected named pipe before or instead of the launcher.
-- Workaround: Pipe name includes the current username, and launcher pipe ACLs restrict some access on Windows 8+.
+**Dictionary metadata can be reduced to comments at the backend boundary:**
+- Symptoms: Backend `CandidateEntry` only has `Text` and `Comment`; frontend dictionary parsing depends on raw lookup comments surviving inside `comment` or `raw_lookup_comment`.
+- Files: `TypeDuck-Windows-backend:imecore/protocol.go`, `TypeDuck-Windows-backend:input_methods/rime/rime.go`, `TypeDuck-Windows:MoqiTextService/MoqiClient.cpp`, `TypeDuck-Windows:MoqiTextService/TypeDuckCandidateInfo.cpp`, `TypeDuck-Windows:Tests/TypeDuckCandidateData/TypeDuckCandidateInfo_test.cpp`
+- Trigger: Backend changes to candidate formatting, comment normalization, protobuf generation, or Rime lookup filter output.
+- Workaround: Frontend tests preserve raw separator parsing; backend tests assert dictionary lookup modules exist, but no single end-to-end test proves rich dictionary fields across both generated schemas.
 
-**Backend responses without expected sequencing can stall or reset the client path:**
-- Symptoms: `Client::callRpcMethod` loops until it receives a response with the matching `seq_num`; mismatched frames are queued as async responses and the method then tries to read more pending data.
-- Files: `MoqiTextService/MoqiClient.cpp`, `MoqLauncher/BackendServer.cpp`, `proto/moqi.proto`
-- Trigger: Backend emits async responses, stale responses, malformed responses, or no matching response during a synchronous key request.
-- Workaround: Failed calls close the RPC connection and reset text-service state.
-
-**Message and candidate window placement uses TODO/FIXME fallback positioning:**
-- Symptoms: Candidate and message windows move to `textRect.left, textRect.bottom` with explicit FIXME comments about placement; message windows default to `(0, 0)` when there is no composition rect.
-- Files: `MoqiTextService/MoqiTextService.cpp`, `MoqiTextService/MoqiCandidateWindow.cpp`
-- Trigger: Host applications without reliable `ITfContextView` rectangles, UI-less contexts, immersive apps, console apps, or composition rect failures.
-- Workaround: Candidate owner/window recovery logic recreates or repositions the candidate window when possible.
+**Backend workflow Go version does not match `go.mod`:**
+- Symptoms: `go.mod` declares `go 1.25.0`, while GitHub Actions in both repos set up Go `1.24.6`.
+- Files: `TypeDuck-Windows-backend:go.mod`, `TypeDuck-Windows-backend:.github/workflows/nightly.yml`, `TypeDuck-Windows-backend:.github/workflows/release.yml`, `TypeDuck-Windows:.github/workflows/nightly.yml`, `TypeDuck-Windows:.github/workflows/release.yml`
+- Trigger: CI or local builds with `GOTOOLCHAIN` disabled, unavailable toolchain downloads, or stricter Go version checks.
+- Workaround: Go's automatic toolchain download can hide this when network access is available.
 
 ## Security Considerations
 
-**Named-pipe framing has no maximum payload length:**
-- Risk: `Proto::FrameBuffer::nextFrame` trusts a 32-bit frame length and keeps appending until that length arrives. A malicious or broken backend/client can force unbounded memory growth.
-- Files: `proto/ProtoFraming.h`, `MoqLauncher/BackendServer.cpp`, `MoqLauncher/PipeClient.cpp`, `MoqiTextService/MoqiClient.cpp`
-- Current mitigation: Protobuf parsing rejects invalid complete payloads; no size limit is enforced before buffering.
-- Recommendations: Define a strict maximum frame size for requests and responses, reject oversized frames, clear buffers on violation, and log a bounded diagnostic.
+**Named-pipe authorization is broad for local app containers:**
+- Risk: The launcher pipe grants read/write/synchronize access to LocalSystem, Administrators, all application packages, and the logon SID.
+- Files: `TypeDuck-Windows:MoqLauncher/PipeSecurity.cpp`, `TypeDuck-Windows:MoqLauncher/PipeServer.cpp`
+- Current mitigation: Network access is denied, rights are narrower than generic all, and the pipe is per-user under `TypeDuckIME`.
+- Recommendations: Add a documented threat model for TSF host processes, verify minimum pipe rights, and add optional server/client process identity validation where Windows permits it.
 
-**Pipe access control is broad for app containers and uses a process-style access mask:**
-- Risk: `PipeSecurityAttributes` grants `GENERIC_ALL` to LocalSystem, Built-in Administrators, and all application packages, then grants the logon SID a broad `PROCESS_ALL_ACCESS_HEX` value for a pipe security descriptor.
-- Files: `MoqLauncher/PipeSecurity.cpp`, `MoqLauncher/PipeServer.cpp`
-- Current mitigation: Remote network access is denied and the logon SID is included; pipe names include the username.
-- Recommendations: Replace broad rights with explicit named-pipe read/write/connect rights, validate the TSF client process identity where practical, and document the minimum access required for packaged/Store app compatibility.
+**Backend process inherits most launcher environment variables:**
+- Risk: The launcher copies the current environment into `TypeDuckRuntime/server.exe`, adding only `PYTHONIOENCODING`. Unexpected variables can influence Go, Rime, logging, or optional AI code paths.
+- Files: `TypeDuck-Windows:MoqLauncher/BackendServer.cpp`, `TypeDuck-Windows-backend:input_methods/rime/ai_config.go`, `TypeDuck-Windows-backend:input_methods/rime/debug_logging.go`
+- Current mitigation: The packaged runtime prunes AI config and the frontend owns the fixed backend command.
+- Recommendations: Construct an allowlisted runtime environment for `server.exe`, explicitly remove non-v1 feature env vars, and record the runtime environment contract in tests.
 
-**Runtime profile and configuration tools are trusted from install payload JSON:**
-- Risk: `MoqiImeModule::onConfigure` reads `configTool`, `configToolParams`, and `configToolDir` from backend `ime.json` and launches the tool with `ShellExecuteW`.
-- Files: `MoqiTextService/MoqiImeModule.cpp`, `MoqiTextService/DllEntry.cpp`
-- Current mitigation: Relative paths are resolved under the input method directory; no signer or directory allowlist is enforced.
-- Recommendations: For TypeDuck, remove arbitrary backend-provided config tool launching or restrict it to a signed first-party executable under the TypeDuck install directory.
+**Runtime staging downloads and extracts binary dependencies:**
+- Risk: Runtime staging pulls a pinned librime archive, extracts `rime.dll`, copies schema data, and records hashes. A compromised or unavailable release source blocks packaging or ships a bad engine if verification is incomplete.
+- Files: `TypeDuck-Windows:scripts/Stage-TypeDuckRuntime.ps1`, `TypeDuck-Windows:scripts/Test-TypeDuckRuntimeContract.ps1`, `TypeDuck-Windows-backend:scripts/build.ps1`, `TypeDuck-Windows:.github/workflows/release.yml`, `TypeDuck-Windows:.github/workflows/nightly.yml`
+- Current mitigation: The staging script records SHA-256 evidence and lookup-filter provenance in a manifest; release workflows checkout the schema source separately.
+- Recommendations: Pin expected archive and DLL hashes in source-controlled verification data, verify code signing where possible, and fail release builds if manifest provenance is absent or mismatched.
 
-**Installer force-kills launcher processes and writes system DLLs:**
-- Risk: Inno Setup runs `taskkill /F /T /IM MoqiLauncher.exe`, and `SetupHelper` copies TSF DLLs into system directories and schedules reboot replacements/tasks as admin.
-- Files: `installer/MoqiTsf.iss`, `SetupHelper/SetupHelper.cpp`
-- Current mitigation: Installer requires admin, uses quoted command-line arguments, and handles reboot-required cases.
-- Recommendations: Use TypeDuck-specific process names, avoid broad image-name kills where possible, validate source DLL paths and signatures before copying, and log setup operations to a TypeDuck-specific location.
+**Installer performs elevated system DLL replacement and scheduled re-registration:**
+- Risk: The setup helper copies 32-bit and 64-bit TSF DLLs into Windows system directories, invokes both `regsvr32` bitnesses, and can schedule a SYSTEM re-registration task after reboot.
+- Files: `TypeDuck-Windows:SetupHelper/SetupHelper.cpp`, `TypeDuck-Windows:installer/MoqiTsf.iss`, `TypeDuck-Windows:scripts/install.ps1`
+- Current mitigation: Admin elevation is required, source paths come from the installed app directory, and bilingual failure messages surface common failure paths.
+- Recommendations: Validate source DLL hashes before copy/register, log all elevated operations to TypeDuck-specific logs, and run clean install/upgrade/uninstall/reboot verification on Windows 10 and Windows 11.
 
-**Cloud clipboard uploads arbitrary clipboard text when enabled:**
-- Risk: The launcher registers a clipboard listener, reads `CF_UNICODETEXT`, and forwards it to the backend when `cloud_clipboard.json` has `enabled=true`.
-- Files: `MoqLauncher/PipeServer.cpp`, `MoqLauncher/BackendServer.cpp`, `proto/moqi.proto`
-- Current mitigation: Feature is gated by config and returns early when disabled.
-- Recommendations: Remove this feature for TypeDuck unless explicitly required. If retained, add clear consent, maximum text length, secret redaction guidance, and visible status controls.
-
-**Debug logs can record process names, executable paths, key handling state, and candidate content behavior:**
-- Risk: Trace/debug logs write to `%LOCALAPPDATA%\MoqiIM\Log` and include process paths, focus state, composition/candidate state, and internal events.
-- Files: `MoqiTextService/DllEntry.cpp`, `MoqiTextService/MoqiTextService.cpp`, `MoqiTextService/MoqiClient.cpp`, `MoqiTextService/MoqiCandidateWindow.cpp`, `MoqiTextService/TsfLog.cpp`, `MoqLauncher/PipeServer.cpp`
-- Current mitigation: Trace/debug logging is gated by `Ime::isTraceLoggingEnabled()` and `Ime::isDebugLoggingEnabled()` in several paths; launcher log level defaults to error.
-- Recommendations: Keep logs opt-in, scrub typed text where possible, rotate all logs consistently, and rename paths to TypeDuck-specific storage.
+**Debug and runtime logs can contain sensitive typing context:**
+- Risk: TSF, launcher, and backend logs include process paths, key states, candidate counts, composition lengths, Rime paths, and error details; backend AI/cloud clipboard source paths can log snippets or network errors when enabled in source builds.
+- Files: `TypeDuck-Windows:MoqiTextService/DllEntry.cpp`, `TypeDuck-Windows:MoqiTextService/TsfLog.cpp`, `TypeDuck-Windows:MoqiTextService/MoqiClient.cpp`, `TypeDuck-Windows:MoqLauncher/PipeServer.cpp`, `TypeDuck-Windows-backend:server.go`, `TypeDuck-Windows-backend:input_methods/rime/debug_logging.go`, `TypeDuck-Windows-backend:input_methods/rime/ai_client.go`, `TypeDuck-Windows-backend:input_methods/rime/cloud_clipboard.go`
+- Current mitigation: Routine backend response payload logging is intentionally suppressed, and frontend debug logging is gated.
+- Recommendations: Keep debug logging opt-in, cap logged text, scrub typed content and clipboard values, and include privacy assertions in release verification.
 
 ## Performance Bottlenecks
 
-**Synchronous named-pipe RPC is on the key handling path:**
-- Problem: `Client::callRpcMethod` uses `TransactNamedPipe` during key filters and key handling, with reconnect loops that can wait up to 10 attempts of 3000 ms when establishing the launcher pipe.
-- Files: `MoqiTextService/MoqiClient.cpp`, `MoqiTextService/MoqiTextService.cpp`
-- Cause: The TSF layer waits on backend IPC for key decisions instead of having a non-blocking local engine path or a bounded fast-fail cache.
-- Improvement path: Keep key filtering local wherever possible. For backend calls, use strict per-key timeouts, async result delivery, circuit-breaker state, and a visible degraded mode when the engine is unavailable.
+**Synchronous backend round-trips sit on TSF key handling paths:**
+- Problem: The TSF client sends key requests through a named pipe to the launcher, which forwards protobuf frames to backend stdin/stdout. Pending requests use bounded waits but still depend on the out-of-process runtime.
+- Files: `TypeDuck-Windows:MoqiTextService/MoqiClient.cpp`, `TypeDuck-Windows:MoqLauncher/PipeClient.cpp`, `TypeDuck-Windows:MoqLauncher/BackendServer.cpp`, `TypeDuck-Windows-backend:server.go`, `TypeDuck-Windows-backend:input_methods/rime/rime.go`
+- Cause: Input decisions are delegated to a separate process and Rime session state instead of an in-process fast path.
+- Improvement path: Maintain strict per-key timeouts, keep first-printable-key fast failure behavior, add telemetry for slow key paths, and preserve local recovery when backend health is degraded.
 
-**Backend process restart is immediate on read error and disconnects all clients:**
-- Problem: `BackendServer::onReadError` calls `restartProcess`, and `terminateProcess` calls `PipeServer::onBackendClosed`, which closes every client using that backend.
-- Files: `MoqLauncher/BackendServer.cpp`, `MoqLauncher/PipeServer.cpp`, `MoqLauncher/PipeClient.cpp`
-- Cause: Backend lifecycle and client state are tightly coupled.
-- Improvement path: Add backoff, health state, and reconnect semantics. Preserve TSF state when the engine restarts if the active composition can be safely canceled or replayed.
+**Rime initialization and redeploy hold global backend state:**
+- Problem: Native Rime initialization is guarded by `sync.Once`; redeploy uses global `nativeRuntimeState` locks and can make operations unavailable during reload.
+- Files: `TypeDuck-Windows-backend:input_methods/rime/native_cgo.go`, `TypeDuck-Windows-backend:input_methods/rime/librime.go`, `TypeDuck-Windows-backend:input_methods/rime/appearance_config.go`, `TypeDuck-Windows-backend:input_methods/rime/rime.go`
+- Cause: Librime runtime state is process-global while TypeDuck sessions are per TSF client.
+- Improvement path: Surface redeploy health through the shared protocol, test concurrent settings updates and key events, and avoid destroying active sessions unless the settings change requires it.
 
-**Candidate window recalculates GDI text metrics and redraws frequently:**
-- Problem: `CandidateWindow::recalculateSize` measures each candidate and comment with `GetTextExtentPoint32W`, rebuilds width arrays, resizes the HWND, and reapplies shape on content changes.
-- Files: `MoqiTextService/MoqiCandidateWindow.cpp`, `MoqiTextService/MoqiTextService.cpp`
-- Cause: UI layout is directly computed inside the window class without a reusable view model or measured text cache.
-- Improvement path: Cache measurements by font/text/comment, separate candidate view data from HWND painting, and add visual regression checks for TypeDuck Web alpha parity.
+**Candidate window layout and dictionary rendering are heavyweight UI paths:**
+- Problem: The candidate window measures text, computes dictionary panels, paints rich rows, and manages candidate details inside a single Win32 window class.
+- Files: `TypeDuck-Windows:MoqiTextService/MoqiCandidateWindow.cpp`, `TypeDuck-Windows:MoqiTextService/TypeDuckCandidateInfo.cpp`, `TypeDuck-Windows:MoqiTextService/MoqiTextService.cpp`
+- Cause: Rendering, layout, dictionary parsing, host window ownership, and TSF UI element behavior are tightly coupled.
+- Improvement path: Cache parsed candidate info and text measurements, separate a renderer-independent view model, and add screenshot/host coverage for dense dictionary rows.
 
-**Clipboard listener reads and uploads whole clipboard text after a short debounce:**
-- Problem: `flushDebouncedClipboardUpload` reads the whole Unicode clipboard and schedules upload after 400 ms when cloud clipboard is enabled.
-- Files: `MoqLauncher/PipeServer.cpp`
-- Cause: There is no size bound or content classification before backend upload.
-- Improvement path: Remove cloud clipboard for TypeDuck or impose maximum payload length, debounce cancellation, and explicit user-triggered sync.
+**Release workflows rebuild schema runtime data repeatedly:**
+- Problem: Workflows checkout schema data, prune files, copy into backend paths, run a deployer, then run the frontend packaging script that also calls the backend build.
+- Files: `TypeDuck-Windows:.github/workflows/nightly.yml`, `TypeDuck-Windows:.github/workflows/release.yml`, `TypeDuck-Windows-backend:scripts/build.ps1`, `TypeDuck-Windows:scripts/_all_in_package.ps1`
+- Cause: Runtime data preparation is split between workflow YAML, frontend scripts, and backend scripts.
+- Improvement path: Move runtime preparation into one script with explicit inputs/outputs and make CI consume that script instead of duplicating packaging steps.
 
 ## Fragile Areas
 
-**TSF registration and uninstall write undocumented per-user language profile registry values:**
-- Files: `libIME2/src/ImeModule.cpp`, `SetupHelper/SetupHelper.cpp`, `installer/MoqiTsf.iss`
-- Why fragile: Registration writes under `HKEY_USERS\<sid>\Control Panel\International\User Profile\<locale>` and loads the default user hive. This is undocumented and can vary by Windows version, user profile state, and admin context.
-- Safe modification: Add tests or scripted verification for Windows 10/11 clean install, upgrade, uninstall, and reinstall. Keep TypeDuck profile locale/GUID constants centralized.
-- Test coverage: No automated install or registry tests detected.
+**TSF/COM profile registration depends on exact GUID, locale, and bitness coordination:**
+- Files: `TypeDuck-Windows:MoqiTextService/TypeDuckProfile.cpp`, `TypeDuck-Windows:MoqiTextService/DllEntry.cpp`, `TypeDuck-Windows:MoqiTextService/MoqiImeModule.cpp`, `TypeDuck-Windows:SetupHelper/SetupHelper.cpp`, `TypeDuck-Windows:installer/MoqiTsf.iss`
+- Why fragile: The profile GUID, CLSID, `zh-HK` locale, service name, deployed DLL name, Inno cleanup keys, and both `regsvr32` bitnesses must stay synchronized.
+- Safe modification: Centralize identity constants generated into C++, Inno, and tests. Any GUID/DLL rename requires installer, setup helper, TSF registration, launcher mapping, and backend profile tests in the same change.
+- Test coverage: `TypeDuck-Windows:scripts/Test-TypeDuckTsfIdentity.ps1` covers identity expectations, but automated admin install/uninstall registry verification remains limited.
 
-**Dual-architecture TSF DLL deployment is manual and system-directory dependent:**
-- Files: `SetupHelper/SetupHelper.cpp`, `scripts/build.ps1`, `scripts/install.ps1`, `installer/MoqiTsf.iss`
-- Why fragile: Win32 and x64 DLLs are copied into `SysWOW64` and `System32`, registered with separate `regsvr32.exe` paths, and sometimes replaced on reboot.
-- Safe modification: Preserve separate Win32/x64 build outputs, verify both `regsvr32` registrations, and avoid renaming DLLs without updating setup, installer cleanup, resource metadata, and COM registration together.
-- Test coverage: No automated setup-helper tests detected.
+**Backend runtime packaging is split across two repos:**
+- Files: `TypeDuck-Windows:scripts/_all_in_package.ps1`, `TypeDuck-Windows:scripts/install.ps1`, `TypeDuck-Windows-backend:scripts/build.ps1`, `TypeDuck-Windows-backend:.github/workflows/release.yml`, `TypeDuck-Windows:.github/workflows/release.yml`
+- Why fragile: The frontend installer expects `TypeDuckRuntime/server.exe` and `input_methods/rime/rime.dll`, while backend scripts and workflows still emit or test some older package-output names.
+- Safe modification: Treat frontend installer packaging as the release authority for v1. Keep backend artifacts internal unless they are renamed and verified as TypeDuck runtime packages.
+- Test coverage: Runtime package pruning and release artifact scripts exist, but a full cross-repo release artifact contract is not enforced by the backend repo's own workflow names and output paths.
 
-**Candidate window ownership/topmost behavior depends on host-specific HWND discovery:**
-- Files: `MoqiTextService/MoqiCandidateWindow.cpp`, `MoqiTextService/MoqiTextService.cpp`
-- Why fragile: Owner resolution falls back from TSF context view to `GetFocus` and `GetForegroundWindow`; the window is `WS_EX_TOPMOST | WS_EX_NOACTIVATE`, and ownership is adjusted dynamically.
-- Safe modification: Test Notepad, Office, browsers, terminal/console, UWP/immersive hosts, games, elevated apps, multi-monitor DPI, and UI-less TSF hosts after each UI change.
-- Test coverage: No UI automation or screenshot-based candidate window tests detected.
+**Candidate details depend on lookup-filter control characters and CSV header order:**
+- Files: `TypeDuck-Windows:MoqiTextService/TypeDuckCandidateInfo.cpp`, `TypeDuck-Windows:MoqiTextService/MoqiCandidateWindow.cpp`, `TypeDuck-Windows-backend:input_methods/rime/librime.go`, `TypeDuck-Windows-backend:input_methods/rime/rime_runtime_test.go`, `TypeDuck-Windows-backend:input_methods/rime/rime.go`
+- Why fragile: `rime-dictionary-lookup-filter` output is encoded inside comments with separator characters and CSV rows. Any plugin output, schema, or comment formatting change can break dictionary display without breaking basic candidate selection.
+- Safe modification: Preserve raw lookup comments as opaque wire payloads, parse in one frontend module, and add a cross-repo golden fixture that starts from a real backend response and ends at rendered candidate info.
+- Test coverage: Frontend parser tests and backend module tests exist; cross-repo rich dictionary rendering coverage is incomplete.
 
-**Protocol compatibility crosses C++, generated protobuf, Go package naming, and backend behavior:**
-- Files: `proto/moqi.proto`, `proto/moqi.pb.cc`, `proto/moqi.pb.h`, `CMakeLists.txt`, `MoqiTextService/MoqiClient.cpp`, `MoqLauncher/BackendServer.cpp`
-- Why fragile: The schema includes Moqi-specific methods and features such as cloud clipboard, tray notifications, UI customization, preserved keys, and Rime deploy command behavior.
-- Safe modification: Version the TypeDuck protocol explicitly. Remove unused methods only with coordinated backend/client changes and golden request/response tests.
-- Test coverage: No protocol compatibility tests detected.
+**Generated protobuf artifacts can diverge from schemas:**
+- Files: `TypeDuck-Windows:proto/moqi.proto`, `TypeDuck-Windows:proto/moqi.pb.cc`, `TypeDuck-Windows:proto/moqi.pb.h`, `TypeDuck-Windows-backend:proto/moqi.proto`, `TypeDuck-Windows-backend:proto/moqi.pb.go`, `TypeDuck-Windows:CMakeLists.txt`
+- Why fragile: The frontend can generate C++ protobuf files during build or fall back to checked-in generated sources; the backend has checked-in Go output. Without a shared generation check, stale generated code can compile.
+- Safe modification: Add a `protoc` verification job in both repos that regenerates and diffs generated files against source, or stop committing generated files and require generated build outputs only.
+- Test coverage: Protocol tests exercise selected fields and framing, not full generated schema freshness.
 
-**Submodules and third-party trees are part of the build surface:**
-- Files: `.gitmodules`, `libIME2/`, `libuv/`, `jsoncpp/`, `libIME2/lib/googletest-release-1.10.0/`, `CMakeLists.txt`
-- Why fragile: The repo depends on forked or vendored dependencies (`gaboolic/libIME2.git`, `EasyIME/libuv`, bundled jsoncpp and googletest). Local submodule tooling failed in this environment because Git's shell helpers could not find Unix tools.
-- Safe modification: Pin submodule commits in CI, document bootstrap requirements, and avoid editing vendored code except behind clearly named patches.
-- Test coverage: CI builds release artifacts, but dependency update checks and vulnerability scans are not detected.
-
-**Detached helper thread sends synthetic left-arrow input for quote pairing:**
-- Files: `MoqiTextService/MoqiClient.cpp`
-- Why fragile: `sendDelayedLeftArrow` detaches a thread, polls foreground window and Shift state, then calls `SendInput` to move the caret. This can race focus changes or conflict with host shortcuts.
-- Safe modification: Replace synthetic keyboard input with TSF edit-session cursor manipulation where possible. If retained, guard it behind TypeDuck-specific pairing settings and add host compatibility tests.
-- Test coverage: No tests cover quote pairing or caret movement.
+**Settings are persisted and applied in both frontend and backend:**
+- Files: `TypeDuck-Windows:MoqLauncher/TypeDuckPreferences.cpp`, `TypeDuck-Windows:TypeDuckSettings/TypeDuckSettingsWindow.cpp`, `TypeDuck-Windows:MoqLauncher/PipeClient.cpp`, `TypeDuck-Windows-backend:input_methods/rime/appearance_config.go`
+- Why fragile: Frontend preferences include display-only fields and Rime side effects; backend preferences only receive a subset. Defaults such as page size and Cangjie behavior must match both sides.
+- Safe modification: Maintain one documented settings schema and separate "interface-only" from "Rime-affecting" fields in both generated protocol and tests.
+- Test coverage: `TypeDuck-Windows:Tests/TypeDuckSettings/TypeDuckPreferences_test.cpp` and `TypeDuck-Windows-backend:input_methods/rime/rime_test.go` cover pieces, but no single integration test validates settings UI to backend Rime config on an installed system.
 
 ## Scaling Limits
 
-**Single launcher and backend instance per user:**
-- Current capacity: One `MoqiLauncherMutex` and one `\\.\pipe\<username>\MoqiIM\Launcher` endpoint per user.
-- Limit: Multiple TypeDuck channels, side-by-side Moqi/TypeDuck installs, beta/stable installs, or per-profile engines collide unless names are changed.
-- Scaling path: Namespace mutexes, pipes, data directories, registry keys, and process names by TypeDuck product/channel.
+**Single per-user launcher, pipe, and runtime bridge:**
+- Current capacity: One `TypeDuckLauncherMutex`, one per-user `TypeDuckIME` launcher pipe, and one fixed `typeduck-runtime-bridge` backend.
+- Limit: Side-by-side stable/beta/dev channels, per-user test installs, or concurrent runtime versions collide.
+- Scaling path: Namespace mutexes, pipes, log directories, registry values, runtime directories, and installer AppIds by channel.
 
-**Candidate list UI is capped by selection keys and UI element reporting:**
-- Current capacity: Default `selKeys_` is `1234567890`; `CandidateWindow::GetCount` reports at most 10 candidates.
-- Limit: TypeDuck Web alpha behavior with richer lookup/filter candidates or dictionary entries can exceed 10 visible items.
-- Scaling path: Define paging and dictionary lookup UX explicitly, including selection keys, comments, paging commands, and TSF UI element reporting.
+**Runtime package assumes one x64 backend and two TSF DLL bitnesses:**
+- Current capacity: x64 installer with Win32 and x64 TSF DLLs, plus one x64 Go backend/runtime DLL package.
+- Limit: ARM64 Windows, per-architecture backend packages, or multi-engine runtimes are not modeled.
+- Scaling path: Add architecture metadata to packaging scripts and runtime manifests, then verify each TSF/launcher/backend combination separately.
 
-**Backend response buffering is unbounded:**
-- Current capacity: `FrameBuffer` stores all partial data in a single `std::string`.
-- Limit: A declared frame length up to `uint32_t` can retain gigabytes in memory before a complete frame exists.
-- Scaling path: Add frame-size caps, incremental parse limits, and per-client/backend buffer quotas.
-
-**Release automation assumes one Windows installer artifact:**
-- Current capacity: `.github/workflows/release.yml` and `.github/workflows/nightly.yml` build and upload `installer/dist/moqi-im-windows-setup.exe`.
-- Limit: Separate TypeDuck alpha/beta/stable channels, signed installers, symbol artifacts, and architecture-specific packages are not modeled.
-- Scaling path: Introduce channel-aware artifact names, code signing, SBOM/dependency manifests, and separate smoke-test jobs before release upload.
+**Candidate and dictionary display are bounded by selection-key assumptions:**
+- Current capacity: Backend defaults to numeric selection keys and frontend candidate UI commonly assumes up to 10 candidates.
+- Limit: Dictionary-rich results, paging, reverse lookup, and multilingual detail panes can exceed compact IME assumptions.
+- Scaling path: Keep selection keys, page metadata, and dictionary detail presentation explicit in protocol fixtures and UI tests.
 
 ## Dependencies at Risk
 
-**`spdlog` is pinned to v1.2.1 via FetchContent:**
-- Risk: Very old logging dependency with potential compatibility and security maintenance gaps.
-- Impact: Build or runtime logging issues can surface when modernizing CMake/MSVC or enabling stricter warnings.
-- Migration plan: Upgrade to a current pinned spdlog release or use a small first-party logging wrapper around Windows ETW/file logging.
+**Pinned TypeDuck librime and lookup filter are binary-runtime dependencies:**
+- Risk: Product dictionary behavior depends on a specific `rime.dll` build and statically included `rime-dictionary-lookup-filter` evidence.
+- Impact: Replacing the DLL or schema data can remove lookup comments, break Rime ABI expectations, or change candidate ordering.
+- Next action: Keep runtime manifest hashes, plugin commit evidence, and schema commit evidence required for release. Add a binary compatibility smoke test that loads `rime.dll`, confirms `dictionary_lookup`, and types a lookup-filter case.
 
-**`protobuf` is downloaded during configure/build unless local roots are supplied:**
-- Risk: `CMakeLists.txt` fetches protobuf 33.5 from GitHub and CI separately downloads `protoc`; builds depend on network availability and exact upstream artifact availability.
-- Impact: Offline development and reproducible builds are fragile.
-- Migration plan: Pin a verified protobuf/protoc package in the build environment or vendor via a package manager with checksums.
+**Backend Go module identity remains external to public TypeDuck repo naming:**
+- Risk: `go.mod` and imports use an older external module identity, while public repo naming is `TypeDuck-HK/TypeDuck-Windows-backend`.
+- Impact: Fork/module resolution, vulnerability scanning, generated protobuf package names, and developer documentation point to a different module identity.
+- Next action: Plan a Go module rename with import updates, generated protobuf update, and compatibility notes for any external consumers.
 
-**`libIME2` is a forked TSF foundation with local behavior changes:**
-- Risk: Core TSF registration, COM, text-service, and candidate UI behavior live under `libIME2/`, including undocumented registry writes and Simplified conversion helper code.
-- Impact: TypeDuck changes may need TSF framework fixes that are easy to confuse with app-level behavior.
-- Migration plan: Keep local patches explicit, add regression tests around modified TSF framework behavior, and document which `libIME2` APIs are stable for TypeDuck.
+**Frontend C++ dependencies are old or vendored:**
+- Risk: `libIME2`, `libuv`, `jsoncpp`, `googletest`, `spdlog`, and protobuf are vendored, fetched, or submodule-based with Windows-specific patches.
+- Impact: Security updates, MSVC updates, and Windows API changes can require patching dependencies that are part of the IME runtime path.
+- Next action: Track dependency versions in `TypeDuck-Windows:.planning/codebase/STACK.md`, add update tests around TSF registration and IPC, and avoid modifying vendored code outside documented patches.
 
-**`libuv` is sourced from `EasyIME/libuv`:**
-- Risk: Launcher IPC and backend process management depend on a forked libuv tree plus a custom named-pipe wrapper.
-- Impact: Process/pipe bugs may require maintaining old libuv code rather than using supported Windows APIs directly.
-- Migration plan: Reassess whether TypeDuck needs libuv. If the engine boundary is in-process, remove launcher/libuv. If out-of-process, consider modern libuv or first-party Windows overlapped pipe code with tests.
-
-**Vendored Inno Setup Simplified Chinese translation conflicts with TypeDuck locale requirements:**
-- Risk: Installer language file is Simplified Chinese and the setup script registers only `chinesesimplified`.
-- Impact: TypeDuck must present Traditional Hong Kong Chinese and English, not Simplified Chinese installer chrome.
-- Migration plan: Replace with Traditional Chinese Hong Kong and English installer resources, and review every string in `installer/MoqiTsf.iss`.
+**Backend workflows package stale standalone runtime assets:**
+- Risk: Backend release/nightly workflows still package zip artifacts with older runtime naming, while the TypeDuck installer path consumes `TypeDuckRuntime`.
+- Impact: A backend-only release can publish artifacts that do not match the TypeDuck Windows v1 installer contract.
+- Next action: Retire standalone backend release artifacts or rename them to TypeDuck runtime artifacts with the same pruning and manifest checks used by the frontend installer build.
 
 ## Missing Critical Features
 
-**TypeDuck Cantonese engine integration is absent:**
-- Problem: No TypeDuck librime fork integration, dictionary lookup filter plugin packaging, or TypeDuck schema assets are present.
-- Blocks: The product cannot mirror TypeDuck Web alpha behavior or produce TypeDuck Cantonese candidates.
+**No single cross-repo release contract file:**
+- Problem: The installer, launcher, backend build, schema checkout, runtime DLL, protobuf schema, and settings fields are verified by separate scripts and tests.
+- Blocks: Automated confidence that a given pair of frontend/backend commits produces a compatible TypeDuck Windows v1 installer.
 
-**Hong Kong Traditional profile installation is not defined:**
-- Problem: Profile locale comes from backend `ime.json`; no first-party TypeDuck `zh-HK` profile metadata is present in the repo.
-- Blocks: Installation under Chinese (Traditional, Hong Kong) cannot be guaranteed.
+**No authoritative IPC/protocol version negotiation at backend runtime:**
+- Problem: The frontend schema has `TypeDuckProtocolInfo`, health, and capability messages, but the backend does not expose matching protocol negotiation.
+- Blocks: Safe rolling upgrades, helpful mismatch diagnostics, and explicit refusal of incompatible backend runtimes.
 
-**Bilingual Traditional Hong Kong Chinese and English UI copy is absent:**
-- Problem: User-facing strings are mostly Moqi Simplified Chinese or English scaffold text.
-- Blocks: TypeDuck UI, installer, tray, logs, error messages, and configuration affordances cannot meet the bilingual product requirement.
-
-**TypeDuck visual parity is not encoded:**
-- Problem: Candidate window defaults are generic white/blue GDI styling and do not reference TypeDuck Web alpha tokens, spacing, typography, or interaction behavior.
-- Blocks: Windows candidate UI cannot be judged against TypeDuck Web alpha without a design contract and visual regression fixtures.
-
-**Dictionary lookup filter UX is not modeled in the protocol or UI:**
-- Problem: Current protocol has candidate text/comment fields and generic menu/buttons but no explicit dictionary lookup filter lifecycle, metadata, or interaction contract.
-- Blocks: The documented lookup-filter CSV payload has no first-class parser/view-model path, making parity and testing fragile.
+**No installed-system UAT automation for TSF host compatibility:**
+- Problem: Script guards inspect source and artifacts, but TSF behavior in real host processes depends on Windows profile registration, COM loading, focus windows, DPI, UI-less mode, and app bitness.
+- Blocks: Confident release signoff for Windows 10/11 apps, browsers, Office, console/terminal, elevated apps, and 32-bit hosts.
 
 ## Test Coverage Gaps
 
-**First-party TSF text service behavior is untested:**
-- What's not tested: Activation, deactivation, key filtering, composition updates, preserved keys, candidate show/hide, UI-less hosts, async response flushing, and connection recovery.
-- Files: `MoqiTextService/MoqiTextService.cpp`, `MoqiTextService/MoqiClient.cpp`, `MoqiTextService/MoqiCandidateWindow.cpp`
-- Risk: Input regressions ship unnoticed because only manual Windows testing catches them.
+**Installer and TSF registration lack automated admin integration tests:**
+- What's not tested: Clean install, upgrade, uninstall, reboot-required replacement, scheduled re-registration, HKCU/HKLM TSF registry state, and both `System32`/`SysWOW64` registrations.
+- Files: `TypeDuck-Windows:SetupHelper/SetupHelper.cpp`, `TypeDuck-Windows:installer/MoqiTsf.iss`, `TypeDuck-Windows:scripts/Test-TypeDuckInstallerSkeleton.ps1`, `TypeDuck-Windows:scripts/Invoke-TypeDuckVmInstallerVerification.ps1`
+- Risk: The installer can build while real Windows typing profile registration fails or leaves stale profile entries.
 - Priority: High
 
-**Launcher/backend IPC is untested:**
-- What's not tested: Named-pipe security, frame parsing, request sequencing, malformed frames, backend crash/restart, stderr handling, cloud clipboard uploads, and multi-client routing.
-- Files: `MoqLauncher/PipeServer.cpp`, `MoqLauncher/PipeClient.cpp`, `MoqLauncher/BackendServer.cpp`, `proto/ProtoFraming.h`
-- Risk: Hangs, spoofing, memory growth, and lost responses ship unnoticed.
+**Cross-repo protocol generation and compatibility are not one command:**
+- What's not tested: Regenerating both C++ and Go protobuf bindings from one schema, diffing generated output, and validating all TypeDuck enum/field support in both runtimes.
+- Files: `TypeDuck-Windows:proto/moqi.proto`, `TypeDuck-Windows-backend:proto/moqi.proto`, `TypeDuck-Windows:Tests/TypeDuckProtocol/ProtoFraming_test.cpp`, `TypeDuck-Windows-backend:imecore/protocol_test.go`
+- Risk: Candidate metadata, settings updates, and runtime health can regress through schema drift.
 - Priority: High
 
-**Installer and registration are untested:**
-- What's not tested: Clean install, upgrade, reboot-required replacement, uninstall cleanup, system DLL copy, scheduled re-registration task, and Windows language profile placement.
-- Files: `SetupHelper/SetupHelper.cpp`, `installer/MoqiTsf.iss`, `libIME2/src/ImeModule.cpp`, `scripts/install.ps1`
-- Risk: Users can end up with broken or orphaned TSF registrations.
+**Real candidate window rendering coverage is incomplete:**
+- What's not tested: Visual placement and text fit for dictionary-rich candidate rows across DPI, multi-monitor layouts, vertical/horizontal layouts, UI-less hosts, and long multilingual definitions.
+- Files: `TypeDuck-Windows:MoqiTextService/MoqiCandidateWindow.cpp`, `TypeDuck-Windows:Preview/main.cpp`, `TypeDuck-Windows:scripts/Test-TypeDuckCandidateWindow.ps1`, `TypeDuck-Windows:Tests/TypeDuckCandidateData/TypeDuckCandidateInfo_test.cpp`
+- Risk: Candidate parsing can pass while actual Windows UI clips, overlaps, or appears in the wrong location.
 - Priority: High
 
-**TypeDuck migration requirements have no automated acceptance tests:**
-- What's not tested: `zh-HK` profile registration, Traditional Hong Kong and English strings, absence of Moqi/fcitx/WebDAV clutter, TypeDuck candidate styling, and dictionary lookup filter behavior.
-- Files: `README.md`, `installer/MoqiTsf.iss`, `MoqLauncher/PipeServer.cpp`, `MoqiTextService/MoqiCandidateWindow.cpp`, `MoqiTextService/MoqiTextService.rc.in`, `proto/moqi.proto`
-- Risk: Legacy scaffold behavior persists under the TypeDuck product.
-- Priority: High
-
-**Only low-level COM helper tests are detected:**
-- What's not tested: Application code outside `libIME2/test/ComPtr_test.cpp` and `libIME2/test/ComObject_test.cpp`.
-- Files: `libIME2/test/ComPtr_test.cpp`, `libIME2/test/ComObject_test.cpp`, `libIME2/test/CMakeLists.txt`
-- Risk: Most product behavior lacks automated regression coverage.
+**Backend runtime source has more surfaces than packaged runtime tests exercise:**
+- What's not tested: Source-built activation of AI, cloud clipboard, `moqi`, `fcitx5`, mobile bridge, Android paths, and standalone backend workflows against the v1 product contract.
+- Files: `TypeDuck-Windows-backend:server.go`, `TypeDuck-Windows-backend:mobilebridge/bridge.go`, `TypeDuck-Windows-backend:input_methods/rime/ai_config.go`, `TypeDuck-Windows-backend:input_methods/rime/cloud_clipboard.go`, `TypeDuck-Windows-backend:.github/workflows/release.yml`
+- Risk: Non-v1 features can re-enter builds through source or workflow changes without failing installer-focused tests.
 - Priority: Medium
+
+**Runtime provenance tests do not fully cover release workflow outputs:**
+- What's not tested: Final installer contains exactly the hashed runtime files, schema files, and lookup-filter-enabled built schema declared by the runtime manifest.
+- Files: `TypeDuck-Windows:scripts/Stage-TypeDuckRuntime.ps1`, `TypeDuck-Windows:scripts/Test-TypeDuckRuntimeContract.ps1`, `TypeDuck-Windows:scripts/Test-TypeDuckReleaseArtifacts.ps1`, `TypeDuck-Windows-backend:scripts/build.ps1`
+- Risk: The runtime manifest can be correct for a staging path while CI packages a different runtime directory.
+- Priority: High
 
 ---
 
-*Concerns audit: 2026-06-23*
+*Concerns audit: 2026-06-28*

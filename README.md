@@ -1,182 +1,180 @@
-# 墨奇输入法 Windows版
+# TypeDuck Windows
 
-墨染清风书雅韵，奇思逸趣入诗文。
+TypeDuck Windows is a Cantonese input method for Windows users in Hong Kong, built on Microsoft Text Services Framework and a TypeDuck Rime runtime.
 
-Windows 端的输入法前端，负责把 `moqi-ime` 后端接入 **Microsoft Text Services Framework (TSF)**，并提供候选窗、语言栏按钮、组合串上屏等 Windows 平台能力。
+TypeDuck Windows 係為香港 Windows 用戶而設嘅粵語輸入法，使用 Microsoft Text Services Framework，並配合 TypeDuck Rime Runtime 提供候選字、粵拼同字典式提示。
 
-当前状态：已实现 **[Rime / 中州韵](https://github.com/rime/librime)** 输入法接入，**fcitx5** 输入法接入中。
+## What You Get / 你會得到咩
 
-项目 TSF 层核心依赖：[`libIME2`](https://github.com/EasyIME/libIME2)。很大程度上参考了[PIME](https://github.com/EasyIME/PIME) 以及 [小狼毫](https://github.com/rime/weasel) 项目。
+- TypeDuck Cantonese IME registered under Chinese (Traditional, Hong Kong) / `zh-HK`.
+- TypeDuck 粵語輸入法會註冊喺「中文（繁體，香港）」/ `zh-HK`。
+- Candidate, Jyutping, and dictionary-style details in a Windows candidate window.
+- 候選窗會顯示候選字、粵拼同字典式資料。
+- A bilingual installer, settings window, about dialog, and Start Menu shortcuts.
+- 雙語安裝程式、設定視窗、關於視窗同開始功能表捷徑。
+- Local settings stored per user, with Rime-affecting options applied through the TypeDuck runtime.
+- 每位用戶有獨立設定；影響 Rime 嘅選項會經 TypeDuck Runtime 套用。
 
-核心引擎：[`moqi-ime`](https://github.com/gaboolic/moqi-ime)。使用Go语言实现。
+## Install / 安裝
 
-默认输入法：[`白霜拼音`](https://github.com/gaboolic/rime-frost)。
+Download the latest installer from [TypeDuck-Windows releases](https://github.com/TypeDuck-HK/TypeDuck-Windows/releases), then run:
 
-为什么选择白霜拼音？
+請到 [TypeDuck-Windows releases](https://github.com/TypeDuck-HK/TypeDuck-Windows/releases) 下載最新安裝程式，然後執行：
 
-1. 白霜拼音经过评测，词频准确度是最高的，超过了商业输入法。[查看rime各方案评测结果](https://github.com/gaboolic/rime-schema-compare/blob/main/report/latest.md)
-2. 白霜拼音作者也是我，有问题改起来方便。
-
-## 快速开始
-
-下载安装包：[moqi-im-windows-setup.exe](https://github.com/gaboolic/moqi-im-windows/releases)
-
-## 特色功能
-
-- 托盘切换输入法状态：中英文 全半角 简繁
-- 外观编辑：主题皮肤切换、字体调整、主题色切换、自定义快捷键。一般功能都可通过托盘图标右键修改，强烈自定义修改需求可修改C:\Users\用户名\AppData\Roaming\Moqi\appearance_config.json  现在已支持导入皮肤，可选yaml文件
-- 默认使用白霜拼音，支持切换方案集、切换输入方案、更新配置
-- 修改了librime的组句算法，支持输出多条整句候选，正确率大大提升
-- 置顶短语、超级简拼
-- 输入设置：自动插入成对符号、分号键次选
-- 同步设置：设置WebDAV后，支持跨设备同步用户词库（WebDAV）
-- **云剪贴板（WebDAV）**：与 Android 版互通，默认关闭。在输入法「设置」菜单 →「云剪贴板」中配置 WebDAV 地址与账号；开启后 PC 任意应用复制纯文本会自动上传到 `{墨奇设置目录}/clip/`（默认 `moqi-input-method/clip/`）。按 `Ctrl+0`（可在设置中修改）将云端条目显示为候选列表并上屏。配置保存在 `%APPDATA%\Moqi\cloud_clipboard.json`，密码经 DPAPI 加密存于 `cloud_clipboard.pw`。
-- 原生ai功能：支持整句优化、翻译、问答等，只有想不到没有做不到。编辑C:\Users\用户名\AppData\Roaming\Moqi\Rime\ai_config.json 可以接入ai大模型以及自定义提示词、快捷键。为了方便体验，已在安装包里加了默认配置，可以替换成用户自己的apikey
-
-```
-{
-  "api": {
-    "base_url": "",
-    "api_key": "",
-    "model": ""
-  },
-  "actions": [
-    {
-      "name": "写好评",
-      "hotkey": "Ctrl+Shift+G",
-      "prompt": "请围绕“{{candidate_1}}”生成最多 3 条适合直接发布的中文好评，每条 20 字左右。"
-    },
-    {
-      "name": "优化整句",
-      "hotkey": "Ctrl+Shift+O",
-      "prompt": "上一句是：{{previous_commit}}\n原始输入拼音是：{{composition}}\n前三个候选词：\n{{candidates_top3}}\n请严格遵循原始输入拼音来选字，只能在符合这串拼音的候选范围内优化整句，不要凭空改成不匹配拼音的字词。只输出 1 条最通顺、最自然的整句候选，不要解释。"
-    },
-    {
-      "name": "中译英",
-      "hotkey": "Ctrl+Shift+E",
-      "prompt": "请把当前中文内容翻译成自然、地道的英文。 “{{candidate_1}}” 只输出 1 条英文翻译，不要解释。"
-    },
-    {
-      "name": "问答",
-      "hotkey": "Ctrl+Shift+Q",
-      "prompt": "用户询问： “{{candidate_1}}” 只输出 1 条答案，不要解释。"
-    }
-  ]
-}
+```text
+typeduck-windows-ime-setup.exe
 ```
 
-## 功能演示
+After installation, choose **TypeDuck 粵語輸入法 / TypeDuck Cantonese IME** under Chinese (Traditional, Hong Kong).
 
-ai功能演示：<https://github.com/gaboolic/moqi-im-windows/issues/4>
-![输入0-ai](others/imgs/input-ai.gif)
-![输入1-ai](others/imgs/input-zise.png)
+安裝完成後，請喺「中文（繁體，香港）」下面揀 **TypeDuck 粵語輸入法 / TypeDuck Cantonese IME**。
 
-外观配置、切换方案
-![菜单主题](others/imgs/caidan-zhuti.png)
-![菜单方案集](others/imgs/caidan-schemas.png)
-![菜单方案](others/imgs/caidan-schema.png)
+## First Use / 第一次使用
 
-同步设置
-![同步设置](others/imgs/caidan-tongbu.png)
-![webdav](others/imgs/caidan-webdav.png)
+1. Open any Windows app that accepts text.
+2. Switch to Chinese (Traditional, Hong Kong), then select TypeDuck.
+3. Type Cantonese input codes and choose a candidate from the TypeDuck candidate window.
+4. Open **輸入法設定 IME Settings** from the Start Menu or launcher tray icon to adjust preferences.
 
-多整句、句中任意辅助码演示
-![输入整句组句](others/imgs/input-zuju.png)
-![输入4-句中辅助码](others/imgs/input-liuxingyusamantianji.gif)
+1. 開啟任何可以輸入文字嘅 Windows 應用程式。
+2. 切換到中文（繁體，香港），再揀 TypeDuck。
+3. 輸入粵語編碼，喺 TypeDuck 候選窗揀字。
+4. 如要調整設定，可由開始功能表或工具列圖示開啟 **輸入法設定 IME Settings**。
 
-一些输入效果
-![输入2](others/imgs/input-mo.png)
-![输入3](others/imgs/input-qi.png)
+## User Settings / 用戶設定
 
-## 运行架构
+The settings app includes bilingual controls for candidate count, display languages, Chinese typeface, Jyutping visibility, completion, correction, sentence composition, input memory, reverse lookup display, and Cangjie version.
 
+設定程式提供雙語控制項，包括每頁候選數量、顯示語言、中文字體、候選詞粵拼、自動完成、自動校正、自動組詞、輸入記憶、反查顯示同倉頡版本。
+
+## Repositories
+
+- Frontend and installer: [TypeDuck-HK/TypeDuck-Windows](https://github.com/TypeDuck-HK/TypeDuck-Windows)
+- Backend runtime: [TypeDuck-HK/TypeDuck-Windows-backend](https://github.com/TypeDuck-HK/TypeDuck-Windows-backend)
+
+## Architecture
+
+TypeDuck Windows is split into two repositories that ship together:
+
+```text
+Windows TSF host apps
+        |
+        v
+TypeDuckTextService.dll
+        |
+        | per-user named pipe, protobuf frames
+        v
+TypeDuckLauncher.exe
+        |
+        | stdin/stdout, protobuf frames
+        v
+TypeDuckRuntime/server.exe
+        |
+        v
+librime + TypeDuck Rime data + dictionary lookup filter
 ```
-┌─────────────────────────────────────────────┐
-│           Windows 应用程序                 │
-│      (记事本 / Word / 浏览器 / 其他)        │
-├─────────────────────────────────────────────┤
-│  MoqiTextService.dll                        │
-│  - TSF 接口实现                             │
-│  - 按键事件/组合串/候选窗处理               │
-│  - 通过命名管道连接 Launcher                │
-├─────────────────────────────────────────────┤
-│  MoqiLauncher.exe                            │
-│  - 读取 backends.json                       │
-│  - 管理后端进程生命周期                     │
-│  - 在命名管道与后端 stdin/stdout 之间转发消息│
-├─────────────────────────────────────────────┤
-│  moqi-ime\server.exe                        │
-│  - Go 后端进程                              │
-│  - 加载 input_methods\*\ime.json            │
-│  - 返回候选、状态、上屏文本等               │
-└─────────────────────────────────────────────┘
+
+The frontend repository owns TSF registration, COM entry points, candidate UI, launcher IPC, settings/about UI, setup helper, runtime staging, and the installer. The backend repository owns the Go runtime process, protobuf conversion, Rime service, librime binding, settings application to Rime configuration, and packaged runtime output.
+
+## Build Prerequisites
+
+- Windows 10 or Windows 11 for development and validation.
+- Visual Studio 2022 with MSVC and Windows SDK.
+- CMake 3.21 or newer.
+- PowerShell 7 or newer; use `pwsh` for repository scripts.
+- Inno Setup 6 for installer builds.
+- Go matching the backend module requirement.
+- Protocol Buffers `protoc` 33.5 or a local protobuf source tree.
+- A TypeDuck Rime schema checkout to pass as `-RimeDataSource`.
+
+## Build
+
+Build the Windows frontend binaries:
+
+```powershell
+pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/build.ps1
 ```
 
-当前默认部署中，`backends.json` 指向 `moqi-ime\server.exe`；Windows 侧通过本地命名管道连到 `MoqLauncher`，`MoqLauncher` 再把请求按行写入后端的标准输入，并从标准输出读取响应。
+Build the full installer after the backend runtime and schema source are available:
 
-## 核心职责
+```powershell
+pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/_all_in_package.ps1 -RimeDataSource <schema-source>
+```
 
-- **TSF 文本服务**：实现 `ITfTextInputProcessor`、`ITfKeyEventSink` 等接口
-- **Windows UI**：管理候选窗口、消息窗口、语言栏按钮和 preserved keys
-- **协议转换**：把按键与状态序列化为 JSON 请求，并应用后端返回的组合串、候选和提交文本
-- **后端接入**：通过 `MoqLauncher` 读取 `backends.json`，按语言配置 GUID 路由到对应后端
+The installer is written to:
 
-## 与 `moqi-ime` 的关系
+```text
+installer/dist/typeduck-windows-ime-setup.exe
+```
 
-本仓库不实现拼音解析、候选生成、词库管理等输入法核心逻辑，这些能力由 `moqi-ime` 提供。
+## Runtime Layout
 
-Windows 侧的职责主要是：
+The installed application uses this product layout:
 
-- 把 TSF 生命周期和按键事件转发给后端
-- 根据后端返回结果更新候选窗、组合串和状态
-- 从已安装后端目录扫描 `input_methods/*/ime.json`，为语言配置提供元数据与配置入口
+```text
+TypeDuckIME/
+├── TypeDuckLauncher.exe
+├── TypeDuckSettings.exe
+├── TypeDuckAbout.exe
+├── TypeDuckSetupHelper.exe
+├── TypeDuckTextService.dll
+├── x64/TypeDuckTextService.dll
+├── resources/
+└── TypeDuckRuntime/
+    ├── server.exe
+    └── input_methods/rime/
+```
 
-因此，`moqi-im-windows` 与 `moqi-ime` 需要配套部署。
+User data and logs use TypeDuck-specific folders:
 
-## 技术栈
+- Preferences: `%APPDATA%\TypeDuckIME\TypeDuckPreferences.json`
+- Rime user data: `%APPDATA%\TypeDuckIME\Rime`
+- Logs: `%LOCALAPPDATA%\TypeDuckIME\Log`
 
-- **语言**：C++ 、GO
-- **框架**：Microsoft TSF、Win32 API
-- **进程/IO**：命名管道、子进程 `stdin/stdout` 转发、`libuv`
-- **数据格式**：protobuf(见/proto/moqi.proto)
-- **日志**：`spdlog`
-- **构建**：CMake + Visual Studio 2022 / MSBuild
+## Testing
 
-## 源码布局
+Build first, then run CTest against a configured Win32 build:
 
-- `MoqiTextService`：TSF 文本服务，产出 `MoqiTextService.dll`
-- `MoqLauncher`：后端启动器与消息转发器，产出 `MoqiLauncher.exe`
-- `libIME2`：IME/TSF 基础库，也是本项目 TSF 层的核心依赖，来源：[`gaboolic/libIME2`](https://github.com/gaboolic/libIME2)
-- `libuv`：Launcher 的事件循环与进程/管道依赖
-- `backends.json`：后端清单，定义后端名称、启动命令和工作目录
-- `scripts`：构建脚本
-- `installer/`：Inno Setup 安装器脚本与输出目录
+```powershell
+ctest --test-dir build-vs32 -C Debug --output-on-failure
+```
 
-## 构建
+Useful focused checks:
 
-前置：**Visual Studio 2022**、**CMake 3.21+**、Windows SDK。
+```powershell
+pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/Test-TypeDuckProtocolContract.ps1 -RepoRoot . -Strict
+pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/Test-TypeDuckCandidateData.ps1 -RepoRoot . -Strict
+pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/Test-TypeDuckSettingsPersistence.ps1 -RepoRoot . -Strict
+pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/Test-TypeDuckReleaseArtifacts.ps1 -RepoRoot . -Strict
+```
 
-在本仓库根目录执行：
+Cross-repo runtime verification should include the backend test suite and a runtime package build from `TypeDuck-Windows-backend`.
 
-   `powershell -ExecutionPolicy Bypass -File .\scripts\_all_in_package.ps1`
+## Protocol
 
-该脚本会生成安装器：`installer\dist\moqi-im-windows-setup.exe`
+Frontend and backend communicate with Protocol Buffers over length-prefixed binary frames. Protocol changes must update both repository schemas and regenerated bindings:
 
-## 参考文档
+- The frontend protobuf schema.
+- The backend protobuf schema.
+- Generated C++ and Go protobuf outputs.
 
-- [Microsoft TSF 文档](https://docs.microsoft.com/en-us/windows/win32/tsf/text-services-framework)
-- [ITfTextInputProcessor 接口](https://docs.microsoft.com/en-us/windows/win32/api/msctf/nn-msctf-itftextinputprocessor)
-- [PIME](https://github.com/EasyIME/PIME)
-- [小狼毫](https://github.com/rime/weasel)
+Do not edit generated protobuf files directly.
 
-## 友情链接
+## Release
 
-白霜拼音 <https://github.com/gaboolic/rime-frost>
+The release workflows build on `windows-2022`, checkout both TypeDuck Windows repositories, prepare TypeDuck Rime schema data, download protobuf tooling, run the packaging script, and upload the installer asset. Release validation should cover:
 
-墨奇音形 <https://github.com/gaboolic/rime-shuangpin-fuzhuma>
+- Installer file name and signature/hash evidence.
+- Clean install, upgrade, uninstall, and reboot-required registration paths.
+- Win32 and x64 TSF DLL registration.
+- `zh-HK` language profile registration.
+- Candidate window and dictionary lookup behavior.
+- Settings persistence and Rime side effects.
 
-墨奇五笔整句 <https://github.com/gaboolic/rime-wubi-sentence>
+## License
 
-### Star History
+This repository is licensed under the [MIT License](LICENSE).
 
-[![Star History Chart](https://api.star-history.com/svg?repos=gaboolic/moqi-im-windows&type=Date)](https://star-history.com/#gaboolic/moqi-im-windows&Date)
+## Acknowledgement
+
+Thanks to the Moqi IME project for its earlier Windows IME engineering work.

@@ -1,122 +1,95 @@
-# External Integrations
+# Integrations
 
-**Analysis Date:** 2026-06-23
+**Analysis Date:** 2026-06-28
 
-## APIs & External Services
+**Scope:** This map treats `https://github.com/TypeDuck-HK/TypeDuck-Windows` and `https://github.com/TypeDuck-HK/TypeDuck-Windows-backend` as equivalent parts of the TypeDuck Windows v1 product. Paths are repo-relative and prefixed with `TypeDuck-Windows:` or `TypeDuck-Windows-backend:`.
 
-**Windows Platform APIs:**
-- Microsoft Text Services Framework (TSF) - registers and runs the IME text service.
-  - SDK/Client: Windows SDK COM/TSF headers through `libIME2/src/` and `MoqiTextService/`.
-  - Auth: Windows COM registration and user language profile state; no env var.
-- Win32 Shell, tray, clipboard, process, registry, ACL, and scheduled task APIs - launcher tray UI, clipboard listener, process startup, elevated setup, DLL registration, reboot fallback, and pipe security.
-  - SDK/Client: Windows SDK functions in `MoqLauncher/PipeServer.cpp`, `MoqLauncher/PipeSecurity.cpp`, `SetupHelper/SetupHelper.cpp`, and `installer/MoqiTsf.iss`.
-  - Auth: User token/admin elevation; `SetupHelper.exe` relaunches with `runas` when needed.
+## External Systems
 
-**Local Backend Process:**
-- TypeDuck runtime bridge - current fixed runtime process for TypeDuck candidate generation and settings/deploy requests.
-  - SDK/Client: `MoqLauncher/PipeServer.cpp` constructs `typeduck-runtime-bridge` with command `TypeDuckRuntime\server.exe`; launcher process management remains in `MoqLauncher/BackendServer.cpp`.
-  - Auth: Local process boundary only; no frontend secret.
-- Legacy `moqi-ime` backend source - sibling backend repository still provides the packaged runtime build, but the Windows frontend no longer trusts source or staged `backends.json` for product runtime discovery.
-  - SDK/Client: Sibling runtime is consumed through the packaged `TypeDuckRuntime` folder.
-  - Auth: Local process boundary only; no frontend secret.
+| Integration | Direction | Purpose | Evidence |
+|-------------|-----------|---------|----------|
+| Microsoft Text Services Framework | Windows loads frontend DLL | Registers and hosts the TypeDuck zh-HK IME profile in TSF host processes. | `TypeDuck-Windows:MoqiTextService/DllEntry.cpp`, `TypeDuck-Windows:MoqiTextService/TypeDuckProfile.cpp`, `TypeDuck-Windows:libIME2/src/` |
+| Windows COM / Registry | Installer and TSF DLL write system/user state | COM class registration, TIP profile registration, startup value, uninstall cleanup, and re-registration fallback. | `TypeDuck-Windows:SetupHelper/SetupHelper.cpp`, `TypeDuck-Windows:installer/MoqiTsf.iss` |
+| Windows named pipes | TSF frontend to launcher | Per-user IPC between in-process TSF DLL clients and `TypeDuckLauncher.exe`. | `TypeDuck-Windows:MoqiTextService/MoqiClient.cpp`, `TypeDuck-Windows:MoqLauncher/PipeServer.cpp`, `TypeDuck-Windows:MoqLauncher/PipeSecurity.cpp` |
+| Backend stdin/stdout | Launcher to backend runtime | Length-prefixed protobuf transport to `TypeDuckRuntime/server.exe`. | `TypeDuck-Windows:MoqLauncher/BackendServer.cpp`, `TypeDuck-Windows-backend:server.go`, `TypeDuck-Windows-backend:protocol_io.go` |
+| librime / Rime DLL | Backend to native engine | Cantonese composition, candidate generation, schema deploy, and dictionary lookup comments. | `TypeDuck-Windows-backend:input_methods/rime/librime.go`, `TypeDuck-Windows-backend:input_methods/rime/native_cgo.go` |
+| Rime schema data | Backend runtime data | Shared data copied into the runtime package for `input_methods/rime/data`. | `TypeDuck-Windows-backend:scripts/build.ps1`, `TypeDuck-Windows:scripts/Stage-TypeDuckRuntime.ps1` |
+| rime-dictionary-lookup-filter | Rime module inside packaged engine | Supplies structured dictionary-like data through Rime candidate comments. | `TypeDuck-Windows-backend:input_methods/rime/librime.go`, `TypeDuck-Windows-backend:input_methods/rime/rime_runtime_test.go`, `TypeDuck-Windows:scripts/Stage-TypeDuckRuntime.ps1` |
+| GitHub Actions | CI/release automation | Builds nightly and release installer/backend artifacts. | `TypeDuck-Windows:.github/workflows/*.yml`, `TypeDuck-Windows-backend:.github/workflows/*.yml` |
+| GitHub Releases | CI artifact publishing | Publishes installer and backend runtime artifacts from workflow outputs. | `TypeDuck-Windows:.github/workflows/nightly.yml`, `TypeDuck-Windows:.github/workflows/release.yml`, `TypeDuck-Windows-backend:.github/workflows/*.yml` |
 
-**GitHub / Build Downloads:**
-- GitHub repositories and release assets - build fetches `spdlog`, `protobuf`, submodules, sibling backend, and CI artifacts/releases.
-  - SDK/Client: CMake FetchContent in `CMakeLists.txt`, git submodules in `.gitmodules`, GitHub Actions in `.github/workflows/nightly.yml` and `.github/workflows/release.yml`.
-  - Auth: `GH_TOKEN=${{ github.token }}` for release upload in workflows.
-- Chocolatey package source - CI installs Inno Setup with `choco install innosetup`.
-  - SDK/Client: `.github/workflows/nightly.yml`, `.github/workflows/release.yml`.
-  - Auth: Not detected.
+## IPC Contract
 
-**Legacy Cloud/AI Services:**
-- WebDAV sync/cloud clipboard - described as legacy backend functionality in `README.md`; Windows launcher only reads local enablement and forwards clipboard text to the backend over protobuf.
-  - SDK/Client: `METHOD_CLOUD_CLIPBOARD_UPLOAD` in `proto/moqi.proto`; upload bridge in `MoqLauncher/PipeServer.cpp` and `MoqLauncher/BackendServer.cpp`.
-  - Auth: Legacy config file `%APPDATA%\Moqi\cloud_clipboard.json`; README says password is stored in `cloud_clipboard.pw` with DPAPI, but this repo does not implement DPAPI encryption/decryption.
-- AI model endpoint - described only by legacy README config (`base_url`, `api_key`, `model`) under `%APPDATA%\Moqi\Rime\ai_config.json`.
-  - SDK/Client: Not implemented in this Windows frontend; delegated to backend/runtime config.
-  - Auth: `api_key` in backend config, not read by this repo.
+- Schema sources are `TypeDuck-Windows:proto/moqi.proto` and `TypeDuck-Windows-backend:proto/moqi.proto`.
+- C++ transport framing is implemented in `TypeDuck-Windows:proto/ProtoFraming.h`; Go transport framing is implemented in `TypeDuck-Windows-backend:protocol_io.go`.
+- Frames use a 32-bit little-endian size prefix followed by serialized protobuf payload.
+- Frontend clients send `ClientRequest` messages through the launcher pipe. The launcher forwards compatible requests to backend stdin and returns `ServerResponse` messages.
+- Candidate/dictionary payloads flow through `CandidateEntry.text`, `CandidateEntry.comment`, and TypeDuck candidate page metadata.
+- Settings are carried through `METHOD_TYPEDUCK_SETTINGS_UPDATE`; backend redeploy is carried through `METHOD_TYPEDUCK_DEPLOY`.
+
+## Runtime Package Integration
+
+```text
+TypeDuck-Windows installer payload
+└── TypeDuckRuntime/
+    ├── server.exe
+    └── input_methods/
+        └── rime/
+            ├── rime.dll
+            ├── appearance_themes.json
+            └── data/
+```
+
+- `TypeDuck-Windows-backend:scripts/build.ps1` creates the runtime package.
+- `TypeDuck-Windows:scripts/install.ps1` filters and copies the runtime package into the installer stage tree.
+- `TypeDuck-Windows:MoqLauncher/PipeServer.cpp` defines the fixed runtime bridge command `TypeDuckRuntime\server.exe` and working directory `TypeDuckRuntime`.
+- `TypeDuck-Windows:MoqiTextService/MoqiImeModule.cpp` scans installed `TypeDuckRuntime/input_methods/*/ime.json` where metadata is available.
+- `TypeDuck-Windows-backend:server.go` registers the fixed TypeDuck Rime profile GUID and can scan `input_methods/*/ime.json` from the backend executable directory.
+
+## Settings Integration
+
+- The Windows settings app writes the TypeDuck preference JSON through shared code in `TypeDuck-Windows:MoqLauncher/TypeDuckPreferences.cpp`.
+- The settings app reaches the launcher through the same named-pipe namespace used by TSF clients, implemented in `TypeDuck-Windows:TypeDuckSettings/TypeDuckSettingsWindow.cpp`.
+- `TypeDuck-Windows:MoqLauncher/PipeClient.cpp` validates preference changes and forwards Rime-affecting side effects through `BackendServer::applyTypeDuckPreferences`.
+- `TypeDuck-Windows-backend:input_methods/rime/appearance_config.go` maps settings into Rime custom YAML and redeploy/reload behavior.
+- Interface-only preferences such as display language, Chinese typeface, romanization visibility, and reverse-code display remain frontend-owned.
+
+## Installer and Windows Shell Integration
+
+- `TypeDuck-Windows:installer/MoqiTsf.iss` configures an x64 installer, TypeDuck bilingual wizard text, Start Menu shortcuts, HKCU startup entry, postinstall settings/about launch, uninstall data prompt, and cleanup.
+- `TypeDuck-Windows:SetupHelper/SetupHelper.cpp` copies `TypeDuckTextService.dll` into `SysWOW64` and `System32`, runs matching `regsvr32.exe`, handles admin elevation, and schedules `TypeDuckIME-ReRegisterTSF` when locked DLLs require reboot-time registration.
+- `TypeDuck-Windows:MoqLauncher/PipeServer.cpp` owns tray menu, launcher mutex/window class, logging, and backend lifecycle.
+- `TypeDuck-Windows:TypeDuckSettings/` owns settings/about executables and resources.
+
+## CI and Release Integration
+
+- Frontend workflows checkout both product repos plus TypeDuck schema data, install Inno Setup, download protoc, prepare Rime data, run `TypeDuck-Windows:scripts/_all_in_package.ps1`, upload installer artifacts, and publish release/nightly assets.
+- Backend workflows run `TypeDuck-Windows-backend:scripts/build.ps1` and package backend runtime zip artifacts.
+- The frontend installer artifact naming contract is `typeduck-windows-ime-setup.exe` plus tag-or-sha variants in release workflows.
+- Release verification guards live primarily in `TypeDuck-Windows:scripts/Test-TypeDuckRelease*.ps1` and `TypeDuck-Windows:scripts/Invoke-TypeDuckReleaseVerification.ps1`.
 
 ## Data Storage
 
-**Databases:**
-- Not detected.
-  - Connection: Not applicable.
-  - Client: Not applicable.
+- User preferences: `%APPDATA%\TypeDuckIME\TypeDuckPreferences.json`.
+- Rime user data: `%APPDATA%\TypeDuckIME\Rime`.
+- Frontend/launcher logs: `%LOCALAPPDATA%\TypeDuckIME\Log`.
+- Backend logs: `%LOCALAPPDATA%\TypeDuckIME\Log\TypeDuckBackend-YYYY-MM-DD.log`, with temp/current-directory fallback in `TypeDuck-Windows-backend:server.go`.
+- Installer app files: `%ProgramFiles(x86)%\TypeDuckIME`.
 
-**File Storage:**
-- Local install payload under `%ProgramFiles(x86)%\MoqiIM` and staged installer payload under `installer/stage/` (`installer/MoqiTsf.iss`, `scripts/install.ps1`).
-- System TSF DLL copies under `SysWOW64\MoqiTextService.dll` and `System32\MoqiTextService.dll` (`SetupHelper/SetupHelper.cpp`).
-- Launcher logs and config under `%LOCALAPPDATA%\MoqiIM`, including `MoqiLauncher.json` and `Log\*.log` (`MoqLauncher/PipeServer.cpp`, `libIME2/src/DebugLogConfig.cpp`).
-- Legacy roaming config under `%APPDATA%\Moqi`, including cloud clipboard enablement (`MoqLauncher/Utils.cpp`, `MoqLauncher/PipeServer.cpp`).
-- Backend language profile metadata under installed `moqi-ime\input_methods\*\ime.json` (`MoqiTextService/DllEntry.cpp`, `MoqiTextService/MoqiImeModule.cpp`, `MoqLauncher/PipeServer.cpp`).
+## Security and Trust Boundaries
 
-**Caching:**
-- No external cache service.
-- Local build cache hints for protobuf source trees under `%USERPROFILE%\.cache\moqi-protobuf` (`scripts/build.ps1`, `scripts/_all_in_package.ps1`).
-- Rotating launcher logs capped at 5 MB and 5 files (`MoqLauncher/PipeServer.cpp`).
+- The TSF DLL runs inside arbitrary host processes; engine work remains out-of-process behind the launcher/backend boundary.
+- Named-pipe access is constrained by local Windows security attributes in `TypeDuck-Windows:MoqLauncher/PipeSecurity.cpp`.
+- Runtime staging downloads and extracts binary engine dependencies in `TypeDuck-Windows:scripts/Stage-TypeDuckRuntime.ps1`; the script records SHA-256 and lookup-filter provenance evidence.
+- The installer performs elevated system DLL registration through `TypeDuck-Windows:SetupHelper/SetupHelper.cpp`; changes need install/upgrade/uninstall/reboot verification.
 
-## Authentication & Identity
+## Integration Gaps
 
-**Auth Provider:**
-- Windows identity and local session security.
-  - Implementation: Named pipe paths include the Windows username (`\\.\pipe\<username>\MoqiIM\Launcher`) in `MoqiTextService/MoqiClient.cpp` and `MoqLauncher/PipeServer.cpp`; pipe security allows the logon SID and denies network access on Windows 8+ (`MoqLauncher/PipeSecurity.cpp`).
-- COM/TSF registration identity.
-  - Implementation: CLSID `{8F204C91-2D7A-4B3E-9E1F-6A5C0D8B2E7F}` in `MoqiTextService/MoqiImeModule.cpp` must stay aligned with `installer/MoqiTsf.iss`.
-- Installer elevation.
-  - Implementation: `SetupHelper.exe` relaunches itself with ShellExecute `runas` if not admin (`SetupHelper/SetupHelper.cpp`).
-
-## Monitoring & Observability
-
-**Error Tracking:**
-- None external.
-
-**Logs:**
-- Launcher logs through `spdlog::rotating_logger_mt` to `%LOCALAPPDATA%\MoqiIM\Log\MoqiLauncher.log` (`MoqLauncher/PipeServer.cpp`).
-- TSF/debug logs under `%LOCALAPPDATA%\MoqiIM\Log`, controlled by `MoqiLauncher.json` log level (`MoqiTextService/DllEntry.cpp`, `MoqiTextService/MoqiClient.cpp`, `MoqiTextService/MoqiTextService.cpp`, `libIME2/src/DebugLogConfig.cpp`).
-- Backend stderr is captured and logged by `MoqLauncher/BackendServer.cpp`.
-- Tray notifications can be emitted by backend protobuf responses (`ServerResponse.tray_notification` in `proto/moqi.proto`, handled in `MoqLauncher/BackendServer.cpp`).
-
-## CI/CD & Deployment
-
-**Hosting:**
-- GitHub Releases for nightly and release installer assets (`.github/workflows/nightly.yml`, `.github/workflows/release.yml`).
-
-**CI Pipeline:**
-- GitHub Actions `windows-2022`.
-- Nightly pipeline triggers on `main` push and manual dispatch; builds sibling `moqi-ime`, packages installer, uploads artifact, and updates a `nightly` prerelease (`.github/workflows/nightly.yml`).
-- Release pipeline triggers on published release and manual dispatch; builds installer and uploads to the GitHub release when applicable (`.github/workflows/release.yml`).
-
-## Environment Configuration
-
-**Required env vars:**
-- `MOQI_PROTOBUF_ROOT` - optional build-time root for local protobuf/protoc (`CMakeLists.txt`, `scripts/build.ps1`).
-- `MOQI_PROTOBUF_SOURCE_DIR` - optional build-time protobuf source checkout (`CMakeLists.txt`, `scripts/build.ps1`).
-- `MOQI_PROTOC_EXECUTABLE` - optional direct `protoc.exe` path (`CMakeLists.txt`).
-- `MOQI_PROGRAM_DIR` - setup/runtime override for installed program directory during TSF registration and discovery (`SetupHelper/SetupHelper.cpp`, `MoqiTextService/MoqiImeModule.cpp`).
-- `LOCALAPPDATA` - runtime logs and launcher config (`MoqiTextService/DllEntry.cpp`, `MoqLauncher/PipeServer.cpp`, `libIME2/src/DebugLogConfig.cpp`).
-- `APPDATA` / `FOLDERID_RoamingAppData` - legacy `%APPDATA%\Moqi` config lookup (`MoqLauncher/Utils.cpp`).
-- `GH_TOKEN` - GitHub release publishing token in workflows (`.github/workflows/nightly.yml`, `.github/workflows/release.yml`).
-- `PROTOBUF_VERSION` - CI version selector set to `33.5` (`.github/workflows/nightly.yml`, `.github/workflows/release.yml`).
-
-**Secrets location:**
-- No repository secrets files detected.
-- GitHub Actions use the built-in `${{ github.token }}` for release publishing.
-- Legacy README references `api_key` in `%APPDATA%\Moqi\Rime\ai_config.json` and WebDAV password in `cloud_clipboard.pw`; those are backend/user runtime files and must not be committed.
-
-## Webhooks & Callbacks
-
-**Incoming:**
-- Windows TSF/COM callbacks into `MoqiTextService.dll` for activation, key events, preserved keys, language profile changes, and menu/config operations (`MoqiTextService/MoqiTextService.cpp`, `MoqiTextService/MoqiClient.cpp`).
-- Local named pipe server listens at `\\.\pipe\<username>\MoqiIM\Launcher` (`MoqLauncher/PipeServer.cpp`).
-- Windows clipboard updates arrive through `AddClipboardFormatListener` and `WM_CLIPBOARDUPDATE` in `MoqLauncher/PipeServer.cpp`.
-- GitHub Actions workflow triggers: `push` to `main`, `workflow_dispatch`, and `release.published` (`.github/workflows/nightly.yml`, `.github/workflows/release.yml`).
-
-**Outgoing:**
-- Named pipe RPC from `MoqiTextService.dll` to `MoqiLauncher.exe` using `TransactNamedPipe`, framed protobuf payloads, and message mode pipes (`MoqiTextService/MoqiClient.cpp`, `proto/ProtoFraming.h`).
-- Launcher subprocess stdio to backend `server.exe` using libuv pipes and framed protobuf (`MoqLauncher/BackendServer.cpp`, `proto/ProtoFraming.h`).
-- ShellExecute launches `MoqiLauncher.exe`, IME config tools from `ime.json`, elevated `SetupHelper.exe`, and optional installer helpers (`MoqiTextService/MoqiClient.cpp`, `MoqiTextService/MoqiImeModule.cpp`, `SetupHelper/SetupHelper.cpp`).
-- GitHub release upload/edit commands run from CI (`.github/workflows/nightly.yml`, `.github/workflows/release.yml`).
+- Cross-repo protobuf schema compatibility is not enforced by one canonical generator/diff command.
+- Backend frame reads do not enforce the same payload maximum as the C++ framing helper.
+- Frontend workflows consume the backend runtime package, while backend workflows also publish standalone runtime zips; release authority should stay explicit.
+- GitHub workflows build/package artifacts but do not currently run full `ctest`, `go test ./...`, or generated-protobuf drift checks as dedicated CI gates.
 
 ---
 
-*Integration audit: 2026-06-23*
+*Integration analysis: 2026-06-28*
