@@ -105,8 +105,6 @@ Name: "{autoprograms}\TypeDuckIME\關於 About TypeDuck…"; Filename: "{app}\Ty
 Name: "{autoprograms}\TypeDuckIME\解除安裝 Uninstall"; Filename: "{uninstallexe}"
 
 [Run]
-Filename: "{app}\TypeDuckLauncher.exe"; Flags: nowait runasoriginaluser; Check: ShouldLaunchLauncher
-Filename: "{app}\TypeDuckSettings.exe"; Parameters: "/apply-settings"; Flags: runhidden waituntilterminated runasoriginaluser; Check: ShouldSeedDefaultSettings
 Filename: "{app}\TypeDuckSettings.exe"; Description: "開啟 TypeDuck 設定 / Open TypeDuck Settings"; Flags: postinstall nowait skipifsilent runasoriginaluser; Check: ShouldLaunchSettings
 Filename: "{app}\TypeDuckAbout.exe"; Description: "開啟 TypeDuck 關於 / Open TypeDuck About"; Flags: postinstall nowait skipifsilent runasoriginaluser; Check: ShouldLaunchAbout
 
@@ -333,6 +331,32 @@ begin
     mbError, MB_OK);
 end;
 
+procedure HandleInstallUserStateFailure;
+begin
+  HelperInstallFailed := True;
+  MsgBox(Bilingual(
+    'TypeDuck 未能完成安裝準備。請重新啟動電腦，然後再次執行安裝程式。',
+    'TypeDuck could not finish preparing installation. Please restart your computer, then run the installer again.'),
+    mbError, MB_OK);
+end;
+
+procedure ApplyInstallSettingsAsOriginalUser;
+var
+  ResultCode: Integer;
+begin
+  ExecAsOriginalUser(ExpandConstant('{app}\TypeDuckLauncher.exe'), '',
+    ExpandConstant('{app}'), SW_SHOWNORMAL, ewNoWait, ResultCode);
+  if not ExecAsOriginalUser(ExpandConstant('{app}\TypeDuckSettings.exe'),
+    '/apply-settings', ExpandConstant('{app}'), SW_HIDE,
+    ewWaitUntilTerminated, ResultCode) then
+  begin
+    HandleInstallUserStateFailure;
+    Exit;
+  end;
+  if ResultCode <> 0 then
+    HandleInstallUserStateFailure;
+end;
+
 procedure CurStepChanged(CurStep: TSetupStep);
 var
   ResultCode: Integer;
@@ -367,6 +391,8 @@ begin
       HandleInstallSetupHelperFailure;
       Exit;
     end;
+
+    ApplyInstallSettingsAsOriginalUser;
   end;
 end;
 
@@ -375,17 +401,7 @@ begin
   Result := HelperInstallNeedsRestart;
 end;
 
-function ShouldLaunchLauncher(): Boolean;
-begin
-  Result := HelperInstallSucceeded;
-end;
-
 function ShouldLaunchSettings(): Boolean;
-begin
-  Result := HelperInstallSucceeded;
-end;
-
-function ShouldSeedDefaultSettings(): Boolean;
 begin
   Result := HelperInstallSucceeded;
 end;

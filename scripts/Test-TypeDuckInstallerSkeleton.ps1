@@ -201,12 +201,13 @@ function Assert-InstallerScript {
     Assert-NotMatch $Failures $Iss "Type:\s*filesandordirs;\s*Name:\s*`"\{userappdata\}\\TypeDuckIME`"" `
         "Roaming user data must be deleted by opt-in code, not by a user-context-sensitive [UninstallDelete] entry."
     Assert-AllMatch $Failures $Iss @(
-        'TypeDuckLauncher\.exe";\s*Flags:\s*nowait runasoriginaluser',
-        'TypeDuckSettings\.exe";\s*Parameters:\s*"/apply-settings";\s*Flags:\s*runhidden waituntilterminated runasoriginaluser',
         'TypeDuckSettings\.exe";\s*Description:.*Flags:\s*postinstall nowait skipifsilent runasoriginaluser',
         'TypeDuckAbout\.exe";\s*Description:.*Flags:\s*postinstall nowait skipifsilent runasoriginaluser',
-        'function\s+ShouldLaunchLauncher\(\):\s+Boolean;\s*begin\s*Result := HelperInstallSucceeded;\s*end;',
-        'function\s+ShouldSeedDefaultSettings\(\):\s+Boolean;\s*begin\s*Result := HelperInstallSucceeded;\s*end;'
+        'ApplyInstallSettingsAsOriginalUser',
+        'ExecAsOriginalUser\(ExpandConstant\(''\{app\}\\TypeDuckLauncher\.exe''\)',
+        'ExecAsOriginalUser\(ExpandConstant\(''\{app\}\\TypeDuckSettings\.exe''\),\s*''/apply-settings''',
+        'ewWaitUntilTerminated',
+        'ResultCode <> 0'
     ) "Installer user-facing and settings-seed processes must run as the original user after any successful helper result so APPDATA and launcher state are created for the right account."
     Assert-NotMatch $Failures $Iss "TSetupForm\.Create" `
         "Uninstaller prompt must use Inno's CreateCustomForm helper instead of constructing TSetupForm directly."

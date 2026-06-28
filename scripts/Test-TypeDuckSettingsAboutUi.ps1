@@ -140,17 +140,15 @@ Assert-Text $installer "Filename:\s+`"\{app\}\\TypeDuckAbout\.exe`"" "Installer 
 Assert-Text $installer "Description:\s+`"開啟 TypeDuck 設定 / Open TypeDuck Settings`"" "Installer settings launch description must be bilingual."
 Assert-Text $installer "Description:\s+`"開啟 TypeDuck 關於 / Open TypeDuck About`"" "Installer About launch description must be bilingual."
 Assert-Text $installer "function\s+ShouldLaunchSettings\(\):\s+Boolean" "Installer settings launch must be gated by a dedicated function."
-Assert-Text $installer "function\s+ShouldSeedDefaultSettings\(\):\s+Boolean" "Installer must gate default settings seeding."
+Assert-Text $installer "procedure\s+ApplyInstallSettingsAsOriginalUser" "Installer must run install settings seeding from code after setup-helper success."
 Assert-Text $installer "function\s+ShouldLaunchAbout\(\):\s+Boolean" "Installer About launch must be gated by a dedicated function."
 Assert-Text $installer 'TypeDuckIME\\輸入法設定 IME Settings";\s+Filename:\s+"\{app\}\\TypeDuckSettings\.exe"' "Installer must create the Phase 6 TypeDuck IME Settings Start Menu shortcut."
 Assert-Text $installer 'TypeDuckIME\\關於 About TypeDuck…";\s+Filename:\s+"\{app\}\\TypeDuckAbout\.exe"' "Installer must create the Phase 6 TypeDuck About Start Menu shortcut."
 Assert-Text $installer 'TypeDuckIME\\解除安裝 Uninstall";\s+Filename:\s+"\{uninstallexe\}"' "Installer must create the Phase 6 TypeDuck Uninstall Start Menu shortcut."
 Assert-Ordered $installer @(
-  "Filename:\s+`"\{app\}\\TypeDuckLauncher\.exe`"",
-  "Parameters:\s+`"/apply-settings`"",
-  "Filename:\s+`"\{app\}\\TypeDuckSettings\.exe`"",
-  "Filename:\s+`"\{app\}\\TypeDuckAbout\.exe`""
-) "Installer run order"
+  "RunSetupHelper\(BuildInstallSetupHelperParameters\('/i'\), ResultCode\)",
+  "ApplyInstallSettingsAsOriginalUser"
+) "Installer setup-helper before install-time settings seed order"
 Assert-Text $packageScript "scripts\\install\.ps1" "All-in package script must continue to route packaging through scripts/install.ps1."
 Assert-Text $imeModule "TypeDuckSettings\.exe" "TSF Configure entry point must launch TypeDuckSettings.exe."
 Assert-Text $imeModule "launchTypeDuckSettings" "TSF Configure entry point must route through a fixed TypeDuck settings launch helper."
