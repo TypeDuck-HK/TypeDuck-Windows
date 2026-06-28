@@ -107,7 +107,14 @@ jobs:
           }
 
           New-Item -ItemType Directory -Path $schemaDest -Force | Out-Null
-          Copy-Item -LiteralPath (Join-Path $schemaSource "*") -Destination $schemaDest -Recurse -Force
+          if (-not (Test-Path -LiteralPath $schemaSource -PathType Container)) {
+            throw "Missing TypeDuck schema checkout: $schemaSource"
+          }
+          $schemaItems = Get-ChildItem -LiteralPath $schemaSource -Force
+          if (-not $schemaItems) {
+            throw "TypeDuck schema checkout is empty: $schemaSource"
+          }
+          Copy-Item -LiteralPath $schemaItems.FullName -Destination $schemaDest -Recurse -Force
 
           if (-not (Test-Path -LiteralPath $rimeDeployer -PathType Leaf)) {
             throw "Missing Rime deployer: $rimeDeployer"
