@@ -184,7 +184,7 @@ TypeDuck::ApplyResult BackendServer::requestTypeDuckDeploy() {
   moqi::protocol::ClientRequest request;
   request.set_method(moqi::protocol::METHOD_TYPEDUCK_DEPLOY);
   request.set_client_id("launcher-tray");
-  request.mutable_typeduck_deploy_request()->set_force(false);
+  request.mutable_typeduck_deploy_request()->set_force(true);
 
   std::string framedMessage;
   if (!Proto::serializeMessageBounded(

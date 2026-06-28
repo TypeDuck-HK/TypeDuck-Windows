@@ -235,8 +235,7 @@ Assert-Text $window "deployViaLauncher" "Installation seed mode must refresh Rim
 Assert-Text $window "kPipeConnectTimeoutMs = 5000" "Settings install/apply mode must use a bounded launcher-start wait."
 Assert-Text $window "kPipeConnectRetryMs" "Settings install/apply mode must retry until the launcher pipe exists."
 Assert-Text $window "GetTickCount64" "Settings install/apply mode must use a bounded launcher pipe retry loop."
-Assert-Text $window "install/update uses it to seed the packaged prebuilt RIME build" "Settings install deploy must document the existing wire-field meaning."
-Assert-Text $window "set_force\(true\)" "Installation seed deploy must request the packaged build-folder seed path."
+Assert-Text $window "set_force\(true\)" "Installation seed deploy must request the same full refresh path as launcher Refresh."
 Assert-Text $window "kApplyDefaultsSwitch" "Settings executable must expose a quiet default-preference seed mode for installation."
 Assert-Text $window "applyInstallSettings" "Installation seed mode must apply current or default settings before explicit Rime refresh."
 Assert-Text $textServiceCmake "MoqLauncher/TypeDuckPreferences\.cpp" "Text service must link the shared preferences loader for UI-only settings."
@@ -252,7 +251,7 @@ Assert-Text $preferences "TypeDuckPreferences\.json" "Settings source of truth m
 
 $backendServerPath = Join-Path $repo "MoqLauncher/BackendServer.cpp"
 $backendServer = Get-Content -Raw -Encoding UTF8 -LiteralPath $backendServerPath
-Assert-Text $backendServer "set_force\(false\)" "Tray Refresh deploy must not copy the packaged build folder into user data."
+Assert-Text $backendServer "set_force\(true\)" "Tray Refresh deploy must request the same full refresh path as install settings apply."
 
 $aboutPath = Join-Path $repo "TypeDuckSettings/TypeDuckAboutDialog.cpp"
 if (Test-Path -LiteralPath $aboutPath) {

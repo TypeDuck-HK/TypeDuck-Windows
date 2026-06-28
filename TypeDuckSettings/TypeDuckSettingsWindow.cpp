@@ -334,7 +334,6 @@ Moqi::TypeDuck::ApplyResult deployViaLauncher() {
   moqi::protocol::ClientRequest deployRequest;
   deployRequest.set_seq_num(2);
   deployRequest.set_method(moqi::protocol::METHOD_TYPEDUCK_DEPLOY);
-  // The wire field is named force; install/update uses it to seed the packaged prebuilt RIME build before deploy.
   deployRequest.mutable_typeduck_deploy_request()->set_force(true);
   moqi::protocol::ServerResponse deployResponse;
   if (!transactLauncher(pipe, deployRequest, deployResponse)) {
