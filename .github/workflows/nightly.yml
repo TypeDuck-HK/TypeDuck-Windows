@@ -47,6 +47,10 @@ jobs:
           path: TypeDuck-HK-schema
           fetch-depth: 1
 
+      - name: Apply TypeDuck submodule patches
+        working-directory: ${{ github.workspace }}/TypeDuck-Windows
+        run: pwsh -NoProfile -ExecutionPolicy Bypass -File .\scripts\Apply-TypeDuckSubmodulePatches.ps1 -RepoRoot .
+
       - name: Set up Go
         uses: actions/setup-go@v5
         with:

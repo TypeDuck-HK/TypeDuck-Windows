@@ -1,0 +1,38 @@
+From 8b68411f59238596bbb5c441cf5717d5aa514049 Mon Sep 17 00:00:00 2001
+From: graphemecluster <graphemecluster@gmail.com>
+Date: Sat, 27 Jun 2026 19:07:07 +0800
+Subject: [PATCH] fix(06-04): use TypeDuck diagnostics paths
+
+- Read debug config from TypeDuckLauncher.json under TypeDuckIME
+- Write TSF debug logs under TypeDuckIME local app data
+---
+ src/DebugLogConfig.cpp | 2 +-
+ src/TextService.cpp    | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/src/DebugLogConfig.cpp b/src/DebugLogConfig.cpp
+index 232a9fc..d4fc867 100644
+--- a/src/DebugLogConfig.cpp
++++ b/src/DebugLogConfig.cpp
+@@ -21,7 +21,7 @@ std::wstring configFilePath() {
+     if (!localAppData || !*localAppData) {
+         return L"";
+     }
+-    return std::wstring(localAppData) + L"\\MoqiIM\\MoqiLauncher.json";
++    return std::wstring(localAppData) + L"\\TypeDuckIME\\TypeDuckLauncher.json";
+ }
+ 
+ bool readFileText(const std::wstring& path, std::string* out) {
+diff --git a/src/TextService.cpp b/src/TextService.cpp
+index 8fd2716..3c57441 100644
+--- a/src/TextService.cpp
++++ b/src/TextService.cpp
+@@ -94,7 +94,7 @@ void appendTextServiceDebugLog(const std::wstring& message) {
+         return;
+     }
+ 
+-    std::wstring logDir = std::wstring(localAppData) + L"\\MoqiIM\\Log";
++    std::wstring logDir = std::wstring(localAppData) + L"\\TypeDuckIME\\Log";
+     std::wstring logPath = DebugLogFile::prepareDailyLogFilePath(
+         logDir, L"tsf-debug.log");
+     if (logPath.empty()) {

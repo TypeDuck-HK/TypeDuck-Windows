@@ -123,6 +123,11 @@ if (-not $Win32BuildDir) { $Win32BuildDir = Join-Path $RepoRoot "build-vs32" }
 if (-not $X64BuildDir) { $X64BuildDir = Join-Path $RepoRoot "build-vs64" }
 $Win32BuildDir = [System.IO.Path]::GetFullPath($Win32BuildDir)
 $X64BuildDir = [System.IO.Path]::GetFullPath($X64BuildDir)
+
+$submodulePatchScript = Join-Path $RepoRoot "scripts\Apply-TypeDuckSubmodulePatches.ps1"
+Write-Host ">> $submodulePatchScript -RepoRoot $RepoRoot"
+& $submodulePatchScript -RepoRoot $RepoRoot
+
 $ProtobufRoot = Resolve-ProtobufRoot -RequestedPath $ProtobufRoot
 $ProtobufSourceDir = Resolve-ProtobufSourceDir -RequestedPath $ProtobufSourceDir -RepoRoot $RepoRoot
 

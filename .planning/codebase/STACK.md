@@ -44,6 +44,7 @@
 - Go 1.25.0 declared in `TypeDuck-Windows-backend:go.mod`; GitHub workflows currently set up Go 1.24.6.
 - Go modules: `google.golang.org/protobuf`, `gopkg.in/yaml.v3`, `golang.org/x/mobile`, `golang.org/x/mod`, `golang.org/x/sync`, and `golang.org/x/tools`.
 - Vendored/frontend dependencies: `TypeDuck-Windows:libIME2/`, `TypeDuck-Windows:libuv/`, `TypeDuck-Windows:jsoncpp/`, and FetchContent `spdlog` / `protobuf`.
+- TypeDuck-owned frontend submodule patches: `TypeDuck-Windows:patches/libIME2/0001-use-typeduck-diagnostics-paths.patch`, applied by `TypeDuck-Windows:scripts/Apply-TypeDuckSubmodulePatches.ps1`.
 - Runtime binary dependency: TypeDuck-HK librime Windows release staged by `TypeDuck-Windows:scripts/Stage-TypeDuckRuntime.ps1`.
 - Runtime data dependency: TypeDuck schema data passed as `-RimeDataSource` to `TypeDuck-Windows-backend:scripts/build.ps1` and frontend packaging workflows.
 
@@ -69,14 +70,15 @@ pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/build.ps1 -RimeDataSource 
 pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/_all_in_package.ps1 -RimeDataSource <schema-source>
 ```
 
-- `TypeDuck-Windows:scripts/build.ps1` configures Win32 and x64 Visual Studio builds. Win32 builds launcher/setup/settings/probe targets; x64 builds the TSF DLL target needed by 64-bit host processes.
+- `TypeDuck-Windows:scripts/build.ps1` applies TypeDuck submodule patches, then configures Win32 and x64 Visual Studio builds. Win32 builds launcher/setup/settings/probe targets; x64 builds the TSF DLL target needed by 64-bit host processes.
+- `TypeDuck-Windows:scripts/Apply-TypeDuckSubmodulePatches.ps1` applies required TypeDuck patches to checked-out third-party submodules; `TypeDuck-Windows:CMakeLists.txt` fails configuration if the required `libIME2` diagnostics path patch is missing.
 - `TypeDuck-Windows-backend:scripts/build.ps1` cross-compiles `server.exe` for Windows amd64, stamps version/icon resources, copies `input_methods/rime`, prunes source-only/runtime-excluded paths, copies Rime shared data, and writes `scripts/build/TypeDuckRuntime`.
 - `TypeDuck-Windows:scripts/install.ps1` creates the installer staging tree, stamps TypeDuck icons into executables, copies frontend binaries, filters `TypeDuckRuntime`, and invokes `installer/build-installer.ps1`.
 - `TypeDuck-Windows:scripts/_all_in_package.ps1` coordinates the backend runtime build, frontend CMake build, and installer stage/build sequence.
 
 ## CI
 
-- `TypeDuck-Windows:.github/workflows/nightly.yml` and `TypeDuck-Windows:.github/workflows/release.yml` run on `windows-2022`, checkout `TypeDuck-Windows`, `TypeDuck-Windows-backend`, and TypeDuck schema data, install Inno Setup, download protoc 33.5, prepare Rime data, and produce installer artifacts.
+- `TypeDuck-Windows:.github/workflows/nightly.yml` and `TypeDuck-Windows:.github/workflows/release.yml` run on `windows-2022`, checkout `TypeDuck-Windows`, `TypeDuck-Windows-backend`, and TypeDuck schema data, apply TypeDuck submodule patches, install Inno Setup, download protoc 33.5, prepare Rime data, and produce installer artifacts.
 - `TypeDuck-Windows-backend:.github/workflows/nightly.yml` and `TypeDuck-Windows-backend:.github/workflows/release.yml` run on `windows-2022`, set up Go, run the backend build script, and upload backend runtime zip artifacts.
 - Dedicated CI steps for `ctest`, `go test ./...`, linting, generated-protobuf diffing, and coverage are not detected.
 

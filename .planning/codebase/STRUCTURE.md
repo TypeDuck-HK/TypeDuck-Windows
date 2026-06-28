@@ -17,6 +17,7 @@ TypeDuck-Windows/
 ├── proto/                         # Shared protobuf schema, generated C++ bindings, C++ framing helper
 ├── scripts/                       # Build, staging, installer, runtime, and verification scripts
 ├── installer/                     # Inno Setup script and installer build support
+├── patches/                       # TypeDuck-owned patches applied to third-party submodules
 ├── runtime/                       # Staged TypeDuck runtime assets for local proof/package work
 ├── third_party/                   # External source checkouts/submodules used by product scripts
 ├── libIME2/                       # Reusable TSF/COM framework and vendored GoogleTest
@@ -75,7 +76,13 @@ TypeDuck-Windows-backend/
 **`TypeDuck-Windows/scripts`:**
 - Purpose: Build, installer staging, runtime staging, VM/install proof, protocol proof, and release verification automation.
 - Contains: PowerShell scripts; run with `pwsh` for Unicode-safe execution.
-- Key files: `TypeDuck-Windows/scripts/build.ps1`, `TypeDuck-Windows/scripts/install.ps1`, `TypeDuck-Windows/scripts/Stage-TypeDuckRuntime.ps1`, `TypeDuck-Windows/scripts/Invoke-TypeDuckReleaseVerification.ps1`, `TypeDuck-Windows/scripts/Test-TypeDuckProtocolContract.ps1`.
+- Key files: `TypeDuck-Windows/scripts/build.ps1`, `TypeDuck-Windows/scripts/Apply-TypeDuckSubmodulePatches.ps1`, `TypeDuck-Windows/scripts/install.ps1`, `TypeDuck-Windows/scripts/Stage-TypeDuckRuntime.ps1`, `TypeDuck-Windows/scripts/Invoke-TypeDuckReleaseVerification.ps1`, `TypeDuck-Windows/scripts/Test-TypeDuckProtocolContract.ps1`.
+
+**`TypeDuck-Windows/patches`:**
+- Purpose: Parent-owned patch files for third-party submodules that are not forked as TypeDuck repositories.
+- Contains: Submodule-specific patch queues.
+- Key files: `TypeDuck-Windows:patches/libIME2/0001-use-typeduck-diagnostics-paths.patch`.
+- Notes: Apply through `TypeDuck-Windows:scripts/Apply-TypeDuckSubmodulePatches.ps1`; frontend CMake checks that the required `libIME2` patch is present before adding the submodule.
 
 **`TypeDuck-Windows/installer`:**
 - Purpose: Inno Setup packaging and install/uninstall orchestration.

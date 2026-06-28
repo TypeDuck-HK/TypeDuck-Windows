@@ -95,6 +95,13 @@ Build the Windows frontend binaries:
 pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/build.ps1
 ```
 
+The build script applies the TypeDuck-owned submodule patches required for the checked-out third-party code. To prepare or verify them without building, run:
+
+```powershell
+pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/Apply-TypeDuckSubmodulePatches.ps1
+pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/Apply-TypeDuckSubmodulePatches.ps1 -CheckOnly
+```
+
 Build the full installer after the backend runtime and schema source are available:
 
 ```powershell

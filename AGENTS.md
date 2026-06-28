@@ -97,6 +97,8 @@ pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/_all_in_package.ps1 -RimeD
 
 Frontend build requirements include Visual Studio 2022, Windows SDK, CMake 3.21+, Inno Setup 6 for installer builds, git submodules, and protobuf tooling. Backend build requirements include Go, protobuf Go bindings, a TypeDuck Rime schema source, and packaged `rime.dll` assets.
 
+TypeDuck-Windows carries TypeDuck-owned patches for third-party submodules in `patches/`. Run `pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/Apply-TypeDuckSubmodulePatches.ps1` after submodule checkout and before manual CMake configuration. `scripts/build.ps1`, release workflows, and nightly workflows apply the patches automatically; CMake fails fast if the required `libIME2` patch is missing.
+
 ## Testing
 
 Choose focused tests for the edited boundary.

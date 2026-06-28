@@ -184,7 +184,7 @@
 **Frontend C++ dependencies are old or vendored:**
 - Risk: `libIME2`, `libuv`, `jsoncpp`, `googletest`, `spdlog`, and protobuf are vendored, fetched, or submodule-based with Windows-specific patches.
 - Impact: Security updates, MSVC updates, and Windows API changes can require patching dependencies that are part of the IME runtime path.
-- Next action: Track dependency versions in `TypeDuck-Windows:.planning/codebase/STACK.md`, add update tests around TSF registration and IPC, and avoid modifying vendored code outside documented patches.
+- Next action: Track dependency versions in `TypeDuck-Windows:.planning/codebase/STACK.md`, keep product-specific submodule deltas in `TypeDuck-Windows:patches/`, add update tests around TSF registration and IPC, and avoid modifying vendored code outside documented patches.
 
 **Backend workflows package stale standalone runtime assets:**
 - Risk: Backend release/nightly workflows still package zip artifacts with older runtime naming, while the TypeDuck installer path consumes `TypeDuckRuntime`.
