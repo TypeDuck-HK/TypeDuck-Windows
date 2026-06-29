@@ -7,5 +7,3 @@ jyut6ping3_mobile_initial_final.schema.yaml
 jyut6ping3_mobile_longpress.schema.yaml
 jyut6ping3_mobile.schema.yaml
 loengfan_longpress.schema.yaml
-trime.yaml
-weasel.yaml
