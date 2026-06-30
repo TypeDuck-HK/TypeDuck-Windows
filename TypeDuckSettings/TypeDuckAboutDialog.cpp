@@ -15,7 +15,7 @@ constexpr const wchar_t* kAboutClassName = L"TypeDuckAboutDialogWindow";
 constexpr const wchar_t* kAboutInstanceMutexName =
     L"Local\\TypeDuckAboutWindowInstance";
 constexpr int kAboutWidth = 1000;
-constexpr int kAboutHeight = 858;
+constexpr int kAboutHeight = 880;
 constexpr int kMargin = 28;
 constexpr int kContentWidth = 928;
 constexpr int kBannerWidth = 490;
@@ -73,13 +73,31 @@ constexpr const wchar_t* kCreditText =
     L"本輸入法由香港教育大學語言學及現代語言系開發。特別鳴謝「語文教育及研究常務委員會」資助本計劃。\r\n"
     L"This input method is developed by the Department of Linguistics and Modern Language Studies, the Education University of Hong Kong. Special thanks to the Standing Committee on Language Education and Research for funding this project.";
 
+std::wstring licenseNoticePath() {
+  wchar_t executablePath[MAX_PATH]{};
+  const DWORD length = GetModuleFileNameW(nullptr, executablePath, MAX_PATH);
+  if (length == 0 || length >= MAX_PATH) {
+    return L"THIRD_PARTY_NOTICES.txt";
+  }
+
+  std::wstring path(executablePath, length);
+  const size_t slash = path.find_last_of(L"\\/");
+  if (slash == std::wstring::npos) {
+    return L"THIRD_PARTY_NOTICES.txt";
+  }
+  path.resize(slash + 1);
+  path += L"THIRD_PARTY_NOTICES.txt";
+  return path;
+}
+
 std::wstring attributionText() {
   std::wstring text;
   text += L"TypeDuck Windows IME 版本 Version ";
   text += TYPEDUCK_VERSION_TEXT;
   text += L"\r\n";
-  text += L"Engine: TypeDuck-HK librime fork v1.1.4\r\n";
-  text += L"Schema: TypeDuck-HK schema v2.0.0";
+  text += L"本軟件循 MIT 特許條款發佈，其包含開源及開放授權元件。授權全文見：\r\n";
+  text += L"This software is distributed under the MIT license. It includes open-source and openly licensed components; see:\r\n";
+  text += licenseNoticePath();
   return text;
 }
 
@@ -271,7 +289,7 @@ class AboutDialog {
     addButton(links[3].label, kLinkBase + 3, rightColumn, 686,
               kLinkButtonWidth, kLinkButtonHeight);
     addButton(L"關閉 Close", kClose,
-              kAboutWidth - kMargin - kCloseButtonWidth - 16, 756,
+              kAboutWidth - kMargin - kCloseButtonWidth - 16, 778,
               kCloseButtonWidth, kCloseButtonHeight, true);
   }
 
@@ -309,7 +327,7 @@ class AboutDialog {
     drawTextBlock(dc, headingFont_.handle, kMutedTextColor, L"連結 Links",
                   linksHeading);
 
-    RECT attribution{kMargin, 734, kAboutWidth - kCloseButtonWidth - 70, 800};
+    RECT attribution{kMargin, 734, kAboutWidth - kCloseButtonWidth - 50, 822};
     drawTextBlock(dc, smallFont_.handle, kMutedTextColor, attributionText(),
                   attribution, DT_LEFT | DT_WORDBREAK | DT_NOPREFIX);
 

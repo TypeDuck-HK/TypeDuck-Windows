@@ -291,9 +291,10 @@ if (Test-Path -LiteralPath $aboutPath) {
   ) "About dialog resource/text/attribution/control order"
   Assert-Ordered $about @(
     "TypeDuck Windows IME 版本 Version",
-    "TypeDuck-HK librime fork",
-    "TypeDuck-HK schema"
+    "本軟件循 MIT 特許條款發佈，其包含開源及開放授權元件",
+    "This software is distributed under the MIT license. It includes open-source and openly licensed components"
   ) "About attribution order"
+  Assert-Text $about "THIRD_PARTY_NOTICES\.txt" "About attribution must point to the installed third-party notice file."
   Assert-Ordered $about @(
     "TypeDuck 網站 Website",
     "LearnDuck 粵拼打字入門 Introduction to Jyutping Typing",

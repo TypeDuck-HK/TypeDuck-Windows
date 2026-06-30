@@ -40,6 +40,7 @@ $requiredPaths = @(
     (Join-Path $win32Root 'TypeDuckLauncher.exe'),
     (Join-Path $win32Root 'TypeDuckSetupHelper.exe'),
     (Join-Path $win32Root 'TypeDuckTextService.dll'),
+    (Join-Path $win32Root 'THIRD_PARTY_NOTICES.txt'),
     (Join-Path $win32Root 'x64\TypeDuckTextService.dll'),
     (Join-Path $x64Root 'TypeDuckTextService.dll')
 )

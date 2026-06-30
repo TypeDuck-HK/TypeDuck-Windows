@@ -374,6 +374,7 @@ $productIcon = Join-Path $iconSourceRoot "TypeDuck.ico"
 $aboutBanner = Join-Path $resourceSourceRoot "About_Banner.bmp"
 $creditLogos = Join-Path $resourceSourceRoot "Credit_Logos.bmp"
 $installerBitmap = Join-Path $resourceSourceRoot "Installer.bmp"
+$licenseNotice = Join-Path $RepoRoot "THIRD_PARTY_NOTICES.txt"
 New-CleanDirectory -Path $StageDir
 New-Item -ItemType Directory -Path $stageWin32Root -Force | Out-Null
 New-Item -ItemType Directory -Path $stageX64Root -Force | Out-Null
@@ -384,6 +385,7 @@ Copy-IfExists -Source $aboutBanner -Destination (Join-Path $stageResourceRoot "A
 Copy-IfExists -Source $creditLogos -Destination (Join-Path $stageResourceRoot "Credit_Logos.bmp")
 Copy-IfExists -Source $installerBitmap -Destination (Join-Path $stageResourceRoot "Installer.bmp")
 Copy-IfExists -Source $smallIcon -Destination (Join-Path $stageResourceRoot "TypeDuck_Small.ico")
+Copy-IfExists -Source $licenseNotice -Destination (Join-Path $stageWin32Root "THIRD_PARTY_NOTICES.txt")
 
 $launcher = Resolve-ArtifactPath -Label "TypeDuckLauncher.exe" -Candidates @(
     (Join-Path $Win32BuildDir "TypeDuckLauncher.exe"),

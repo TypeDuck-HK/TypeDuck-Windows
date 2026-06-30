@@ -205,10 +205,11 @@ Assert-NotText $backendBuildScript '\$ServerIcon\s*=\s*Join-Path\s+\$IconsDir\s+
 
 Assert-Ordered $about @(
   "TypeDuck Windows IME 版本 Version",
-  "TypeDuck-HK librime fork",
-  "TypeDuck-HK schema",
+  "本軟件循 MIT 特許條款發佈，其包含開源及開放授權元件",
+  "This software is distributed under the MIT license. It includes open-source and openly licensed components",
   "aboutLinks"
 ) "About version and attribution order"
+Assert-Text $about "THIRD_PARTY_NOTICES\.txt" "About attribution must point to the installed third-party notice file."
 Assert-Ordered $about @(
   "TypeDuck 網站 Website",
   "https://typeduck\.hk",

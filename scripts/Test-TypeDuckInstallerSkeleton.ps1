@@ -299,6 +299,7 @@ function Assert-StagingPipeline {
         "TypeDuckLauncher\.exe",
         "TypeDuckSetupHelper\.exe",
         "TypeDuckTextService\.dll",
+        "THIRD_PARTY_NOTICES\.txt",
         "typeduck-windows-ime-setup\.exe"
     ) "installer/build-installer.ps1 must validate the TypeDuck staged payload and output artifact."
 
@@ -308,6 +309,7 @@ function Assert-StagingPipeline {
         "TypeDuckLauncher\.exe",
         "TypeDuckSetupHelper\.exe",
         "TypeDuckTextService\.dll",
+        "THIRD_PARTY_NOTICES\.txt",
         "TypeDuckIME",
         "SkipMoqiImeCopy"
     ) "scripts/install.ps1 must stage TypeDuck roots and deployed binary names."

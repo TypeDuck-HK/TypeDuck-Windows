@@ -84,18 +84,67 @@ function Get-UploadArtifactBlocks {
   return $blocks
 }
 
+function Assert-NoticeFormat {
+  param(
+    [System.Collections.Generic.List[string]] $Failures,
+    [string] $NoticeText
+  )
+
+  if ($NoticeText.Length -eq 0) {
+    Add-Failure $Failures "Third-party notice must not be empty."
+    return
+  }
+
+  if ($NoticeText -notmatch '^THIRD PARTY NOTICES\r\n\r\n') {
+    Add-Failure $Failures "Third-party notice must start with a title followed by one empty line."
+  }
+
+  if ($NoticeText -match "`f") {
+    Add-Failure $Failures "Third-party notice must not contain form feed characters."
+  }
+
+  if ($NoticeText -match "(?<!`r)`n") {
+    Add-Failure $Failures "Third-party notice must use CRLF line endings."
+  }
+
+  if ($NoticeText -match "(?m)[ `t]+$") {
+    Add-Failure $Failures "Third-party notice must not contain trailing spaces."
+  }
+
+  $separator = "=" * 80
+  Assert-Text $Failures $NoticeText "(?m)^$([regex]::Escape($separator))`r?`n$([regex]::Escape($separator))`r?`n$([regex]::Escape($separator))`r?`nLicense: " "Third-party notice sections must start with three separator lines followed by a License header."
+
+  $sectionStartPattern = [regex]::Escape("$separator`r`n$separator`r`n$separator`r`nLicense: ")
+  foreach ($match in [regex]::Matches($NoticeText, $sectionStartPattern)) {
+    if ($match.Index -lt 4 -or $NoticeText.Substring($match.Index - 4, 4) -ne "`r`n`r`n") {
+      Add-Failure $Failures "Each third-party notice group must be preceded by a blank line."
+    }
+  }
+
+  $lines = $NoticeText -split '\r\n'
+  foreach ($line in $lines) {
+    if ($line -match '^Source: ' -and $line -notmatch '^Source: https?://') {
+      Add-Failure $Failures "Third-party notice source must be a URL: $line"
+    }
+  }
+}
+
 $root = Resolve-FullPath -BasePath (Get-Location).Path -Path $RepoRoot
 $failures = [System.Collections.Generic.List[string]]::new()
 
 $releasePath = Join-Path $root ".github\workflows\release.yml"
 $nightlyPath = Join-Path $root ".github\workflows\nightly.yml"
 $packagePath = Join-Path $root "scripts\_all_in_package.ps1"
+$buildPath = Join-Path $root "scripts\build.ps1"
 $installerBuildPath = Join-Path $root "installer\build-installer.ps1"
+$licenseNoticePath = Join-Path $root "THIRD_PARTY_NOTICES.txt"
 
 $release = Read-RequiredText $failures $releasePath ".github/workflows/release.yml"
 $nightly = Read-RequiredText $failures $nightlyPath ".github/workflows/nightly.yml"
 $package = Read-RequiredText $failures $packagePath "scripts/_all_in_package.ps1"
+$build = Read-RequiredText $failures $buildPath "scripts/build.ps1"
 $installerBuild = Read-RequiredText $failures $installerBuildPath "installer/build-installer.ps1"
+$licenseNotice = Read-RequiredText $failures $licenseNoticePath "THIRD_PARTY_NOTICES.txt"
 $workflows = $release + "`n" + $nightly
 $packageText = $package + "`n" + $installerBuild
 
@@ -127,6 +176,19 @@ foreach ($workflow in @(
 Assert-Text $failures $packageText 'installer\\dist\\typeduck-windows-ime-setup\.exe|installer/dist/typeduck-windows-ime-setup\.exe' "Package scripts must point at installer/dist/typeduck-windows-ime-setup.exe."
 Assert-Text $failures $packageText 'RimeDataSource' "Package scripts must forward the TypeDuck schema source to the backend build."
 Assert-NoText $failures $package '`\\"\$[A-Za-z][A-Za-z0-9_]*`\\"' "Package script native argument arrays must not embed literal quote characters around variable values."
+Assert-Text $failures $build '-DCMAKE_POLICY_VERSION_MINIMUM:STRING=3\.5' "Build script must configure CMake with a policy-version minimum for CMake 4 compatibility."
+Assert-Text $failures $licenseNotice 'TypeDuck-Windows-backend' "Third-party license notice must include the backend license."
+Assert-Text $failures $licenseNotice 'TypeDuck-HK librime fork' "Third-party license notice must include librime."
+Assert-Text $failures $licenseNotice 'rime-dictionary-lookup-filter' "Third-party license notice must include the dictionary lookup filter."
+Assert-Text $failures $licenseNotice 'darts-clone / OpenCC deps/darts-clone-0\.32' "Third-party notice must include checked OpenCC deps."
+Assert-Text $failures $licenseNotice 'Source: https://github\.com/s-yata/darts-clone' "Vendored single-file dependencies must trace to upstream sources."
+Assert-Text $failures $licenseNotice 'OpenCC deps/rapidjson-1\.1\.0 msinttypes' "Third-party notice must include recursively checked nested dependency notices."
+Assert-Text $failures $licenseNotice 'OpenCC deps/tclap-1\.2\.5' "Third-party notice must include checked OpenCC deps."
+Assert-Text $failures $licenseNotice 'luna-pinyin schema data' "Third-party license notice must include schema dependency licenses."
+Assert-Text $failures $licenseNotice 'cangjie3 schema data' "Third-party license notice must include cangjie3 schema data."
+Assert-NoticeFormat $failures $licenseNotice
+Assert-NoText $failures $licenseNotice '(?i)([A-Z]:\\|\\VSProjects\\|\\\.cache\\|TypeDuck-Windows:|TypeDuck-Windows-backend:)' "Third-party notice must not contain local checkout paths or repo-relative source labels."
+Assert-NoText $failures $licenseNotice '(?m)^THIRD_PARTY_LICENSES\.txt$|^COMPONENTS$|^NOTICE TEXTS$|^OPENCC VENDORED DEPENDENCY INVENTORY$|This file is installed|collects license texts|OpenCC deps checked from' "Third-party notice must not use the old filename, table headings, or meta-commentary preamble."
 
 $installerFullPath = Resolve-FullPath -BasePath $root -Path $InstallerPath
 if (Test-Path -LiteralPath $installerFullPath -PathType Leaf) {
@@ -141,7 +203,8 @@ if (Test-Path -LiteralPath $installerFullPath -PathType Leaf) {
   if ($hash.Hash -notmatch '^[0-9A-Fa-f]{64}$') {
     Add-Failure $failures "Installer SHA-256 hash must be a 64-character hex digest."
   }
-} elseif ($Strict) {
+}
+elseif ($Strict) {
   Add-Failure $failures "Strict mode requires a present installer artifact at $InstallerPath."
 }
 
