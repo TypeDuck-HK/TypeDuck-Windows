@@ -1479,30 +1479,28 @@ bool Client::selectCandidate(int index) {
     return false;
   }
 
-  bool handled = false;
   HRESULT sessionResult = E_FAIL;
   auto editSession = Ime::ComPtr<Ime::EditSession>::make(
       context,
-      [this, &req, &handled](Ime::EditSession *session, TfEditCookie) {
+      [this, req](Ime::EditSession *session, TfEditCookie) mutable {
         Json::Value ret;
         if (!callRpcMethod(req, ret)) {
-          handled = false;
           return;
         }
-        handled = handleRpcResponse(ret, session);
-        if (handled) {
+        if (handleRpcResponse(ret, session)) {
+          refreshAsyncPollTimer();
           flushPendingAsyncResponses(session);
         }
       });
   context->RequestEditSession(textService_->clientId(), editSession,
-                              TF_ES_SYNC | TF_ES_READWRITE,
+                              TF_ES_ASYNCDONTCARE | TF_ES_READWRITE,
                               &sessionResult);
   if (FAILED(sessionResult)) {
     appendRpcGuardLog(L"selection click RequestEditSession failed hr=" +
                       std::to_wstring(static_cast<long>(sessionResult)));
     return false;
   }
-  return handled;
+  return true;
 }
 
 bool Client::changePage(bool backward) {

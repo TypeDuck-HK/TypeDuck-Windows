@@ -169,6 +169,7 @@ if ($Strict) {
   Assert-Contains $windowSource 'hitTestPageNavigation' "candidate page navigation must have mouse hit testing"
   Assert-Contains $windowSource 'candidateHasPrevious|candidateHasNext' "candidate page navigation must consume backend page availability"
   Assert-Contains $clientSource 'setCandidateHasPrevious|setCandidateHasNext' "backend page availability must be applied to the text service"
+  Assert-Contains $clientSource '(?s)bool\s+Client::selectCandidate\(int index\).*?TF_ES_ASYNCDONTCARE \| TF_ES_READWRITE' "Word candidate click regression: popup mouse selectCandidate must use async edit session because Word drops synchronous popup selection"
   Assert-Contains $windowSource 'GetDpiForWindow|LOGPIXELSX|scalePx' "DPI-aware sizing"
   Assert-Contains $windowSource 'dpiForOwnerWindow|createPointFontForDpi|ThreadDpiAwarenessScope' "candidate popup must use owner DPI instead of host-virtualized window DC sizing"
   Assert-Contains $windowSource 'resolveFontFace|EnumFontFamiliesExW|candFontName' "candidate popup DPI-owned fonts must preserve configured Chinese font fallback lists"
