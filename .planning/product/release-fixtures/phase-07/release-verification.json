@@ -235,11 +235,9 @@
     ],
     "workflow_frontend_repo": "TypeDuck-Windows",
     "workflow_backend_repo": "TypeDuck-Windows-backend",
-    "schema_repository": "${{ github.repository_owner }}/schema",
-    "schema_branch": "aap2-alpha",
-    "schema_prune_list": "scripts\\typeduck-schema-prune-list.txt",
+    "schema_artifact_url": "https://github.com/TypeDuck-HK/schema/releases/download/latest/TypeDuck-Windows.zip",
+    "schema_artifact_extract_path": "TypeDuck-HK-schema",
     "installer_release_asset_pattern": "typeduck-windows-ime-setup-${{ github.event.release.tag_name || github.sha }}.exe",
-    "rime_deployer_build_folder": "TypeDuck-Windows-backend\\input_methods\\rime\\build",
     "standalone_schema_artifact": false
   },
   "limitations": {

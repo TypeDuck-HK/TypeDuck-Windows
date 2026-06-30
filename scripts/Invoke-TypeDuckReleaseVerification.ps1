@@ -239,11 +239,9 @@ $manifest = [pscustomobject] @{
     case_ids = @("artifact-name-and-sha256")
     workflow_frontend_repo = "TypeDuck-Windows"
     workflow_backend_repo = "TypeDuck-Windows-backend"
-    schema_repository = '${{ github.repository_owner }}/schema'
-    schema_branch = "aap2-alpha"
-    schema_prune_list = "scripts\typeduck-schema-prune-list.txt"
+    schema_artifact_url = "https://github.com/TypeDuck-HK/schema/releases/download/latest/TypeDuck-Windows.zip"
+    schema_artifact_extract_path = "TypeDuck-HK-schema"
     installer_release_asset_pattern = 'typeduck-windows-ime-setup-${{ github.event.release.tag_name || github.sha }}.exe'
-    rime_deployer_build_folder = "TypeDuck-Windows-backend\input_methods\rime\build"
     standalone_schema_artifact = $false
   }
   limitations = [pscustomobject] @{
@@ -293,7 +291,7 @@ $notes = @(
   "- D-06 through D-10: command, log, hash, registry/file, and human-note evidence are represented.",
   "- D-11 through D-13: protocol/recovery cases are non-visual, redacted, and failure detail stays in logs/evidence.",
   "- D-14 through D-16: no product capability changes are made by this aggregate verification.",
-  "- D-17 through D-20: workflows use TypeDuck-Windows, TypeDuck-Windows-backend, the current GitHub owner schema repository on aap2-alpha, the shared schema prune list, Rime deployer build output, and no standalone schema artifact.",
+  "- D-17 through D-20: workflows use TypeDuck-Windows, TypeDuck-Windows-backend, the TypeDuck schema release artifact, and no standalone schema upload artifact.",
   "- Research: excluded because existing GSD documentation was sufficient and skip-research was requested before planning.",
   "",
   "## Rerun Rule",

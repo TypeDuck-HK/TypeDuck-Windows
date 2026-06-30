@@ -63,7 +63,7 @@ TypeDuck-Windows installer payload
 
 ## CI and Release Integration
 
-- Frontend workflows checkout both product repos plus TypeDuck schema data, install Inno Setup, download protoc, prepare Rime data, run `TypeDuck-Windows:scripts/_all_in_package.ps1`, upload installer artifacts, and publish release/nightly assets.
+- Frontend workflows checkout both product repos, download and extract the TypeDuck schema release artifact, install Inno Setup, download protoc, run `TypeDuck-Windows:scripts/_all_in_package.ps1`, upload installer artifacts, and publish release/nightly assets.
 - Backend workflows run `TypeDuck-Windows-backend:scripts/build.ps1` and package backend runtime zip artifacts.
 - The frontend installer artifact naming contract is `typeduck-windows-ime-setup.exe` plus tag-or-sha variants in release workflows.
 - Release verification guards live primarily in `TypeDuck-Windows:scripts/Test-TypeDuckRelease*.ps1` and `TypeDuck-Windows:scripts/Invoke-TypeDuckReleaseVerification.ps1`.

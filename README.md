@@ -85,7 +85,7 @@ The frontend repository owns TSF registration, COM entry points, candidate UI, l
 - Inno Setup 6 for installer builds.
 - Go matching the backend module requirement.
 - Protocol Buffers `protoc` 33.5 or a local protobuf source tree.
-- A TypeDuck Rime schema checkout to pass as `-RimeDataSource`.
+- A TypeDuck Rime schema source directory to pass as `-RimeDataSource`. The directory must include a `build` folder containing the artifacts pre-compiled by librime.
 
 ## Build
 
@@ -169,7 +169,7 @@ Do not edit generated protobuf files directly.
 
 ## Release
 
-The release workflows build on `windows-2022`, checkout both TypeDuck Windows repositories, prepare TypeDuck Rime schema data, download protobuf tooling, run the packaging script, and upload the installer asset. Release validation should cover:
+The release workflows build on `windows-2022`, checkout both TypeDuck Windows repositories, download the TypeDuck schema release artifact, download protobuf tooling, run the packaging script, and upload the installer asset. Release validation should cover:
 
 - Installer file name and signature/hash evidence.
 - Clean install, upgrade, uninstall, and reboot-required registration paths.

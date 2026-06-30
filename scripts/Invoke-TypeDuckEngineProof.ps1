@@ -24,9 +24,6 @@
 .PARAMETER TypeDuckSchemaRoot
   Optional TypeDuck Web schema checkout used to overlay current desktop schema files for proof execution.
 
-.PARAMETER SchemaPruneListPath
-  Relative or absolute path to the TypeDuck schema files removed before Rime deployment.
-
 .PARAMETER CheckOnly
   Validate required inputs and existing proof evidence without running the probe.
 #>
@@ -38,7 +35,6 @@ param(
   [string] $OutputPath = ".planning\product\engine-runtime-fixtures\phase-02\typing-proof.json",
   [string] $FrameLogPath = ".planning\product\engine-runtime-fixtures\phase-02\backend-stdio-frames.ndjson",
   [string] $TypeDuckSchemaRoot = "I:\GitHub\TypeDuck-Web\schema",
-  [string] $SchemaPruneListPath = ".\scripts\typeduck-schema-prune-list.txt",
   [switch] $CheckOnly
 )
 
@@ -166,30 +162,11 @@ function Copy-DirectoryContents {
   }
 }
 
-function Read-SchemaPruneList {
-  param([string] $Path)
-
-  if ([string]::IsNullOrWhiteSpace($Path)) {
-    return @()
-  }
-  $full = Resolve-ProofPath -BasePath $script:RepoRootFull -Path $Path
-  Assert-File -Path $full -Label "TypeDuck schema prune list"
-  $entries = @()
-  Get-Content -LiteralPath $full | ForEach-Object {
-    $entry = $_.Trim()
-    if (-not [string]::IsNullOrWhiteSpace($entry) -and -not $entry.StartsWith("#")) {
-      $entries += $entry
-    }
-  }
-  return $entries
-}
-
 function Overlay-TypeDuckSchema {
   param(
     [string] $SchemaRoot,
     [string] $RimeDataRoot,
-    [string] $WorkRoot,
-    [string] $SchemaPruneListPath
+    [string] $WorkRoot
   )
 
   if ([string]::IsNullOrWhiteSpace($SchemaRoot)) {
@@ -205,7 +182,7 @@ function Overlay-TypeDuckSchema {
   Assert-File -Path (Join-Path $schemaFull "jyut6ping3.schema.yaml") -Label "TypeDuck Web Jyutping schema"
   Assert-File -Path (Join-Path $schemaFull "jyut6ping3.dict.yaml") -Label "TypeDuck Web Jyutping dictionary"
 
-  $excludeNames = @(".git") + @(Read-SchemaPruneList -Path $SchemaPruneListPath)
+  $excludeNames = @(".git")
   Copy-DirectoryContents -SourceRoot $schemaFull -DestinationRoot $RimeDataRoot -ExcludeNames $excludeNames
 
   $schemaBuildRoot = Join-Path $schemaFull "build"
@@ -406,8 +383,7 @@ function Prepare-AdapterWorkDir {
   param(
     [string] $StageRoot,
     [string] $AdapterRoot,
-    [string] $TypeDuckSchemaRoot,
-    [string] $SchemaPruneListPath
+    [string] $TypeDuckSchemaRoot
   )
 
   $workRoot = Join-Path $StageRoot "adapter-work"
@@ -420,7 +396,7 @@ function Prepare-AdapterWorkDir {
   Assert-Directory -Path $sourceRimeRoot -Label "staged TypeDuck rime runtime"
   Copy-Item -LiteralPath (Join-Path $sourceRimeRoot "rime.dll") -Destination (Join-Path $rimeRoot "rime.dll") -Force
   Copy-DirectoryContents -SourceRoot $sourceRimeRoot -DestinationRoot $rimeDataRoot -ExcludeNames @("rime.dll", "user", "common.custom.yaml", "default.custom.yaml")
-  Overlay-TypeDuckSchema -SchemaRoot $TypeDuckSchemaRoot -RimeDataRoot $rimeDataRoot -WorkRoot $workRoot -SchemaPruneListPath $SchemaPruneListPath
+  Overlay-TypeDuckSchema -SchemaRoot $TypeDuckSchemaRoot -RimeDataRoot $rimeDataRoot -WorkRoot $workRoot
 
   Copy-Item -LiteralPath (Join-Path $AdapterRoot "input_methods\rime\ime.json") -Destination (Join-Path $rimeRoot "ime.json") -Force
   $appearanceThemes = Join-Path $AdapterRoot "input_methods\rime\appearance_themes.json"
@@ -504,7 +480,7 @@ if ($CheckOnly) {
   exit 0
 }
 
-$adapterWorkRoot = Prepare-AdapterWorkDir -StageRoot $StageRootFull -AdapterRoot $MoqiImeRootFull -TypeDuckSchemaRoot $TypeDuckSchemaRoot -SchemaPruneListPath $SchemaPruneListPath
+$adapterWorkRoot = Prepare-AdapterWorkDir -StageRoot $StageRootFull -AdapterRoot $MoqiImeRootFull -TypeDuckSchemaRoot $TypeDuckSchemaRoot
 $adapterServerExe = Join-Path $adapterWorkRoot "server.exe"
 Build-AdapterServer -AdapterRoot $MoqiImeRootFull -ServerExe $adapterServerExe
 

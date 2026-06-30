@@ -128,7 +128,7 @@
 - Do not edit vendored/generated third-party files under `TypeDuck-Windows:libIME2/lib/googletest-release-1.10.0/`, `TypeDuck-Windows:jsoncpp/`, or `TypeDuck-Windows:libuv/` unless the task is explicitly about vendor maintenance.
 
 **CI Behavior:**
-- `TypeDuck-Windows:.github/workflows/nightly.yml` and `TypeDuck-Windows:.github/workflows/release.yml` run on `windows-2022`, use `pwsh`, checkout both public repos, install Inno Setup, download protobuf `33.5`, prepare Rime data, and run `scripts/_all_in_package.ps1`.
+- `TypeDuck-Windows:.github/workflows/nightly.yml` and `TypeDuck-Windows:.github/workflows/release.yml` run on `windows-2022`, use `pwsh`, checkout both public repos, download the TypeDuck schema release artifact, install Inno Setup, download protobuf `33.5`, and run `scripts/_all_in_package.ps1`.
 - `TypeDuck-Windows-backend:.github/workflows/nightly.yml` and `TypeDuck-Windows-backend:.github/workflows/release.yml` run on `windows-2022`, use `powershell`, set up Go `1.24.6`, run `scripts/build.ps1`, and upload runtime zip artifacts.
 - No dedicated lint, `go test`, `ctest`, or coverage workflow is detected in either repo. Add explicit CI test steps when a change relies on test execution rather than package-build compilation.
 

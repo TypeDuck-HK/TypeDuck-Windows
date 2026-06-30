@@ -210,14 +210,11 @@ if ($manifest.release_artifacts.workflow_frontend_repo -ne "TypeDuck-Windows") {
 if ($manifest.release_artifacts.workflow_backend_repo -ne "TypeDuck-Windows-backend") {
   Add-Failure $failures "release_artifacts.workflow_backend_repo must be TypeDuck-Windows-backend."
 }
-if ($manifest.release_artifacts.schema_repository -ne '${{ github.repository_owner }}/schema') {
-  Add-Failure $failures "release_artifacts.schema_repository must be `${{ github.repository_owner }}/schema."
+if ($manifest.release_artifacts.schema_artifact_url -ne "https://github.com/TypeDuck-HK/schema/releases/download/latest/TypeDuck-Windows.zip") {
+  Add-Failure $failures "release_artifacts.schema_artifact_url must reference the TypeDuck schema release artifact."
 }
-if ($manifest.release_artifacts.schema_branch -ne "aap2-alpha") {
-  Add-Failure $failures "release_artifacts.schema_branch must be aap2-alpha."
-}
-if ($manifest.release_artifacts.schema_prune_list -ne "scripts\typeduck-schema-prune-list.txt") {
-  Add-Failure $failures "release_artifacts.schema_prune_list must reference scripts\typeduck-schema-prune-list.txt."
+if ($manifest.release_artifacts.schema_artifact_extract_path -ne "TypeDuck-HK-schema") {
+  Add-Failure $failures "release_artifacts.schema_artifact_extract_path must be TypeDuck-HK-schema."
 }
 if ($manifest.release_artifacts.installer_release_asset_pattern -ne 'typeduck-windows-ime-setup-${{ github.event.release.tag_name || github.sha }}.exe') {
   Add-Failure $failures "release_artifacts.installer_release_asset_pattern must use the release tag or commit SHA."

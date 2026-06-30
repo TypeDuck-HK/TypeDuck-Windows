@@ -46,7 +46,7 @@
 - Vendored/frontend dependencies: `TypeDuck-Windows:libIME2/`, `TypeDuck-Windows:libuv/`, `TypeDuck-Windows:jsoncpp/`, and FetchContent `spdlog` / `protobuf`.
 - TypeDuck-owned frontend submodule patches: `TypeDuck-Windows:patches/libIME2/0001-use-typeduck-diagnostics-paths.patch`, applied by `TypeDuck-Windows:scripts/Apply-TypeDuckSubmodulePatches.ps1`.
 - Runtime binary dependency: TypeDuck-HK librime Windows release staged by `TypeDuck-Windows:scripts/Stage-TypeDuckRuntime.ps1`.
-- Runtime data dependency: TypeDuck schema data passed as `-RimeDataSource` to `TypeDuck-Windows-backend:scripts/build.ps1` and frontend packaging workflows.
+- Runtime data dependency: TypeDuck schema data passed as `-RimeDataSource` to `TypeDuck-Windows-backend:scripts/build.ps1`; frontend packaging workflows download the prebuilt TypeDuck schema release artifact and pass its extracted directory.
 
 ## Configuration
 
@@ -78,7 +78,7 @@ pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/_all_in_package.ps1 -RimeD
 
 ## CI
 
-- `TypeDuck-Windows:.github/workflows/nightly.yml` and `TypeDuck-Windows:.github/workflows/release.yml` run on `windows-2022`, checkout `TypeDuck-Windows`, `TypeDuck-Windows-backend`, and TypeDuck schema data, apply TypeDuck submodule patches, install Inno Setup, download protoc 33.5, prepare Rime data, and produce installer artifacts.
+- `TypeDuck-Windows:.github/workflows/nightly.yml` and `TypeDuck-Windows:.github/workflows/release.yml` run on `windows-2022`, checkout `TypeDuck-Windows` and `TypeDuck-Windows-backend`, download and extract the TypeDuck schema release artifact, apply TypeDuck submodule patches, install Inno Setup, download protoc 33.5, and produce installer artifacts.
 - `TypeDuck-Windows-backend:.github/workflows/nightly.yml` and `TypeDuck-Windows-backend:.github/workflows/release.yml` run on `windows-2022`, set up Go, run the backend build script, and upload backend runtime zip artifacts.
 - Dedicated CI steps for `ctest`, `go test ./...`, linting, generated-protobuf diffing, and coverage are not detected.
 

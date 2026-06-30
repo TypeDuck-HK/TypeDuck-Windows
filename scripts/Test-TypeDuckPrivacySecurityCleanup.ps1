@@ -291,13 +291,9 @@ foreach ($pattern in @(
     'typeduck-windows-ime-nightly-',
     'path:\s+TypeDuck-Windows',
     'path:\s+TypeDuck-Windows-backend',
-    'repository:\s+\$\{\{\s*github\.repository_owner\s*\}\}/schema',
-    'ref:\s+aap2-alpha',
-    'typeduck-schema-prune-list\.txt',
+    'https://github\.com/TypeDuck-HK/schema/releases/download/latest/TypeDuck-Windows\.zip',
+    'Expand-Archive\s+-Path\s+\$schemaZip\s+-DestinationPath\s+\$schemaDir\s+-Force',
     '-RimeDataSource',
-    'Rime deployer',
-    'rime_deployer\.exe',
-    'runtime build folder',
     'pwsh -NoProfile -ExecutionPolicy Bypass -File \.\\scripts\\_all_in_package\.ps1')) {
   Assert-PatternPresent $violations "ci-artifacts" $workflowText $pattern "Release/nightly workflow is missing required TypeDuck CI/runtime pattern: $pattern"
 }
@@ -349,7 +345,7 @@ if ($Strict) {
       'Legacy Moqi coexistence',
       'Legacy Moqi deletion, migration, registry cleanup, scheduled-task cleanup, install-folder cleanup, and process termination',
       '香港教育大學 The Education University of Hong Kong',
-      'typeduck-schema-prune-list',
+      'TypeDuck-Windows\.zip',
       '-RimeDataSource',
       'restart guidance')) {
     if ($scriptText -notmatch $required) {

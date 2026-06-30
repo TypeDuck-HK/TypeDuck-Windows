@@ -1,9 +1,0 @@
-.git
-.gitignore
-common.custom.yaml
-default.custom.yaml
-jyut6ping3_mobile_10keys.schema.yaml
-jyut6ping3_mobile_initial_final.schema.yaml
-jyut6ping3_mobile_longpress.schema.yaml
-jyut6ping3_mobile.schema.yaml
-loengfan_longpress.schema.yaml

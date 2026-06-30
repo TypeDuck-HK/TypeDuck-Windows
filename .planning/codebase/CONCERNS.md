@@ -114,11 +114,11 @@
 - Cause: Rendering, layout, dictionary parsing, host window ownership, and TSF UI element behavior are tightly coupled.
 - Improvement path: Cache parsed candidate info and text measurements, separate a renderer-independent view model, and add screenshot/host coverage for dense dictionary rows.
 
-**Release workflows rebuild schema runtime data repeatedly:**
-- Problem: Workflows checkout schema data, prune files, copy into backend paths, run a deployer, then run the frontend packaging script that also calls the backend build.
+**Release workflows depend on a schema release artifact:**
+- Problem: The schema repository now owns the built schema zip, while frontend workflows download that artifact and backend packaging consumes its extracted directory through `-RimeDataSource`.
 - Files: `TypeDuck-Windows:.github/workflows/nightly.yml`, `TypeDuck-Windows:.github/workflows/release.yml`, `TypeDuck-Windows-backend:scripts/build.ps1`, `TypeDuck-Windows:scripts/_all_in_package.ps1`
-- Cause: Runtime data preparation is split between workflow YAML, frontend scripts, and backend scripts.
-- Improvement path: Move runtime preparation into one script with explicit inputs/outputs and make CI consume that script instead of duplicating packaging steps.
+- Cause: Schema build ownership moved out of the frontend workflow, but the frontend installer still depends on the release artifact shape and availability.
+- Improvement path: Keep schema artifact ownership and release URL explicit in workflow tests, and avoid duplicating schema pruning/build logic in frontend packaging.
 
 ## Fragile Areas
 
@@ -194,7 +194,7 @@
 ## Missing Critical Features
 
 **No single cross-repo release contract file:**
-- Problem: The installer, launcher, backend build, schema checkout, runtime DLL, protobuf schema, and settings fields are verified by separate scripts and tests.
+- Problem: The installer, launcher, backend build, schema release artifact, runtime DLL, protobuf schema, and settings fields are verified by separate scripts and tests.
 - Blocks: Automated confidence that a given pair of frontend/backend commits produces a compatible TypeDuck Windows v1 installer.
 
 **No authoritative IPC/protocol version negotiation at backend runtime:**
