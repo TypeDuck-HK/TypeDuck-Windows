@@ -2486,13 +2486,15 @@ void CandidateWindow::onMouseWheel(WPARAM wp, LPARAM lp) {
     }
     POINT pt = {GET_X_LPARAM(lp), GET_Y_LPARAM(lp)};
     ::ScreenToClient(hwnd_, &pt);
-    if (dictionaryPanelVisible() && pointInDictionaryPanel(pt) && dictionaryMaxScrollOffset() > 0) {
-        const int scrollLines = (std::max)(1, std::abs(delta) / WHEEL_DELTA);
-        const int scrollStep = scalePx(kDictionaryScrollStep) * scrollLines;
-        dictionaryScrollOffset_ += delta > 0 ? -scrollStep : scrollStep;
-        clampDictionaryScrollOffset();
-        if (isVisible()) {
-            ::InvalidateRect(hwnd_, NULL, TRUE);
+    if (dictionaryPanelVisible() && pointInDictionaryPanel(pt)) {
+        if (dictionaryMaxScrollOffset() > 0) {
+            const int scrollLines = (std::max)(1, std::abs(delta) / WHEEL_DELTA);
+            const int scrollStep = scalePx(kDictionaryScrollStep) * scrollLines;
+            dictionaryScrollOffset_ += delta > 0 ? -scrollStep : scrollStep;
+            clampDictionaryScrollOffset();
+            if (isVisible()) {
+                ::InvalidateRect(hwnd_, NULL, TRUE);
+            }
         }
         return;
     }

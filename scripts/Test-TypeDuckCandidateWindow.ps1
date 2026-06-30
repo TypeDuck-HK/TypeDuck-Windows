@@ -142,6 +142,7 @@ if ($Strict) {
   Assert-NotContains $textServiceSource 'setPreeditText\(effectiveInlinePreedit\(\) \? L"" : candidatePreedit_\)|setPreeditCursor\(effectiveInlinePreedit\(\) \? 0 : candidatePreeditCursor_\)' "inline preedit hiding the popup input buffer in source"
   Assert-Contains $windowSource 'WS_EX_NOACTIVATE|MA_NOACTIVATE|SWP_NOACTIVATE' "focus-safe non-activating popup behavior"
   Assert-Contains $windowSource 'TrackMouseEvent|WM_MOUSELEAVE' "mouse leave tracking"
+  Assert-Contains $windowSource '(?s)pointInDictionaryPanel\(pt\).*?dictionaryMaxScrollOffset\(\) > 0.*?return;.*?changeCandidatePage' "dictionary panel must consume mouse wheel even when its content cannot scroll"
   Assert-Contains $windowSource 'hitTestPageNavigation' "candidate page navigation must have mouse hit testing"
   Assert-Contains $windowSource 'candidateHasPrevious|candidateHasNext' "candidate page navigation must consume backend page availability"
   Assert-Contains $clientSource 'setCandidateHasPrevious|setCandidateHasNext' "backend page availability must be applied to the text service"
