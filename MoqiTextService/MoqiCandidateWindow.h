@@ -93,6 +93,7 @@ public:
     void setDisplayPreferences(TypeDuck::DisplayPreferences preferences);
     void syncOwner(Ime::EditSession* session);
     void recalculateSize() override;
+    void refresh();
 
 protected:
     ~CandidateWindow(void) override;
@@ -101,6 +102,8 @@ protected:
 
 private:
     void onPaint();
+    void renderSurface(HDC hdc, const RECT& rc, bool transparentOutsidePanels);
+    void presentLayeredSurface();
     void paintInputBuffer(HDC hdc, const RECT& panelRc);
     void paintPageNavigation(HDC hdc, const RECT& panelRc);
     void paintCandidateRow(HDC hdc, int index, const RECT& rowRc);
@@ -125,6 +128,8 @@ private:
     void onMouseWheel(WPARAM wp, LPARAM lp);
     void paintPreeditCursor(HDC hdc, const RECT& preeditRc, int cursorX);
     void applyWindowShape();
+    bool usesLayeredPresentation() const;
+    void resizeForLayout(int width, int height);
     int scalePx(int value) const;
     bool updateDpiFromOwner(HWND owner);
     void refreshOwnedFonts();

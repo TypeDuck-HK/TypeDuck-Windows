@@ -90,6 +90,12 @@ $productionAnchors = @(
   @{ Path = $windowHeader; Pattern = 'lastMouseMovePoint_|lastPointerPoint'; Description = 'stationary pointer tracking' },
   @{ Path = $windowSource; Pattern = 'panel_background|selection_background|input_buffer_background|input_buffer_text|pronunciation_text|definition_text'; Description = 'theme palette role consumption' },
   @{ Path = $windowSource; Pattern = 'definitionLayout|displayLanguages|mainLanguage|otherLanguages'; Description = 'settings-aware display language layout' }
+  @{ Path = $windowSource; Pattern = 'WS_EX_TOOLWINDOW\s*\|\s*WS_EX_TOPMOST\s*\|\s*WS_EX_NOACTIVATE\s*\|\s*WS_EX_LAYERED'; Description = 'blink regression: candidate popup must use a layered window so separated panels do not expose an unpainted black/solid first frame' }
+  @{ Path = $windowSource; Pattern = '(?s)UpdateLayeredWindow\([^;]*ULW_COLORKEY'; Description = 'blink regression: candidate popup must present the separated panel surface through layered-window color-key transparency' }
+  @{ Path = $windowSource; Pattern = 'transparentOutsidePanels\s*\?\s*kLayeredTransparentColor'; Description = 'blink regression: candidate/dictionary union area outside rounded panels must remain transparent, not white' }
+  @{ Path = $windowSource; Pattern = '(?s)void\s+CandidateWindow::applyWindowShape\(\).*?usesLayeredPresentation\(\).*?return;.*?SetWindowRgn'; Description = 'blink regression: layered candidate popup must bypass SetWindowRgn region churn' }
+  @{ Path = $windowSource; Pattern = '(?s)STDMETHODIMP\s+CandidateWindow::Show\(BOOL bShow\).*?presentLayeredSurface\(\).*?show\(\)'; Description = 'blink regression: candidate popup must paint the layered surface before first visible show' }
+  @{ Path = $windowSource; Pattern = '(?s)void\s+CandidateWindow::resizeForLayout\(int width, int height\).*?SWP_NOREDRAW'; Description = 'blink regression: layered candidate popup resize must suppress intermediate redraw frames' }
 )
 
 $missing = @()

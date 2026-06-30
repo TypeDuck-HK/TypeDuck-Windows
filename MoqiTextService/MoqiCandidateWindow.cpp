@@ -22,6 +22,7 @@ namespace {
 
 constexpr COLORREF kWindowBackground = RGB(255, 255, 255);       // panel_background
 constexpr COLORREF kDictionaryBackground = RGB(246, 243, 237);   // dictionary_background
+constexpr COLORREF kLayeredTransparentColor = RGB(255, 0, 255);
 constexpr COLORREF kInputBufferBackground = RGB(246, 234, 216);  // input_buffer_background
 constexpr COLORREF kInputBufferText = RGB(70, 58, 42);           // input_buffer_text
 constexpr COLORREF kWindowBorder = RGB(222, 217, 207);           // panel_border
@@ -609,7 +610,7 @@ CandidateWindow::CandidateWindow(Ime::TextService* service, Ime::EditSession* se
     {
         ThreadDpiAwarenessScope dpiScope;
         create(owner, WS_POPUP | WS_CLIPCHILDREN,
-               WS_EX_TOOLWINDOW | WS_EX_TOPMOST | WS_EX_NOACTIVATE);
+               WS_EX_TOOLWINDOW | WS_EX_TOPMOST | WS_EX_NOACTIVATE | WS_EX_LAYERED);
     }
 
     std::wostringstream log;
@@ -659,6 +660,7 @@ STDMETHODIMP CandidateWindow::Show(BOOL bShow) {
         appendCandidateWindowLog(log.str());
     }
     if (shown_) {
+        presentLayeredSurface();
         show();
         enforceCandidateWindowTopmost(hwnd_, true, L"Show(TRUE)");
     } else {
@@ -666,6 +668,12 @@ STDMETHODIMP CandidateWindow::Show(BOOL bShow) {
         logCandidateWindowState(L"[CandidateWindow::hide.state]", hwnd_);
     }
     return S_OK;
+}
+
+void CandidateWindow::refresh() {
+    if (hwnd_) {
+        ::InvalidateRect(hwnd_, NULL, FALSE);
+    }
 }
 
 STDMETHODIMP CandidateWindow::IsShown(BOOL* pbShow) {
@@ -1102,7 +1110,7 @@ void CandidateWindow::recalculateSize() {
         contentTop_ = borderWidth_ + padY_;
         candidatePanelWidth_ = padX_ * 2 + borderWidth_ * 2;
         candidatePanelHeight_ = padY_ * 2 + borderWidth_ * 2;
-        resize(candidatePanelWidth_, candidatePanelHeight_);
+        resizeForLayout(candidatePanelWidth_, candidatePanelHeight_);
         applyWindowShape();
         return;
     }
@@ -1505,7 +1513,7 @@ void CandidateWindow::recalculateSize() {
     const int width = candidatePanelWidth +
                       (dictionaryPanelVisible() ? panelGap_ + dictionaryPanelWidth_ : 0);
     const int height = (std::max)(candidatePanelHeight, dictionaryHeight);
-    resize(width, height);
+    resizeForLayout(width, height);
     applyWindowShape();
 
     std::wostringstream log;
@@ -1551,11 +1559,32 @@ void CandidateWindow::onPaint() {
 
     RECT rc = {};
     GetClientRect(hwnd_, &rc);
+    if (usesLayeredPresentation()) {
+        EndPaint(hwnd_, &ps);
+        presentLayeredSurface();
+        return;
+    }
+
     HDC memdc = ::CreateCompatibleDC(hdc);
     HBITMAP membmp = ::CreateCompatibleBitmap(hdc, rc.right - rc.left, rc.bottom - rc.top);
     HGDIOBJ oldBitmap = ::SelectObject(memdc, membmp);
-    HGDIOBJ oldFont = ::SelectObject(memdc, font_);
-    ::SetBkMode(memdc, TRANSPARENT);
+    renderSurface(memdc, rc, false);
+    ::BitBlt(hdc, 0, 0, rc.right - rc.left, rc.bottom - rc.top, memdc, 0, 0, SRCCOPY);
+
+    ::SelectObject(memdc, oldBitmap);
+    ::DeleteObject(membmp);
+    ::DeleteDC(memdc);
+    EndPaint(hwnd_, &ps);
+}
+
+void CandidateWindow::renderSurface(HDC hdc, const RECT& rc, bool transparentOutsidePanels) {
+    HGDIOBJ oldFont = ::SelectObject(hdc, font_);
+    ::SetBkMode(hdc, TRANSPARENT);
+
+    HBRUSH clearBrush = ::CreateSolidBrush(
+        transparentOutsidePanels ? kLayeredTransparentColor : backgroundColor_);
+    ::FillRect(hdc, &rc, clearBrush);
+    ::DeleteObject(clearBrush);
 
     HBRUSH backgroundBrush = ::CreateSolidBrush(backgroundColor_);
     HBRUSH borderBrush = ::CreateSolidBrush(kWindowBorder);
@@ -1577,12 +1606,11 @@ void CandidateWindow::onPaint() {
         ::CombineRgn(windowRgn, windowRgn, dictionaryWindowRgn, RGN_OR);
         ::DeleteObject(dictionaryWindowRgn);
     }
-    ::FillRect(memdc, &rc, backgroundBrush);
-    ::FillRgn(memdc, windowRgn, backgroundBrush);
-    ::FrameRgn(memdc, windowRgn, borderBrush, borderWidth_, borderWidth_);
+    ::FillRgn(hdc, windowRgn, backgroundBrush);
+    ::FrameRgn(hdc, windowRgn, borderBrush, borderWidth_, borderWidth_);
 
-    paintInputBuffer(memdc, candidatePanelRc);
-    paintPageNavigation(memdc, candidatePanelRc);
+    paintInputBuffer(hdc, candidatePanelRc);
+    paintPageNavigation(hdc, candidatePanelRc);
 
     int y = contentTop_;
     for (int i = 0, n = static_cast<int>(items_.size()); i < n; ++i) {
@@ -1592,7 +1620,7 @@ void CandidateWindow::onPaint() {
             y,
             candidatePanelRc.right - borderWidth_ - padX_ / 2,
             y + rowHeight};
-        paintCandidateRow(memdc, i, rowRc);
+        paintCandidateRow(hdc, i, rowRc);
         y += rowHeight + rowSpacing_;
     }
 
@@ -1606,24 +1634,81 @@ void CandidateWindow::onPaint() {
             dictionaryRc.left, dictionaryRc.top, dictionaryRc.right + 1, dictionaryRc.bottom + 1,
             borderRadius_ * 2, borderRadius_ * 2);
         HBRUSH dictionaryBrush = ::CreateSolidBrush(kDictionaryBackground);
-        ::FillRgn(memdc, dictionaryRgn, dictionaryBrush);
-        ::FrameRgn(memdc, dictionaryRgn, borderBrush, borderWidth_, borderWidth_);
+        ::FillRgn(hdc, dictionaryRgn, dictionaryBrush);
+        ::FrameRgn(hdc, dictionaryRgn, borderBrush, borderWidth_, borderWidth_);
         ::DeleteObject(dictionaryBrush);
         ::DeleteObject(dictionaryRgn);
-        paintDictionaryPanel(memdc, dictionaryRc, items_[effectiveDictionaryIndex()].candidateInfo);
-        paintDictionaryScrollBar(memdc, dictionaryRc);
+        paintDictionaryPanel(hdc, dictionaryRc, items_[effectiveDictionaryIndex()].candidateInfo);
+        paintDictionaryScrollBar(hdc, dictionaryRc);
     }
-
-    ::BitBlt(hdc, 0, 0, rc.right - rc.left, rc.bottom - rc.top, memdc, 0, 0, SRCCOPY);
 
     ::DeleteObject(windowRgn);
     ::DeleteObject(borderBrush);
     ::DeleteObject(backgroundBrush);
-    ::SelectObject(memdc, oldFont);
+    ::SelectObject(hdc, oldFont);
+}
+
+void CandidateWindow::presentLayeredSurface() {
+    if (!hwnd_ || !usesLayeredPresentation()) {
+        return;
+    }
+
+    RECT rc = {};
+    ::GetClientRect(hwnd_, &rc);
+    const int width = rc.right - rc.left;
+    const int height = rc.bottom - rc.top;
+    if (width <= 0 || height <= 0) {
+        return;
+    }
+
+    HDC screenDc = ::GetDC(nullptr);
+    if (!screenDc) {
+        return;
+    }
+    HDC memdc = ::CreateCompatibleDC(screenDc);
+    HBITMAP membmp = ::CreateCompatibleBitmap(screenDc, width, height);
+    if (!memdc || !membmp) {
+        if (membmp) {
+            ::DeleteObject(membmp);
+        }
+        if (memdc) {
+            ::DeleteDC(memdc);
+        }
+        ::ReleaseDC(nullptr, screenDc);
+        return;
+    }
+
+    HGDIOBJ oldBitmap = ::SelectObject(memdc, membmp);
+    renderSurface(memdc, rc, true);
+
+    RECT windowRc = {};
+    ::GetWindowRect(hwnd_, &windowRc);
+    POINT dst = {windowRc.left, windowRc.top};
+    POINT src = {0, 0};
+    SIZE size = {width, height};
+    BLENDFUNCTION blend = {AC_SRC_OVER, 0, 255, 0};
+    ::SetLastError(0);
+    const BOOL ok = ::UpdateLayeredWindow(
+        hwnd_,
+        screenDc,
+        &dst,
+        &size,
+        memdc,
+        &src,
+        kLayeredTransparentColor,
+        &blend,
+        ULW_COLORKEY);
+    if (!ok) {
+        std::wostringstream log;
+        log << L"[CandidateWindow::presentLayeredSurface] UpdateLayeredWindow failed last_error="
+            << ::GetLastError();
+        appendCandidateWindowLog(log.str());
+    }
+
     ::SelectObject(memdc, oldBitmap);
     ::DeleteObject(membmp);
     ::DeleteDC(memdc);
-    EndPaint(hwnd_, &ps);
+    ::ReleaseDC(nullptr, screenDc);
 }
 
 void CandidateWindow::paintInputBuffer(HDC hdc, const RECT& panelRc) {
@@ -2609,6 +2694,9 @@ void CandidateWindow::applyWindowShape() {
     if (!hwnd_) {
         return;
     }
+    if (usesLayeredPresentation()) {
+        return;
+    }
 
     RECT rc = {};
     ::GetClientRect(hwnd_, &rc);
@@ -2635,6 +2723,19 @@ void CandidateWindow::applyWindowShape() {
         ::DeleteObject(dictionaryRegion);
     }
     ::SetWindowRgn(hwnd_, region, TRUE);
+}
+
+bool CandidateWindow::usesLayeredPresentation() const {
+    return hwnd_ &&
+           (::GetWindowLongPtr(hwnd_, GWL_EXSTYLE) & WS_EX_LAYERED) == WS_EX_LAYERED;
+}
+
+void CandidateWindow::resizeForLayout(int width, int height) {
+    UINT flags = SWP_NOZORDER | SWP_NOMOVE | SWP_NOACTIVATE;
+    if (usesLayeredPresentation()) {
+        flags |= SWP_NOREDRAW;
+    }
+    ::SetWindowPos(hwnd_, HWND_TOP, 0, 0, width, height, flags);
 }
 
 } // namespace Moqi
