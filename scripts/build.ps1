@@ -131,7 +131,10 @@ Write-Host ">> $submodulePatchScript -RepoRoot $RepoRoot"
 $ProtobufRoot = Resolve-ProtobufRoot -RequestedPath $ProtobufRoot
 $ProtobufSourceDir = Resolve-ProtobufSourceDir -RequestedPath $ProtobufSourceDir -RepoRoot $RepoRoot
 
-$commonConfigureArgs = @("-S", $RepoRoot)
+$commonConfigureArgs = @(
+  "-S", $RepoRoot,
+  "-DCMAKE_POLICY_VERSION_MINIMUM:STRING=3.5"
+)
 if (-not [string]::IsNullOrWhiteSpace($ProtobufRoot)) {
   Write-Host "[INFO] Using local protobuf root: $ProtobufRoot"
   $commonConfigureArgs += "-DMOQI_PROTOBUF_ROOT=$ProtobufRoot"
