@@ -114,6 +114,31 @@ The installer is written to:
 installer/dist/typeduck-windows-ime-setup.exe
 ```
 
+## Installer Command-Line Flags
+
+TypeDuck uses an Inno Setup installer. For managed or bulk deployment, run the installer from an elevated shell:
+
+```powershell
+typeduck-windows-ime-setup.exe /VERYSILENT /SUPPRESSMSGBOXES /NORESTART /LOG="C:\Temp\TypeDuck-install.log"
+```
+
+- `/SILENT` runs installation with a progress window and no wizard pages.
+- `/VERYSILENT` runs installation without the wizard or progress window. This is the recommended flag for bulk installation.
+- `/SUPPRESSMSGBOXES` answers standard installer message boxes automatically where possible. Use it with `/SILENT` or `/VERYSILENT`.
+- `/NORESTART` prevents the installer from restarting Windows automatically. If TSF files are locked, TypeDuck may finish registration after a later restart.
+- `/LOG="path"` writes an installer log for deployment diagnostics.
+- `/DIR="path"` overrides the install directory. The default is `%ProgramFiles(x86)%\TypeDuckIME`.
+
+The silent installer still registers the TSF text service, installs the launcher startup entry, and runs the settings-apply path. It does not open the Settings or About windows at the end.
+
+The uninstaller is installed as `%ProgramFiles(x86)%\TypeDuckIME\unins000.exe` and accepts the same silent/logging flags:
+
+```powershell
+& "$env:ProgramFiles(x86)\TypeDuckIME\unins000.exe" /VERYSILENT /SUPPRESSMSGBOXES /NORESTART /LOG="C:\Temp\TypeDuck-uninstall.log"
+```
+
+Interactive uninstall asks whether to delete personal TypeDuck settings and dictionary data. Silent uninstall skips that prompt and preserves roaming user data under `%APPDATA%\TypeDuckIME`; local TypeDuck logs/cache under `%LOCALAPPDATA%\TypeDuckIME` are removed by the uninstaller.
+
 ## Runtime Layout
 
 The installed application uses this product layout:
