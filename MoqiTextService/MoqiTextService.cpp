@@ -1033,7 +1033,6 @@ void TextService::createCandidateWindow(Ime::EditSession* session) {
 		else {
 			appendCandidateWindowLog(L"[TextService::createCandidateWindow] elementMgr unavailable");
 		}
-		candidateWindow_->Show(shouldShowCandidateWindowUI_ ? TRUE : FALSE);
 		if (!shouldShowCandidateWindowUI_) {
 			appendCandidateWindowLog(L"[TextService::createCandidateWindow] candidate window suppressed by UI-less host");
 		}
@@ -1103,12 +1102,14 @@ void TextService::updateCandidates(Ime::EditSession* session) {
 			candidateWindow_->add(candidates_[i], selKeys_[i]);
 		}
 		candidateWindow_->recalculateSize();
-		candidateWindow_->refresh();
 		markCandidateContentApplied(renderedPreedit);
 		hasAppliedCandidateCursor_ = false;
 	}
 
 	moveCandidateWindowToInputRect(session, L"updateCandidates", true);
+	if (contentChanged) {
+		candidateWindow_->refresh();
+	}
 
 	if (showingCandidates_) {
 		candidateWindow_->Show(shouldShowCandidateWindowUI_ ? TRUE : FALSE);
@@ -1303,11 +1304,10 @@ void TextService::showCandidates(Ime::EditSession* session) {
 	createCandidateWindow(session);
 	if (candidateWindow_) {
 		candidateWindow_->syncOwner(session);
-		candidateWindow_->Show(shouldShowCandidateWindowUI_ ? TRUE : FALSE);
 	}
 	showingCandidates_ = true;
 	pendingCandidateRecovery_ = false;
-	appendCandidateWindowLog(L"[TextService::showCandidates] shown");
+	appendCandidateWindowLog(L"[TextService::showCandidates] pending first positioned update");
 }
 
 // hide candidate list window
