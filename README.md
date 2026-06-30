@@ -4,48 +4,43 @@ TypeDuck Windows is a Cantonese input method for Windows users in Hong Kong, bui
 
 TypeDuck Windows 係為香港 Windows 用戶而設嘅粵語輸入法，使用 Microsoft Text Services Framework，並配合 TypeDuck Rime Runtime 提供候選字、粵拼同字典式提示。
 
-## What You Get / 你會得到咩
+## Features / 功能
 
-- TypeDuck Cantonese IME registered under Chinese (Traditional, Hong Kong) / `zh-HK`.
-- TypeDuck 粵語輸入法會註冊喺「中文（繁體，香港）」/ `zh-HK`。
-- Candidate, Jyutping, and dictionary-style details in a Windows candidate window.
-- 候選窗會顯示候選字、粵拼同字典式資料。
-- A bilingual installer, settings window, about dialog, and Start Menu shortcuts.
-- 雙語安裝程式、設定視窗、關於視窗同開始功能表捷徑。
-- Local settings stored per user, with Rime-affecting options applied through the TypeDuck runtime.
-- 每位用戶有獨立設定；影響 Rime 嘅選項會經 TypeDuck Runtime 套用。
+- TypeDuck Cantonese IME registered under Chinese (Traditional, Hong Kong) / `zh-HK`.<br>
+  TypeDuck 粵語輸入法會註冊喺「中文（繁體，香港）」/ `zh-HK`。
+- Candidate, Jyutping, and dictionary-style details in a Windows candidate window.<br>
+  候選窗會顯示候選字、粵拼同字典式資料。
+- A bilingual installer, settings window, about dialog, and Start Menu shortcuts.<br>
+  雙語安裝程式、設定視窗、關於視窗同開始功能表捷徑。
+- Local settings stored per user, with Rime-affecting options applied through the TypeDuck runtime.<br>
+  每位用戶有獨立設定；影響 Rime 嘅選項會經 TypeDuck Runtime 套用。
 
 ## Install / 安裝
 
-Download the latest installer from [TypeDuck-Windows releases](https://github.com/TypeDuck-HK/TypeDuck-Windows/releases), then run:
+Download and run the latest installer from [TypeDuck-Windows releases](https://github.com/TypeDuck-HK/TypeDuck-Windows/releases).
 
-請到 [TypeDuck-Windows releases](https://github.com/TypeDuck-HK/TypeDuck-Windows/releases) 下載最新安裝程式，然後執行：
-
-```text
-typeduck-windows-ime-setup.exe
-```
+請喺 [TypeDuck-Windows releases](https://github.com/TypeDuck-HK/TypeDuck-Windows/releases) 下載並執行最新安裝程式。
 
 After installation, choose **TypeDuck 粵語輸入法 / TypeDuck Cantonese IME** under Chinese (Traditional, Hong Kong).
 
 安裝完成後，請喺「中文（繁體，香港）」下面揀 **TypeDuck 粵語輸入法 / TypeDuck Cantonese IME**。
 
-## First Use / 第一次使用
+## Usage / 用法
 
-1. Open any Windows app that accepts text.
-2. Switch to Chinese (Traditional, Hong Kong), then select TypeDuck.
-3. Type Cantonese input codes and choose a candidate from the TypeDuck candidate window.
-4. Open **輸入法設定 IME Settings** from the Start Menu or launcher tray icon to adjust preferences.
-
-1. 開啟任何可以輸入文字嘅 Windows 應用程式。
-2. 切換到中文（繁體，香港），再揀 TypeDuck。
-3. 輸入粵語編碼，喺 TypeDuck 候選窗揀字。
-4. 如要調整設定，可由開始功能表或工具列圖示開啟 **輸入法設定 IME Settings**。
+1. Open any Windows app that accepts text.<br>
+   開啟任何可以輸入文字嘅 Windows 應用程式。
+2. Switch to Chinese (Traditional, Hong Kong), then select TypeDuck.<br>
+   切換至中文（繁體，香港），再揀 TypeDuck。
+3. Type Cantonese Jyutping and choose a candidate from the TypeDuck candidate window.<br>
+   輸入粵拼，喺 TypeDuck 候選窗揀字。
+4. Open **IME Settings** from the Start Menu or launcher tray icon to adjust preferences.<br>
+   如要調整設定，可由開始功能表或工具列圖示開啟 **輸入法設定 IME Settings**。
 
 ## User Settings / 用戶設定
 
-The settings app includes bilingual controls for candidate count, display languages, Chinese typeface, Jyutping visibility, completion, correction, sentence composition, input memory, reverse lookup display, and Cangjie version.
+The settings app includes controls for candidate count, display languages, Chinese typeface, Jyutping visibility, completion, correction, sentence composition, input memory, reverse lookup display, and Cangjie version.
 
-設定程式提供雙語控制項，包括每頁候選數量、顯示語言、中文字體、候選詞粵拼、自動完成、自動校正、自動組詞、輸入記憶、反查顯示同倉頡版本。
+設定程式提供各種控制項，包括每頁候選數量、顯示語言、中文字體、候選詞粵拼、自動完成、自動校正、自動組詞、輸入記憶、反查顯示同倉頡版本。
 
 ## Repositories
 
