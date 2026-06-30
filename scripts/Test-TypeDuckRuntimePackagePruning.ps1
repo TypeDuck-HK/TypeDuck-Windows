@@ -214,7 +214,8 @@ if (Test-Path -LiteralPath $sourceBackends -PathType Leaf) {
 Assert-SourceText $violations $backendBuildScript '\$PackageDir\s*=\s*Join-Path\s+\$BuildRoot\s+"TypeDuckRuntime"' "Backend build default package output must be scripts/build/TypeDuckRuntime."
 Assert-SourceNotText $violations $backendBuildScript 'backends\.moqi-ime\.json|Generate backends\.json snippet|workingDir\s*=\s*"moqi-ime"|command\s*=\s*"moqi-ime\\server\.exe"' "Backend build must not emit legacy backend snippets."
 Assert-SourceNotText $violations $backendBuildScript '\$packageAppearanceThemesData\s*=|Packaged appearance theme compatibility copy|compatibility data path' "Backend build must not package input_methods/rime/data/appearance_themes.json."
-Assert-SourceText $violations $backendBuildScript 'input_methods\\rime\\appearance_themes\.json' "Backend build must preserve canonical input_methods/rime/appearance_themes.json."
+Assert-SourceText $violations $backendBuildScript '\$runtimeFiles\s*=\s*@\([^)]*"appearance_themes\.json"[^)]*\)' "Backend build must whitelist canonical input_methods/rime/appearance_themes.json."
+Assert-SourceText $violations $backendBuildScript '\$destinationPath\s*=\s*Join-Path\s+\$PackageRimeDir\s+\$name' "Backend build must stage whitelisted Rime runtime files at input_methods/rime."
 Assert-SourceText $violations $backendServer 'typeDuckProfileGUID\s*=\s*"\{c6e8f5df-6504-44f9-b7cf-17a195373a83\}"' "Backend must register the fixed TypeDuck profile GUID after ime.json is pruned."
 Assert-SourceText $violations $backendServer 'registerTypeDuckRimeService\(server\)' "Backend startup must register TypeDuck Rime without relying on packaged ime.json metadata."
 

@@ -137,8 +137,9 @@ Assert-True ($compatProbeIndex -ge 0) "Backend loader may keep data-path compati
 Assert-True ($canonicalProbeIndex -lt $compatProbeIndex) "Backend loader must prefer the canonical root theme file before the data compatibility copy."
 
 $buildScriptSource = Get-Content -Raw -Encoding UTF8 -LiteralPath $buildScriptPath
-Assert-True ($buildScriptSource.Contains('$sourceAppearanceThemes = Join-Path $RimeDir "appearance_themes.json"')) "Build script must source themes from canonical input_methods/rime/appearance_themes.json."
-Assert-True ($buildScriptSource.Contains('$packageAppearanceThemes = Join-Path $PackageRimeDir "appearance_themes.json"')) "Build script must stage the canonical root theme path."
+Assert-True ($buildScriptSource -match '\$runtimeFiles\s*=\s*@\([^)]*"appearance_themes\.json"[^)]*\)') "Build script must whitelist canonical input_methods/rime/appearance_themes.json."
+Assert-True ($buildScriptSource -match '\$sourcePath\s*=\s*Join-Path\s+\$RimeDir\s+\$name') "Build script must source whitelisted runtime files from input_methods/rime."
+Assert-True ($buildScriptSource -match '\$destinationPath\s*=\s*Join-Path\s+\$PackageRimeDir\s+\$name') "Build script must stage whitelisted runtime files at the canonical input_methods/rime root."
 Assert-True (-not $buildScriptSource.Contains('$packageAppearanceThemesData = Join-Path $PackageRimeDataDir "appearance_themes.json"')) "Build script must not stage a data-path appearance_themes.json compatibility copy."
 Assert-True (-not $buildScriptSource.Contains("Packaged appearance theme compatibility copy is not byte-identical")) "Build script must not retain compatibility-copy drift checks for the removed data-path theme file."
 
