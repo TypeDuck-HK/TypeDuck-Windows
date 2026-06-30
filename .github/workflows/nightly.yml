@@ -117,15 +117,6 @@ jobs:
         run: |
           $tag = "nightly"
           $assetPath = Join-Path $PWD ("installer\dist\" + $env:TYPEDUCK_INSTALLER_ASSET)
-          $notesPath = Join-Path $env:RUNNER_TEMP "nightly-notes.md"
-          $runUrl = "https://github.com/$env:GITHUB_REPOSITORY/actions/runs/$env:GITHUB_RUN_ID"
-
-          @(
-            "Automated nightly build from `main`."
-            ""
-            "Commit: $env:GITHUB_SHA"
-            "Run: $runUrl"
-          ) | Set-Content -LiteralPath $notesPath -Encoding utf8
 
           git tag --force $tag $env:GITHUB_SHA
           git push origin "refs/tags/$tag" --force
@@ -139,8 +130,7 @@ jobs:
 
           if (-not [string]::IsNullOrWhiteSpace($existingTag)) {
             gh release upload $tag $assetPath --clobber
-            gh release edit $tag --title "Nightly" --notes-file $notesPath
           }
           else {
-            gh release create $tag $assetPath --title "Nightly" --notes-file $notesPath --prerelease
+            gh release create $tag $assetPath --title "Nightly" --prerelease
           }
