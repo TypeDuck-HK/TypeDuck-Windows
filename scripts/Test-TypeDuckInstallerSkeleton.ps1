@@ -268,8 +268,6 @@ function Assert-SetupHelper {
 
     Assert-AllMatch $Failures $SetupHelper @(
         "TYPEDUCK_PROGRAM_DIR",
-        "MOQI_PROGRAM_DIR",
-        "transition-only|compatibility alias",
         "TypeDuckIME-ReRegisterTSF",
         "TypeDuckTextService\.dll",
         "Software\\\\TypeDuckIME",
@@ -283,6 +281,8 @@ function Assert-SetupHelper {
         "/u",
         "TypeDuckSetupHelper"
     ) "SetupHelper must use TypeDuck DLL/env/task identity and keep dual-bitness registration mechanics."
+    Assert-NotMatch $Failures $SetupHelper "MOQI_PROGRAM_DIR|transition-only|compatibility alias" `
+        "SetupHelper must not use the legacy MOQI_PROGRAM_DIR registration alias."
 
     Assert-BilingualCopy $Failures $SetupHelper "SetupHelper/SetupHelper.cpp"
     Assert-Match $Failures $SetupHelperCMake "OUTPUT_NAME\s+`"?TypeDuckSetupHelper|PROPERTIES[\s\S]*OUTPUT_NAME[\s\S]*TypeDuckSetupHelper" `

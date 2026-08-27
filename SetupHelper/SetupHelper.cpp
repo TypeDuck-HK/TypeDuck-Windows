@@ -15,8 +15,6 @@ constexpr int kExitFailure = 1;
 constexpr int kExitRestartRequired = 2;
 constexpr int kExitInvalidArgs = 3;
 constexpr wchar_t kProgramDirEnvVar[] = L"TYPEDUCK_PROGRAM_DIR";
-// Transition-only compatibility alias for Plan 03-01 registration paths.
-constexpr wchar_t kLegacyProgramDirEnvVar[] = L"MOQI_PROGRAM_DIR";
 constexpr wchar_t kReregisterTaskName[] = L"TypeDuckIME-ReRegisterTSF";
 constexpr wchar_t kTextServiceDllName[] = L"TypeDuckTextService.dll";
 constexpr wchar_t kSetupHelperCaption[] = L"TypeDuckSetupHelper";
@@ -366,16 +364,12 @@ bool RunRegsvr(const fs::path& regsvr_path,
   std::wstring working_dir = dll_path_for_process.parent_path().wstring();
   const EnvironmentVariableSnapshot previous_program_dir =
       CaptureEnvironmentVariable(kProgramDirEnvVar);
-  const EnvironmentVariableSnapshot previous_legacy_program_dir =
-      CaptureEnvironmentVariable(kLegacyProgramDirEnvVar);
   SetEnvironmentVariableW(kProgramDirEnvVar, program_dir.c_str());
-  SetEnvironmentVariableW(kLegacyProgramDirEnvVar, program_dir.c_str());
 
   DWORD exit_code = 0;
   const bool ran =
       RunProcess(regsvr_path.wstring(), mutable_command, working_dir, &exit_code);
   RestoreEnvironmentVariable(previous_program_dir);
-  RestoreEnvironmentVariable(previous_legacy_program_dir);
   if (!ran) {
     return false;
   }

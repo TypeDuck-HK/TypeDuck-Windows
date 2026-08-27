@@ -68,12 +68,6 @@ std::wstring environmentProgramDir() {
     return path;
   }
 
-  length = ::GetEnvironmentVariableW(
-      legacyProgramDirEnvVar(), path, static_cast<DWORD>(_countof(path)));
-  if (length > 0 && length < _countof(path)) {
-    return path;
-  }
-
   return std::wstring();
 }
 
@@ -131,10 +125,6 @@ const wchar_t* deployedDllName() {
 
 const wchar_t* programDirEnvVar() {
   return L"TYPEDUCK_PROGRAM_DIR";
-}
-
-const wchar_t* legacyProgramDirEnvVar() {
-  return L"MOQI_PROGRAM_DIR";
 }
 
 const wchar_t* installDirName() {

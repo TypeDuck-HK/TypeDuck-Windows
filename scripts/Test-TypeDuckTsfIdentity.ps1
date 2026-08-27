@@ -218,8 +218,8 @@ if ($Strict) {
         "Strict mode: CMake must list TypeDuckProfile.h."
     Assert-Match $failures $combinedSource "programDirEnvVar\(\)|TYPEDUCK_PROGRAM_DIR" `
         "Strict mode: TSF install-path code must prefer the centralized TYPEDUCK_PROGRAM_DIR source."
-    Assert-Match $failures $combinedSource "legacyProgramDirEnvVar\(\)|MOQI_PROGRAM_DIR" `
-        "Strict mode: TSF install-path code should retain MOQI_PROGRAM_DIR only as a compatibility fallback during transition."
+    Assert-NotMatch $failures $combinedSource "legacyProgramDirEnvVar\(\)|MOQI_PROGRAM_DIR" `
+        "Strict mode: TSF install-path code must not use the legacy MOQI_PROGRAM_DIR alias."
     Assert-Match $failures $combinedSource "RegOpenKeyExW" `
         "Strict mode: TSF install-path code must read the persisted installer app directory."
     Assert-Match $failures $combinedSource "Software\\\\TypeDuckIME" `
