@@ -20,6 +20,8 @@ constexpr wchar_t kLegacyProgramDirEnvVar[] = L"MOQI_PROGRAM_DIR";
 constexpr wchar_t kReregisterTaskName[] = L"TypeDuckIME-ReRegisterTSF";
 constexpr wchar_t kTextServiceDllName[] = L"TypeDuckTextService.dll";
 constexpr wchar_t kSetupHelperCaption[] = L"TypeDuckSetupHelper";
+constexpr wchar_t kInstallRegistrySubkey[] = L"Software\\TypeDuckIME";
+constexpr wchar_t kInstallDirRegistryValue[] = L"InstallDir";
 
 enum class Action {
   kHelp,
@@ -652,6 +654,69 @@ bool CopyFileWithFallback(const fs::path& source,
   return false;
 }
 
+bool Is64BitWindows() {
+#if defined(_WIN64)
+  return true;
+#else
+  BOOL is_wow64 = FALSE;
+  return IsWow64Process(GetCurrentProcess(), &is_wow64) && is_wow64 == TRUE;
+#endif
+}
+
+std::vector<REGSAM> RegistryViewsForInstallDir() {
+  std::vector<REGSAM> views;
+  views.push_back(0);
+  if (Is64BitWindows()) {
+    views.push_back(KEY_WOW64_32KEY);
+    views.push_back(KEY_WOW64_64KEY);
+  }
+  return views;
+}
+
+bool WriteInstallDirectoryForView(const std::wstring& app_dir,
+                                  const REGSAM view) {
+  HKEY key = nullptr;
+  const LSTATUS open_status = RegCreateKeyExW(
+      HKEY_LOCAL_MACHINE, kInstallRegistrySubkey, 0, nullptr, 0,
+      KEY_SET_VALUE | view, nullptr, &key, nullptr);
+  if (open_status != ERROR_SUCCESS) {
+    return false;
+  }
+  const DWORD bytes =
+      static_cast<DWORD>((app_dir.size() + 1) * sizeof(wchar_t));
+  const LSTATUS set_status = RegSetValueExW(
+      key, kInstallDirRegistryValue, 0, REG_SZ,
+      reinterpret_cast<const BYTE*>(app_dir.c_str()), bytes);
+  RegCloseKey(key);
+  return set_status == ERROR_SUCCESS;
+}
+
+bool PersistInstallDirectory(const fs::path& app_dir) {
+  bool wrote_all = true;
+  for (const REGSAM view : RegistryViewsForInstallDir()) {
+    wrote_all = WriteInstallDirectoryForView(app_dir.wstring(), view) && wrote_all;
+  }
+  return wrote_all;
+}
+
+void DeleteInstallDirectoryForView(const REGSAM view) {
+  HKEY key = nullptr;
+  const LSTATUS open_status = RegOpenKeyExW(
+      HKEY_LOCAL_MACHINE, kInstallRegistrySubkey, 0,
+      KEY_SET_VALUE | view, &key);
+  if (open_status != ERROR_SUCCESS) {
+    return;
+  }
+  RegDeleteValueW(key, kInstallDirRegistryValue);
+  RegCloseKey(key);
+}
+
+void DeleteInstallDirectoryRegistryValue() {
+  for (const REGSAM view : RegistryViewsForInstallDir()) {
+    DeleteInstallDirectoryForView(view);
+  }
+}
+
 int ShowFailureAndReturn(const std::wstring& message, const bool silent) {
   ShowMessage(message, kSetupHelperCaption, MB_ICONERROR | MB_OK, silent);
   return kExitFailure;
@@ -678,6 +743,13 @@ int RunReregister(const Options& options) {
   CleanupStaleOldFiles(dest64);
   CleanupStaleRebootCopies(source32);
   CleanupStaleRebootCopies(source64);
+
+  if (!PersistInstallDirectory(app_dir)) {
+    return ShowFailureAndReturn(
+        Bilingual(L"未能儲存 TypeDuck 安裝位置。",
+                  L"Unable to save the TypeDuck install location."),
+        options.silent);
+  }
 
   if (!RunRegsvr(regsvr32, dest32, app_dir, false)) {
     return ShowFailureAndReturn(TypingSetupFailureMessage(), options.silent);
@@ -712,6 +784,13 @@ int RunInstall(const Options& options) {
     return ShowFailureAndReturn(
         Bilingual(L"缺少 x64 TypeDuck 安裝檔案: " + source64.wstring(),
                   L"Missing x64 TypeDuck payload: " + source64.wstring()),
+        options.silent);
+  }
+
+  if (!PersistInstallDirectory(app_dir)) {
+    return ShowFailureAndReturn(
+        Bilingual(L"未能儲存 TypeDuck 安裝位置。",
+                  L"Unable to save the TypeDuck install location."),
         options.silent);
   }
 
@@ -789,6 +868,7 @@ int RunUninstall(const Options& options) {
   DeleteReregisterTask();
   RunRegsvr(regsvr32, dest32, app_dir, true);
   RunRegsvr(regsvr64, dest64_for_regsvr, app_dir, true);
+  DeleteInstallDirectoryRegistryValue();
 
   bool reboot_required = false;
   if (!DeleteFileWithFallback(dest32, reboot_required)) {

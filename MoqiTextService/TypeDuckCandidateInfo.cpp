@@ -266,15 +266,15 @@ const std::vector<DisplayLanguage>& allDisplayLanguages() {
 std::wstring languageCode(DisplayLanguage language) {
   switch (language) {
   case DisplayLanguage::English:
-    return L"en";
+    return L"eng";
   case DisplayLanguage::Hindi:
-    return L"hi";
+    return L"hin";
   case DisplayLanguage::Indonesian:
-    return L"id";
+    return L"ind";
   case DisplayLanguage::Nepali:
-    return L"ne";
+    return L"nep";
   case DisplayLanguage::Urdu:
-    return L"ur";
+    return L"urd";
   }
   return L"";
 }
@@ -480,7 +480,7 @@ std::vector<LanguageRow> CandidateEntry::otherLanguages(
     }
     const std::wstring value = definition(language);
     if (!value.empty()) {
-      rows.push_back({languageCode(language), languageName(language), value});
+      rows.push_back({language, languageName(language), value});
     }
   }
   return rows;

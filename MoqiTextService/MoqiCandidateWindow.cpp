@@ -20,33 +20,13 @@
 
 namespace {
 
-constexpr COLORREF kWindowBackground = RGB(255, 255, 255);       // panel_background
-constexpr COLORREF kDictionaryBackground = RGB(246, 243, 237);   // dictionary_background
 constexpr COLORREF kLayeredTransparentColor = RGB(255, 0, 255);
-constexpr COLORREF kInputBufferBackground = RGB(246, 234, 216);  // input_buffer_background
-constexpr COLORREF kInputBufferText = RGB(70, 58, 42);           // input_buffer_text
-constexpr COLORREF kWindowBorder = RGB(222, 217, 207);           // panel_border
-constexpr COLORREF kDividerColor = RGB(222, 217, 207);
-constexpr COLORREF kItemText = RGB(36, 34, 30);                  // text_primary
-constexpr COLORREF kSecondaryText = RGB(105, 98, 88);            // text_secondary
-constexpr COLORREF kPronunciationText = RGB(102, 93, 82);        // pronunciation_text
-constexpr COLORREF kDefinitionText = RGB(78, 72, 63);            // definition_text
-constexpr COLORREF kDisabledText = RGB(168, 160, 148);           // disabled_text
-constexpr COLORREF kLinkText = RGB(151, 102, 31);                // link_text
-constexpr COLORREF kSelectedBackground = RGB(254, 220, 156);     // selection_background
-constexpr COLORREF kSelectedText = RGB(36, 34, 30);
-constexpr COLORREF kPosPillBackground = RGB(246, 243, 237);
-constexpr COLORREF kPosPillBorder = RGB(180, 171, 157);
-constexpr COLORREF kPosPillText = RGB(86, 79, 69);
-constexpr int kDefaultCandidateSpacing = 20;
 constexpr int kTypeDuckCandidatePanelRenderer = 1;
 constexpr int kMovementRevealThreshold = 2;
 constexpr int kPageNavNone = -1;
 constexpr int kPageNavPrevious = 0;
 constexpr int kPageNavNext = 1;
 constexpr int kWindowDpiBaseline = 96;
-constexpr const wchar_t* kDefaultCandidateFontName = L"Microsoft JhengHei";
-constexpr const wchar_t* kDefaultCommentFontName = L"Segoe UI";
 constexpr int kBorderWidth = 1;
 constexpr int kInitialCompactPanelPaddingX = 7;
 constexpr int kInitialCompactPanelPaddingY = 3;
@@ -82,7 +62,6 @@ constexpr int kCandidateBodyLineMinHeight = 25;
 constexpr int kCandidateRowLineMinHeight = 20;
 constexpr int kPageNavWidth = 64;
 constexpr int kPageNavPreeditlessHeight = 30;
-constexpr int kPageNavGlyphPointSize = 28;
 constexpr int kPageNavGlyphYOffset = 7;
 constexpr int kPageNavHoverRadius = 6;
 constexpr int kPreeditExtraHeight = 8;
@@ -123,9 +102,6 @@ constexpr int kDictionaryScrollThumbMinHeight = 24;
 constexpr int kDictionaryBridgeOverlap = 6;
 constexpr int kInlineBodySpacingUnit = 4;
 constexpr int kUnboundedMeasureHeight = 32000;
-constexpr COLORREF kDictionaryScrollTrack = RGB(224, 218, 208);
-constexpr COLORREF kDictionaryScrollThumb = RGB(166, 153, 132);
-constexpr const wchar_t* kInputBufferFontName = L"Microsoft JhengHei UI";
 
 Moqi::TextService* productTextService(Ime::TextService* service) {
     return static_cast<Moqi::TextService*>(service);
@@ -232,85 +208,6 @@ DpiPair dpiForOwnerWindow(HWND owner) {
     return dpi;
 }
 
-int fontPointHeightForDpi(int dpiY, int point) {
-    return -::MulDiv(point, (std::max)(kWindowDpiBaseline, dpiY), 72);
-}
-
-std::wstring trimFontToken(std::wstring value) {
-    const size_t stylePos = value.find(L':');
-    if (stylePos != std::wstring::npos) {
-        value = value.substr(0, stylePos);
-    }
-    const auto isSpace = [](wchar_t ch) { return std::iswspace(ch) != 0; };
-    const auto first = std::find_if_not(value.begin(), value.end(), isSpace);
-    const auto last = std::find_if_not(value.rbegin(), value.rend(), isSpace).base();
-    if (first >= last) {
-        return L"";
-    }
-    return std::wstring(first, last);
-}
-
-BOOL CALLBACK markFontFamilyFound(const LOGFONTW*, const TEXTMETRICW*, DWORD, LPARAM lParam) {
-    *reinterpret_cast<bool*>(lParam) = true;
-    return FALSE;
-}
-
-bool isFontFamilyInstalled(const std::wstring& faceName) {
-    if (faceName.empty()) {
-        return false;
-    }
-    HDC hdc = ::GetDC(nullptr);
-    if (!hdc) {
-        return false;
-    }
-    LOGFONTW lf{};
-    lf.lfCharSet = DEFAULT_CHARSET;
-    wcsncpy_s(lf.lfFaceName, _countof(lf.lfFaceName), faceName.c_str(), _TRUNCATE);
-    bool found = false;
-    ::EnumFontFamiliesExW(hdc, &lf, markFontFamilyFound, reinterpret_cast<LPARAM>(&found), 0);
-    ::ReleaseDC(nullptr, hdc);
-    return found;
-}
-
-std::wstring resolveFontFace(const std::wstring& requested, const wchar_t* fallback) {
-    size_t start = 0;
-    while (start <= requested.size()) {
-        const size_t comma = requested.find(L',', start);
-        const std::wstring candidate = trimFontToken(
-            requested.substr(start, comma == std::wstring::npos ? std::wstring::npos : comma - start));
-        if (isFontFamilyInstalled(candidate)) {
-            return candidate;
-        }
-        if (comma == std::wstring::npos) {
-            break;
-        }
-        start = comma + 1;
-    }
-    return fallback;
-}
-
-HFONT createPointFontForDpi(int dpiY,
-                            const wchar_t* faceName,
-                            int pointSize,
-                            int weight = FW_NORMAL,
-                            bool italic = false) {
-    return ::CreateFontW(
-        fontPointHeightForDpi(dpiY, pointSize),
-        0,
-        0,
-        0,
-        weight,
-        italic ? TRUE : FALSE,
-        FALSE,
-        FALSE,
-        DEFAULT_CHARSET,
-        OUT_DEFAULT_PRECIS,
-        CLIP_DEFAULT_PRECIS,
-        CLEARTYPE_QUALITY,
-        DEFAULT_PITCH | FF_DONTCARE,
-        faceName);
-}
-
 std::wstring currentProcessPath() {
     std::wstring buffer(MAX_PATH, L'\0');
     DWORD len = ::GetModuleFileNameW(nullptr, &buffer[0], static_cast<DWORD>(buffer.size()));
@@ -353,18 +250,6 @@ std::wstring formatCandidateWindowLogLine(const std::wstring& message) {
          << L"[exe=" << (exeName.empty() ? L"<unknown>" : exeName) << L"] "
          << message;
     return line.str();
-}
-
-HFONT createDerivedFont(HFONT baseFont, const wchar_t* faceName) {
-    LOGFONTW lf = {};
-    if (!baseFont || ::GetObjectW(baseFont, sizeof(lf), &lf) == 0) {
-        HFONT defaultFont = reinterpret_cast<HFONT>(::GetStockObject(DEFAULT_GUI_FONT));
-        if (!defaultFont || ::GetObjectW(defaultFont, sizeof(lf), &lf) == 0) {
-            return nullptr;
-        }
-    }
-    wcscpy_s(lf.lfFaceName, faceName);
-    return ::CreateFontIndirectW(&lf);
 }
 
 SIZE textExtent(HDC hdc, HFONT font, const std::wstring& text) {
@@ -544,8 +429,6 @@ CandidateWindow::CandidateWindow(Ime::TextService* service, Ime::EditSession* se
       textWidth_(0),
       commentWidth_(0),
       itemHeight_(0),
-      candPerRow_(1),
-      candSpacing_(kDefaultCandidateSpacing),
       colSpacing_(0),
       rowSpacing_(0),
       padX_(service->isImmersive() ? kPanelPaddingX : kInitialCompactPanelPaddingX),
@@ -581,12 +464,27 @@ CandidateWindow::CandidateWindow(Ime::TextService* service, Ime::EditSession* se
       movementRevealThreshold_(kMovementRevealThreshold),
       lastMouseMovePoint_{0, 0},
       hasLastMouseMovePoint_(false),
-      backgroundColor_(kWindowBackground),
-      highlightColor_(kSelectedBackground),
-      textColor_(kItemText),
-      highlightTextColor_(kSelectedText),
-      commentColor_(kItemText),
-      commentHighlightColor_(kSelectedText),
+      backgroundColor_(0),
+      dictionaryBackgroundColor_(0),
+      highlightColor_(0),
+      textColor_(0),
+      highlightTextColor_(0),
+      commentColor_(0),
+      commentHighlightColor_(0),
+      borderColor_(0),
+      inputBufferBackgroundColor_(0),
+      inputBufferTextColor_(0),
+      labelTextColor_(0),
+      pronunciationTextColor_(0),
+      definitionTextColor_(0),
+      metalanguageTextColor_(0),
+      activeTextColor_(0),
+      disabledTextColor_(0),
+      posPillBackgroundColor_(0),
+      posPillBorderColor_(0),
+      posPillTextColor_(0),
+      dictionaryScrollTrackColor_(0),
+      dictionaryScrollThumbColor_(0),
       preeditCursor_(0),
       preeditSelectionStart_(0),
       preeditSelectionEnd_(0),
@@ -596,17 +494,29 @@ CandidateWindow::CandidateWindow(Ime::TextService* service, Ime::EditSession* se
       hoveredPageNavDirection_(kPageNavNone),
       dpiX_(kWindowDpiBaseline),
       dpiY_(kWindowDpiBaseline),
-      ownedFont_(nullptr),
-      ownedCommentFont_(nullptr),
+      interfaceFont_(nullptr),
+      inputBufferFont_(nullptr),
+      selectionLabelFont_(nullptr),
+      chineseFont_(nullptr),
+      pageNavigationFont_(nullptr),
+      infoIconFont_(nullptr),
+      dictionaryHeadwordFont_(nullptr),
+      dictionaryPronunciationFont_(nullptr),
+      dictionaryPronunciationTypeFont_(nullptr),
+      dictionaryMetaFont_(nullptr),
+      dictionaryPartOfSpeechFont_(nullptr),
+      dictionaryBodyFont_(nullptr),
+      dictionaryValueFont_(nullptr),
+      dictionaryCaptionFont_(nullptr),
       draggingWindow_(false),
-      trackingMouse_(false),
-      useCursor_(false),
-      commentFont_(nullptr) {
+      trackingMouse_(false) {
     margin_ = 0;
 
     const HWND rawOwner = resolveCandidateOwnerWindow(session);
     const HWND owner = normalizeCandidateOwnerWindow(rawOwner, service->isImmersive(), L"ctor");
     updateDpiFromOwner(owner);
+    refreshThemeColors();
+    refreshOwnedFonts();
     {
         ThreadDpiAwarenessScope dpiScope;
         create(owner, WS_POPUP | WS_CLIPCHILDREN,
@@ -623,14 +533,7 @@ CandidateWindow::CandidateWindow(Ime::TextService* service, Ime::EditSession* se
 }
 
 CandidateWindow::~CandidateWindow(void) {
-    if (ownedFont_) {
-        ::DeleteObject(ownedFont_);
-        ownedFont_ = nullptr;
-    }
-    if (ownedCommentFont_) {
-        ::DeleteObject(ownedCommentFont_);
-        ownedCommentFont_ = nullptr;
-    }
+    deleteOwnedFonts();
 }
 
 STDMETHODIMP CandidateWindow::GetDescription(BSTR* pbstrDescription) {
@@ -833,29 +736,11 @@ void CandidateWindow::clear() {
 }
 
 void CandidateWindow::setFont(HFONT) {
+    refreshThemeColors();
     refreshOwnedFonts();
     recalculateSize();
     if (isVisible()) {
         ::InvalidateRect(hwnd_, NULL, TRUE);
-    }
-}
-
-void CandidateWindow::setCandPerRow(int n) {
-    n = (std::max)(1, n);
-    if (candPerRow_ != n) {
-        candPerRow_ = n;
-        recalculateSize();
-    }
-}
-
-void CandidateWindow::setCandSpacing(int spacing) {
-    spacing = (std::max)(0, spacing);
-    if (candSpacing_ != spacing) {
-        candSpacing_ = spacing;
-        recalculateSize();
-        if (isVisible()) {
-            ::InvalidateRect(hwnd_, NULL, TRUE);
-        }
     }
 }
 
@@ -879,13 +764,6 @@ void CandidateWindow::setCurrentSel(int sel) {
         if (isVisible()) {
             ::InvalidateRect(hwnd_, NULL, TRUE);
         }
-    }
-}
-
-void CandidateWindow::setUseCursor(bool use) {
-    useCursor_ = use;
-    if (isVisible()) {
-        ::InvalidateRect(hwnd_, NULL, TRUE);
     }
 }
 
@@ -936,64 +814,11 @@ void CandidateWindow::setPreeditSelection(int start, int end) {
 }
 
 void CandidateWindow::setCommentFont(HFONT) {
+    refreshThemeColors();
     refreshOwnedFonts();
     recalculateSize();
     if (isVisible()) {
         ::InvalidateRect(hwnd_, NULL, TRUE);
-    }
-}
-
-void CandidateWindow::setBackgroundColor(COLORREF color) {
-    if (backgroundColor_ != color) {
-        backgroundColor_ = color;
-        if (isVisible()) {
-            ::InvalidateRect(hwnd_, NULL, TRUE);
-        }
-    }
-}
-
-void CandidateWindow::setHighlightColor(COLORREF color) {
-    if (highlightColor_ != color) {
-        highlightColor_ = color;
-        if (isVisible()) {
-            ::InvalidateRect(hwnd_, NULL, TRUE);
-        }
-    }
-}
-
-void CandidateWindow::setTextColor(COLORREF color) {
-    if (textColor_ != color) {
-        textColor_ = color;
-        if (isVisible()) {
-            ::InvalidateRect(hwnd_, NULL, TRUE);
-        }
-    }
-}
-
-void CandidateWindow::setHighlightTextColor(COLORREF color) {
-    if (highlightTextColor_ != color) {
-        highlightTextColor_ = color;
-        if (isVisible()) {
-            ::InvalidateRect(hwnd_, NULL, TRUE);
-        }
-    }
-}
-
-void CandidateWindow::setCommentColor(COLORREF color) {
-    if (commentColor_ != color) {
-        commentColor_ = color;
-        if (isVisible()) {
-            ::InvalidateRect(hwnd_, NULL, TRUE);
-        }
-    }
-}
-
-void CandidateWindow::setCommentHighlightColor(COLORREF color) {
-    if (commentHighlightColor_ != color) {
-        commentHighlightColor_ = color;
-        if (isVisible()) {
-            ::InvalidateRect(hwnd_, NULL, TRUE);
-        }
     }
 }
 
@@ -1077,26 +902,91 @@ bool CandidateWindow::updateDpiFromOwner(HWND owner) {
 
 void CandidateWindow::refreshOwnedFonts() {
     auto* service = productTextService(textService_);
-    const std::wstring candidateFace = service->candFontName().empty()
-                                           ? kDefaultCandidateFontName
-                                           : resolveFontFace(service->candFontName(), kDefaultCandidateFontName);
-    const std::wstring commentFace = service->candCommentFontName().empty()
-                                         ? kDefaultCommentFontName
-                                         : resolveFontFace(service->candCommentFontName(), kDefaultCommentFontName);
-
-    HFONT nextFont = createPointFontForDpi(dpiY_, candidateFace.c_str(), service->candFontSize());
-    HFONT nextCommentFont = createPointFontForDpi(dpiY_, commentFace.c_str(), service->candCommentFontSize());
-
-    if (ownedFont_) {
-        ::DeleteObject(ownedFont_);
+    deleteOwnedFonts();
+    interfaceFont_ = service->createCandidateFontForDpi(CandidateFontRole::Interface, dpiY_);
+    inputBufferFont_ = service->createCandidateFontForDpi(CandidateFontRole::InputBuffer, dpiY_);
+    selectionLabelFont_ = service->createCandidateFontForDpi(CandidateFontRole::SelectionLabel, dpiY_);
+    chineseFont_ = service->createCandidateFontForDpi(CandidateFontRole::Chinese, dpiY_);
+    pageNavigationFont_ = service->createCandidateFontForDpi(CandidateFontRole::PageNavigation, dpiY_);
+    infoIconFont_ = service->createCandidateFontForDpi(CandidateFontRole::InfoIcon, dpiY_);
+    dictionaryHeadwordFont_ = service->createCandidateFontForDpi(CandidateFontRole::DictionaryHeadword, dpiY_);
+    dictionaryPronunciationFont_ = service->createCandidateFontForDpi(CandidateFontRole::DictionaryPronunciation, dpiY_);
+    dictionaryPronunciationTypeFont_ = service->createCandidateFontForDpi(CandidateFontRole::DictionaryPronunciationType, dpiY_);
+    dictionaryMetaFont_ = service->createCandidateFontForDpi(CandidateFontRole::DictionaryMeta, dpiY_);
+    dictionaryPartOfSpeechFont_ = service->createCandidateFontForDpi(CandidateFontRole::DictionaryPartOfSpeech, dpiY_);
+    dictionaryBodyFont_ = service->createCandidateFontForDpi(CandidateFontRole::DictionaryBody, dpiY_);
+    dictionaryValueFont_ = service->createCandidateFontForDpi(CandidateFontRole::DictionaryValue, dpiY_);
+    dictionaryCaptionFont_ = service->createCandidateFontForDpi(CandidateFontRole::DictionaryCaption, dpiY_);
+    for (TypeDuck::DisplayLanguage language : TypeDuck::allDisplayLanguages()) {
+        candidateDefinitionFonts_[language] =
+            service->createCandidateLanguageFontForDpi(language, CandidateFontRole::CandidateDefinition, dpiY_);
+        dictionaryLanguageFonts_[language] =
+            service->createCandidateLanguageFontForDpi(language, CandidateFontRole::DictionaryLanguage, dpiY_);
     }
-    if (ownedCommentFont_) {
-        ::DeleteObject(ownedCommentFont_);
+    font_ = chineseFont_;
+}
+
+void CandidateWindow::deleteOwnedFonts() {
+    std::vector<HFONT*> fonts = {
+        &interfaceFont_, &inputBufferFont_, &selectionLabelFont_, &chineseFont_,
+        &pageNavigationFont_, &infoIconFont_, &dictionaryHeadwordFont_,
+        &dictionaryPronunciationFont_, &dictionaryPronunciationTypeFont_,
+        &dictionaryMetaFont_, &dictionaryPartOfSpeechFont_, &dictionaryBodyFont_,
+        &dictionaryValueFont_, &dictionaryCaptionFont_};
+    for (HFONT* font : fonts) {
+        if (*font) {
+            ::DeleteObject(*font);
+            *font = nullptr;
+        }
     }
-    ownedFont_ = nextFont;
-    ownedCommentFont_ = nextCommentFont;
-    font_ = ownedFont_ ? ownedFont_ : static_cast<HFONT>(::GetStockObject(DEFAULT_GUI_FONT));
-    commentFont_ = ownedCommentFont_;
+    for (auto& item : candidateDefinitionFonts_) {
+        if (item.second) {
+            ::DeleteObject(item.second);
+        }
+    }
+    candidateDefinitionFonts_.clear();
+    for (auto& item : dictionaryLanguageFonts_) {
+        if (item.second) {
+            ::DeleteObject(item.second);
+        }
+    }
+    dictionaryLanguageFonts_.clear();
+    font_ = nullptr;
+}
+
+void CandidateWindow::refreshThemeColors() {
+    auto* service = productTextService(textService_);
+    backgroundColor_ = service->candidateColor(CandidateColorRole::PanelBackground);
+    dictionaryBackgroundColor_ = service->candidateColor(CandidateColorRole::DictionaryBackground);
+    highlightColor_ = service->candidateColor(CandidateColorRole::SelectionBackground);
+    textColor_ = service->candidateColor(CandidateColorRole::ItemText);
+    highlightTextColor_ = textColor_;
+    commentColor_ = service->candidateColor(CandidateColorRole::LabelText);
+    commentHighlightColor_ = commentColor_;
+    borderColor_ = service->candidateColor(CandidateColorRole::PanelBorder);
+    inputBufferBackgroundColor_ = service->candidateColor(CandidateColorRole::InputBufferBackground);
+    inputBufferTextColor_ = service->candidateColor(CandidateColorRole::InputBufferText);
+    labelTextColor_ = service->candidateColor(CandidateColorRole::LabelText);
+    pronunciationTextColor_ = service->candidateColor(CandidateColorRole::PronunciationText);
+    definitionTextColor_ = service->candidateColor(CandidateColorRole::DefinitionText);
+    metalanguageTextColor_ = service->candidateColor(CandidateColorRole::MetalanguageText);
+    activeTextColor_ = service->candidateColor(CandidateColorRole::ActiveText);
+    disabledTextColor_ = service->candidateColor(CandidateColorRole::DisabledText);
+    posPillBackgroundColor_ = dictionaryBackgroundColor_;
+    posPillBorderColor_ = service->candidateColor(CandidateColorRole::PosPillBorder);
+    posPillTextColor_ = metalanguageTextColor_;
+    dictionaryScrollTrackColor_ = service->candidateColor(CandidateColorRole::DictionaryScrollTrack);
+    dictionaryScrollThumbColor_ = service->candidateColor(CandidateColorRole::DictionaryScrollThumb);
+}
+
+HFONT CandidateWindow::candidateDefinitionFont(TypeDuck::DisplayLanguage language) const {
+    const auto found = candidateDefinitionFonts_.find(language);
+    return found != candidateDefinitionFonts_.end() ? found->second : interfaceFont_;
+}
+
+HFONT CandidateWindow::dictionaryLanguageFont(TypeDuck::DisplayLanguage language) const {
+    const auto found = dictionaryLanguageFonts_.find(language);
+    return found != dictionaryLanguageFonts_.end() ? found->second : interfaceFont_;
 }
 
 void CandidateWindow::recalculateSize() {
@@ -1167,26 +1057,24 @@ void CandidateWindow::recalculateSize() {
     bool hasDefinitionColumn = false;
     bool hasIndicatorColumn = false;
 
-    HGDIOBJ oldFont = ::SelectObject(hdc, font_);
-    HFONT rowMetaFont = createPointFontForDpi(dpiY_, L"Segoe UI", 12);
+    HGDIOBJ oldFont = ::SelectObject(hdc, chineseFont_);
+    HFONT rowMetaFont = selectionLabelFont_;
     TEXTMETRICW metrics = {};
     TEXTMETRICW commentMetrics = {};
     ::GetTextMetricsW(hdc, &metrics);
-    if (commentFont_) {
-        ::SelectObject(hdc, commentFont_);
-        ::GetTextMetricsW(hdc, &commentMetrics);
-        ::SelectObject(hdc, font_);
-    }
+    ::SelectObject(hdc, interfaceFont_);
+    ::GetTextMetricsW(hdc, &commentMetrics);
+    ::SelectObject(hdc, chineseFont_);
     const int bodyLineHeight = (std::max)(
         scalePx(kCandidateBodyLineMinHeight),
         static_cast<int>((std::max)(
             metrics.tmHeight + metrics.tmExternalLeading,
-            commentFont_ ? commentMetrics.tmHeight + commentMetrics.tmExternalLeading : 0)));
+            commentMetrics.tmHeight + commentMetrics.tmExternalLeading)));
     auto measureWithFont = [&](HFONT font, const std::wstring& value) -> int {
         if (value.empty()) {
             return 0;
         }
-        HGDIOBJ previous = ::SelectObject(hdc, font ? font : font_);
+        HGDIOBJ previous = ::SelectObject(hdc, font);
         SIZE size = {};
         ::GetTextExtentPoint32W(hdc, value.c_str(), static_cast<int>(value.length()), &size);
         ::SelectObject(hdc, previous);
@@ -1205,7 +1093,7 @@ void CandidateWindow::recalculateSize() {
         SIZE selKeySize = {};
         wchar_t selKey[] = L"?.";
         selKey[0] = selKeys_[i];
-        HGDIOBJ previousFont = ::SelectObject(hdc, rowMetaFont ? rowMetaFont : font_);
+        HGDIOBJ previousFont = ::SelectObject(hdc, rowMetaFont);
         ::GetTextExtentPoint32W(hdc, selKey, 2, &selKeySize);
         ::SelectObject(hdc, previousFont);
         selKeyWidth_ = (std::max)(selKeyWidth_, static_cast<int>(selKeySize.cx));
@@ -1218,11 +1106,11 @@ void CandidateWindow::recalculateSize() {
         itemTextWidths_[i] = static_cast<int>(candidateSize.cx);
         textWidth_ = (std::max)(textWidth_, static_cast<int>(candidateSize.cx));
         const int candidateEntryRows = entryRowCount(item);
-        if (!itemComment.empty() && commentFont_) {
+        if (!itemComment.empty()) {
             SIZE commentSize = {};
-            ::SelectObject(hdc, commentFont_);
+            ::SelectObject(hdc, interfaceFont_);
             ::GetTextExtentPoint32W(hdc, itemComment.c_str(), static_cast<int>(itemComment.length()), &commentSize);
-            ::SelectObject(hdc, font_);
+            ::SelectObject(hdc, chineseFont_);
             itemCommentWidths_[i] = static_cast<int>(commentSize.cx);
             commentWidth_ = (std::max)(commentWidth_, static_cast<int>(commentSize.cx));
         }
@@ -1246,12 +1134,12 @@ void CandidateWindow::recalculateSize() {
                 hasJyutpingColumn = true;
                 jyutpingContentWidth = (std::max)(
                     jyutpingContentWidth,
-                    measureWithFont(rowMetaFont ? rowMetaFont : (commentFont_ ? commentFont_ : font_), entry.jyutping));
+                    measureWithFont(interfaceFont_, entry.jyutping));
             }
 
             const std::wstring honzi = entry.honzi.empty() ? item.displayText() : entry.honzi;
             if (!honzi.empty()) {
-                honziContentWidth = (std::max)(honziContentWidth, measureWithFont(font_, honzi));
+                honziContentWidth = (std::max)(honziContentWidth, measureWithFont(chineseFont_, honzi));
             }
 
             const std::wstring note = (!item.candidateInfo.isReverseLookup || displayPreferences_.showReverseCode)
@@ -1261,7 +1149,7 @@ void CandidateWindow::recalculateSize() {
                 hasNoteColumn = true;
                 noteContentWidth = (std::max)(
                     noteContentWidth,
-                    measureWithFont(commentFont_ ? commentFont_ : font_, note));
+                    measureWithFont(interfaceFont_, note));
             }
 
             const std::wstring definition = layoutDefinition(entry, item);
@@ -1269,7 +1157,7 @@ void CandidateWindow::recalculateSize() {
                 hasDefinitionColumn = true;
                 definitionContentWidth = (std::max)(
                     definitionContentWidth,
-                    measureWithFont(commentFont_ ? commentFont_ : font_, definition));
+                    measureWithFont(candidateDefinitionFont(displayPreferences_.mainLanguage), definition));
             }
         }
         if (item.candidateInfo.hasDictionaryEntry(displayPreferences_)) {
@@ -1277,14 +1165,10 @@ void CandidateWindow::recalculateSize() {
         }
     }
     if (!preedit_.empty()) {
-        HFONT inputFont = createDerivedFont(font_, kInputBufferFontName);
-        HGDIOBJ previousFont = ::SelectObject(hdc, inputFont ? inputFont : font_);
+        HGDIOBJ previousFont = ::SelectObject(hdc, inputBufferFont_);
         SIZE preeditSize = {};
         ::GetTextExtentPoint32W(hdc, preedit_.c_str(), static_cast<int>(preedit_.length()), &preeditSize);
         ::SelectObject(hdc, previousFont);
-        if (inputFont) {
-            ::DeleteObject(inputFont);
-        }
         preeditWidth = static_cast<int>(preeditSize.cx) + scalePx(kPreeditTextWidthPadding);
         textWidth_ = (std::max)(textWidth_, static_cast<int>(preeditSize.cx));
         preeditHeight_ = static_cast<int>(preeditSize.cy);
@@ -1293,13 +1177,13 @@ void CandidateWindow::recalculateSize() {
     int dictionaryContentWidth = 0;
     dictionaryContentHeight_ = 0;
     if (dictionaryPanelVisible()) {
-        HFONT entryFont = createPointFontForDpi(dpiY_, L"DFKai-SB", 32);
-        HFONT pronFont = createPointFontForDpi(dpiY_, L"Segoe UI", 15);
-        HFONT pronTypeFont = createPointFontForDpi(dpiY_, L"Segoe UI", 12);
-        HFONT posFont = createPointFontForDpi(dpiY_, L"Segoe UI", 10);
-        HFONT bodyFont = createPointFontForDpi(dpiY_, L"Segoe UI", 12);
-        HFONT valueFont = createPointFontForDpi(dpiY_, L"Microsoft JhengHei", 12);
-        HFONT captionFont = createPointFontForDpi(dpiY_, L"Segoe UI", 13, FW_SEMIBOLD);
+        HFONT entryFont = dictionaryHeadwordFont_;
+        HFONT pronFont = dictionaryPronunciationFont_;
+        HFONT pronTypeFont = dictionaryPronunciationTypeFont_;
+        HFONT posFont = dictionaryPartOfSpeechFont_;
+        HFONT bodyFont = dictionaryBodyFont_;
+        HFONT valueFont = dictionaryValueFont_;
+        HFONT captionFont = dictionaryCaptionFont_;
         const int titleGap = scalePx(kDictionaryHeaderGap);
         const int posPadding = scalePx(kDictionaryPosPadding);
         const int posGap = scalePx(kDictionaryPosGap);
@@ -1396,13 +1280,6 @@ void CandidateWindow::recalculateSize() {
                 }
             }
         }
-        ::DeleteObject(captionFont);
-        ::DeleteObject(valueFont);
-        ::DeleteObject(bodyFont);
-        ::DeleteObject(posFont);
-        ::DeleteObject(pronTypeFont);
-        ::DeleteObject(pronFont);
-        ::DeleteObject(entryFont);
     }
     dictionaryPanelWidth_ = dictionaryPanelVisible()
                                 ? (std::max)(dictionaryContentWidth + scalePx(kDictionaryMeasureWidthPadding),
@@ -1420,9 +1297,6 @@ void CandidateWindow::recalculateSize() {
             paintDictionaryEntry(hdc, y, measureRc, entry, false);
         }
         dictionaryContentHeight_ = (std::max)(0, static_cast<int>(y - measureRc.top));
-    }
-    if (rowMetaFont) {
-        ::DeleteObject(rowMetaFont);
     }
     ::SelectObject(hdc, oldFont);
     ::ReleaseDC(hwnd(), hdc);
@@ -1518,8 +1392,7 @@ void CandidateWindow::recalculateSize() {
 
     std::wostringstream log;
     log << L"[CandidateWindow::recalculateSize] items=" << items_.size()
-        << L" width=" << width << L" height=" << height
-        << L" perRow=" << candPerRow_;
+        << L" width=" << width << L" height=" << height;
     appendCandidateWindowLog(log.str());
 }
 
@@ -1587,7 +1460,7 @@ void CandidateWindow::renderSurface(HDC hdc, const RECT& rc, bool transparentOut
     ::DeleteObject(clearBrush);
 
     HBRUSH backgroundBrush = ::CreateSolidBrush(backgroundColor_);
-    HBRUSH borderBrush = ::CreateSolidBrush(kWindowBorder);
+    HBRUSH borderBrush = ::CreateSolidBrush(borderColor_);
     const int candidatePanelWidth = candidatePanelWidth_ > 0 ? candidatePanelWidth_ : rc.right - rc.left;
     const int dictionaryRight = candidatePanelWidth + panelGap_ + dictionaryPanelWidth_;
     RECT candidatePanelRc = {rc.left, rc.top, candidatePanelWidth, rc.top + candidatePanelHeight_};
@@ -1633,7 +1506,7 @@ void CandidateWindow::renderSurface(HDC hdc, const RECT& rc, bool transparentOut
         HRGN dictionaryRgn = ::CreateRoundRectRgn(
             dictionaryRc.left, dictionaryRc.top, dictionaryRc.right + 1, dictionaryRc.bottom + 1,
             borderRadius_ * 2, borderRadius_ * 2);
-        HBRUSH dictionaryBrush = ::CreateSolidBrush(kDictionaryBackground);
+        HBRUSH dictionaryBrush = ::CreateSolidBrush(dictionaryBackgroundColor_);
         ::FillRgn(hdc, dictionaryRgn, dictionaryBrush);
         ::FrameRgn(hdc, dictionaryRgn, borderBrush, borderWidth_, borderWidth_);
         ::DeleteObject(dictionaryBrush);
@@ -1721,8 +1594,7 @@ void CandidateWindow::paintInputBuffer(HDC hdc, const RECT& panelRc) {
         panelRc.top + borderWidth_ + padY_,
         panelRc.right - borderWidth_ - padX_ - pageNavWidth_,
         panelRc.top + borderWidth_ + padY_ + preeditHeight_ + scalePx(kPreeditExtraHeight)};
-    HFONT inputFont = createDerivedFont(font_, kInputBufferFontName);
-    HGDIOBJ oldFont = ::SelectObject(hdc, inputFont ? inputFont : font_);
+    HGDIOBJ oldFont = ::SelectObject(hdc, inputBufferFont_);
     ::SetBkMode(hdc, TRANSPARENT);
 
     const int length = static_cast<int>(preedit_.length());
@@ -1749,7 +1621,7 @@ void CandidateWindow::paintInputBuffer(HDC hdc, const RECT& panelRc) {
 
     if (!before.empty()) {
         RECT beforeRc = {x + plainMargin, preeditRc.top, preeditRc.right, preeditRc.bottom};
-        ::SetTextColor(hdc, kItemText);
+        ::SetTextColor(hdc, textColor_);
         ::DrawTextW(hdc, before.c_str(), static_cast<int>(before.length()), &beforeRc,
                     DT_LEFT | DT_VCENTER | DT_SINGLELINE | DT_NOPREFIX | DT_END_ELLIPSIS);
         x += textWidth(before) + plainMargin * 2;
@@ -1760,7 +1632,7 @@ void CandidateWindow::paintInputBuffer(HDC hdc, const RECT& panelRc) {
     RECT activeTextRc = activeRc;
     if (!active.empty() && activeWidth > 0) {
         activeRc.right = (std::min)(static_cast<int>(preeditRc.right), x + activeWidth + activePadX * 2);
-        HBRUSH inputBrush = ::CreateSolidBrush(kInputBufferBackground);
+        HBRUSH inputBrush = ::CreateSolidBrush(inputBufferBackgroundColor_);
         HRGN activeRgn = ::CreateRoundRectRgn(activeRc.left, activeRc.top, activeRc.right + 1,
                                               activeRc.bottom + 1,
                                               scalePx(kPreeditActiveCornerRadius) * 2,
@@ -1772,14 +1644,14 @@ void CandidateWindow::paintInputBuffer(HDC hdc, const RECT& panelRc) {
         activeTextRc = activeRc;
         activeTextRc.left += activePadX;
         activeTextRc.right -= activePadX;
-        ::SetTextColor(hdc, kInputBufferText);
+        ::SetTextColor(hdc, inputBufferTextColor_);
         ::DrawTextW(hdc, active.c_str(), static_cast<int>(active.length()), &activeTextRc,
                     DT_LEFT | DT_VCENTER | DT_SINGLELINE | DT_NOPREFIX | DT_END_ELLIPSIS);
         x = activeRc.right;
     }
     if (!after.empty() && x < preeditRc.right) {
         RECT afterRc = {x + plainMargin, preeditRc.top, preeditRc.right, preeditRc.bottom};
-        ::SetTextColor(hdc, kItemText);
+        ::SetTextColor(hdc, textColor_);
         ::DrawTextW(hdc, after.c_str(), static_cast<int>(after.length()), &afterRc,
                     DT_LEFT | DT_VCENTER | DT_SINGLELINE | DT_NOPREFIX | DT_END_ELLIPSIS);
     }
@@ -1797,16 +1669,13 @@ void CandidateWindow::paintInputBuffer(HDC hdc, const RECT& panelRc) {
     paintPreeditCursor(hdc, preeditRc, cursorXForIndex(preeditCursor_));
 
     const int dividerY = preeditRc.bottom + preeditGap_ / 2;
-    HPEN dividerPen = ::CreatePen(PS_SOLID, 1, kDividerColor);
+    HPEN dividerPen = ::CreatePen(PS_SOLID, 1, borderColor_);
     HGDIOBJ oldPen = ::SelectObject(hdc, dividerPen);
     ::MoveToEx(hdc, panelRc.left + borderWidth_ + padX_, dividerY, nullptr);
     ::LineTo(hdc, panelRc.right - borderWidth_ - padX_, dividerY);
     ::SelectObject(hdc, oldPen);
     ::DeleteObject(dividerPen);
     ::SelectObject(hdc, oldFont);
-    if (inputFont) {
-        ::DeleteObject(inputFont);
-    }
 }
 
 void CandidateWindow::paintPageNavigation(HDC hdc, const RECT& panelRc) {
@@ -1826,9 +1695,9 @@ void CandidateWindow::paintPageNavigation(HDC hdc, const RECT& panelRc) {
         if (pressedPageNavDirection_ != direction && hoveredPageNavDirection_ != direction) {
             return;
         }
-        HBRUSH brush = ::CreateSolidBrush(kWindowBorder);
+        HBRUSH brush = ::CreateSolidBrush(borderColor_);
         HBRUSH oldBrush = static_cast<HBRUSH>(::SelectObject(hdc, brush));
-        HPEN pen = ::CreatePen(PS_SOLID, 1, kWindowBorder);
+        HPEN pen = ::CreatePen(PS_SOLID, 1, borderColor_);
         HPEN oldPen = static_cast<HPEN>(::SelectObject(hdc, pen));
         ::RoundRect(hdc, buttonRc.left, buttonRc.top, buttonRc.right, buttonRc.bottom,
                     scalePx(kPageNavHoverRadius), scalePx(kPageNavHoverRadius));
@@ -1840,8 +1709,7 @@ void CandidateWindow::paintPageNavigation(HDC hdc, const RECT& panelRc) {
     paintNavBackground(kPageNavPrevious, prevRc, hasPrev);
     paintNavBackground(kPageNavNext, nextRc, hasNext);
 
-    HFONT navFont = createPointFontForDpi(dpiY_, L"Segoe UI Symbol", kPageNavGlyphPointSize);
-    HGDIOBJ oldFont = ::SelectObject(hdc, navFont ? navFont : font_);
+    HGDIOBJ oldFont = ::SelectObject(hdc, pageNavigationFont_);
     auto drawNavGlyph = [&](const wchar_t* glyph, const RECT& glyphRc, COLORREF color) {
         SIZE glyphSize = {};
         ::GetTextExtentPoint32W(hdc, glyph, 1, &glyphSize);
@@ -1851,12 +1719,9 @@ void CandidateWindow::paintPageNavigation(HDC hdc, const RECT& panelRc) {
         ::SetTextColor(hdc, color);
         ::TextOutW(hdc, x, y, glyph, 1);
     };
-    drawNavGlyph(L"‹", prevRc, hasPrev ? kLinkText : kDisabledText);
-    drawNavGlyph(L"›", nextRc, hasNext ? kLinkText : kDisabledText);
+    drawNavGlyph(L"‹", prevRc, hasPrev ? activeTextColor_ : disabledTextColor_);
+    drawNavGlyph(L"›", nextRc, hasNext ? activeTextColor_ : disabledTextColor_);
     ::SelectObject(hdc, oldFont);
-    if (navFont) {
-        ::DeleteObject(navFont);
-    }
 }
 
 void CandidateWindow::paintItem(HDC hdc, int index, int x, int y) {
@@ -1867,12 +1732,10 @@ void CandidateWindow::paintItem(HDC hdc, int index, int x, int y) {
 void CandidateWindow::paintCandidateRow(HDC hdc, int index, const RECT& rowRc) {
     // Mirrors TypeDuck Web definitionLayout: enabled displayLanguages decide
     // which mainLanguage/otherLanguages definitions are visible.
-    const bool selected = dictionaryHoverIndex_ >= 0
-                              ? index == dictionaryHoverIndex_
-                              : (useCursor_ && index == currentSel_);
+    const bool selected = index == (dictionaryHoverIndex_ >= 0 ? dictionaryHoverIndex_ : currentSel_);
 
     const COLORREF bgColor = selected ? highlightColor_ : backgroundColor_;
-    const COLORREF selColor = selected ? highlightTextColor_ : textColor_;
+    const COLORREF selColor = labelTextColor_;
 
     if (selected) {
         HBRUSH highlightBrush = ::CreateSolidBrush(bgColor);
@@ -1891,8 +1754,8 @@ void CandidateWindow::paintCandidateRow(HDC hdc, int index, const RECT& rowRc) {
     wchar_t selKey[] = L"?.";
     selKey[0] = selKeys_[index];
     const COLORREF oldColor = ::SetTextColor(hdc, selColor);
-    HFONT rowMetaFont = createPointFontForDpi(dpiY_, L"Segoe UI", 12);
-    HGDIOBJ oldFont = ::SelectObject(hdc, rowMetaFont ? rowMetaFont : font_);
+    HFONT rowMetaFont = selectionLabelFont_;
+    HGDIOBJ oldFont = ::SelectObject(hdc, rowMetaFont);
 
     const CandidateUiItem& item = items_[index];
     const auto matchedEntries = item.candidateInfo.matchedEntries();
@@ -1907,7 +1770,7 @@ void CandidateWindow::paintCandidateRow(HDC hdc, int index, const RECT& rowRc) {
     // candidateBaselineAligned: labels, Jyutping, Honzi, and definitions share the first row baseline.
     ::DrawTextW(hdc, selKey, 2, &firstLineRc, DT_LEFT | DT_VCENTER | DT_SINGLELINE | DT_NOPREFIX);
 
-    ::SelectObject(hdc, font_);
+    ::SelectObject(hdc, chineseFont_);
     for (int entryIndex = 0; entryIndex < rowCount; ++entryIndex) {
         TypeDuck::CandidateEntry fallbackEntry;
         const TypeDuck::CandidateEntry* entry = nullptr;
@@ -1939,22 +1802,22 @@ void CandidateWindow::paintCandidateRow(HDC hdc, int index, const RECT& rowRc) {
         indicatorRc.bottom = rowRc.bottom;
         indicatorRc.right = rowRc.right - scalePx(kCandidateIndicatorInsetRight);
 
-        ::SelectObject(hdc, rowMetaFont ? rowMetaFont : (commentFont_ ? commentFont_ : font_));
-        ::SetTextColor(hdc, selected ? commentHighlightColor_ : kPronunciationText);
+        ::SelectObject(hdc, interfaceFont_);
+        ::SetTextColor(hdc, pronunciationTextColor_);
         const bool showJyutping = displayPreferences_.shouldShowJyutping(item.candidateInfo.isReverseLookup);
         if (showJyutping && jyutpingColumnWidth_ > 0) {
             ::DrawTextW(hdc, entry->jyutping.c_str(), static_cast<int>(entry->jyutping.length()), &jyutpingRc,
                         DT_LEFT | DT_VCENTER | DT_SINGLELINE | DT_NOPREFIX | DT_END_ELLIPSIS);
         }
 
-        ::SelectObject(hdc, font_);
-        ::SetTextColor(hdc, selected ? highlightTextColor_ : textColor_);
+        ::SelectObject(hdc, chineseFont_);
+        ::SetTextColor(hdc, textColor_);
         const std::wstring honzi = entry->honzi.empty() ? item.displayText() : entry->honzi;
         ::DrawTextW(hdc, honzi.c_str(), static_cast<int>(honzi.length()), &honziRc,
                     DT_LEFT | DT_VCENTER | DT_SINGLELINE | DT_NOPREFIX | DT_END_ELLIPSIS);
 
-        ::SelectObject(hdc, commentFont_ ? commentFont_ : font_);
-        ::SetTextColor(hdc, selected ? commentHighlightColor_ : kSecondaryText);
+        ::SelectObject(hdc, interfaceFont_);
+        ::SetTextColor(hdc, labelTextColor_);
         const std::wstring note = (!item.candidateInfo.isReverseLookup || displayPreferences_.showReverseCode)
                                       ? item.candidateInfo.note
                                       : L"";
@@ -1969,23 +1832,23 @@ void CandidateWindow::paintCandidateRow(HDC hdc, int index, const RECT& rowRc) {
             definition = reference.empty() ? joinDisplayValues(entry->formattedLabels(), L" ") : L"→" + reference;
         }
         if (definitionColumnWidth_ > 0) {
-            ::SetTextColor(hdc, selected ? commentHighlightColor_ : kDefinitionText);
+            ::SelectObject(hdc, candidateDefinitionFont(displayPreferences_.mainLanguage));
+            ::SetTextColor(hdc, definitionTextColor_);
+            const UINT definitionAlign = displayPreferences_.mainLanguage == TypeDuck::DisplayLanguage::Urdu ? DT_RIGHT : DT_LEFT;
             ::DrawTextW(hdc, definition.c_str(), static_cast<int>(definition.length()), &definitionRc,
-                        DT_LEFT | DT_VCENTER | DT_SINGLELINE | DT_NOPREFIX | DT_END_ELLIPSIS);
+                        definitionAlign | DT_VCENTER | DT_SINGLELINE | DT_NOPREFIX | DT_END_ELLIPSIS);
         }
 
         if (entryIndex == 0 && indicatorColumnWidth_ > 0 &&
             item.candidateInfo.hasDictionaryEntry(displayPreferences_)) {
-            ::SetTextColor(hdc, selected ? highlightTextColor_ : kSecondaryText);
+            ::SelectObject(hdc, infoIconFont_);
+            ::SetTextColor(hdc, labelTextColor_);
             ::DrawTextW(hdc, L"ⓘ", 1, &indicatorRc,
                         DT_RIGHT | DT_VCENTER | DT_SINGLELINE | DT_NOPREFIX);
         }
         y += lineHeight;
     }
     ::SelectObject(hdc, oldFont);
-    if (rowMetaFont) {
-        ::DeleteObject(rowMetaFont);
-    }
     ::SetTextColor(hdc, oldColor);
 }
 
@@ -2019,13 +1882,13 @@ void CandidateWindow::paintDictionaryEntry(
     const RECT& panelRc,
     const TypeDuck::CandidateEntry& entry,
     bool paint) {
-    HFONT entryFont = createPointFontForDpi(dpiY_, L"DFKai-SB", 32);
-    HFONT pronFont = createPointFontForDpi(dpiY_, L"Segoe UI", 15);
-    HFONT pronTypeFont = createPointFontForDpi(dpiY_, L"Segoe UI", 12);
-    HFONT posFont = createPointFontForDpi(dpiY_, L"Segoe UI", 10);
-    HFONT bodyFont = createPointFontForDpi(dpiY_, L"Segoe UI", 12);
-    HFONT valueFont = createPointFontForDpi(dpiY_, L"Microsoft JhengHei", 12);
-    HFONT captionFont = createPointFontForDpi(dpiY_, L"Segoe UI", 13, FW_SEMIBOLD);
+    HFONT entryFont = dictionaryHeadwordFont_;
+    HFONT pronFont = dictionaryPronunciationFont_;
+    HFONT pronTypeFont = dictionaryPronunciationTypeFont_;
+    HFONT posFont = dictionaryPartOfSpeechFont_;
+    HFONT bodyFont = dictionaryBodyFont_;
+    HFONT valueFont = dictionaryValueFont_;
+    HFONT captionFont = dictionaryCaptionFont_;
     HGDIOBJ oldFont = ::SelectObject(hdc, font_);
 
     const int padX = scalePx(kDictionaryPanelHorizontalPadding);
@@ -2062,7 +1925,7 @@ void CandidateWindow::paintDictionaryEntry(
     RECT pronunciationRc = {x, y, right, y + titleHeight};
     if (paint) {
         ::SelectObject(hdc, pronFont);
-        ::SetTextColor(hdc, kPronunciationText);
+        ::SetTextColor(hdc, pronunciationTextColor_);
         ::DrawTextW(hdc, pronunciation.c_str(), static_cast<int>(pronunciation.length()), &pronunciationRc,
                     DT_LEFT | DT_BOTTOM | DT_SINGLELINE | DT_NOPREFIX | DT_END_ELLIPSIS);
     }
@@ -2070,7 +1933,7 @@ void CandidateWindow::paintDictionaryEntry(
     RECT pronTypeRc = {x, y, right, y + titleHeight};
     if (paint) {
         ::SelectObject(hdc, pronTypeFont);
-        ::SetTextColor(hdc, kSecondaryText);
+        ::SetTextColor(hdc, metalanguageTextColor_);
         ::DrawTextW(hdc, pronType.c_str(), static_cast<int>(pronType.length()), &pronTypeRc,
                     DT_LEFT | DT_BOTTOM | DT_SINGLELINE | DT_NOPREFIX | DT_END_ELLIPSIS);
     }
@@ -2121,7 +1984,7 @@ void CandidateWindow::paintDictionaryEntry(
     RECT bodyRc = {bodyX, bodyTop, right, bodyTop + bodyHeight};
     if (paint) {
         ::SelectObject(hdc, bodyFont);
-        ::SetTextColor(hdc, kDefinitionText);
+        ::SetTextColor(hdc, textColor_);
         ::DrawTextW(hdc, body.c_str(), static_cast<int>(body.length()), &bodyRc,
                     DT_LEFT | DT_TOP | DT_SINGLELINE | DT_NOPREFIX | DT_END_ELLIPSIS);
     }
@@ -2145,7 +2008,7 @@ void CandidateWindow::paintDictionaryEntry(
             RECT valueRc = {labelRc.right + fieldGap, y, right, labelRc.bottom};
             if (paint && i == 0) {
                 ::SelectObject(hdc, bodyFont);
-                ::SetTextColor(hdc, kSecondaryText);
+                ::SetTextColor(hdc, metalanguageTextColor_);
                 ::DrawTextW(hdc, other.name.c_str(), static_cast<int>(other.name.length()), &labelRc,
                             DT_RIGHT | DT_TOP | DT_SINGLELINE | DT_NOPREFIX | DT_END_ELLIPSIS);
             }
@@ -2186,11 +2049,11 @@ void CandidateWindow::paintDictionaryEntry(
             RECT valueRc = {labelRc.right + fieldGap, y, right, labelRc.bottom};
             if (paint) {
                 ::SelectObject(hdc, bodyFont);
-                ::SetTextColor(hdc, kSecondaryText);
+                ::SetTextColor(hdc, metalanguageTextColor_);
                 ::DrawTextW(hdc, language.name.c_str(), static_cast<int>(language.name.length()), &labelRc,
                             DT_RIGHT | DT_BOTTOM | DT_SINGLELINE | DT_NOPREFIX | DT_END_ELLIPSIS);
-                ::SelectObject(hdc, valueFont);
-                ::SetTextColor(hdc, kDefinitionText);
+                ::SelectObject(hdc, dictionaryLanguageFont(language.language));
+                ::SetTextColor(hdc, textColor_);
                 ::DrawTextW(hdc, language.value.c_str(), static_cast<int>(language.value.length()), &valueRc,
                             DT_LEFT | DT_BOTTOM | DT_SINGLELINE | DT_NOPREFIX | DT_END_ELLIPSIS);
             }
@@ -2200,13 +2063,6 @@ void CandidateWindow::paintDictionaryEntry(
 
     y += entrySpacing - fieldSpacing + padY;
     ::SelectObject(hdc, oldFont);
-    ::DeleteObject(captionFont);
-    ::DeleteObject(valueFont);
-    ::DeleteObject(bodyFont);
-    ::DeleteObject(posFont);
-    ::DeleteObject(pronTypeFont);
-    ::DeleteObject(pronFont);
-    ::DeleteObject(entryFont);
 }
 
 void CandidateWindow::paintDictionaryScrollBar(HDC hdc, const RECT& panelRc) {
@@ -2232,8 +2088,8 @@ void CandidateWindow::paintDictionaryScrollBar(HDC hdc, const RECT& panelRc) {
     const int thumbTravel = (std::max)(0, trackHeight - thumbHeight);
     const int thumbTop = trackRc.top + (maxScroll > 0 ? ::MulDiv(thumbTravel, dictionaryScrollOffset_, maxScroll) : 0);
     RECT thumbRc = {trackRc.left, thumbTop, trackRc.right, thumbTop + thumbHeight};
-    HBRUSH trackBrush = ::CreateSolidBrush(kDictionaryScrollTrack);
-    HBRUSH thumbBrush = ::CreateSolidBrush(kDictionaryScrollThumb);
+    HBRUSH trackBrush = ::CreateSolidBrush(dictionaryScrollTrackColor_);
+    HBRUSH thumbBrush = ::CreateSolidBrush(dictionaryScrollThumbColor_);
     ::FillRect(hdc, &trackRc, trackBrush);
     ::FillRect(hdc, &thumbRc, thumbBrush);
     ::DeleteObject(thumbBrush);
@@ -2251,9 +2107,9 @@ void CandidateWindow::paintPartOfSpeechPills(
         return;
     }
 
-    HGDIOBJ oldFont = ::SelectObject(hdc, pillFont ? pillFont : (commentFont_ ? commentFont_ : font_));
-    HPEN borderPen = ::CreatePen(PS_SOLID, (std::max)(kBorderWidth, scalePx(kBorderWidth)), kPosPillBorder);
-    HBRUSH fillBrush = ::CreateSolidBrush(kPosPillBackground);
+    HGDIOBJ oldFont = ::SelectObject(hdc, pillFont);
+    HPEN borderPen = ::CreatePen(PS_SOLID, (std::max)(kBorderWidth, scalePx(kBorderWidth)), posPillBorderColor_);
+    HBRUSH fillBrush = ::CreateSolidBrush(posPillBackgroundColor_);
     HGDIOBJ oldPen = ::SelectObject(hdc, borderPen);
     HGDIOBJ oldBrush = ::SelectObject(hdc, fillBrush);
     const int gap = scalePx(kDictionaryPillGap);
@@ -2272,7 +2128,7 @@ void CandidateWindow::paintPartOfSpeechPills(
                     scalePx(kDictionaryPillCornerRadius) * 2,
                     scalePx(kDictionaryPillCornerRadius) * 2);
         RECT textRc = {x + padX, y, x + pillWidth - padX, y + pillHeight};
-        ::SetTextColor(hdc, kPosPillText);
+        ::SetTextColor(hdc, posPillTextColor_);
         ::DrawTextW(hdc, value.c_str(), static_cast<int>(value.length()), &textRc,
                     DT_CENTER | DT_VCENTER | DT_SINGLELINE | DT_NOPREFIX | DT_END_ELLIPSIS);
         x += pillWidth + gap;
@@ -2314,10 +2170,8 @@ int CandidateWindow::hitTestCandidate(POINT pt) const {
     for (int i = 0, n = static_cast<int>(items_.size()); i < n; ++i) {
         RECT rect = {};
         itemRect(i, rect);
-        if (candPerRow_ == 1) {
-            rect.left = borderWidth_ + padX_;
-            rect.right = candidatePanelRight;
-        }
+        rect.left = borderWidth_ + padX_;
+        rect.right = candidatePanelRight;
         if (::PtInRect(&rect, pt)) {
             return i;
         }

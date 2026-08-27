@@ -20,8 +20,7 @@ const wchar_t* deployedDllName();
 const wchar_t* programDirEnvVar();
 const wchar_t* legacyProgramDirEnvVar();
 const wchar_t* installDirName();
-
-std::wstring defaultProgramDir(const wchar_t* programFilesDir);
+std::wstring configuredProgramDir();
 Ime::LangProfileInfo makeLangProfile(const std::wstring& iconFile, int iconIndex);
 
 }  // namespace TypeDuck

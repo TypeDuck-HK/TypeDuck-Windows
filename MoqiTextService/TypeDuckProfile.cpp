@@ -4,15 +4,85 @@ namespace Moqi {
 namespace TypeDuck {
 namespace {
 
+constexpr const wchar_t* kInstallRegistrySubkey = L"Software\\TypeDuckIME";
+constexpr const wchar_t* kInstallDirRegistryValue = L"InstallDir";
+
+bool is64BitWindows() {
+#if defined(_WIN64)
+  return true;
+#else
+  BOOL isWow64 = FALSE;
+  return ::IsWow64Process(::GetCurrentProcess(), &isWow64) && isWow64 == TRUE;
+#endif
+}
+
+std::wstring registryInstallDirForView(REGSAM view) {
+  HKEY key = nullptr;
+  const LSTATUS openStatus = ::RegOpenKeyExW(
+      HKEY_LOCAL_MACHINE, kInstallRegistrySubkey, 0,
+      KEY_QUERY_VALUE | view, &key);
+  if (openStatus != ERROR_SUCCESS) {
+    return std::wstring();
+  }
+
+  DWORD type = 0;
+  DWORD bytes = 0;
+  LSTATUS queryStatus = ::RegQueryValueExW(
+      key, kInstallDirRegistryValue, nullptr, &type, nullptr, &bytes);
+  if (queryStatus != ERROR_SUCCESS || type != REG_SZ || bytes < sizeof(wchar_t)) {
+    ::RegCloseKey(key);
+    return std::wstring();
+  }
+
+  std::wstring value(bytes / sizeof(wchar_t), L'\0');
+  queryStatus = ::RegQueryValueExW(
+      key, kInstallDirRegistryValue, nullptr, &type,
+      reinterpret_cast<LPBYTE>(value.data()), &bytes);
+  ::RegCloseKey(key);
+  if (queryStatus != ERROR_SUCCESS || type != REG_SZ) {
+    return std::wstring();
+  }
+
+  value.resize(wcsnlen_s(value.c_str(), value.size()));
+  return value;
+}
+
+std::wstring registryInstallDir() {
+  if (std::wstring value = registryInstallDirForView(0); !value.empty()) {
+    return value;
+  }
+  if (!is64BitWindows()) {
+    return std::wstring();
+  }
+  if (std::wstring value = registryInstallDirForView(KEY_WOW64_64KEY); !value.empty()) {
+    return value;
+  }
+  return registryInstallDirForView(KEY_WOW64_32KEY);
+}
+
+std::wstring environmentProgramDir() {
+  wchar_t path[MAX_PATH] = {};
+  DWORD length = ::GetEnvironmentVariableW(
+      programDirEnvVar(), path, static_cast<DWORD>(_countof(path)));
+  if (length > 0 && length < _countof(path)) {
+    return path;
+  }
+
+  length = ::GetEnvironmentVariableW(
+      legacyProgramDirEnvVar(), path, static_cast<DWORD>(_countof(path)));
+  if (length > 0 && length < _countof(path)) {
+    return path;
+  }
+
+  return std::wstring();
+}
+
 std::wstring preferredSmallIconPath(const std::wstring& fallbackIconFile) {
-  wchar_t programDir[MAX_PATH] = {};
-  const DWORD length = ::GetEnvironmentVariableW(
-      programDirEnvVar(), programDir, static_cast<DWORD>(_countof(programDir)));
-  if (length == 0 || length >= _countof(programDir)) {
+  std::wstring iconPath = environmentProgramDir();
+  if (iconPath.empty()) {
     return fallbackIconFile;
   }
 
-  std::wstring iconPath = programDir;
   if (!iconPath.empty() && iconPath.back() != L'\\' && iconPath.back() != L'/') {
     iconPath += L'\\';
   }
@@ -71,14 +141,11 @@ const wchar_t* installDirName() {
   return L"TypeDuckIME";
 }
 
-std::wstring defaultProgramDir(const wchar_t* programFilesDir) {
-  if (programFilesDir == nullptr || programFilesDir[0] == L'\0') {
-    return std::wstring();
+std::wstring configuredProgramDir() {
+  if (std::wstring value = environmentProgramDir(); !value.empty()) {
+    return value;
   }
-  std::wstring programDir = programFilesDir;
-  programDir += L"\\";
-  programDir += installDirName();
-  return programDir;
+  return registryInstallDir();
 }
 
 Ime::LangProfileInfo makeLangProfile(const std::wstring& iconFile, int iconIndex) {

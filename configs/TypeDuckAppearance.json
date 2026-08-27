@@ -1,0 +1,156 @@
+{
+  "version": 1,
+  "fonts": {
+    "default_interface": {
+      "description": "HK Chinese and English interface text",
+      "stack": [
+        "Segoe UI",
+        "Segoe UI Symbol",
+        "Microsoft JhengHei UI",
+        "Microsoft JhengHei",
+        "Noto Sans HK",
+        "Noto Sans CJK HK",
+        "Arial",
+        "sans-serif"
+      ]
+    },
+    "selection_label": {
+      "description": "Candidate selection labels",
+      "stack": [
+        "Century Gothic",
+        "Lucida Sans",
+        "Lucida Sans Unicode",
+        "Segoe UI",
+        "Noto Sans",
+        "Arial",
+        "sans-serif"
+      ]
+    },
+    "chinese_sung": {
+      "description": "Sung Chinese candidate and dictionary headword presentation",
+      "stack": [
+        "Chiron Sung HK",
+        "Chiron Sung HK WS",
+        "MingLiU_HKSCS",
+        "MingLiU_HKSCS-ExtB",
+        "MingLiU",
+        "MingLiU-ExtB",
+        "PMingLiU",
+        "PMingLiU-ExtB",
+        "Noto Serif HK",
+        "Noto Serif CJK HK",
+        "serif"
+      ]
+    },
+    "chinese_hei": {
+      "description": "Hei Chinese candidate and dictionary headword presentation",
+      "stack": [
+        "Chiron Hei HK",
+        "Chiron Hei HK WS",
+        "Microsoft JhengHei UI",
+        "Microsoft JhengHei",
+        "Noto Sans HK",
+        "Noto Sans CJK HK",
+        "sans-serif"
+      ]
+    },
+    "display_languages": {
+      "eng": {
+        "description": "英語 English",
+        "stack": [
+          "Segoe UI",
+          "Noto Sans",
+          "Arial",
+          "sans-serif"
+        ]
+      },
+      "hin": {
+        "description": "印地語 Hindi",
+        "stack": [
+          "Nirmala UI",
+          "Mangal",
+          "Noto Sans Devanagari",
+          "Segoe UI",
+          "sans-serif"
+        ]
+      },
+      "ind": {
+        "description": "印尼語 Indonesian",
+        "stack": [
+          "Times New Roman",
+          "Georgia",
+          "Cambria",
+          "Noto Serif",
+          "serif"
+        ]
+      },
+      "nep": {
+        "description": "尼泊爾語 Nepali",
+        "stack": [
+          "Nirmala UI",
+          "Mangal",
+          "Noto Sans Devanagari",
+          "Segoe UI",
+          "sans-serif"
+        ]
+      },
+      "urd": {
+        "description": "烏爾都語 Urdu",
+        "stack": [
+          "Urdu Typesetting",
+          "Noto Nastaliq Urdu",
+          "Tahoma",
+          "Segoe UI",
+          "Arial",
+          "sans-serif"
+        ]
+      }
+    }
+  },
+  "themes": [
+    {
+      "id": "light",
+      "description": "淺色 Light",
+      "palette": {
+        "panel_border": "#ded9cf",
+        "panel_background": "#ffffff",
+        "dictionary_background": "#f6f3ed",
+        "selection_background": "#fedc9c",
+        "input_buffer_background": "#f6ead8",
+        "input_buffer_text": "#463a2a",
+        "item_text": "#282725",
+        "label_text": "#5e564b",
+        "definition_text": "#614c34",
+        "pronunciation_text": "#8d5700",
+        "metalanguage_text": "#69502c",
+        "active_text": "#9b6000",
+        "disabled_text": "#bdb7ad",
+        "pos_pill_border": "#b4ab9d",
+        "dictionary_scroll_track": "#e0dad0",
+        "dictionary_scroll_thumb": "#a69984"
+      }
+    },
+    {
+      "id": "dark",
+      "description": "深色 Dark",
+      "palette": {
+        "panel_border": "#50473c",
+        "panel_background": "#201e1c",
+        "dictionary_background": "#36322d",
+        "selection_background": "#725427",
+        "input_buffer_background": "#4d3b24",
+        "input_buffer_text": "#fff0c2",
+        "item_text": "#fff8e9",
+        "label_text": "#dad0bd",
+        "definition_text": "#fbebc5",
+        "pronunciation_text": "#e7b557",
+        "metalanguage_text": "#fbdfa3",
+        "active_text": "#ca9f4f",
+        "disabled_text": "#767168",
+        "pos_pill_border": "#756a5a",
+        "dictionary_scroll_track": "#50473c",
+        "dictionary_scroll_thumb": "#8d7c65"
+      }
+    }
+  ]
+}

@@ -81,14 +81,14 @@ $productionAnchors = @(
   @{ Path = $windowSource; Pattern = 'paintCandidateRow|drawCandidateRow'; Description = 'source-backed candidate row rendering' },
   @{ Path = $windowSource; Pattern = 'paintDictionaryPanel|drawDictionaryPanel'; Description = 'dictionary side panel rendering' },
   @{ Path = $windowSource; Pattern = 'paintPartOfSpeechPills|drawPartOfSpeechPills'; Description = 'part-of-speech pill rendering' },
-  @{ Path = $windowSource; Pattern = 'kPosPillBorder|kPosPillText|kPosPillBackground'; Description = 'part-of-speech pill theme colors' },
+  @{ Path = $windowSource; Pattern = 'posPillBorderColor_|posPillTextColor_|posPillBackgroundColor_'; Description = 'part-of-speech pill theme colors' },
   @{ Path = $windowSource; Pattern = 'More Languages'; Description = 'dictionary More Languages rendering' },
   @{ Path = $windowSource; Pattern = 'entryRowCount|matchedEntries'; Description = 'multi-row candidate detail rendering' },
   @{ Path = $windowSource; Pattern = 'movementRevealThreshold_|kMovementRevealThreshold'; Description = 'movement-triggered dictionary reveal threshold' },
   @{ Path = $windowSource; Pattern = 'actualPointerMovement|mouseMoveCount|dictionaryMoveCount'; Description = 'actual pointer movement counter' },
   @{ Path = $windowHeader; Pattern = 'dictionaryRevealIndex_|dictionaryPanel'; Description = 'dictionary panel state' },
   @{ Path = $windowHeader; Pattern = 'lastMouseMovePoint_|lastPointerPoint'; Description = 'stationary pointer tracking' },
-  @{ Path = $windowSource; Pattern = 'panel_background|selection_background|input_buffer_background|input_buffer_text|pronunciation_text|definition_text'; Description = 'theme palette role consumption' },
+  @{ Path = $windowSource; Pattern = 'PanelBackground|SelectionBackground|InputBufferBackground|InputBufferText|PronunciationText|DefinitionText|MetalanguageText|ActiveText'; Description = 'theme palette role consumption' },
   @{ Path = $windowSource; Pattern = 'definitionLayout|displayLanguages|mainLanguage|otherLanguages'; Description = 'settings-aware display language layout' }
   @{ Path = $windowSource; Pattern = 'WS_EX_TOOLWINDOW\s*\|\s*WS_EX_TOPMOST\s*\|\s*WS_EX_NOACTIVATE\s*\|\s*WS_EX_LAYERED'; Description = 'blink regression: candidate popup must use a layered window so separated panels do not expose an unpainted black/solid first frame' }
   @{ Path = $windowSource; Pattern = '(?s)UpdateLayeredWindow\([^;]*ULW_COLORKEY'; Description = 'blink regression: candidate popup must present the separated panel surface through layered-window color-key transparency' }
@@ -148,8 +148,9 @@ if ($Strict) {
   Assert-Contains $clientSource 'setCandidateHasPrevious|setCandidateHasNext' "backend page availability must be applied to the text service"
   Assert-Contains $clientSource '(?s)bool\s+Client::selectCandidate\(int index\).*?TF_ES_ASYNCDONTCARE \| TF_ES_READWRITE' "Word candidate click regression: popup mouse selectCandidate must use async edit session because Word drops synchronous popup selection"
   Assert-Contains $windowSource 'GetDpiForWindow|LOGPIXELSX|scalePx' "DPI-aware sizing"
-  Assert-Contains $windowSource 'dpiForOwnerWindow|createPointFontForDpi|ThreadDpiAwarenessScope' "candidate popup must use owner DPI instead of host-virtualized window DC sizing"
-  Assert-Contains $windowSource 'resolveFontFace|EnumFontFamiliesExW|candFontName' "candidate popup DPI-owned fonts must preserve configured Chinese font fallback lists"
+  Assert-Contains $windowSource 'dpiForOwnerWindow|createCandidateFontForDpi|ThreadDpiAwarenessScope' "candidate popup must use owner DPI instead of host-virtualized window DC sizing"
+  Assert-Contains $windowSource 'createCandidateFontForDpi|CandidateFontRole::Chinese|DictionaryHeadword' "candidate popup DPI-owned fonts must come from TextService appearance roles"
+  Assert-NotContains $windowSource 'kDefaultCandidateFontName|kDefaultCommentFontName|kInputBufferFontName|DFKai-SB|createPointFontForDpi|createDerivedFont|rowMetaFont \\? rowMetaFont :|commentFont_ \\?' "CandidateWindow must not own font fallback families or point-size font creation"
   Assert-Contains $textServiceSource 'clampCandidateWindowToWorkArea|MonitorFromRect|GetMonitorInfo' "multi-monitor work-area placement"
   Assert-Contains $textServiceSource 'fallbackAnchorRect|GetGUIThreadInfo' "composition rectangle fallback"
   Assert-Contains $textServiceSource 'SWP_NOACTIVATE' "non-activating SetWindowPos placement"

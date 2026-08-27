@@ -368,6 +368,8 @@ $stageWin32X64Root = Join-Path $stageWin32Root "x64"
 $iconSourceRoot = Join-Path $RepoRoot "TypeDuckSettings\assets"
 $resourceSourceRoot = Join-Path $RepoRoot "TypeDuckSettings\resources"
 $stageResourceRoot = Join-Path $stageWin32Root "resources"
+$appearanceSourceRoot = Join-Path $RepoRoot "configs"
+$stageAppearanceRoot = Join-Path $stageWin32Root "configs"
 $transparentIcon = Join-Path $iconSourceRoot "TypeDuck_Transparent.ico"
 $smallIcon = Join-Path $iconSourceRoot "TypeDuck_Small.ico"
 $productIcon = Join-Path $iconSourceRoot "TypeDuck.ico"
@@ -375,17 +377,20 @@ $aboutBanner = Join-Path $resourceSourceRoot "About_Banner.bmp"
 $creditLogos = Join-Path $resourceSourceRoot "Credit_Logos.bmp"
 $installerBitmap = Join-Path $resourceSourceRoot "Installer.bmp"
 $licenseNotice = Join-Path $RepoRoot "THIRD_PARTY_NOTICES.txt"
+$typeDuckAppearance = Join-Path $appearanceSourceRoot "TypeDuckAppearance.json"
 New-CleanDirectory -Path $StageDir
 New-Item -ItemType Directory -Path $stageWin32Root -Force | Out-Null
 New-Item -ItemType Directory -Path $stageX64Root -Force | Out-Null
 New-Item -ItemType Directory -Path $stageWin32X64Root -Force | Out-Null
 New-Item -ItemType Directory -Path $stageResourceRoot -Force | Out-Null
+New-Item -ItemType Directory -Path $stageAppearanceRoot -Force | Out-Null
 
 Copy-IfExists -Source $aboutBanner -Destination (Join-Path $stageResourceRoot "About_Banner.bmp")
 Copy-IfExists -Source $creditLogos -Destination (Join-Path $stageResourceRoot "Credit_Logos.bmp")
 Copy-IfExists -Source $installerBitmap -Destination (Join-Path $stageResourceRoot "Installer.bmp")
 Copy-IfExists -Source $smallIcon -Destination (Join-Path $stageResourceRoot "TypeDuck_Small.ico")
 Copy-IfExists -Source $licenseNotice -Destination (Join-Path $stageWin32Root "THIRD_PARTY_NOTICES.txt")
+Copy-IfExists -Source $typeDuckAppearance -Destination (Join-Path $stageAppearanceRoot "TypeDuckAppearance.json")
 
 $launcher = Resolve-ArtifactPath -Label "TypeDuckLauncher.exe" -Candidates @(
     (Join-Path $Win32BuildDir "TypeDuckLauncher.exe"),

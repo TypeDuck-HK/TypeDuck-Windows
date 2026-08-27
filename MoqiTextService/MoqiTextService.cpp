@@ -32,6 +32,8 @@
 #include <Shellapi.h>
 #include <sys/stat.h>
 #include <cwctype>
+#include <cstdlib>
+#include <filesystem>
 #include <fstream>
 #include <sstream>
 
@@ -45,9 +47,61 @@ std::wstring currentProcessPath();
 std::wstring processBaseName(const std::wstring& imagePath);
 std::wstring timestampNow();
 std::wstring formatDebugLogLine(const std::wstring& message);
-constexpr wchar_t kDefaultCandidateFontFace[] = L"Microsoft JhengHei";
-constexpr wchar_t kDefaultCommentFontFace[] = L"Segoe UI";
 constexpr ULONGLONG kCandidateWindowMoveThrottleMs = 50;
+constexpr int kCandidateDpiBaseline = 96;
+constexpr const wchar_t* kTypeDuckAppearanceRelativePath = L"configs\\TypeDuckAppearance.json";
+
+std::wstring utf8ToWide(const std::string& value) {
+	if (value.empty()) {
+		return L"";
+	}
+	const int required = ::MultiByteToWideChar(CP_UTF8, 0, value.c_str(), static_cast<int>(value.size()), nullptr, 0);
+	if (required <= 0) {
+		return L"";
+	}
+	std::wstring result(required, L'\0');
+	::MultiByteToWideChar(CP_UTF8, 0, value.c_str(), static_cast<int>(value.size()), result.data(), required);
+	return result;
+}
+
+std::wstring joinFontStack(const std::vector<std::wstring>& stack) {
+	std::wstring result;
+	for (const auto& face : stack) {
+		if (face.empty()) {
+			continue;
+		}
+		if (!result.empty()) {
+			result += L", ";
+		}
+		result += face;
+	}
+	return result;
+}
+
+int fontPointHeightForDpi(int dpiY, int point) {
+	return -::MulDiv(point, (std::max)(kCandidateDpiBaseline, dpiY), 72);
+}
+
+bool colorFromHex(const std::string& value, COLORREF& color) {
+	std::string hex = value;
+	if (!hex.empty() && hex[0] == '#') {
+		hex.erase(hex.begin());
+	}
+	if (hex.size() != 6) {
+		return false;
+	}
+	char* end = nullptr;
+	const long rgb = std::strtol(hex.c_str(), &end, 16);
+	if (end == nullptr || *end != '\0') {
+		return false;
+	}
+	color = RGB((rgb >> 16) & 0xff, (rgb >> 8) & 0xff, rgb & 0xff);
+	return true;
+}
+
+bool fileExists(const std::wstring& path) {
+	return !path.empty() && ::GetFileAttributesW(path.c_str()) != INVALID_FILE_ATTRIBUTES;
+}
 
 std::wstring trimFontToken(std::wstring value) {
 	const size_t stylePos = value.find(L':');
@@ -85,12 +139,16 @@ bool isFontFamilyInstalled(const std::wstring& faceName) {
 	return found;
 }
 
-std::wstring resolveFontFace(const std::wstring& requested, const wchar_t* fallback) {
+std::wstring resolveFontFace(const std::wstring& requested) {
+	std::wstring firstRequested;
 	size_t start = 0;
 	while (start <= requested.size()) {
 		const size_t comma = requested.find(L',', start);
 		const std::wstring candidate = trimFontToken(
 			requested.substr(start, comma == std::wstring::npos ? std::wstring::npos : comma - start));
+		if (firstRequested.empty() && !candidate.empty()) {
+			firstRequested = candidate;
+		}
 		if (isFontFamilyInstalled(candidate)) {
 			return candidate;
 		}
@@ -99,7 +157,7 @@ std::wstring resolveFontFace(const std::wstring& requested, const wchar_t* fallb
 		}
 		start = comma + 1;
 	}
-	return fallback;
+	return firstRequested;
 }
 
 bool callClientFilterKeyDown(Client* client, Ime::KeyEvent& keyEvent, bool& sehCaught) {
@@ -530,46 +588,21 @@ TextService::TextService(ImeModule* module):
 	lastCandidateWindowPos_{0, 0},
 	lastCandidateWindowMoveTick_(0),
 	updateFont_(false),
-	candPerRow_(1),
 	candidatePageIndex_(0),
 	candidatePageSize_(0),
 	candidateTotalCount_(0),
 	candidateHasPrevious_(false),
 	candidateHasNext_(false),
-	candSpacing_(20),
 	selKeys_(L"1234567890"),
-	candUseCursor_(true),
-	candCommentFontName_(kDefaultCommentFontFace),
-	candFontSize_(16),
-	candCommentFontSize_(14),
-	candBackgroundColor_(RGB(255, 255, 255)),
-	candHighlightColor_(RGB(254, 220, 156)),
-	candTextColor_(RGB(36, 34, 30)),
-	candHighlightTextColor_(RGB(36, 34, 30)),
-	candCommentColor_(RGB(78, 72, 63)),
-	candCommentHighlightColor_(RGB(78, 72, 63)),
-	inlinePreedit_(true),
-	autoPairQuotes_(false),
 	suppressNextCompositionTerminatedNotification_(false),
 	candidatePreeditCursor_(0),
 	candidatePreeditSelectionStart_(0),
 	candidatePreeditSelectionEnd_(0),
 	currentLangProfile_(GUID_NULL) {
 	shouldShowCandidateWindowUI_ = !effectiveUiLess();
-
-	// font for candidate and mesasge windows
-	font_ = (HFONT)GetStockObject(DEFAULT_GUI_FONT);
-	LOGFONT lf;
-	GetObject(font_, sizeof(lf), &lf);
-	lf.lfHeight = candFontHeight(); // FIXME: make this configurable
-	lf.lfWeight = FW_NORMAL;
-	wcsncpy_s(lf.lfFaceName, _countof(lf.lfFaceName),
-	          resolveFontFace(candFontName_, kDefaultCandidateFontFace).c_str(), _TRUNCATE);
-	font_ = CreateFontIndirect(&lf);
-	lf.lfHeight = candCommentFontHeight();
-	const std::wstring commentFontName = resolveFontFace(candCommentFontName_, kDefaultCommentFontFace);
-	wcsncpy_s(lf.lfFaceName, _countof(lf.lfFaceName), commentFontName.c_str(), _TRUNCATE);
-	commentFont_ = CreateFontIndirect(&lf);
+	reloadCandidateAppearanceTheme();
+	font_ = createCandidateFontForDpi(CandidateFontRole::Interface, kCandidateDpiBaseline);
+	commentFont_ = createCandidateFontForDpi(CandidateFontRole::Interface, kCandidateDpiBaseline);
 }
 
 TextService::~TextService(void) {
@@ -600,7 +633,7 @@ void TextService::onActivate() {
 	    << L" is_ui_less=" << boolText(isUiLess())
 	    << L" effective_ui_less=" << boolText(effectiveUiLess())
 	    << L" auto_ui_less=" << boolText(autoUiLessOverride_)
-	    << L" inline_preedit=" << boolText(inlinePreedit_)
+	    << L" inline_preedit=" << boolText(kTypeDuckInlinePreedit)
 	    << L" effective_inline_preedit=" << boolText(effectiveInlinePreedit())
 	    << L" auto_inline_preedit_disabled=" << boolText(autoInlinePreeditDisabled_)
 	    << L" auto_disable_tsf_candidate_ui=" << boolText(autoDisableTsfCandidateUi_)
@@ -1007,10 +1040,6 @@ void TextService::createCandidateWindow(Ime::EditSession* session) {
 
 		candidateWindow_->setFont(font_);
 		candidateWindow_->setCommentFont(commentFont_);
-		candidateWindow_->setBackgroundColor(candBackgroundColor_);
-		candidateWindow_->setHighlightColor(candHighlightColor_);
-		candidateWindow_->setTextColor(candTextColor_);
-		candidateWindow_->setHighlightTextColor(candHighlightTextColor_);
 		candidateWindow_->setDisplayPreferences(typeDuckDisplayPreferences_);
 		candidateWindow_->setPreeditText(candidatePreedit_);
 		candidateWindow_->setPreeditCursor(candidatePreeditCursor_);
@@ -1081,15 +1110,6 @@ void TextService::updateCandidates(Ime::EditSession* session) {
 	const bool contentChanged = !isCandidateContentApplied(renderedPreedit);
 	if (contentChanged) {
 		candidateWindow_->clear();
-		candidateWindow_->setUseCursor(candUseCursor_);
-		candidateWindow_->setCandPerRow(candPerRow_);
-		candidateWindow_->setCandSpacing(candSpacing_);
-		candidateWindow_->setBackgroundColor(candBackgroundColor_);
-		candidateWindow_->setHighlightColor(candHighlightColor_);
-		candidateWindow_->setTextColor(candTextColor_);
-		candidateWindow_->setHighlightTextColor(candHighlightTextColor_);
-		candidateWindow_->setCommentColor(candCommentColor_);
-		candidateWindow_->setCommentHighlightColor(candCommentHighlightColor_);
 		candidateWindow_->setDisplayPreferences(typeDuckDisplayPreferences_);
 		candidateWindow_->setPreeditText(renderedPreedit);
 		candidateWindow_->setPreeditCursor(candidatePreeditCursor_);
@@ -1151,15 +1171,6 @@ void TextService::updateCandidatesWithoutSession() {
 	invalidateCandidateUiCache();
 
 	candidateWindow_->clear();
-	candidateWindow_->setUseCursor(candUseCursor_);
-	candidateWindow_->setCandPerRow(candPerRow_);
-	candidateWindow_->setCandSpacing(candSpacing_);
-	candidateWindow_->setBackgroundColor(candBackgroundColor_);
-	candidateWindow_->setHighlightColor(candHighlightColor_);
-	candidateWindow_->setTextColor(candTextColor_);
-	candidateWindow_->setHighlightTextColor(candHighlightTextColor_);
-	candidateWindow_->setCommentColor(candCommentColor_);
-	candidateWindow_->setCommentHighlightColor(candCommentHighlightColor_);
 	candidateWindow_->setDisplayPreferences(typeDuckDisplayPreferences_);
 	candidateWindow_->setPreeditText(candidatePreedit_);
 	candidateWindow_->setPreeditCursor(candidatePreeditCursor_);
@@ -1422,26 +1433,253 @@ void CALLBACK TextService::onMessageTimeout(HWND hwnd, UINT msg, UINT_PTR id, DW
 void TextService::updateLangButtons() {
 }
 
-int TextService::candFontHeight() {
-	int candFontHeight_ = -candFontSize_;
-	HDC hdc = GetDC(NULL);
-	if (hdc)
-	{
-		candFontHeight_ = -MulDiv(candFontSize_, GetDeviceCaps(hdc, LOGPIXELSY), 72);
-		ReleaseDC(NULL, hdc);
+void TextService::reloadCandidateAppearanceTheme() {
+	appearanceFontStacks_.clear();
+	appearancePalette_.clear();
+
+	const std::wstring path = resolveCandidateRuntimeAppearanceThemePath();
+	if (!loadCandidateAppearanceThemeFromFile(path)) {
+		logDebug(L"[appearance] TypeDuckAppearance.json missing or invalid: " + path);
+		appearanceFontStacks_.clear();
+		appearancePalette_.clear();
 	}
-	return candFontHeight_;
 }
 
-int TextService::candCommentFontHeight() {
-	int candFontHeight_ = -candCommentFontSize_;
-	HDC hdc = GetDC(NULL);
-	if (hdc)
-	{
-		candFontHeight_ = -MulDiv(candCommentFontSize_, GetDeviceCaps(hdc, LOGPIXELSY), 72);
-		ReleaseDC(NULL, hdc);
+std::wstring TextService::resolveCandidateRuntimeAppearanceThemePath() const {
+	auto* module = static_cast<Moqi::ImeModule*>(imeModule().operator->());
+	std::wstring dir = module != nullptr ? module->programDir() : L"";
+	if (dir.empty()) {
+		return L"";
 	}
-	return candFontHeight_;
+	if (!dir.empty() && dir.back() != L'\\' && dir.back() != L'/') {
+		dir += L"\\";
+	}
+	return dir + kTypeDuckAppearanceRelativePath;
+}
+
+bool TextService::loadCandidateAppearanceThemeFromFile(const std::wstring& path) {
+	if (!fileExists(path)) {
+		return false;
+	}
+	std::ifstream input(std::filesystem::path(path), std::ios::binary);
+	if (!input) {
+		return false;
+	}
+	Json::Value root;
+	input >> root;
+	if (!root.isObject() || !root["fonts"].isObject() || !root["themes"].isArray()) {
+		return false;
+	}
+	std::map<std::wstring, std::vector<std::wstring>> fontStacks;
+	std::map<std::wstring, COLORREF> paletteColors;
+	const Json::Value fonts = root["fonts"];
+	const auto readStack = [&](const Json::Value& node) {
+		std::vector<std::wstring> stack;
+		const Json::Value values = node["stack"];
+		if (!values.isArray()) {
+			return stack;
+		}
+		for (const auto& value : values) {
+			if (value.isString()) {
+				stack.push_back(utf8ToWide(value.asString()));
+			}
+		}
+		return stack;
+	};
+	for (const char* key : {"default_interface", "selection_label", "chinese_sung", "chinese_hei"}) {
+		std::vector<std::wstring> stack = readStack(fonts[key]);
+		if (stack.empty()) {
+			return false;
+		}
+		fontStacks[utf8ToWide(key)] = std::move(stack);
+	}
+	const Json::Value displayLanguages = fonts["display_languages"];
+	for (const char* key : {"eng", "hin", "ind", "nep", "urd"}) {
+		std::vector<std::wstring> stack = readStack(displayLanguages[key]);
+		if (stack.empty()) {
+			return false;
+		}
+		fontStacks[L"display_languages." + utf8ToWide(key)] = std::move(stack);
+	}
+	const Json::Value* selectedTheme = nullptr;
+	for (const auto& theme : root["themes"]) {
+		if (theme["id"].isString() && theme["id"].asString() == "light") {
+			selectedTheme = &theme;
+			break;
+		}
+	}
+	if (selectedTheme == nullptr || !(*selectedTheme)["palette"].isObject()) {
+		return false;
+	}
+	const Json::Value palette = (*selectedTheme)["palette"];
+	for (const char* name : {
+		     "panel_border", "panel_background", "dictionary_background",
+		     "selection_background", "input_buffer_background", "input_buffer_text",
+		     "item_text", "label_text", "definition_text", "pronunciation_text",
+		     "metalanguage_text", "active_text", "disabled_text", "pos_pill_border",
+		     "dictionary_scroll_track", "dictionary_scroll_thumb"}) {
+		const Json::Value value = palette[name];
+		COLORREF color{};
+		if (!value.isString() || !colorFromHex(value.asString(), color)) {
+			return false;
+		}
+		paletteColors[utf8ToWide(name)] = color;
+	}
+	appearanceFontStacks_ = std::move(fontStacks);
+	appearancePalette_ = std::move(paletteColors);
+	return true;
+}
+
+std::wstring TextService::candidateFontStack(CandidateFontRole role) const {
+	std::wstring key;
+	switch (role) {
+	case CandidateFontRole::SelectionLabel:
+		key = L"selection_label";
+		break;
+	case CandidateFontRole::Chinese:
+	case CandidateFontRole::DictionaryHeadword:
+	case CandidateFontRole::DictionaryValue:
+		key = typeDuckDisplayPreferences_.chineseTypeface == TypeDuck::ChineseTypeface::Hei
+		          ? L"chinese_hei"
+		          : L"chinese_sung";
+		break;
+	case CandidateFontRole::DisplayLanguageEnglish:
+		key = L"display_languages.eng";
+		break;
+	case CandidateFontRole::DisplayLanguageHindi:
+		key = L"display_languages.hin";
+		break;
+	case CandidateFontRole::DisplayLanguageIndonesian:
+		key = L"display_languages.ind";
+		break;
+	case CandidateFontRole::DisplayLanguageNepali:
+		key = L"display_languages.nep";
+		break;
+	case CandidateFontRole::DisplayLanguageUrdu:
+		key = L"display_languages.urd";
+		break;
+	default:
+		key = L"default_interface";
+		break;
+	}
+	const auto found = appearanceFontStacks_.find(key);
+	if (found != appearanceFontStacks_.end()) {
+		return joinFontStack(found->second);
+	}
+	return L"";
+}
+
+int TextService::candidateFontPointSize(CandidateFontRole role) const {
+	switch (role) {
+	case CandidateFontRole::Chinese:
+	case CandidateFontRole::InputBuffer:
+		return 16;
+	case CandidateFontRole::SelectionLabel:
+	case CandidateFontRole::DictionaryPronunciationType:
+	case CandidateFontRole::DictionaryMeta:
+	case CandidateFontRole::DictionaryBody:
+	case CandidateFontRole::DictionaryValue:
+	case CandidateFontRole::DictionaryLanguage:
+	case CandidateFontRole::DisplayLanguageEnglish:
+	case CandidateFontRole::DisplayLanguageHindi:
+	case CandidateFontRole::DisplayLanguageIndonesian:
+	case CandidateFontRole::DisplayLanguageNepali:
+	case CandidateFontRole::DisplayLanguageUrdu:
+		return 12;
+	case CandidateFontRole::PageNavigation:
+		return 28;
+	case CandidateFontRole::InfoIcon:
+		return 16;
+	case CandidateFontRole::DictionaryHeadword:
+		return 32;
+	case CandidateFontRole::DictionaryPronunciation:
+		return 15;
+	case CandidateFontRole::DictionaryPartOfSpeech:
+		return 10;
+	case CandidateFontRole::DictionaryCaption:
+		return 13;
+	case CandidateFontRole::CandidateDefinition:
+		return 14;
+	case CandidateFontRole::Interface:
+	default:
+		return 14;
+	}
+}
+
+HFONT TextService::createCandidateFontForDpi(CandidateFontRole role, int dpiY) const {
+	const std::wstring stack = candidateFontStack(role);
+	const std::wstring face = resolveFontFace(stack);
+	return ::CreateFontW(
+		fontPointHeightForDpi(dpiY, candidateFontPointSize(role)),
+		0, 0, 0,
+		role == CandidateFontRole::DictionaryCaption ? FW_SEMIBOLD : FW_NORMAL,
+		FALSE, FALSE, FALSE,
+		DEFAULT_CHARSET,
+		OUT_DEFAULT_PRECIS,
+		CLIP_DEFAULT_PRECIS,
+		CLEARTYPE_QUALITY,
+		DEFAULT_PITCH | FF_DONTCARE,
+		face.c_str());
+}
+
+HFONT TextService::createCandidateLanguageFontForDpi(
+	TypeDuck::DisplayLanguage language, CandidateFontRole sizeRole, int dpiY) const {
+	CandidateFontRole languageRole = CandidateFontRole::DisplayLanguageEnglish;
+	switch (language) {
+	case TypeDuck::DisplayLanguage::Hindi:
+		languageRole = CandidateFontRole::DisplayLanguageHindi;
+		break;
+	case TypeDuck::DisplayLanguage::Indonesian:
+		languageRole = CandidateFontRole::DisplayLanguageIndonesian;
+		break;
+	case TypeDuck::DisplayLanguage::Nepali:
+		languageRole = CandidateFontRole::DisplayLanguageNepali;
+		break;
+	case TypeDuck::DisplayLanguage::Urdu:
+		languageRole = CandidateFontRole::DisplayLanguageUrdu;
+		break;
+	case TypeDuck::DisplayLanguage::English:
+	default:
+		languageRole = CandidateFontRole::DisplayLanguageEnglish;
+		break;
+	}
+	const std::wstring face = resolveFontFace(candidateFontStack(languageRole));
+	return ::CreateFontW(
+		fontPointHeightForDpi(dpiY, candidateFontPointSize(sizeRole)),
+		0, 0, 0, FW_NORMAL, FALSE, FALSE, FALSE,
+		DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS,
+		CLEARTYPE_QUALITY, DEFAULT_PITCH | FF_DONTCARE, face.c_str());
+}
+
+COLORREF TextService::candidateColor(CandidateColorRole role) const {
+	std::wstring key;
+	bool backgroundRole = false;
+	switch (role) {
+	case CandidateColorRole::DictionaryBackground: key = L"dictionary_background"; backgroundRole = true; break;
+	case CandidateColorRole::PanelBorder: key = L"panel_border"; break;
+	case CandidateColorRole::SelectionBackground: key = L"selection_background"; backgroundRole = true; break;
+	case CandidateColorRole::InputBufferBackground: key = L"input_buffer_background"; backgroundRole = true; break;
+	case CandidateColorRole::InputBufferText: key = L"input_buffer_text"; break;
+	case CandidateColorRole::ItemText: key = L"item_text"; break;
+	case CandidateColorRole::LabelText: key = L"label_text"; break;
+	case CandidateColorRole::DefinitionText: key = L"definition_text"; break;
+	case CandidateColorRole::PronunciationText: key = L"pronunciation_text"; break;
+	case CandidateColorRole::MetalanguageText: key = L"metalanguage_text"; break;
+	case CandidateColorRole::ActiveText: key = L"active_text"; break;
+	case CandidateColorRole::DisabledText: key = L"disabled_text"; break;
+	case CandidateColorRole::PosPillBorder: key = L"pos_pill_border"; break;
+	case CandidateColorRole::DictionaryScrollTrack: key = L"dictionary_scroll_track"; break;
+	case CandidateColorRole::DictionaryScrollThumb: key = L"dictionary_scroll_thumb"; break;
+	case CandidateColorRole::PanelBackground:
+	default:
+		key = L"panel_background";
+		backgroundRole = true;
+		break;
+	}
+	const auto found = appearancePalette_.find(key);
+	return found != appearancePalette_.end()
+	           ? found->second
+	           : (backgroundRole ? RGB(255, 255, 255) : RGB(0, 0, 0));
 }
 
 void TextService::applyCandidateAppearanceNow() {
@@ -1449,13 +1687,6 @@ void TextService::applyCandidateAppearanceNow() {
 		return;
 	}
 
-	HFONT baseFont = font_;
-	if (!baseFont) {
-		baseFont = (HFONT)GetStockObject(DEFAULT_GUI_FONT);
-	}
-
-	LOGFONT lf{};
-	GetObject(baseFont, sizeof(lf), &lf);
 	if (font_) {
 		::DeleteObject(font_);
 		font_ = nullptr;
@@ -1464,17 +1695,8 @@ void TextService::applyCandidateAppearanceNow() {
 		::DeleteObject(commentFont_);
 		commentFont_ = nullptr;
 	}
-
-	lf.lfHeight = candFontHeight();
-	lf.lfWeight = FW_NORMAL;
-	wcsncpy_s(lf.lfFaceName, _countof(lf.lfFaceName),
-	          resolveFontFace(candFontName_, kDefaultCandidateFontFace).c_str(), _TRUNCATE);
-	font_ = CreateFontIndirect(&lf);
-
-	lf.lfHeight = candCommentFontHeight();
-	const std::wstring commentFontName = resolveFontFace(candCommentFontName_, kDefaultCommentFontFace);
-	wcsncpy_s(lf.lfFaceName, _countof(lf.lfFaceName), commentFontName.c_str(), _TRUNCATE);
-	commentFont_ = CreateFontIndirect(&lf);
+	font_ = createCandidateFontForDpi(CandidateFontRole::Interface, kCandidateDpiBaseline);
+	commentFont_ = createCandidateFontForDpi(CandidateFontRole::Interface, kCandidateDpiBaseline);
 	updateFont_ = false;
 
 	if (messageWindow_) {
@@ -1491,13 +1713,6 @@ void TextService::refreshCandidateAppearance() {
 	if (!candidateWindow_) {
 		return;
 	}
-	candidateWindow_->setUseCursor(candUseCursor_);
-	candidateWindow_->setCandPerRow(candPerRow_);
-	candidateWindow_->setCandSpacing(candSpacing_);
-	candidateWindow_->setBackgroundColor(candBackgroundColor_);
-	candidateWindow_->setHighlightColor(candHighlightColor_);
-	candidateWindow_->setTextColor(candTextColor_);
-	candidateWindow_->setHighlightTextColor(candHighlightTextColor_);
 	candidateWindow_->setDisplayPreferences(typeDuckDisplayPreferences_);
 	candidateWindow_->setPreeditText(candidatePreedit_);
 	candidateWindow_->setPreeditCursor(candidatePreeditCursor_);
@@ -1508,18 +1723,12 @@ void TextService::refreshCandidateAppearance() {
 }
 
 void TextService::setTypeDuckDisplayPreferences(TypeDuck::DisplayPreferences preferences) {
-	if (!candFontName_.empty() && displayPreferencesEqual(typeDuckDisplayPreferences_, preferences)) {
+	if (displayPreferencesEqual(typeDuckDisplayPreferences_, preferences)) {
 		return;
 	}
 	typeDuckDisplayPreferences_ = std::move(preferences);
-	if (typeDuckDisplayPreferences_.chineseTypeface == TypeDuck::ChineseTypeface::Hei) {
-		setCandFontName(L"Microsoft JhengHei UI, Microsoft JhengHei");
-		setCandCommentFontName(L"Microsoft JhengHei UI, Microsoft JhengHei");
-	}
-	else {
-		setCandFontName(L"PMingLiU, MingLiU, Microsoft JhengHei UI");
-		setCandCommentFontName(L"Microsoft JhengHei UI, Microsoft JhengHei");
-	}
+	updateFont_ = true;
+	applyCandidateAppearanceNow();
 	if (candidateWindow_) {
 		candidateWindow_->setDisplayPreferences(typeDuckDisplayPreferences_);
 		candidateWindow_->recalculateSize();

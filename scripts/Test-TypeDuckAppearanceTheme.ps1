@@ -1,20 +1,21 @@
 #Requires -Version 5.1
 <#
 .SYNOPSIS
-  Validates the TypeDuck appearance theme contract.
+  Validates the frontend-owned TypeDuck candidate appearance contract.
 
 .PARAMETER RepoRoot
-  Root of moqi-im-windows.
+  Root of TypeDuck-Windows.
 
 .PARAMETER BackendRoot
-  Root of the sibling moqi-ime backend runtime.
+  Deprecated compatibility parameter. TypeDuckAppearance.json is no longer
+  read from the backend.
 
 .PARAMETER Strict
   Enables all currently implemented guard checks.
 #>
 param(
     [string] $RepoRoot = ".",
-    [string] $BackendRoot = "D:\VSProjects\moqi-ime",
+    [string] $BackendRoot = "",
     [switch] $Strict
 )
 
@@ -44,29 +45,25 @@ function Assert-ArraySetEquals {
         [string[]] $Expected,
         [string] $Label
     )
-    $actualSorted = @($Actual | Sort-Object)
-    $expectedSorted = @($Expected | Sort-Object)
-    $actualJoined = $actualSorted -join ","
-    $expectedJoined = $expectedSorted -join ","
+    $actualJoined = (@($Actual) | Sort-Object) -join ","
+    $expectedJoined = (@($Expected) | Sort-Object) -join ","
     if ($actualJoined -ne $expectedJoined) {
         throw "$Label mismatch. Expected [$expectedJoined], got [$actualJoined]."
     }
 }
 
 $repoRootPath = Resolve-FullPath -Path $RepoRoot
-$backendRootPath = Resolve-FullPath -Path $BackendRoot
-$themePath = Join-Path $backendRootPath "input_methods\rime\appearance_themes.json"
+$appearancePath = Join-Path $repoRootPath "configs\TypeDuckAppearance.json"
 
-Assert-True (Test-Path -LiteralPath $themePath) "Missing canonical TypeDuck appearance theme file: $themePath"
+Assert-True (Test-Path -LiteralPath $appearancePath) "Missing frontend TypeDuck appearance file: $appearancePath"
 
-$rawThemeJson = Get-Content -Raw -Encoding UTF8 -LiteralPath $themePath
-$themeFile = $rawThemeJson | ConvertFrom-Json
+$rawJson = Get-Content -Raw -Encoding UTF8 -LiteralPath $appearancePath
+$appearance = $rawJson | ConvertFrom-Json
 
-Assert-True ($themeFile.version -ge 2) "appearance_themes.json must use the TypeDuck schema version 2 or newer."
-Assert-True ($null -ne $themeFile.fonts) "appearance_themes.json must define top-level fonts."
-Assert-True ($null -ne $themeFile.themes) "appearance_themes.json must define themes."
-Assert-True (-not (@($themeFile.PSObject.Properties.Name) -contains "source")) "appearance_themes.json must not include development-source metadata."
-Assert-ArraySetEquals -Actual @($themeFile.themes | ForEach-Object { $_.id }) -Expected @("light", "dark") -Label "Bundled theme IDs"
+Assert-True ($appearance.version -ge 1) "TypeDuckAppearance.json must declare a schema version."
+Assert-True ($null -ne $appearance.fonts) "TypeDuckAppearance.json must define top-level fonts."
+Assert-True ($null -ne $appearance.themes) "TypeDuckAppearance.json must define themes."
+Assert-ArraySetEquals -Actual @($appearance.themes | ForEach-Object { $_.id }) -Expected @("light", "dark") -Label "Bundled theme IDs"
 
 $requiredPaletteRoles = @(
     "panel_background",
@@ -74,90 +71,55 @@ $requiredPaletteRoles = @(
     "input_buffer_background",
     "panel_border",
     "selection_background",
-    "accent",
-    "text_primary",
-    "text_secondary",
+    "item_text",
+    "label_text",
     "pronunciation_text",
     "definition_text",
+    "metalanguage_text",
     "disabled_text",
-    "link_text"
+    "active_text",
+    "pos_pill_border",
+    "dictionary_scroll_track",
+    "dictionary_scroll_thumb"
 )
 
-$bannedThemeIds = @("default", "theme2", "moqi", "purple", "wallgray", "orange", "redplum", "shacheng", "globe", "soymilk", "chrysanthemum", "qinhuangdao", "bubblegum", "pepsi")
-$bannedTextPatterns = @("Moqi", "moqi", "墨奇", "默认主题", "橘白", "很有韵味", "墙灰", "橙狗", "老红梅", "沙城老窖", "地球仪", "豆浆杯", "菊花茶", "秦皇岛", "歪比巴卜", "百事可乐")
-$bannedPaletteKeys = @("primary", "primary-content", "primary-content-200", "highlighted", "secondary", "secondary-content", "base-100", "base-200", "base-300", "base-400", "base-500", "base-content", "base-content-200", "base-content-300", "base-content-400")
-
-foreach ($theme in $themeFile.themes) {
-    Assert-True (-not ($bannedThemeIds -contains $theme.id)) "Banned scaffold theme ID remains: $($theme.id)"
+foreach ($theme in $appearance.themes) {
     $themeProperties = @($theme.PSObject.Properties.Name)
     Assert-True (-not ($themeProperties -contains "fonts")) "Theme '$($theme.id)' must not contain font data; fonts belong at the top level."
-    Assert-True (-not ($themeProperties -contains "appearance")) "Theme '$($theme.id)' must not use the legacy appearance object."
-    Assert-True (-not ($themeProperties -contains "source")) "Theme '$($theme.id)' must not include development-source metadata."
     Assert-True ($null -ne $theme.palette) "Theme '$($theme.id)' must define a role-based palette."
-
     $paletteKeys = @($theme.palette.PSObject.Properties.Name)
     foreach ($role in $requiredPaletteRoles) {
         Assert-True ($paletteKeys -contains $role) "Theme '$($theme.id)' is missing palette role '$role'."
     }
-    foreach ($key in $paletteKeys) {
-        Assert-True (-not ($bannedPaletteKeys -contains $key)) "Theme '$($theme.id)' uses banned Tailwind/DaisyUI token key '$key'."
+    foreach ($removedRole in @("pos_pill_background", "pos_pill_text", "selection_text", "link_hover_text", "tooltip_background", "tooltip_text")) {
+        Assert-True (-not ($paletteKeys -contains $removedRole)) "Theme '$($theme.id)' must not define removed palette role '$removedRole'."
     }
 }
 
-foreach ($pattern in $bannedTextPatterns) {
-    Assert-True (-not $rawThemeJson.Contains($pattern)) "Banned scaffold theme text remains in appearance_themes.json: $pattern"
-}
-
-$displayLanguages = $themeFile.fonts.display_languages
+$displayLanguages = $appearance.fonts.display_languages
 Assert-True ($null -ne $displayLanguages) "Top-level fonts must include display_languages."
 Assert-ArraySetEquals -Actual @($displayLanguages.PSObject.Properties.Name) -Expected @("eng", "hin", "ind", "nep", "urd") -Label "Display-language font IDs"
 
-foreach ($fontKey in @("candidate_chinese_sung", "candidate_chinese_hei", "dictionary_comment")) {
-    Assert-True ($null -ne $themeFile.fonts.$fontKey) "Top-level fonts missing '$fontKey'."
+foreach ($fontKey in @("default_interface", "selection_label", "chinese_sung", "chinese_hei")) {
+    Assert-True ($null -ne $appearance.fonts.$fontKey) "Top-level fonts missing '$fontKey'."
 }
 
-$loaderPath = Join-Path $backendRootPath "input_methods\rime\appearance_themes.go"
-$buildScriptPath = Join-Path $backendRootPath "scripts\build.ps1"
-Assert-True (Test-Path -LiteralPath $loaderPath) "Missing backend theme loader: $loaderPath"
-Assert-True (Test-Path -LiteralPath $buildScriptPath) "Missing backend build script: $buildScriptPath"
-
-$loaderSource = Get-Content -Raw -Encoding UTF8 -LiteralPath $loaderPath
-Assert-True ($loaderSource.Contains("ThemePalette")) "Backend loader must decode the TypeDuck palette contract."
-Assert-True ($loaderSource -match 'Palette\s+ThemePalette\s+`json:"palette,omitempty"`') "ThemeDefinition must expose TypeDuck palette data."
-Assert-True (-not ($loaderSource -match '`json:"source"`')) "ThemeDefinition must not decode or write development-source metadata."
-Assert-True ($loaderSource -match 'Fonts\s+map\[string\]interface\{\}\s+`json:"fonts,omitempty"`') "appearanceThemesFile must decode top-level fonts."
-Assert-True ($loaderSource.Contains("paletteAppearanceConfig")) "Backend loader must map TypeDuck palettes to runtime appearance fields."
-
-$canonicalProbe = 'filepath.Join(exeDir, "input_methods", "rime", appearanceThemesFileName)'
-$compatProbe = 'filepath.Join(exeDir, "input_methods", "rime", "data", appearanceThemesFileName)'
-$canonicalProbeIndex = $loaderSource.IndexOf($canonicalProbe)
-$compatProbeIndex = $loaderSource.IndexOf($compatProbe)
-Assert-True ($canonicalProbeIndex -ge 0) "Backend loader must probe canonical input_methods/rime/appearance_themes.json."
-Assert-True ($compatProbeIndex -ge 0) "Backend loader may keep data-path compatibility only after the canonical probe."
-Assert-True ($canonicalProbeIndex -lt $compatProbeIndex) "Backend loader must prefer the canonical root theme file before the data compatibility copy."
-
-$buildScriptSource = Get-Content -Raw -Encoding UTF8 -LiteralPath $buildScriptPath
-Assert-True ($buildScriptSource -match '\$runtimeFiles\s*=\s*@\([^)]*"appearance_themes\.json"[^)]*\)') "Build script must whitelist canonical input_methods/rime/appearance_themes.json."
-Assert-True ($buildScriptSource -match '\$sourcePath\s*=\s*Join-Path\s+\$RimeDir\s+\$name') "Build script must source whitelisted runtime files from input_methods/rime."
-Assert-True ($buildScriptSource -match '\$destinationPath\s*=\s*Join-Path\s+\$PackageRimeDir\s+\$name') "Build script must stage whitelisted runtime files at the canonical input_methods/rime root."
-Assert-True (-not $buildScriptSource.Contains('$packageAppearanceThemesData = Join-Path $PackageRimeDataDir "appearance_themes.json"')) "Build script must not stage a data-path appearance_themes.json compatibility copy."
-Assert-True (-not $buildScriptSource.Contains("Packaged appearance theme compatibility copy is not byte-identical")) "Build script must not retain compatibility-copy drift checks for the removed data-path theme file."
-
-$compatThemePath = Join-Path $backendRootPath "input_methods\rime\data\appearance_themes.json"
-if (Test-Path -LiteralPath $compatThemePath) {
-    $canonicalHash = (Get-FileHash -Algorithm SHA256 -LiteralPath $themePath).Hash
-    $compatHash = (Get-FileHash -Algorithm SHA256 -LiteralPath $compatThemePath).Hash
-    Assert-True ($canonicalHash -eq $compatHash) "Existing data-path compatibility theme file is not byte-identical to the canonical root file."
+foreach ($fontKey in @("candidate_chinese_sung", "candidate_chinese_hei", "dictionary_headword_sung", "dictionary_headword_hei", "dictionary_comment")) {
+    Assert-True ($null -eq $appearance.fonts.$fontKey) "Removed font role remains: '$fontKey'."
 }
 
-$packageThemePath = Join-Path $backendRootPath "scripts\build\TypeDuckRuntime\input_methods\rime\appearance_themes.json"
-$packageCompatThemePath = Join-Path $backendRootPath "scripts\build\TypeDuckRuntime\input_methods\rime\data\appearance_themes.json"
-if ((Test-Path -LiteralPath $packageThemePath) -or (Test-Path -LiteralPath $packageCompatThemePath)) {
-    Assert-True (Test-Path -LiteralPath $packageThemePath) "Packaged canonical appearance theme is missing from input_methods/rime."
-    Assert-True (-not (Test-Path -LiteralPath $packageCompatThemePath)) "Packaged data-path compatibility appearance theme must not exist."
-    $packageCanonicalHash = (Get-FileHash -Algorithm SHA256 -LiteralPath $packageThemePath).Hash
-    Assert-True ($packageCanonicalHash -eq (Get-FileHash -Algorithm SHA256 -LiteralPath $themePath).Hash) "Packaged canonical theme file does not match the backend source theme file."
-}
+Assert-True ($rawJson -notmatch '"point_size"\s*:') "TypeDuckAppearance.json must not contain point_size keys."
+Assert-True ($rawJson -notmatch '"lang"\s*:') "TypeDuckAppearance.json must not contain lang keys."
+Assert-True ($rawJson -notmatch '"label"\s*:') "TypeDuckAppearance.json must not contain label keys; use description."
 
-Write-Host "[PASS] TypeDuck appearance theme schema is role-based, light/dark only, and font data is top-level."
-Write-Host "[PASS] Backend loader prefers the canonical root theme file and package output keeps only that canonical copy."
+$textServiceSource = Get-Content -Raw -Encoding UTF8 -LiteralPath (Join-Path $repoRootPath "MoqiTextService\MoqiTextService.cpp")
+$installScript = Get-Content -Raw -Encoding UTF8 -LiteralPath (Join-Path $repoRootPath "scripts\install.ps1")
+
+Assert-True ($textServiceSource.Contains("configs\\TypeDuckAppearance.json")) "TextService must load the frontend TypeDuckAppearance.json asset."
+Assert-True (-not $textServiceSource.Contains("appearance_themes.json")) "TextService must not load backend appearance_themes.json."
+Assert-True (-not $textServiceSource.Contains("ProgramFiles(x86)")) "TextService must not guess the install path from Program Files."
+Assert-True ($textServiceSource.Contains("programDir()")) "TextService must resolve appearance from the configured app directory."
+Assert-True ($installScript.Contains("configs")) "Installer staging must create/copy the frontend configs folder."
+Assert-True ($installScript.Contains("TypeDuckAppearance.json")) "Installer staging must include TypeDuckAppearance.json."
+
+Write-Host "[PASS] TypeDuckAppearance.json is frontend-owned, role-based, and packaged under configs."

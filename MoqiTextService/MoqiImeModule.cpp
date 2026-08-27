@@ -22,8 +22,6 @@
 #include "MoqiTextService.h"
 #include "TypeDuckProfile.h"
 #include <Shellapi.h>
-#include <ShlObj.h>
-#include <Shlwapi.h>
 #include <cstring>
 #include <fstream>
 #include <json/json.h>
@@ -37,29 +35,6 @@ namespace {
 
 constexpr const wchar_t* kTypeDuckSettingsExecutable = L"TypeDuckSettings.exe";
 constexpr const wchar_t* kTypeDuckRuntimeDir = L"TypeDuckRuntime";
-
-std::wstring getConfiguredProgramDir() {
-  wchar_t path[MAX_PATH] = {};
-  DWORD len = ::GetEnvironmentVariableW(TypeDuck::programDirEnvVar(), path, _countof(path));
-  if (len > 0 && len < _countof(path)) {
-    return path;
-  }
-
-  len = ::GetEnvironmentVariableW(TypeDuck::legacyProgramDirEnvVar(), path, _countof(path));
-  if (len > 0 && len < _countof(path)) {
-    return path;
-  }
-
-  HRESULT result;
-  result = ::SHGetFolderPathW(NULL, CSIDL_PROGRAM_FILESX86, NULL, 0, path);
-  if (result != S_OK) {
-    result = ::SHGetFolderPathW(NULL, CSIDL_PROGRAM_FILES, NULL, 0, path);
-  }
-  if (result == S_OK) {
-    return TypeDuck::defaultProgramDir(path);
-  }
-  return std::wstring();
-}
 
 std::wstring buildTypeDuckSettingsPath(const std::wstring& programDir) {
   if (programDir.empty()) {
@@ -88,7 +63,7 @@ void loadFixedRuntimeDirs(std::vector<std::wstring>& backendDirs) {
 
 ImeModule::ImeModule(HMODULE module)
     : Ime::ImeModule(module, g_textServiceClsid) {
-  programDir_ = getConfiguredProgramDir();
+  programDir_ = TypeDuck::configuredProgramDir();
   if (!programDir_.empty()) {
     loadFixedRuntimeDirs(backendDirs_);
   }

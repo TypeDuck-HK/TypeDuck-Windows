@@ -30,7 +30,7 @@ enum class ChineseTypeface {
 };
 
 struct LanguageRow {
-  std::wstring code;
+  DisplayLanguage language;
   std::wstring name;
   std::wstring value;
 };

@@ -8,6 +8,7 @@
 #include <LibIME2/src/ImeWindow.h>
 #include "TypeDuckCandidateInfo.h"
 
+#include <map>
 #include <string>
 #include <vector>
 
@@ -76,20 +77,11 @@ public:
     void add(CandidateUiItem item, wchar_t selKey);
     void clear();
     void setFont(HFONT font);
-    void setCandPerRow(int n);
-    void setCandSpacing(int spacing);
     void setCurrentSel(int sel);
-    void setUseCursor(bool use);
     void setPreeditText(std::wstring text);
     void setPreeditCursor(int cursor);
     void setPreeditSelection(int start, int end);
     void setCommentFont(HFONT font);
-    void setBackgroundColor(COLORREF color);
-    void setHighlightColor(COLORREF color);
-    void setTextColor(COLORREF color);
-    void setHighlightTextColor(COLORREF color);
-    void setCommentColor(COLORREF color);
-    void setCommentHighlightColor(COLORREF color);
     void setDisplayPreferences(TypeDuck::DisplayPreferences preferences);
     void syncOwner(Ime::EditSession* session);
     void recalculateSize() override;
@@ -141,6 +133,10 @@ private:
     void clampDictionaryScrollOffset();
     void resetDictionaryReveal(bool resetMouseTracking = true);
     void updateDictionaryRevealFromMovement(POINT pt);
+    void refreshThemeColors();
+    void deleteOwnedFonts();
+    HFONT candidateDefinitionFont(TypeDuck::DisplayLanguage language) const;
+    HFONT dictionaryLanguageFont(TypeDuck::DisplayLanguage language) const;
 
 private:
     BOOL shown_;
@@ -148,8 +144,6 @@ private:
     int textWidth_;
     int commentWidth_;
     int itemHeight_;
-    int candPerRow_;
-    int candSpacing_;
     int colSpacing_;
     int rowSpacing_;
     int padX_;
@@ -186,16 +180,30 @@ private:
     POINT lastMouseMovePoint_;
     bool hasLastMouseMovePoint_;
     COLORREF backgroundColor_;
+    COLORREF dictionaryBackgroundColor_;
     COLORREF highlightColor_;
     COLORREF textColor_;
     COLORREF highlightTextColor_;
     COLORREF commentColor_;
     COLORREF commentHighlightColor_;
+    COLORREF borderColor_;
+    COLORREF inputBufferBackgroundColor_;
+    COLORREF inputBufferTextColor_;
+    COLORREF labelTextColor_;
+    COLORREF pronunciationTextColor_;
+    COLORREF definitionTextColor_;
+    COLORREF metalanguageTextColor_;
+    COLORREF activeTextColor_;
+    COLORREF disabledTextColor_;
+    COLORREF posPillBackgroundColor_;
+    COLORREF posPillBorderColor_;
+    COLORREF posPillTextColor_;
+    COLORREF dictionaryScrollTrackColor_;
+    COLORREF dictionaryScrollThumbColor_;
     std::wstring preedit_;
     int preeditCursor_;
     int preeditSelectionStart_;
     int preeditSelectionEnd_;
-    HFONT commentFont_;
     std::vector<wchar_t> selKeys_;
     std::vector<CandidateUiItem> items_;
     std::vector<int> itemTextWidths_;
@@ -209,11 +217,24 @@ private:
     int hoveredPageNavDirection_;
     int dpiX_;
     int dpiY_;
-    HFONT ownedFont_;
-    HFONT ownedCommentFont_;
+    HFONT interfaceFont_;
+    HFONT inputBufferFont_;
+    HFONT selectionLabelFont_;
+    HFONT chineseFont_;
+    HFONT pageNavigationFont_;
+    HFONT infoIconFont_;
+    HFONT dictionaryHeadwordFont_;
+    HFONT dictionaryPronunciationFont_;
+    HFONT dictionaryPronunciationTypeFont_;
+    HFONT dictionaryMetaFont_;
+    HFONT dictionaryPartOfSpeechFont_;
+    HFONT dictionaryBodyFont_;
+    HFONT dictionaryValueFont_;
+    HFONT dictionaryCaptionFont_;
+    std::map<TypeDuck::DisplayLanguage, HFONT> candidateDefinitionFonts_;
+    std::map<TypeDuck::DisplayLanguage, HFONT> dictionaryLanguageFonts_;
     bool draggingWindow_;
     bool trackingMouse_;
-    bool useCursor_;
 };
 
 } // namespace Moqi

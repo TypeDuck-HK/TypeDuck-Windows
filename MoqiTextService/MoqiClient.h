@@ -37,11 +37,6 @@ namespace Moqi {
 
 class TextService;
 
-struct AutoPairRuleState {
-	std::wstring open;
-	std::wstring close;
-};
-
 class Client
 {
 public:
@@ -133,7 +128,6 @@ private:
 	bool updateCandidatePayload(Json::Value& msg, bool& hasVisibleCandidates);
     void updateCandidateList(Json::Value& msg, Ime::EditSession* session);
 	void updateCandidateListWithoutSession(Json::Value& msg);
-    void updateUI(const Json::Value& data);
     void updateStatus(Json::Value& msg, Ime::EditSession* session = nullptr);
 
 private:
@@ -152,7 +146,6 @@ private:
 	UINT_PTR asyncPollTimerId_;
 	bool asyncFlushInProgress_;
 	std::deque<Json::Value> pendingAsyncResponses_;
-	std::vector<AutoPairRuleState> autoPairRules_;
 };
 
 }

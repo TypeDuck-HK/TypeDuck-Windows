@@ -36,11 +36,9 @@
 #include <cwctype>
 #include <filesystem>
 #include <fstream>
-#include <iomanip>
 #include <memory>
 #include <sstream>
 #include <exception>
-#include <thread>
 
 using namespace std;
 
@@ -188,36 +186,6 @@ private:
   std::atomic<int> &counter_;
 };
 
-std::wstring quotePairLogPath() {
-  const wchar_t *localAppData = _wgetenv(L"LOCALAPPDATA");
-  if (!localAppData || !*localAppData) {
-    return L"";
-  }
-  return std::wstring(localAppData) + L"\\TypeDuckIME\\Log\\quote-pair-debug.log";
-}
-
-void appendQuotePairLog(const std::wstring &message) {
-  if (!Ime::isDebugLoggingEnabled()) {
-    return;
-  }
-  const std::wstring logPath = quotePairLogPath();
-  if (logPath.empty()) {
-    return;
-  }
-
-  SYSTEMTIME now{};
-  ::GetLocalTime(&now);
-  wchar_t timestamp[32] = {};
-  swprintf_s(timestamp, L"%04d-%02d-%02d %02d:%02d:%02d", now.wYear,
-             now.wMonth, now.wDay, now.wHour, now.wMinute, now.wSecond);
-
-  std::wofstream stream(logPath, std::ios::app);
-  if (!stream.is_open()) {
-    return;
-  }
-  stream << L"[" << timestamp << L"] " << message << L"\n";
-}
-
 int utf16CursorFromCodePointCursor(const std::wstring &text, int cursor) {
   if (cursor <= 0) {
     return 0;
@@ -233,95 +201,6 @@ int utf16CursorFromCodePointCursor(const std::wstring &text, int cursor) {
     }
   }
   return utf16Cursor;
-}
-
-std::wstring formatCodePoints(const std::wstring &text) {
-  if (text.empty()) {
-    return L"(empty)";
-  }
-
-  std::wostringstream stream;
-  stream << std::uppercase << std::hex;
-  for (size_t i = 0; i < text.size(); ++i) {
-    if (i != 0) {
-      stream << L" ";
-    }
-    stream << L"U+" << std::setw(4) << std::setfill(L'0')
-           << static_cast<unsigned int>(text[i]);
-  }
-  return stream.str();
-}
-
-std::vector<AutoPairRuleState> defaultAutoPairRules() {
-  return {
-      {L"“", L"”"}, {L"‘", L"’"}, {L"【", L"】"}, {L"《", L"》"},
-      {L"<", L">"}, {L"(", L")"}, {L"（", L"）"}, {L"「", L"」"},
-  };
-}
-
-bool shouldAutoPairSymbol(const std::wstring &commitString,
-                          const std::vector<AutoPairRuleState> &rules,
-                          std::wstring &pairedString) {
-  if (commitString.size() != 1) {
-    return false;
-  }
-
-  for (const auto &rule : rules) {
-    if (rule.open.size() != 1 || rule.close.size() != 1) {
-      continue;
-    }
-    const wchar_t symbol = commitString[0];
-    if (symbol != rule.open[0] && symbol != rule.close[0]) {
-      continue;
-    }
-    pairedString = rule.open + rule.close;
-    return true;
-  }
-  return false;
-}
-
-void sendDelayedLeftArrow(HWND targetWindow) {
-  if (targetWindow == nullptr) {
-    appendQuotePairLog(L"[caretMove] skipped target_window=null");
-    return;
-  }
-
-  std::thread([targetWindow]() {
-    constexpr int kInitialDelayMs = 25;
-    constexpr int kModifierPollDelayMs = 5;
-    constexpr int kModifierPollCount = 40;
-
-    ::Sleep(kInitialDelayMs);
-    for (int i = 0; i < kModifierPollCount; ++i) {
-      HWND foreground = ::GetForegroundWindow();
-      if (foreground != targetWindow) {
-        appendQuotePairLog(L"[caretMove] skipped foreground_changed");
-        return;
-      }
-      const bool shiftDown =
-          (::GetAsyncKeyState(VK_SHIFT) & 0x8000) != 0 ||
-          (::GetAsyncKeyState(VK_LSHIFT) & 0x8000) != 0 ||
-          (::GetAsyncKeyState(VK_RSHIFT) & 0x8000) != 0;
-      if (!shiftDown) {
-        break;
-      }
-      ::Sleep(kModifierPollDelayMs);
-    }
-
-    INPUT inputs[2] = {};
-    inputs[0].type = INPUT_KEYBOARD;
-    inputs[0].ki.wVk = VK_LEFT;
-    inputs[1].type = INPUT_KEYBOARD;
-    inputs[1].ki.wVk = VK_LEFT;
-    inputs[1].ki.dwFlags = KEYEVENTF_KEYUP;
-
-    const UINT sent = ::SendInput(2, inputs, sizeof(INPUT));
-    if (sent == 2) {
-      appendQuotePairLog(L"[caretMove] sent VK_LEFT");
-    } else {
-      appendQuotePairLog(L"[caretMove] SendInput failed");
-    }
-  }).detach();
 }
 
 } // namespace
@@ -385,53 +264,6 @@ static Json::Value menuItemsToJson(
     }
     result.append(jsonItem);
   }
-  return result;
-}
-
-static Json::Value customizeUiToJson(const moqi::protocol::CustomizeUi &ui) {
-  Json::Value result;
-  if (ui.has_cand_font_name())
-    result["candFontName"] = ui.cand_font_name();
-  if (ui.has_cand_comment_font_name())
-    result["candCommentFontName"] = ui.cand_comment_font_name();
-  if (ui.has_cand_font_size())
-    result["candFontSize"] = ui.cand_font_size();
-  if (ui.has_cand_comment_font_size())
-    result["candCommentFontSize"] = ui.cand_comment_font_size();
-  if (ui.has_cand_per_row())
-    result["candPerRow"] = ui.cand_per_row();
-  if (ui.has_cand_spacing())
-    result["candSpacing"] = ui.cand_spacing();
-  if (ui.has_cand_use_cursor())
-    result["candUseCursor"] = ui.cand_use_cursor();
-  if (ui.has_inline_preedit())
-    result["inlinePreedit"] = ui.inline_preedit();
-  if (ui.has_cand_background_color())
-    result["candBackgroundColor"] = ui.cand_background_color();
-  if (ui.has_cand_highlight_color())
-    result["candHighlightColor"] = ui.cand_highlight_color();
-  if (ui.has_cand_text_color())
-    result["candTextColor"] = ui.cand_text_color();
-  if (ui.has_cand_highlight_text_color())
-    result["candHighlightTextColor"] = ui.cand_highlight_text_color();
-  if (ui.has_cand_comment_color())
-    result["candCommentColor"] = ui.cand_comment_color();
-  if (ui.has_cand_comment_highlight_color())
-    result["candCommentHighlightColor"] = ui.cand_comment_highlight_color();
-  if (ui.has_auto_pair_quotes())
-    result["autoPairQuotes"] = ui.auto_pair_quotes();
-  if (ui.auto_pair_rules_size() > 0) {
-    Json::Value rules(Json::arrayValue);
-    for (const auto &rule : ui.auto_pair_rules()) {
-      Json::Value item;
-      item["open"] = rule.open();
-      item["close"] = rule.close();
-      rules.append(item);
-    }
-    result["autoPairRules"] = rules;
-  }
-  if (ui.has_semicolon_select_second())
-    result["semicolonSelectSecond"] = ui.semicolon_select_second();
   return result;
 }
 
@@ -694,8 +526,6 @@ static Json::Value responseToJson(const moqi::protocol::ServerResponse &response
     result["commitString"] = response.commit_string();
   if (!response.set_sel_keys().empty())
     result["setSelKeys"] = response.set_sel_keys();
-  if (response.has_customize_ui())
-    result["customizeUI"] = customizeUiToJson(response.customize_ui());
   if (response.has_show_message()) {
     Json::Value message;
     message["message"] = response.show_message().message();
@@ -777,8 +607,7 @@ Client::Client(TextService *service, REFIID langProfileGuid)
       shouldWaitConnection_{true}, launcherStartAttempted_{false},
       degradedUntilTick_(0),
       asyncPollTimerWindow_(nullptr),
-      asyncPollTimerId_(0), asyncFlushInProgress_(false),
-      autoPairRules_(defaultAutoPairRules()) {}
+      asyncPollTimerId_(0), asyncFlushInProgress_(false) {}
 
 Client::~Client(void) {
   if (asyncPollTimerId_ != 0) {
@@ -834,51 +663,6 @@ bool Client::handleTypeDuckFailure(Json::Value &msg, Ime::EditSession *session) 
   return false;
 }
 
-void Client::updateUI(const Json::Value &data) {
-  for (auto it = data.begin(); it != data.end(); ++it) {
-    const char *name = it.memberName();
-    const Json::Value &value = *it;
-    if (value.isString() && strcmp(name, "candFontName") == 0) {
-      continue;
-    } else if (value.isString() && strcmp(name, "candCommentFontName") == 0) {
-      continue;
-    } else if (value.isInt() && strcmp(name, "candFontSize") == 0) {
-      textService_->setCandFontSize(value.asInt());
-    } else if (value.isInt() && strcmp(name, "candCommentFontSize") == 0) {
-      textService_->setCandCommentFontSize(value.asInt());
-    } else if (value.isInt() && strcmp(name, "candPerRow") == 0) {
-      textService_->setCandPerRow(value.asInt());
-    } else if (value.isInt() && strcmp(name, "candSpacing") == 0) {
-      textService_->setCandSpacing(value.asInt());
-    } else if (value.isBool() && strcmp(name, "candUseCursor") == 0) {
-      textService_->setCandUseCursor(value.asBool());
-    } else if (value.isBool() && strcmp(name, "inlinePreedit") == 0) {
-      textService_->setInlinePreedit(value.asBool());
-    } else if (value.isBool() && strcmp(name, "autoPairQuotes") == 0) {
-      textService_->setAutoPairQuotes(value.asBool());
-    } else if (value.isArray() && strcmp(name, "autoPairRules") == 0) {
-      std::vector<AutoPairRuleState> rules;
-      rules.reserve(value.size());
-      for (const auto &item : value) {
-        const Json::Value &open = item["open"];
-        const Json::Value &close = item["close"];
-        if (!open.isString() || !close.isString()) {
-          continue;
-        }
-        std::wstring openText = utf8ToUtf16(open.asCString());
-        std::wstring closeText = utf8ToUtf16(close.asCString());
-        if (openText.empty() || closeText.empty()) {
-          continue;
-        }
-        rules.push_back({std::move(openText), std::move(closeText)});
-      }
-      autoPairRules_ = std::move(rules);
-    }
-  }
-  textService_->applyCandidateAppearanceNow();
-  textService_->refreshCandidateAppearance();
-}
-
 void Client::updateSelectionKeys(Json::Value &msg) {
   // set sel keys before update candidates
   const auto &setSelKeysVal = msg["setSelKeys"];
@@ -917,34 +701,13 @@ void Client::updateCommitString(Json::Value &msg, Ime::EditSession *session,
   // handle comosition and commit strings
   const auto &commitStringVal = msg["commitString"];
   if (commitStringVal.isString()) {
-    const std::wstring rawCommitString = utf8ToUtf16(commitStringVal.asCString());
-    const bool autoPairQuotesEnabled = textService_->autoPairQuotes();
-    std::wstring commitString = rawCommitString;
-    std::wstring pairedCommitString;
-    const bool isAutoPairSymbol =
-        shouldAutoPairSymbol(rawCommitString, autoPairRules_, pairedCommitString);
-    if (isAutoPairSymbol) {
-      appendQuotePairLog(L"[updateCommitString] raw_redacted length=" +
-                         std::to_wstring(rawCommitString.size()) + L" auto_pair_quotes=" +
-                         (autoPairQuotesEnabled ? L"true" : L"false"));
-    }
-
-    const bool autoPairedSymbols = autoPairQuotesEnabled && isAutoPairSymbol;
-    if (autoPairedSymbols) {
-      commitString = pairedCommitString;
-      appendQuotePairLog(L"[updateCommitString] paired_redacted length=" +
-                         std::to_wstring(commitString.size()));
-    }
+    const std::wstring commitString = utf8ToUtf16(commitStringVal.asCString());
     if (!commitString.empty()) {
-      HWND targetWindow = ::GetForegroundWindow();
       if (!textService_->isComposing()) {
         textService_->startComposition(session->context());
       }
       textService_->setCompositionString(session, commitString.c_str(),
                                          commitString.length());
-      if (autoPairedSymbols) {
-        textService_->setCompositionCursor(session, 1);
-      }
       // FIXME: update the position of candidate and message window when the
       // composition string is changed.
       if (textService_->hasCandidateWindow()) {
@@ -957,9 +720,6 @@ void Client::updateCommitString(Json::Value &msg, Ime::EditSession *session,
         textService_->suppressNextCompositionTerminatedNotification();
       }
       textService_->endComposition(session->context());
-      if (autoPairedSymbols) {
-        sendDelayedLeftArrow(targetWindow);
-      }
     }
   }
 }
@@ -1189,11 +949,6 @@ void Client::updateStatus(Json::Value &msg, Ime::EditSession *session) {
 
   // show message
   bool endComposition = false;
-  const auto &customizeUIVal = msg["customizeUI"];
-  if (customizeUIVal.isObject()) {
-    updateUI(customizeUIVal);
-  }
-
   if (session != nullptr) { // if an edit session is available
     updateMessageWindow(msg, session, endComposition);
 
@@ -2212,7 +1967,6 @@ void Client::resetTextServiceState() {
     }
     buttons_.clear();
   }
-  autoPairRules_ = defaultAutoPairRules();
 }
 
 void Client::closeRpcConnection() {

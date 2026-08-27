@@ -216,10 +216,18 @@ if ($Strict) {
         "Strict mode: CMake must compile TypeDuckProfile.cpp."
     Assert-Match $failures $cmakeSource "TypeDuckProfile\.h" `
         "Strict mode: CMake must list TypeDuckProfile.h."
-    Assert-Match $failures $moduleSource "programDirEnvVar\(\)|TYPEDUCK_PROGRAM_DIR" `
-        "Strict mode: MoqiImeModule.cpp must prefer the centralized TYPEDUCK_PROGRAM_DIR source."
-    Assert-Match $failures $moduleSource "legacyProgramDirEnvVar\(\)|MOQI_PROGRAM_DIR" `
-        "Strict mode: MoqiImeModule.cpp should retain MOQI_PROGRAM_DIR only as a compatibility fallback during transition."
+    Assert-Match $failures $combinedSource "programDirEnvVar\(\)|TYPEDUCK_PROGRAM_DIR" `
+        "Strict mode: TSF install-path code must prefer the centralized TYPEDUCK_PROGRAM_DIR source."
+    Assert-Match $failures $combinedSource "legacyProgramDirEnvVar\(\)|MOQI_PROGRAM_DIR" `
+        "Strict mode: TSF install-path code should retain MOQI_PROGRAM_DIR only as a compatibility fallback during transition."
+    Assert-Match $failures $combinedSource "RegOpenKeyExW" `
+        "Strict mode: TSF install-path code must read the persisted installer app directory."
+    Assert-Match $failures $combinedSource "Software\\\\TypeDuckIME" `
+        "Strict mode: TSF install-path code must read the TypeDuck install-directory registry key."
+    Assert-Match $failures $combinedSource "InstallDir" `
+        "Strict mode: TSF install-path code must read the persisted installer app directory value."
+    Assert-NotMatch $failures $combinedSource "CSIDL_PROGRAM_FILES|ProgramFiles|defaultProgramDir" `
+        "Strict mode: TSF install-path code must not guess the install directory from Program Files."
 }
 
 if ($failures.Count -gt 0) {

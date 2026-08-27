@@ -29,14 +29,60 @@
 #include <sys/types.h>
 #include "MoqiClient.h"
 #include <algorithm>
+#include <map>
 #include <memory>
 
 
 namespace Moqi {
 
+enum class CandidateFontRole {
+	Interface,
+	InputBuffer,
+	SelectionLabel,
+	Chinese,
+	PageNavigation,
+	InfoIcon,
+	DictionaryHeadword,
+	DictionaryPronunciation,
+	DictionaryPronunciationType,
+	DictionaryMeta,
+	DictionaryPartOfSpeech,
+	DictionaryBody,
+	DictionaryValue,
+	DictionaryCaption,
+	CandidateDefinition,
+	DictionaryLanguage,
+	DisplayLanguageEnglish,
+	DisplayLanguageHindi,
+	DisplayLanguageIndonesian,
+	DisplayLanguageNepali,
+	DisplayLanguageUrdu,
+};
+
+enum class CandidateColorRole {
+	PanelBackground,
+	DictionaryBackground,
+	PanelBorder,
+	SelectionBackground,
+	InputBufferBackground,
+	InputBufferText,
+	ItemText,
+	LabelText,
+	DefinitionText,
+	PronunciationText,
+	MetalanguageText,
+	ActiveText,
+	DisabledText,
+	PosPillBorder,
+	DictionaryScrollTrack,
+	DictionaryScrollThumb,
+};
+
 class TextService: public Ime::TextService {
 	friend class Client;
 public:
+	static constexpr bool kTypeDuckInlinePreedit = true;
+
 	TextService(ImeModule* module);
 
 	virtual void onActivate();
@@ -84,14 +130,6 @@ public:
 	virtual void onLayoutChange(ITfContext* context, TfLayoutCode code, ITfContextView* view) override;
 
 	// methods called by Moqi::Client
-	int candPerRow() const {
-		return candPerRow_;
-	}
-
-	void setCandPerRow(int candPerRow) {
-		candPerRow_ = candPerRow;
-	}
-
 	int candidatePageSize() const {
 		return candidatePageSize_;
 	}
@@ -132,120 +170,12 @@ public:
 		candidateHasNext_ = candidateHasNext;
 	}
 
-	int candSpacing() const {
-		return candSpacing_;
-	}
-
-	void setCandSpacing(int candSpacing) {
-		candSpacing_ = candSpacing;
-	}
-
 	std::wstring selKeys() const {
 		return selKeys_;
 	}
 
 	void setSelKeys(std::wstring selKeys) {
 		selKeys_ = selKeys;
-	}
-
-	bool candUseCursor() const {
-		return candUseCursor_;
-	}
-
-	void setCandUseCursor(bool candUseCursor) {
-		candUseCursor_ = candUseCursor;
-	}
-
-	std::wstring candFontName() const {
-		return candFontName_;
-	}
-
-	void setCandFontName(std::wstring candFontName) {
-		candFontName_ = candFontName;
-		updateFont_ = true;
-		applyCandidateAppearanceNow();
-	}
-
-	std::wstring candCommentFontName() const {
-		return candCommentFontName_;
-	}
-
-	void setCandCommentFontName(std::wstring candCommentFontName) {
-		candCommentFontName_ = candCommentFontName;
-		updateFont_ = true;
-		applyCandidateAppearanceNow();
-	}
-
-	int candFontSize() {
-		return candFontSize_;
-	}
-
-	void setCandFontSize(int candFontSize) {
-		candFontSize_ = candFontSize;
-		updateFont_ = true;
-		applyCandidateAppearanceNow();
-	}
-
-	int candCommentFontSize() const {
-		return candCommentFontSize_;
-	}
-
-	void setCandCommentFontSize(int candCommentFontSize) {
-		candCommentFontSize_ = candCommentFontSize;
-		updateFont_ = true;
-		applyCandidateAppearanceNow();
-	}
-
-	COLORREF candBackgroundColor() const {
-		return candBackgroundColor_;
-	}
-
-	void setCandBackgroundColor(COLORREF color) {
-		candBackgroundColor_ = color;
-	}
-
-	COLORREF candHighlightColor() const {
-		return candHighlightColor_;
-	}
-
-	void setCandHighlightColor(COLORREF color) {
-		candHighlightColor_ = color;
-	}
-
-	COLORREF candTextColor() const {
-		return candTextColor_;
-	}
-
-	void setCandTextColor(COLORREF color) {
-		candTextColor_ = color;
-	}
-
-	COLORREF candHighlightTextColor() const {
-		return candHighlightTextColor_;
-	}
-
-	void setCandHighlightTextColor(COLORREF color) {
-		candHighlightTextColor_ = color;
-	}
-
-	COLORREF candCommentColor() const {
-		return candCommentColor_;
-	}
-
-	void setCandCommentColor(COLORREF color) {
-		candCommentColor_ = color;
-	}
-
-	COLORREF candCommentHighlightColor() const {
-		return candCommentHighlightColor_;
-	}
-
-	void setCandCommentHighlightColor(COLORREF color) {
-		candCommentHighlightColor_ = color;
-	}
-
-	bool inlinePreedit() const {
-		return inlinePreedit_;
 	}
 
 	bool effectiveUiLess() const {
@@ -256,7 +186,7 @@ public:
 		if (autoInlinePreeditDisabled_) {
 			return false;
 		}
-		return effectiveUiLess() || inlinePreedit_;
+		return effectiveUiLess() || kTypeDuckInlinePreedit;
 	}
 
 	bool effectiveExternalPreedit() const {
@@ -267,29 +197,17 @@ public:
 		return !autoDisableTsfCandidateUi_;
 	}
 
+	HFONT createCandidateFontForDpi(CandidateFontRole role, int dpiY) const;
+	HFONT createCandidateLanguageFontForDpi(TypeDuck::DisplayLanguage language, CandidateFontRole role, int dpiY) const;
+	COLORREF candidateColor(CandidateColorRole role) const;
+	void reloadCandidateAppearanceTheme();
+
 	virtual bool inlinePreeditEnabledForComposition() const override {
 		return effectiveInlinePreedit();
 	}
 
 	virtual bool shouldUseDummyCompositionAnchor() const override {
 		return !effectiveUiLess() && autoDummyAnchorCompat_;
-	}
-
-	void setInlinePreedit(bool inlinePreedit) {
-		inlinePreedit_ = inlinePreedit;
-		if (candidateWindow_) {
-			candidateWindow_->setPreeditText(candidatePreedit_);
-			candidateWindow_->setPreeditCursor(candidatePreeditCursor_);
-			invalidateCandidateUiCache();
-		}
-	}
-
-	bool autoPairQuotes() const {
-		return autoPairQuotes_;
-	}
-
-	void setAutoPairQuotes(bool autoPairQuotes) {
-		autoPairQuotes_ = autoPairQuotes;
 	}
 
 	void setTypeDuckDisplayPreferences(TypeDuck::DisplayPreferences preferences);
@@ -392,10 +310,12 @@ private:
 	void createCandidateWindow(Ime::EditSession* session);
 	void destroyCandidateWindow();
 	bool ensureCandidateWindowValid(const wchar_t* reason);
-	int candFontHeight();
-	int candCommentFontHeight();
 	void applyCandidateAppearanceNow();
 	void refreshCandidateAppearance();
+	std::wstring resolveCandidateRuntimeAppearanceThemePath() const;
+	std::wstring candidateFontStack(CandidateFontRole role) const;
+	int candidateFontPointSize(CandidateFontRole role) const;
+	bool loadCandidateAppearanceThemeFromFile(const std::wstring& path);
 	void reloadTypeDuckDisplayPreferences();
 	void applyUiLessOverrideState();
 	void invalidateCandidateUiCache();
@@ -433,28 +353,15 @@ private:
 	HFONT font_;
 	HFONT commentFont_;
 	bool updateFont_;
-	int candPerRow_;
 	int candidatePageIndex_;
 	int candidatePageSize_;
 	int candidateTotalCount_;
 	bool candidateHasPrevious_;
 	bool candidateHasNext_;
-	int candSpacing_;
 	std::wstring selKeys_;
-	bool candUseCursor_;
-	std::wstring candFontName_;
-	std::wstring candCommentFontName_;
-	int candFontSize_;
-	int candCommentFontSize_;
-	COLORREF candBackgroundColor_;
-	COLORREF candHighlightColor_;
-	COLORREF candTextColor_;
-	COLORREF candHighlightTextColor_;
-	COLORREF candCommentColor_;
-	COLORREF candCommentHighlightColor_;
+	std::map<std::wstring, std::vector<std::wstring>> appearanceFontStacks_;
+	std::map<std::wstring, COLORREF> appearancePalette_;
 	TypeDuck::DisplayPreferences typeDuckDisplayPreferences_;
-	bool inlinePreedit_;
-	bool autoPairQuotes_;
 	bool suppressNextCompositionTerminatedNotification_;
 	std::wstring candidatePreedit_;
 	int candidatePreeditCursor_;
