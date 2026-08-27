@@ -351,7 +351,6 @@ private:
 	std::unique_ptr<Ime::MessageWindow> messageWindow_;
 	UINT messageTimerId_;
 	HFONT font_;
-	HFONT commentFont_;
 	bool updateFont_;
 	int candidatePageIndex_;
 	int candidatePageSize_;

@@ -813,15 +813,6 @@ void CandidateWindow::setPreeditSelection(int start, int end) {
     }
 }
 
-void CandidateWindow::setCommentFont(HFONT) {
-    refreshThemeColors();
-    refreshOwnedFonts();
-    recalculateSize();
-    if (isVisible()) {
-        ::InvalidateRect(hwnd_, NULL, TRUE);
-    }
-}
-
 void CandidateWindow::setDisplayPreferences(TypeDuck::DisplayPreferences preferences) {
     displayPreferences_ = std::move(preferences);
     for (auto& item : items_) {

@@ -81,7 +81,6 @@ public:
     void setPreeditText(std::wstring text);
     void setPreeditCursor(int cursor);
     void setPreeditSelection(int start, int end);
-    void setCommentFont(HFONT font);
     void setDisplayPreferences(TypeDuck::DisplayPreferences preferences);
     void syncOwner(Ime::EditSession* session);
     void recalculateSize() override;

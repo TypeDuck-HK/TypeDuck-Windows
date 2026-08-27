@@ -602,7 +602,6 @@ TextService::TextService(ImeModule* module):
 	shouldShowCandidateWindowUI_ = !effectiveUiLess();
 	reloadCandidateAppearanceTheme();
 	font_ = createCandidateFontForDpi(CandidateFontRole::Interface, kCandidateDpiBaseline);
-	commentFont_ = createCandidateFontForDpi(CandidateFontRole::Interface, kCandidateDpiBaseline);
 }
 
 TextService::~TextService(void) {
@@ -620,8 +619,6 @@ TextService::~TextService(void) {
 
 	if(font_)
 		::DeleteObject(font_);
-	if(commentFont_)
-		::DeleteObject(commentFont_);
 }
 
 // virtual
@@ -1039,7 +1036,6 @@ void TextService::createCandidateWindow(Ime::EditSession* session) {
 		candidateWindow_->Release();  // decrease ref count caused by new
 
 		candidateWindow_->setFont(font_);
-		candidateWindow_->setCommentFont(commentFont_);
 		candidateWindow_->setDisplayPreferences(typeDuckDisplayPreferences_);
 		candidateWindow_->setPreeditText(candidatePreedit_);
 		candidateWindow_->setPreeditCursor(candidatePreeditCursor_);
@@ -1691,12 +1687,7 @@ void TextService::applyCandidateAppearanceNow() {
 		::DeleteObject(font_);
 		font_ = nullptr;
 	}
-	if (commentFont_) {
-		::DeleteObject(commentFont_);
-		commentFont_ = nullptr;
-	}
 	font_ = createCandidateFontForDpi(CandidateFontRole::Interface, kCandidateDpiBaseline);
-	commentFont_ = createCandidateFontForDpi(CandidateFontRole::Interface, kCandidateDpiBaseline);
 	updateFont_ = false;
 
 	if (messageWindow_) {
@@ -1704,7 +1695,6 @@ void TextService::applyCandidateAppearanceNow() {
 	}
 	if (candidateWindow_) {
 		candidateWindow_->setFont(font_);
-		candidateWindow_->setCommentFont(commentFont_);
 	}
 	refreshCandidateAppearance();
 }
