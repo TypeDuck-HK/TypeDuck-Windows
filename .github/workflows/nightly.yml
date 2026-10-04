@@ -122,7 +122,20 @@ jobs:
           $existingTag = $releaseList | Where-Object { $_.tagName -eq $tag } | Select-Object -ExpandProperty tagName -First 1
 
           if (-not [string]::IsNullOrWhiteSpace($existingTag)) {
-            gh release upload $tag $assetPath --clobber
+            $releaseJson = gh release view $tag --json assets
+            if ($LASTEXITCODE -ne 0) {
+              throw "Failed to query existing nightly release assets."
+            }
+            $release = $releaseJson | ConvertFrom-Json
+
+            foreach ($asset in $release.assets) {
+              gh release delete-asset $tag $asset.name --yes
+              if ($LASTEXITCODE -ne 0) {
+                throw "Failed to delete existing nightly release asset: $($asset.name)"
+              }
+            }
+
+            gh release upload $tag $assetPath
           }
           else {
             gh release create $tag $assetPath --title "Nightly" --prerelease
