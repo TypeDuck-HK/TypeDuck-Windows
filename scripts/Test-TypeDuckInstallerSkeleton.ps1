@@ -206,6 +206,27 @@ function Assert-InstallerScript {
         'TypeDuckSettings\.exe";\s*Description:.*Flags:\s*postinstall nowait skipifsilent runasoriginaluser',
         'TypeDuckAbout\.exe";\s*Description:.*Flags:\s*postinstall nowait skipifsilent runasoriginaluser'
     ) "Installer user-facing and settings-apply launcher process must run as the original user so APPDATA and launcher state are created for the right account."
+    Assert-AllMatch $Failures $Iss @(
+        "procedure MigrateLegacyTypeDuckUserMemory",
+        "ExpandConstant\('\{userappdata\}\\TypeDuck\\jyut6ping3\.userdb'\)",
+        "ExpandConstant\('\{userappdata\}\\TypeDuckIME\\Rime\\jyut6ping3\.userdb'\)",
+        "if DirExists\(SourceUserDb\) and \(not FileExists\(DestUserDb\)\) and \(not DirExists\(DestUserDb\)\) then",
+        "TryCopyDirectoryTree\(SourceUserDb, DestUserDb\)",
+        "RunSetupHelper\(BuildInstallSetupHelperParameters\('/i'\)"
+    ) "Installer must migrate the legacy TypeDuck jyut6ping3 user memory before post-install launches."
+    Assert-AllMatch $Failures $Iss @(
+        "function TryCopyDirectoryTree\(const SourceDir: String; const DestDir: String\): Boolean",
+        "if not ForceDirectories\(DestDir\) then\s*Exit;",
+        "else if not FileCopy\(SourcePath, DestPath, False\) then\s*Exit;"
+    ) "Legacy TypeDuck user memory migration must be best-effort and must not block installation on copy failure."
+    Assert-NotMatch $Failures $Iss "UserMemoryMigrationFailureText|RaiseException\(UserMemoryMigrationFailureText\)" `
+        "Legacy TypeDuck user memory migration must not surface a blocking install failure."
+    if ($Iss -notmatch "if CurStep = ssInstall then\s*begin\s*MigrateLegacyTypeDuckUserMemory;\s*HadExistingInstall := ExistingImeInstallationPresent;") {
+        Add-Failure $Failures "Legacy TypeDuck user memory migration must run during ssInstall before process cleanup, setup helper work, and installer [Run] entries."
+    }
+    if ($Iss -match "if CurStep = ssPostInstall then\s*begin\s*MigrateLegacyTypeDuckUserMemory;") {
+        Add-Failure $Failures "Legacy TypeDuck user memory migration must not run from ssPostInstall because normal [Run] entries are processed before that phase."
+    }
     Assert-NotMatch $Failures $Iss 'TypeDuckSettings\.exe";\s*Parameters:\s*"/apply-settings"' `
         "Install-time settings apply must be routed through the Launcher flag, not a second mandatory [Run] entry."
     Assert-NotMatch $Failures $Iss 'TypeDuckSettings\.exe";\s*Parameters:\s*"/apply-settings";[^\r\n]*postinstall' `

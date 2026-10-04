@@ -280,6 +280,54 @@ begin
     '', SW_HIDE, ewWaitUntilTerminated, R);
 end;
 
+function TryCopyDirectoryTree(const SourceDir: String; const DestDir: String): Boolean;
+var
+  FindRec: TFindRec;
+  SourcePath: String;
+  DestPath: String;
+begin
+  Result := False;
+
+  if not ForceDirectories(DestDir) then
+    Exit;
+
+  if FindFirst(AddBackslash(SourceDir) + '*', FindRec) then
+  begin
+    try
+      repeat
+        if (FindRec.Name <> '.') and (FindRec.Name <> '..') then
+        begin
+          SourcePath := AddBackslash(SourceDir) + FindRec.Name;
+          DestPath := AddBackslash(DestDir) + FindRec.Name;
+          if DirExists(SourcePath) then
+          begin
+            if not TryCopyDirectoryTree(SourcePath, DestPath) then
+              Exit;
+          end
+          else if not FileCopy(SourcePath, DestPath, False) then
+            Exit;
+        end;
+      until not FindNext(FindRec);
+    finally
+      FindClose(FindRec);
+    end;
+  end;
+
+  Result := True;
+end;
+
+procedure MigrateLegacyTypeDuckUserMemory;
+var
+  SourceUserDb: String;
+  DestUserDb: String;
+begin
+  SourceUserDb := ExpandConstant('{userappdata}\TypeDuck\jyut6ping3.userdb');
+  DestUserDb := ExpandConstant('{userappdata}\TypeDuckIME\Rime\jyut6ping3.userdb');
+
+  if DirExists(SourceUserDb) and (not FileExists(DestUserDb)) and (not DirExists(DestUserDb)) then
+    TryCopyDirectoryTree(SourceUserDb, DestUserDb);
+end;
+
 function GetSetupHelperPath: String;
 begin
   Result := ExpandConstant('{app}\TypeDuckSetupHelper.exe');
@@ -338,6 +386,7 @@ var
 begin
   if CurStep = ssInstall then
   begin
+    MigrateLegacyTypeDuckUserMemory;
     HadExistingInstall := ExistingImeInstallationPresent;
     StopTypeDuckProcesses;
     DeleteTypeDuckReregisterTask;
