@@ -5,6 +5,12 @@
 #define MyAppName "TypeDuck 粵語輸入法 / TypeDuck Cantonese IME"
 #define MyAppPublisher "香港教育大學 The Education University of Hong Kong"
 #define MyAppURL "https://www.typeduck.hk/"
+#define VersionFileHandle FileOpen(AddBackslash(SourcePath) + "..\version.txt")
+#if !VersionFileHandle
+  #error "Cannot open version.txt"
+#endif
+#define MyAppVersion Trim(FileRead(VersionFileHandle))
+#expr FileClose(VersionFileHandle)
 ; Inno Setup directives escape a literal leading "{" as "{{".
 ; AppId therefore intentionally uses a doubled opening brace; code and registry
 ; strings use normal single-braced GUID constants below.
@@ -19,11 +25,20 @@
 [Setup]
 AppId={#MyAppId}
 AppName={#MyAppName}
-AppVersion=1.0.0
+AppVersion={#MyAppVersion}
 AppPublisher={#MyAppPublisher}
 AppPublisherURL={#MyAppURL}
 AppSupportURL={#MyAppURL}
 AppUpdatesURL={#MyAppURL}
+VersionInfoVersion={#MyAppVersion}.0
+VersionInfoProductVersion={#MyAppVersion}.0
+VersionInfoCompany={#MyAppPublisher}
+VersionInfoCopyright=© 香港教育大學 The Education University of Hong Kong
+VersionInfoDescription={#MyAppName} Setup
+VersionInfoOriginalFileName=typeduck-windows-ime-setup.exe
+VersionInfoProductName={#MyAppName}
+VersionInfoProductTextVersion={#MyAppVersion}
+VersionInfoTextVersion={#MyAppVersion}
 DefaultDirName={autopf32}\TypeDuckIME
 DisableProgramGroupPage=yes
 PrivilegesRequired=admin

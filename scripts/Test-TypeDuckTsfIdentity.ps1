@@ -156,10 +156,12 @@ function Test-ResourceMetadata {
         "Resource script must use Traditional Chinese Hong Kong metadata."
     Assert-Match $Failures $ResourceSource "LANG_ENGLISH,\s*SUBLANG_ENGLISH_US|0x409|0x0409" `
         "Resource script must include English resource metadata."
-    Assert-Match $Failures $ResourceSource "VALUE `"CompanyName`", `"TypeDuck`"" `
-        "Resource CompanyName must be TypeDuck."
-    Assert-Match $Failures $ResourceSource "VALUE `"FileDescription`", `"TypeDuck 粵語輸入法 / TypeDuck Cantonese IME`"" `
-        "Resource FileDescription must be bilingual TypeDuck text."
+    Assert-Match $Failures $ResourceSource "VALUE `"CompanyName`", `"香港教育大學 The Education University of Hong Kong`"" `
+        "Resource CompanyName must be the TypeDuck publisher."
+    Assert-Match $Failures $ResourceSource "VALUE `"FileDescription`", `"TypeDuck Text Service`"" `
+        "Resource FileDescription must describe TypeDuckTextService.dll."
+    Assert-Match $Failures $ResourceSource "VALUE `"LegalCopyright`", `"© 香港教育大學 The Education University of Hong Kong`"" `
+        "Resource LegalCopyright must be the TypeDuck publisher copyright."
     Assert-Match $Failures $ResourceSource "VALUE `"ProductName`", `"TypeDuck 粵語輸入法 / TypeDuck Cantonese IME`"" `
         "Resource ProductName must be bilingual TypeDuck text."
     Assert-Match $Failures $ResourceSource "VALUE `"OriginalFilename`", `"TypeDuckTextService\.dll`"" `

@@ -1,5 +1,7 @@
 project(SetupHelper)
 
+configure_file("SetupHelperVersion.rc.in" "SetupHelperVersion.rc" @ONLY)
+
 add_executable(SetupHelper WIN32
     SetupHelper.cpp
     SetupHelper.rc

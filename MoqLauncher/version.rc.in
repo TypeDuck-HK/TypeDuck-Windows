@@ -6,8 +6,8 @@
 #pragma code_page(65001)
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION @MOQI_VERSION_MAJOR@,@MOQI_VERSION_MINOR@,@MOQI_VERSION_PATCH@
- PRODUCTVERSION @MOQI_VERSION_MAJOR@,@MOQI_VERSION_MINOR@,@MOQI_VERSION_PATCH@
+ FILEVERSION @MOQI_VERSION_MAJOR@,@MOQI_VERSION_MINOR@,@MOQI_VERSION_PATCH@,0
+ PRODUCTVERSION @MOQI_VERSION_MAJOR@,@MOQI_VERSION_MINOR@,@MOQI_VERSION_PATCH@,0
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -22,14 +22,14 @@ BEGIN
     BEGIN
         BLOCK "0c0404b0"
         BEGIN
-            VALUE "CompanyName", "TypeDuck"
-            VALUE "FileDescription", "TypeDuck 粵語輸入法 / TypeDuck Cantonese IME"
-            VALUE "FileVersion", "@MOQI_VERSION_MAJOR@.@MOQI_VERSION_MINOR@.@MOQI_VERSION_PATCH@"
+            VALUE "CompanyName", "香港教育大學 The Education University of Hong Kong"
+            VALUE "FileDescription", "TypeDuck Launcher"
+            VALUE "FileVersion", "@MOQI_VERSION@"
             VALUE "InternalName", "TypeDuckLauncher.exe"
-            VALUE "LegalCopyright", "Copyright (C) TypeDuck"
+            VALUE "LegalCopyright", "© 香港教育大學 The Education University of Hong Kong"
             VALUE "OriginalFilename", "TypeDuckLauncher.exe"
             VALUE "ProductName", "TypeDuck 粵語輸入法 / TypeDuck Cantonese IME"
-            VALUE "ProductVersion", "@MOQI_VERSION_MAJOR@.@MOQI_VERSION_MINOR@.@MOQI_VERSION_PATCH@"
+            VALUE "ProductVersion", "@MOQI_VERSION@"
         END
     END
     BLOCK "VarFileInfo"

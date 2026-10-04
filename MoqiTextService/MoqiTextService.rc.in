@@ -60,8 +60,8 @@ IDI_TYPEDUCK_PROFILE ICON "../TypeDuckSettings/assets/TypeDuck_Small.ico"
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION @MOQI_VERSION_MAJOR@,@MOQI_VERSION_MINOR@,@MOQI_VERSION_PATCH@
- PRODUCTVERSION @MOQI_VERSION_MAJOR@,@MOQI_VERSION_MINOR@,@MOQI_VERSION_PATCH@
+ FILEVERSION @MOQI_VERSION_MAJOR@,@MOQI_VERSION_MINOR@,@MOQI_VERSION_PATCH@,0
+ PRODUCTVERSION @MOQI_VERSION_MAJOR@,@MOQI_VERSION_MINOR@,@MOQI_VERSION_PATCH@,0
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -76,25 +76,25 @@ BEGIN
     BEGIN
         BLOCK "0C0404B0"
         BEGIN
-            VALUE "CompanyName", "TypeDuck"
-            VALUE "FileDescription", "TypeDuck 粵語輸入法 / TypeDuck Cantonese IME"
-            VALUE "FileVersion", "@MOQI_VERSION_MAJOR@.@MOQI_VERSION_MINOR@.@MOQI_VERSION_PATCH@"
+            VALUE "CompanyName", "香港教育大學 The Education University of Hong Kong"
+            VALUE "FileDescription", "TypeDuck Text Service"
+            VALUE "FileVersion", "@MOQI_VERSION@"
             VALUE "InternalName", "TypeDuckTextService.dll"
-            VALUE "LegalCopyright", "Copyright (C) 2026 TypeDuck developers"
+            VALUE "LegalCopyright", "© 香港教育大學 The Education University of Hong Kong"
             VALUE "OriginalFilename", "TypeDuckTextService.dll"
             VALUE "ProductName", "TypeDuck 粵語輸入法 / TypeDuck Cantonese IME"
-            VALUE "ProductVersion", "@MOQI_VERSION_MAJOR@.@MOQI_VERSION_MINOR@.@MOQI_VERSION_PATCH@"
+            VALUE "ProductVersion", "@MOQI_VERSION@"
         END
         BLOCK "040904B0"
         BEGIN
-            VALUE "CompanyName", "TypeDuck"
-            VALUE "FileDescription", "TypeDuck 粵語輸入法 / TypeDuck Cantonese IME"
-            VALUE "FileVersion", "@MOQI_VERSION_MAJOR@.@MOQI_VERSION_MINOR@.@MOQI_VERSION_PATCH@"
+            VALUE "CompanyName", "香港教育大學 The Education University of Hong Kong"
+            VALUE "FileDescription", "TypeDuck Text Service"
+            VALUE "FileVersion", "@MOQI_VERSION@"
             VALUE "InternalName", "TypeDuckTextService.dll"
-            VALUE "LegalCopyright", "Copyright (C) 2026 TypeDuck developers"
+            VALUE "LegalCopyright", "© 香港教育大學 The Education University of Hong Kong"
             VALUE "OriginalFilename", "TypeDuckTextService.dll"
             VALUE "ProductName", "TypeDuck 粵語輸入法 / TypeDuck Cantonese IME"
-            VALUE "ProductVersion", "@MOQI_VERSION_MAJOR@.@MOQI_VERSION_MINOR@.@MOQI_VERSION_PATCH@"
+            VALUE "ProductVersion", "@MOQI_VERSION@"
         END
     END
     BLOCK "VarFileInfo"
