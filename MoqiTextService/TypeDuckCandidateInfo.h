@@ -76,7 +76,6 @@ struct CandidateEntry {
   std::wstring collocation;
   std::map<DisplayLanguage, std::wstring> definitions;
   bool isJyutpingOnly = false;
-  bool malformed = false;
 
   static CandidateEntry fromCsvRow(const std::wstring& csv);
   static CandidateEntry jyutpingOnly(std::wstring honzi, std::wstring jyutping);

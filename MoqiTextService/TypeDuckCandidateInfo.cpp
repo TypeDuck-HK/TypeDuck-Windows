@@ -13,11 +13,6 @@
 namespace Moqi::TypeDuck {
 namespace {
 
-constexpr size_t kMaxRawCommentLength = 64 * 1024;
-constexpr size_t kMaxCsvRowLength = 16 * 1024;
-constexpr size_t kMaxCsvFieldLength = 4096;
-constexpr size_t kLookupFilterColumnCount = 20;
-
 class ConsumedString {
 public:
   explicit ConsumedString(std::wstring value) : value_(std::move(value)) {}
@@ -73,10 +68,6 @@ std::vector<std::wstring> split(const std::wstring& value, wchar_t delimiter) {
 
 std::vector<std::wstring> parseCsv(const std::wstring& csv) {
   std::vector<std::wstring> fields;
-  if (csv.size() > kMaxCsvRowLength) {
-    return fields;
-  }
-
   bool isQuoted = false;
   std::wstring value;
   for (size_t i = 0; i < csv.size(); ++i) {
@@ -94,18 +85,21 @@ std::vector<std::wstring> parseCsv(const std::wstring& csv) {
     } else if (value.empty() && ch == L'"') {
       isQuoted = true;
     } else if (ch == L',') {
-      fields.push_back(value.size() > kMaxCsvFieldLength
-                           ? value.substr(0, kMaxCsvFieldLength)
-                           : value);
+      fields.push_back(value);
       value.clear();
     } else {
       value.push_back(ch);
     }
   }
-  fields.push_back(value.size() > kMaxCsvFieldLength
-                       ? value.substr(0, kMaxCsvFieldLength)
-                       : value);
+  fields.push_back(value);
   return fields;
+}
+
+const std::wstring& fieldOrEmpty(
+    const std::vector<std::wstring>& fields,
+    size_t index) {
+  static const std::wstring kEmpty;
+  return index < fields.size() ? fields[index] : kEmpty;
 }
 
 std::wstring formatJyutping(const std::wstring& jyutping) {
@@ -318,33 +312,29 @@ std::vector<std::wstring> OtherDataRow::values() const {
 CandidateEntry CandidateEntry::fromCsvRow(const std::wstring& csv) {
   CandidateEntry entry;
   const std::vector<std::wstring> fields = parseCsv(csv);
-  if (fields.size() != kLookupFilterColumnCount) {
-    entry.malformed = true;
-    return entry;
-  }
 
   // D-10 lookup-filter header:
   // match_input_buffer,honzi,jyutping,canonical_honzi,canonical_jyutping,
-  // components_honzi,components_jyutping,pron_label,lit_col_reading,pos,
-  // register,label,written_form,vernacular_form,collocation,eng,hin,urd,nep,ind
-  entry.matchInputBuffer = fields[0];
-  entry.honzi = fields[1];
-  entry.jyutping = formatJyutping(fields[2]);
-  entry.canonicalHonzi = fields[3];
-  entry.canonicalJyutping = formatJyutping(fields[4]);
-  entry.pronLabel = fields[7];
-  entry.litColReading = fields[8];
-  entry.partOfSpeech = fields[9];
-  entry.registerValue = fields[10];
-  entry.label = fields[11];
-  entry.writtenForm = fields[12];
-  entry.vernacularForm = fields[13];
-  entry.collocation = fields[14];
-  entry.definitions[DisplayLanguage::English] = fields[15];
-  entry.definitions[DisplayLanguage::Hindi] = fields[16];
-  entry.definitions[DisplayLanguage::Urdu] = fields[17];
-  entry.definitions[DisplayLanguage::Nepali] = fields[18];
-  entry.definitions[DisplayLanguage::Indonesian] = fields[19];
+  // pron_label,lit_col_reading,pos,register,label,written_form,
+  // vernacular_form,collocation,eng,hin,urd,nep,ind
+  entry.matchInputBuffer = fieldOrEmpty(fields, 0);
+  entry.honzi = fieldOrEmpty(fields, 1);
+  entry.jyutping = formatJyutping(fieldOrEmpty(fields, 2));
+  entry.canonicalHonzi = fieldOrEmpty(fields, 3);
+  entry.canonicalJyutping = formatJyutping(fieldOrEmpty(fields, 4));
+  entry.pronLabel = fieldOrEmpty(fields, 5);
+  entry.litColReading = fieldOrEmpty(fields, 6);
+  entry.partOfSpeech = fieldOrEmpty(fields, 7);
+  entry.registerValue = fieldOrEmpty(fields, 8);
+  entry.label = fieldOrEmpty(fields, 9);
+  entry.writtenForm = fieldOrEmpty(fields, 10);
+  entry.vernacularForm = fieldOrEmpty(fields, 11);
+  entry.collocation = fieldOrEmpty(fields, 12);
+  entry.definitions[DisplayLanguage::English] = fieldOrEmpty(fields, 13);
+  entry.definitions[DisplayLanguage::Hindi] = fieldOrEmpty(fields, 14);
+  entry.definitions[DisplayLanguage::Urdu] = fieldOrEmpty(fields, 15);
+  entry.definitions[DisplayLanguage::Nepali] = fieldOrEmpty(fields, 16);
+  entry.definitions[DisplayLanguage::Indonesian] = fieldOrEmpty(fields, 17);
   return entry;
 }
 
@@ -471,7 +461,7 @@ std::vector<LanguageRow> CandidateEntry::otherLanguages(
 }
 
 bool CandidateEntry::isDictionaryEntry(const DisplayPreferences& preferences) const {
-  if (isJyutpingOnly || malformed) {
+  if (isJyutpingOnly) {
     return false;
   }
   if (!partOfSpeech.empty() || !registerValue.empty() || !writtenForm.empty() ||
@@ -501,9 +491,7 @@ CandidateInfo::CandidateInfo(
     std::wstring fallbackJyutping)
     : label(std::move(candidateLabel)),
       text(std::move(candidateText)),
-      rawComment(commentString.size() > kMaxRawCommentLength
-                     ? commentString.substr(0, kMaxRawCommentLength)
-                     : commentString) {
+      rawComment(std::move(commentString)) {
   ConsumedString comment(rawComment);
   isReverseLookup = comment.consume(L'\v');
   note = comment.consumeUntil(L'\f');
@@ -517,10 +505,7 @@ CandidateInfo::CandidateInfo(
   if (comment.consume(L'\r')) {
     for (const auto& row : split(comment.remaining(), L'\r')) {
       if (!row.empty()) {
-        CandidateEntry entry = CandidateEntry::fromCsvRow(row);
-        if (!entry.malformed) {
-          entries.push_back(std::move(entry));
-        }
+        entries.push_back(CandidateEntry::fromCsvRow(row));
       }
     }
   } else {

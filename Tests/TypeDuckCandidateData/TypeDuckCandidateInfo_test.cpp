@@ -15,27 +15,27 @@ using Moqi::TypeDuck::JyutpingVisibility;
 namespace {
 
 std::wstring NeiRow() {
-  return L"1,你,nei5,,,,,,,oth,,,,,,you (singular),आप,تم,तपाईं,kamu";
+  return L"1,你,nei5,,,,,oth,,,,,,you (singular),आप,تم,तपाईं,kamu";
 }
 
 std::wstring NeiCanonicalRow() {
-  return L"1,呢,nei1,,ni1,,,,,part,yue,,這,,,this,(particle),(particle),,(imbuhan kata)";
+  return L"1,呢,nei1,,ni1,,,part,yue,,這,,,this,(particle),(particle),,(imbuhan kata)";
 }
 
 std::wstring HouGoodRow() {
-  return L"1,好,hou2,,,,,,,adj,yue,,,,,good; well,अच्छा,اچھا,राम्रो,baik";
+  return L"1,好,hou2,,,,,adj,yue,,,,,good; well,अच्छा,اچھا,राम्रो,baik";
 }
 
 std::wstring HouFondRow() {
-  return L"1,好,hou3,,,,,,,v,yue,,,,,to like; to be fond of,,,,suka";
+  return L"1,好,hou3,,,,,v,yue,,,,,to like; to be fond of,,,,suka";
 }
 
 std::wstring HousamRow() {
-  return L"1,好心,hou2 sam1,,,,,,,adj|adv,yue,,拜托,,,kind; come on,दयालु,نرم دل,दयालु,baik hati";
+  return L"1,好心,hou2 sam1,,,,,adj|adv,yue,,拜托,,,kind; come on,दयालु,نرم دل,दयालु,baik hati";
 }
 
 std::wstring HousamNeiRow() {
-  return L"1,你,nei5,,,,,,,oth,,,,,,you (singular),आप,تم,तपाईं,kamu";
+  return L"1,你,nei5,,,,,oth,,,,,,you (singular),आप,تم,तपाईं,kamu";
 }
 
 DisplayPreferences MultilingualIndonesianPreferences() {
@@ -68,7 +68,7 @@ TEST(TypeDuckCandidateInfoTest, PreservesLookupFilterControlSeparatorSemantics) 
 
 TEST(TypeDuckCandidateInfoTest, ParsesCsvRowsWithLookupFilterHeaderOrderAndQuotes) {
   const std::wstring csv =
-      L"1,\"你\",nei5,,,,,,,oth,,,,,,\"quoted \"\"meaning\"\", with comma\",,,,";
+      L"1,\"你\",nei5,,,,,oth,,,,,,\"quoted \"\"meaning\"\", with comma\",,,,";
   const CandidateEntry entry = CandidateEntry::fromCsvRow(csv);
 
   EXPECT_EQ(entry.matchInputBuffer, L"1");
@@ -76,6 +76,15 @@ TEST(TypeDuckCandidateInfoTest, ParsesCsvRowsWithLookupFilterHeaderOrderAndQuote
   EXPECT_EQ(entry.jyutping, L"nei5");
   EXPECT_EQ(entry.definition(DisplayLanguage::English), L"quoted \"meaning\", with comma");
   EXPECT_TRUE(entry.definition(DisplayLanguage::Hindi).empty());
+}
+
+TEST(TypeDuckCandidateInfoTest, AcceptsRowsWithMissingTrailingColumns) {
+  const CandidateEntry entry = CandidateEntry::fromCsvRow(L"1,你,nei5");
+
+  EXPECT_EQ(entry.matchInputBuffer, L"1");
+  EXPECT_EQ(entry.honzi, L"你");
+  EXPECT_EQ(entry.jyutping, L"nei5");
+  EXPECT_TRUE(entry.definition(DisplayLanguage::English).empty());
 }
 
 TEST(TypeDuckCandidateInfoTest, MapsNeiToCandidateDictionaryAndMoreLanguages) {
