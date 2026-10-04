@@ -1928,21 +1928,22 @@ void CandidateWindow::paintDictionaryEntry(
         ::DrawTextW(hdc, pronType.c_str(), static_cast<int>(pronType.length()), &pronTypeRc,
                     DT_LEFT | DT_BOTTOM | DT_SINGLELINE | DT_NOPREFIX | DT_END_ELLIPSIS);
     }
-    y += titleHeight + spacing;
+    y += titleHeight;
+    bool hasDrawnSection = titleHeight > 0;
+    bool hasTrailingFieldSpacing = false;
+    const auto beginSection = [&]() {
+        if (hasTrailingFieldSpacing) {
+            y -= fieldSpacing;
+            hasTrailingFieldSpacing = false;
+        }
+        if (hasDrawnSection) {
+            y += spacing;
+        }
+        hasDrawnSection = true;
+    };
 
     int bodyX = panelRc.left + padX;
-    const int bodyTop = y;
-    const int bodyHeight =
-        (std::max)(scalePx(kDictionaryBodyMinHeight),
-                   static_cast<int>(textExtent(hdc, bodyFont, L"Ag").cy) + posPadding * 2);
-    if (paint) {
-        paintPartOfSpeechPills(
-            hdc, bodyX, bodyTop + scalePx(kDictionaryPillBaselineOffset), right,
-            entry.formattedPartsOfSpeech(), posFont);
-    }
-    if (!entry.formattedPartsOfSpeech().empty()) {
-        bodyX += definitionGap - posGap;
-    }
+    const auto partsOfSpeech = entry.formattedPartsOfSpeech();
 
     std::wstring body;
     for (const auto& reg : entry.formattedRegister()) {
@@ -1972,21 +1973,45 @@ void CandidateWindow::paintDictionaryEntry(
             body += mainDefinition;
         }
     }
-    RECT bodyRc = {bodyX, bodyTop, right, bodyTop + bodyHeight};
-    if (paint) {
-        ::SelectObject(hdc, bodyFont);
-        ::SetTextColor(hdc, textColor_);
-        ::DrawTextW(hdc, body.c_str(), static_cast<int>(body.length()), &bodyRc,
-                    DT_LEFT | DT_TOP | DT_SINGLELINE | DT_NOPREFIX | DT_END_ELLIPSIS);
+    if (!partsOfSpeech.empty() || !body.empty()) {
+        beginSection();
+        const int bodyTop = y;
+        const int bodyHeight =
+            (std::max)(scalePx(kDictionaryBodyMinHeight),
+                       static_cast<int>(textExtent(hdc, bodyFont, L"Ag").cy) + posPadding * 2);
+        if (paint) {
+            paintPartOfSpeechPills(
+                hdc, bodyX, bodyTop + scalePx(kDictionaryPillBaselineOffset), right,
+                partsOfSpeech, posFont);
+        }
+        if (!partsOfSpeech.empty()) {
+            bodyX += definitionGap - posGap;
+        }
+
+        RECT bodyRc = {bodyX, bodyTop, right, bodyTop + bodyHeight};
+        if (paint) {
+            ::SelectObject(hdc, bodyFont);
+            ::SetTextColor(hdc, textColor_);
+            ::DrawTextW(hdc, body.c_str(), static_cast<int>(body.length()), &bodyRc,
+                        DT_LEFT | DT_TOP | DT_SINGLELINE | DT_NOPREFIX | DT_END_ELLIPSIS);
+        }
+        y = bodyRc.bottom;
     }
-    y = bodyRc.bottom + spacing;
 
     int keyWidth = 0;
     for (const auto& other : entry.otherData()) {
         keyWidth = (std::max)(keyWidth, static_cast<int>(textExtent(hdc, bodyFont, other.name).cx));
     }
+    bool hasOtherData = false;
     for (const auto& other : entry.otherData()) {
         const std::vector<std::wstring> values = other.values();
+        if (values.empty()) {
+            continue;
+        }
+        if (!hasOtherData) {
+            beginSection();
+            hasOtherData = true;
+        }
         const int labelHeight = static_cast<int>(textExtent(hdc, bodyFont, other.name).cy);
         for (int i = 0, n = static_cast<int>(values.size()); i < n; ++i) {
             const int lineHeight = (std::max)(labelHeight,
@@ -2010,12 +2035,13 @@ void CandidateWindow::paintDictionaryEntry(
                             DT_LEFT | DT_TOP | DT_SINGLELINE | DT_NOPREFIX | DT_END_ELLIPSIS);
             }
             y += lineHeight + fieldSpacing;
+            hasTrailingFieldSpacing = true;
         }
     }
 
     const auto moreLanguages = entry.otherLanguages(displayPreferences_);
     if (!moreLanguages.empty()) {
-        y += spacing - fieldSpacing;
+        beginSection();
         RECT captionRc = {panelRc.left + padX, y, right, y + textExtent(hdc, captionFont, L"More Languages").cy};
         const std::wstring caption = L"More Languages";
         if (paint) {
@@ -2049,10 +2075,14 @@ void CandidateWindow::paintDictionaryEntry(
                             DT_LEFT | DT_BOTTOM | DT_SINGLELINE | DT_NOPREFIX | DT_END_ELLIPSIS);
             }
             y += lineHeight + fieldSpacing;
+            hasTrailingFieldSpacing = true;
         }
     }
 
-    y += entrySpacing - fieldSpacing + padY;
+    if (hasTrailingFieldSpacing) {
+        y -= fieldSpacing;
+    }
+    y += entrySpacing + padY;
     ::SelectObject(hdc, oldFont);
 }
 
