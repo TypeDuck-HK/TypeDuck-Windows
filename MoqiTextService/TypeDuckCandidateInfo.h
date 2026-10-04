@@ -55,7 +55,6 @@ struct DisplayPreferences {
 };
 
 const std::vector<DisplayLanguage>& allDisplayLanguages();
-std::wstring languageCode(DisplayLanguage language);
 std::wstring languageName(DisplayLanguage language);
 std::wstring languageLabel(DisplayLanguage language);
 std::wstring jyutpingVisibilityLabel(JyutpingVisibility visibility);

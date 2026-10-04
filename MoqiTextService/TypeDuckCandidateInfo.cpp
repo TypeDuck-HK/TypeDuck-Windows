@@ -263,22 +263,6 @@ const std::vector<DisplayLanguage>& allDisplayLanguages() {
   return kLanguages;
 }
 
-std::wstring languageCode(DisplayLanguage language) {
-  switch (language) {
-  case DisplayLanguage::English:
-    return L"eng";
-  case DisplayLanguage::Hindi:
-    return L"hin";
-  case DisplayLanguage::Indonesian:
-    return L"ind";
-  case DisplayLanguage::Nepali:
-    return L"nep";
-  case DisplayLanguage::Urdu:
-    return L"urd";
-  }
-  return L"";
-}
-
 std::wstring languageName(DisplayLanguage language) {
   switch (language) {
   case DisplayLanguage::English:
