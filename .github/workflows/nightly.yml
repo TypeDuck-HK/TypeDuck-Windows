@@ -39,19 +39,12 @@ jobs:
           submodules: recursive
           fetch-depth: 0
 
-      - name: Download TypeDuck schema build
-        run: |
-          $schemaDir = Join-Path $env:GITHUB_WORKSPACE "TypeDuck-HK-schema"
-          $schemaZip = Join-Path $env:RUNNER_TEMP "TypeDuck-Windows.zip"
-
-          if (Test-Path -LiteralPath $schemaDir) {
-            Remove-Item -LiteralPath $schemaDir -Recurse -Force
-          }
-
-          Invoke-WebRequest `
-            -Uri "https://github.com/TypeDuck-HK/schema/releases/download/latest/TypeDuck-Windows.zip" `
-            -OutFile $schemaZip
-          Expand-Archive -Path $schemaZip -DestinationPath $schemaDir -Force
+      - name: Checkout TypeDuck schema
+        uses: actions/checkout@v4
+        with:
+          repository: TypeDuck-HK/schema
+          ref: desktop
+          path: TypeDuck-HK-schema
 
       - name: Apply TypeDuck submodule patches
         working-directory: ${{ github.workspace }}/TypeDuck-Windows
